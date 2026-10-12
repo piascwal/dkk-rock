@@ -58,7 +58,6 @@ const SONS: Record<string, Son> = {
     const f = [523, 587, 659, 784][Math.floor(Math.random() * 4)]!;
     s.note({ freq: f, duree: 0.18, type: 'square', volume: 0.05 * v, filtre: 3000 });
   },
-  bouclier: (s, v) => s.note({ freq: 1400, vers: 900, duree: 0.06, type: 'square', volume: 0.06 * v }),
   drop: (s, v) => s.note({ freq: 900, vers: 100, duree: 0.5, type: 'sine', volume: 0.12 * v }),
   flash: (s, v) => s.bruit({ duree: 0.1, volume: 0.15 * v, passeHaut: 4000 }),
   boum: (s, v) => s.note({ freq: 140, vers: 40, duree: 0.25, type: 'sine', volume: 0.35 * v }),

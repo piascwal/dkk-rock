@@ -17,7 +17,7 @@ export const CLUB: Omit<DefNiveau, 'carte'> = {
   ],
   dialogues: {
     1: [
-      { qui: 'NARRATEUR', texte: 'Les videurs sont blindés de face. Contournez-les, ou faites tout sauter.' },
+      { qui: 'NARRATEUR', texte: 'Les videurs sont costauds : il en faut, du rock, pour les faire tomber.' },
     ],
     2: [
       { qui: 'MAT', texte: 'J’entends une ligne de basse. Une VRAIE.' },

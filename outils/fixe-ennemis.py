@@ -1,13 +1,21 @@
 #!/usr/bin/env python3
-"""Planches fixes (une seule image, sans animation) des ennemis fournis en sprite de base.
+"""Planches fixes (sans animation) des ennemis, une planche par type d'ennemi avec toutes ses apparences.
 
 Usage : python3 outils/fixe-ennemis.py      (Pillow et numpy requis)
-Entrées : assets-sources/ennemis/<nom>-base.png      Sorties : public/sprites/<nom>.png
 
-Le sprite est remis sur sa grille de pixels, recadré sur sa silhouette, puis réduit à la hauteur voulue (SPRITES)
-en gardant la palette (vote majoritaire par case, comme pour les héros). Aucun pixel n'est redessiné.
+Entrées : assets-sources/ennemis/<type>-<n>-base.png, n = 1, 2, 3... (une apparence par fichier)
+Sorties : public/sprites/<type>s.png (une image par apparence, côte à côte)
+          src/rendu/feuilles-ennemis.ts (généré : déclare les planches au jeu)
+
+Pour ajouter une apparence : déposer `<type>-<n suivant>-base.png` dans assets-sources/ennemis/ et relancer
+ce script. Le jeu en choisit une selon l'identifiant de l'ennemi (voir `variantes` dans feuilles.ts).
+
+Chaque sprite est remis sur sa grille de pixels, recadré sur sa silhouette, réduit à la hauteur voulue en
+gardant la palette (vote majoritaire par case, comme pour les héros), puis centré dans une image de largeur
+commune, les pieds en bas. Aucun pixel n'est redessiné.
 """
 import pathlib
+import re
 
 import numpy as np
 from PIL import Image
@@ -15,8 +23,15 @@ from PIL import Image
 RACINE = pathlib.Path(__file__).resolve().parent.parent
 SRC = RACINE / 'assets-sources' / 'ennemis'
 SORTIE = RACINE / 'public' / 'sprites'
-# hauteur de chaque sprite en jeu, en pixels (un héros fait 40 px)
-SPRITES = {'videur-polo': 46, 'videur-costume': 46, 'fetard-1': 40, 'fetard-2': 40, 'fetard-3': 40, 'fetard-4': 40}
+TS = RACINE / 'src' / 'rendu' / 'feuilles-ennemis.ts'
+
+# type d'ennemi : (genre dans jeu/vue.ts, hauteur en jeu en pixels ; un héros fait 40 px)
+TYPES = {
+    'fetard': ('FETARD', 40),
+    'videur': ('VIDEUR', 46),
+    'influenceur': ('INFLUENCEUR', 40),
+    'yeti': ('YETI', 50),
+}
 
 
 def natif(chemin):
@@ -44,14 +59,45 @@ def reduit(a, echelle):
     return Image.fromarray(res)
 
 
+def apparences(type_):
+    """Les fichiers <type>-<n>-base.png, dans l'ordre de n."""
+    trouves = []
+    for f in SRC.glob(f'{type_}-*-base.png'):
+        m = re.fullmatch(rf'{type_}-(\d+)-base\.png', f.name)
+        if m:
+            trouves.append((int(m.group(1)), f))
+    return [f for _, f in sorted(trouves)]
+
+
 def main():
     SORTIE.mkdir(parents=True, exist_ok=True)
-    for nom, hauteur in SPRITES.items():
-        nat = natif(SRC / f'{nom}-base.png')
-        echelle = hauteur / nat.shape[0]
-        im = reduit(nat, echelle)
-        im.save(SORTIE / f'{nom}.png')
-        print(nom, 'taille en jeu', im.width, 'x', im.height)
+    lignes = []
+    for type_, (genre, hauteur) in TYPES.items():
+        fichiers = apparences(type_)
+        if not fichiers:
+            continue
+        images = []
+        for f in fichiers:
+            nat = natif(f)
+            images.append(reduit(nat, hauteur / nat.shape[0]))
+        largeur = max(im.width for im in images)
+        h = max(im.height for im in images)
+        planche = Image.new('RGBA', (largeur * len(images), h), (0, 0, 0, 0))
+        for i, im in enumerate(images):
+            # centré dans sa case, les pieds en bas
+            planche.alpha_composite(im, (i * largeur + (largeur - im.width) // 2, h - im.height))
+        nom = f'{type_}s.png'
+        planche.save(SORTIE / nom)
+        print(f'{nom} : {len(images)} apparence(s), {largeur} x {h} px chacune (silhouettes : {[im.width for im in images]})')
+        lignes.append(
+            f"  [G.{genre}]: {{ fichier: '{nom}', w: {largeur}, h: {h}, images: [{len(images)}], variantes: true }},"
+        )
+    TS.write_text(
+        "// Fichier généré par outils/fixe-ennemis.py : ne pas modifier à la main.\n"
+        "import { G, type Genre } from '../jeu/vue';\n"
+        "import type { Feuille } from './feuilles';\n\n"
+        "export const FEUILLES_ENNEMIS: Partial<Record<Genre, Feuille>> = {\n" + '\n'.join(lignes) + '\n};\n'
+    )
 
 
 if __name__ == '__main__':

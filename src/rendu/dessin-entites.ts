@@ -42,7 +42,8 @@ export function dessineEntite(
   const blanc = v.clignote && !heros && !estTir;
   const pb = blanc ? (x0: number, y0: number, w: number, h: number) => p(x0, y0, w, h, '#ffffff') : p;
 
-  const compteur = heros ? (v.f & 15) * 2 : v.f;
+  // sprites à apparences : l'identifiant choisit l'apparence ; héros : phase d'animation ; autres : compteur
+  const compteur = FEUILLES[v.g]?.variantes ? v.id : heros ? (v.f & 15) * 2 : v.f;
   if (dessineFeuille(ctx, v.g, v.e, compteur, heros !== undefined && (v.f & 128) !== 0)) {
     // une planche fournie remplace le dessin en code ; l'instrument d'un héros se pose par-dessus
     const epaule = FEUILLES[v.g]?.epaule;

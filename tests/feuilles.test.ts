@@ -18,6 +18,20 @@ describe('les planches de sprites', () => {
   });
 });
 
+describe('les apparences d’un ennemi', () => {
+  const f: Feuille = { fichier: 'x.png', w: 20, h: 40, images: [4], variantes: true };
+
+  it('sont choisies d’après l’identifiant de l’ennemi, toujours les mêmes pour un même ennemi', () => {
+    expect(caseDeLaPlanche(f, 1, 7)).toEqual({ col: 3, ligne: 0 });
+    expect(caseDeLaPlanche(f, 0, 7)).toEqual(caseDeLaPlanche(f, 9, 7));
+  });
+
+  it('se répartissent sur toutes les apparences', () => {
+    const vues = new Set(Array.from({ length: 40 }, (_, id) => caseDeLaPlanche(f, 0, id).col));
+    expect([...vues].sort()).toEqual([0, 1, 2, 3]);
+  });
+});
+
 describe('les planches déclarées', () => {
   it.each(Object.entries(FEUILLES))(
     'le genre %s : le fichier existe et ses dimensions collent à la déclaration',

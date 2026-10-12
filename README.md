@@ -39,7 +39,7 @@ minimale, et le Yéti Alpha) → la Plage du Tube de l'Été → la Ville Autotu
 - **Armes à ramasser** (ampli à lampes, vinyle de jazz, accordéon-flamme, cornemuse, triangle
   laser, gong sacré) ; **médiators d'or** : soin et spécial.
 - **Drapeaux** : point de reprise et sauvegarde. « Continuer » reprend au dernier drapeau.
-- Ennemis : fêtards autotunés, videurs à bouclier, danseurs du tube de l'été (kamikazes),
+- Ennemis : fêtards autotunés, videurs costauds, danseurs du tube de l'été (kamikazes),
   lanceurs de drops, drones à LED, influenceurs (le flash éblouit), yétis (n'attaquent que sur
   le temps), robots vocodeurs ; boss : Yéti Alpha, DJ Boucle et ses enceintes (son anneau
   d'hypnose inverse les commandes).

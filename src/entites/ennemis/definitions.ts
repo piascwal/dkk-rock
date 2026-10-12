@@ -14,8 +14,6 @@ import {
 export interface DefEnnemi {
   nom: string;
   genre: Genre;
-  /** plusieurs apparences possibles : une est tirée au sort à chaque apparition */
-  genres?: Genre[];
   pv: number;
   w: number;
   h: number;
@@ -29,8 +27,6 @@ export interface DefEnnemi {
   /** dégâts au contact */
   contact?: number;
   vole?: boolean;
-  /** insensible à ce qui vient de face (sauf les explosions) */
-  bouclier?: boolean;
   explose?: { rayon: number; degats: number };
   /** ce qu'il crie quand il vous repère */
   cris: string[];
@@ -40,7 +36,6 @@ export const ENNEMIS_PAR_LETTRE: Record<string, DefEnnemi> = {
   a: {
     nom: 'Fêtard autotuné',
     genre: G.FETARD,
-    genres: [G.FETARD, G.FETARD_2, G.FETARD_3, G.FETARD_4],
     pv: 2,
     w: 14,
     h: 38,
@@ -55,7 +50,6 @@ export const ENNEMIS_PAR_LETTRE: Record<string, DefEnnemi> = {
   b: {
     nom: 'Videur de club',
     genre: G.VIDEUR,
-    genres: [G.VIDEUR, G.VIDEUR_COSTUME],
     pv: 8,
     w: 20,
     h: 44,
@@ -66,7 +60,6 @@ export const ENNEMIS_PAR_LETTRE: Record<string, DefEnnemi> = {
     points: 250,
     comportement: charge,
     contact: 1,
-    bouclier: true,
     cris: ['Pas de baskets.', 'T’es pas sur la liste.', 'Pas ce soir.'],
   },
   c: {
@@ -117,8 +110,8 @@ export const ENNEMIS_PAR_LETTRE: Record<string, DefEnnemi> = {
     nom: 'Influenceur',
     genre: G.INFLUENCEUR,
     pv: 2,
-    w: 10,
-    h: 15,
+    w: 14,
+    h: 38,
     vitesse: 1,
     vision: 140,
     visionVerticale: 40,
@@ -131,8 +124,8 @@ export const ENNEMIS_PAR_LETTRE: Record<string, DefEnnemi> = {
     nom: 'Yéti minimal',
     genre: G.YETI,
     pv: 5,
-    w: 14,
-    h: 19,
+    w: 30,
+    h: 46,
     vitesse: 0.6,
     vision: 190,
     visionVerticale: 90,

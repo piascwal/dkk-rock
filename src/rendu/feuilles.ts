@@ -1,4 +1,5 @@
 import { G, type Genre } from '../jeu/vue';
+import { FEUILLES_ENNEMIS } from './feuilles-ennemis';
 
 /**
  * Les planches de sprites : des images (PNG à fond transparent) qui remplacent les dessins faits
@@ -26,6 +27,11 @@ export interface Feuille {
    * décalage horizontal depuis le milieu, hauteur de l'épaule au-dessus des pieds, en pixels du jeu.
    */
   epaule?: { x: number; y: number };
+  /**
+   * Les images de la ligne 0 ne sont pas une animation mais des apparences différentes du même personnage :
+   * le jeu en choisit une d'après l'identifiant de l'ennemi (sprites fixes, voir outils/fixe-ennemis.py).
+   */
+  variantes?: boolean;
   /** agrandissement du sprite (1 par défaut) : la planche peut être plus fine que le jeu */
   echelle?: number;
 }
@@ -38,19 +44,12 @@ export interface Feuille {
 const ANIMATIONS_HEROS = [4, 6, 1, 2, 1, 1, 1, 0, 0, 0, 2];
 
 export const FEUILLES: Partial<Record<Genre, Feuille>> = {
+  ...FEUILLES_ENNEMIS,
   // les héros, fabriqués par outils/anime-heros.py : repos 4, course 6, saut, échelle 2, tyrolienne, mur, mort, tir 2
   [G.JBT]: { fichier: 'jbt.png', w: 38, h: 41, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 4, y: 24 } },
   [G.JBM]: { fichier: 'jbm.png', w: 35, h: 41, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 4, y: 24 } },
   [G.JBG]: { fichier: 'jbg.png', w: 38, h: 41, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 4, y: 24 } },
   [G.MAT]: { fichier: 'mat.png', w: 34, h: 40, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 4, y: 24 } },
-  // les fêtards autotunés, quatre apparences en sprites fixes : outils/fixe-ennemis.py
-  [G.FETARD]: { fichier: 'fetard-1.png', w: 25, h: 40, images: [1] },
-  [G.FETARD_2]: { fichier: 'fetard-2.png', w: 26, h: 40, images: [1] },
-  [G.FETARD_3]: { fichier: 'fetard-3.png', w: 22, h: 40, images: [1] },
-  [G.FETARD_4]: { fichier: 'fetard-4.png', w: 20, h: 40, images: [1] },
-  // les videurs, sprites fixes (une seule image, sans animation) : outils/fixe-ennemis.py
-  [G.VIDEUR]: { fichier: 'videur-polo.png', w: 22, h: 46, images: [1] },
-  [G.VIDEUR_COSTUME]: { fichier: 'videur-costume.png', w: 27, h: 46, images: [1] },
   [G.TOM]: { fichier: 'tom.png', w: 39, h: 42, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 4, y: 24 } },
   // Fadatchi, fabriqué par outils/anime-kiwi.py : debout 8 images (il respire), court 4, saut 1, coup de bec 4
   [G.KIWI]: { fichier: 'fadatchi.png', w: 41, h: 23, images: [8, 4, 1, 0, 0, 0, 0, 0, 0, 0, 4], rythme: 5 },
@@ -61,6 +60,8 @@ export const GENRES_HEROS: Genre[] = [G.JBT, G.JBM, G.JBG, G.MAT, G.TOM];
 
 /** La case de la planche à dessiner : colonne et ligne, pour l'animation `e` à l'instant `compteur`. */
 export function caseDeLaPlanche(f: Feuille, e: number, compteur: number): { col: number; ligne: number } {
+  // apparences : `compteur` est alors l'identifiant de l'ennemi, il fixe l'apparence une fois pour toutes
+  if (f.variantes) return { col: compteur % Math.max(1, f.images[0] ?? 1), ligne: 0 };
   const ligne = (f.images[e] ?? 0) > 0 ? e : 0;
   const n = Math.max(1, f.images[ligne] ?? 1);
   return { col: Math.floor(compteur / (f.rythme ?? 6)) % n, ligne };

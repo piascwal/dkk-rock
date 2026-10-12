@@ -41,33 +41,6 @@ export const DESSINS_ENNEMIS: Partial<Record<number, Dessin>> = {
     const leds = ['#ff4fd8', '#3fe0ff', '#7cfc7c', '#ffd23f'];
     for (let i = 0; i < 4; i++) p(-4 + i * 2, -3, 1, 1, leds[(i + Math.floor(f / 6)) % 4]!);
   },
-  [G.INFLUENCEUR]: (p, e, f) => {
-    const yt = humain(
-      p,
-      { peau: '#f1c27d', haut: '#ffffff', bas: '#a0c4ff', chaussures: '#ff8fab' },
-      { pas: pasDe(e, f) },
-    );
-    p(-3, yt - 1, 6, 2, '#c68642');
-    p(-2, yt - 3, 3, 2, '#c68642');
-    p(3, yt - 2, 1, 10, '#999');
-    p(2, yt - 6, 4, 4, '#222');
-    p(3, yt - 5, 2, 2, e === ANIM.ATTAQUE ? '#ffffff' : '#3fe0ff');
-  },
-  [G.YETI]: (p, e, f) => {
-    const hoche = f % 30 < 15 ? 0 : 1;
-    p(-7, -17 + hoche, 14, 14, '#f4f9ff');
-    p(-7, -5, 14, 2, '#c8d8ea');
-    p(-6, -3, 4, 3, '#dfe9f5');
-    p(2, -3, 4, 3, '#dfe9f5');
-    p(-1, -15 + hoche * 2, 6, 5, '#7fa7d8');
-    p(0, -14 + hoche * 2, 1, 1, '#111');
-    p(3, -14 + hoche * 2, 1, 1, '#111');
-    p(-8, -16 + hoche * 2, 2, 4, '#3fe0ff');
-    p(6, -16 + hoche * 2, 2, 4, '#3fe0ff');
-    p(-7, -19 + hoche * 2, 14, 1, '#3fe0ff');
-    if (e === ANIM.ATTAQUE) p(6, -12, 5, 5, '#ffffff');
-    else p(6, -10, 2, 5, '#f4f9ff');
-  },
   [G.ROBOT]: (p, e, f) => {
     const pas = pasDe(e, f);
     p(-5, -6, 3, 6 - (pas === 0 ? 1 : 0), '#555');

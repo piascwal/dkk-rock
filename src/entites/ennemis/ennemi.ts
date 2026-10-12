@@ -1,7 +1,7 @@
 import { TUILE } from '../../config';
 import { appliqueGravite, deplace, ligneDeVue, nouveauCorps, type Corps } from '../../monde/physique';
 import type { Camp, Cible, Contexte, EntiteSimulee } from '../../jeu/contexte';
-import { ANIM, type EntiteVue, type Genre } from '../../jeu/vue';
+import { ANIM, type EntiteVue } from '../../jeu/vue';
 import type { DefEnnemi } from './definitions';
 
 export type EtatEnnemi = 'patrouille' | 'alerte' | 'attaque' | 'perdu';
@@ -14,8 +14,6 @@ export type EtatEnnemi = 'patrouille' | 'alerte' | 'attaque' | 'perdu';
 export class Ennemi implements Cible, EntiteSimulee {
   readonly camp: Camp = 'ennemis';
   readonly id: number;
-  /** l'apparence tirée au sort (voir DefEnnemi.genres) */
-  readonly genre: Genre;
   readonly corps: Corps;
   fini = false;
   pv: number;
@@ -29,6 +27,8 @@ export class Ennemi implements Cible, EntiteSimulee {
   anim = 0;
   /** mémoire libre pour le comportement (rafale en cours, fuite...) */
   memoire = 0;
+  /** délai avant un nouveau demi-tour : évite de pivoter à chaque pas contre un obstacle */
+  virage = 0;
   private flash = 0;
 
   constructor(
@@ -38,7 +38,6 @@ export class Ennemi implements Cible, EntiteSimulee {
     y: number,
   ) {
     this.id = ctx.prochainId();
-    this.genre = def.genres && def.genres.length > 1 ? ctx.rng.choix(def.genres) : def.genre;
     this.pv = def.pv;
     this.corps = nouveauCorps(x + (TUILE - def.w) / 2, y + TUILE - def.h, def.w, def.h);
     this.dir = ctx.rng.suivant() < 0.5 ? -1 : 1;
@@ -75,12 +74,6 @@ export class Ennemi implements Cible, EntiteSimulee {
 
   blesse(degats: number, ctx: Contexte, dx: number, explosion: boolean): void {
     if (this.fini) return;
-    // le bouclier arrête ce qui vient de face, pas les explosions
-    if (this.def.bouclier && !explosion && dx === -this.dir) {
-      ctx.evenement({ k: 'impact', x: this.cx + this.dir * 6, y: this.cy, c: '#9fd8f0' });
-      ctx.son('bouclier', this.cx, this.cy);
-      return;
-    }
     this.pv -= degats;
     this.flash = 4;
     if (explosion) this.corps.vy = -3;
@@ -142,7 +135,7 @@ export class Ennemi implements Cible, EntiteSimulee {
     switch (this.etat) {
       case 'alerte':
         this.corps.vx = 0;
-        if (this.cible) this.dir = this.cible.x > this.corps.x ? 1 : -1;
+        if (this.cible) this.faceA(this.cible);
         if (--this.minuteur <= 0) this.etat = 'attaque';
         break;
       case 'attaque':
@@ -168,9 +161,18 @@ export class Ennemi implements Cible, EntiteSimulee {
     this.contact(ctx);
   }
 
-  /** Marche, demi-tour au bord du vide ou contre un mur, petites pauses. */
+  /**
+   * Marche, demi-tour au bord du vide ou contre un mur, petites pauses. Le demi-tour se décide avant de
+   * choisir la vitesse, sur la géométrie d'ici et maintenant, et pas plus d'une fois toutes les 30 images.
+   */
   patrouille(ctx: Contexte): void {
     const c = this.corps;
+    if (this.virage > 0) this.virage--;
+    const bloque = this.murDevant(ctx) || (!this.def.vole && c.auSol && !this.solDevant(ctx));
+    if (bloque && this.virage === 0) {
+      this.dir = -this.dir as 1 | -1;
+      this.virage = 30;
+    }
     if (this.def.vole) {
       c.vx = this.dir * this.def.vitesse * 0.5;
       c.vy = Math.sin(this.anim / 20) * 0.3;
@@ -181,8 +183,6 @@ export class Ennemi implements Cible, EntiteSimulee {
       c.vx = this.dir * this.def.vitesse * 0.5;
       if (ctx.rng.suivant() < 0.004) this.memoire = 60;
     }
-    if (c.mur || (c.auSol && !this.solDevant(ctx)) || (this.def.vole && this.murDevant(ctx)))
-      this.dir = -this.dir as 1 | -1;
   }
 
   solDevant(ctx: Contexte): boolean {
@@ -191,9 +191,17 @@ export class Ennemi implements Cible, EntiteSimulee {
       .solide;
   }
 
+  /** Un mur plein juste devant, au niveau des pieds, du torse ou de la tête (un ennemi peut être grand). */
   murDevant(ctx: Contexte): boolean {
     const px = this.dir > 0 ? this.corps.x + this.corps.w + 4 : this.corps.x - 4;
-    return ctx.carte.solideEnPixel(px, this.cy);
+    const { y, h } = this.corps;
+    return [y + 3, y + h / 2, y + h - 3].some((py) => ctx.carte.solideEnPixel(px, py));
+  }
+
+  /** Se tourne vers une cible, sauf quand elle est à peu près à la verticale (sinon on pivote à chaque pas). */
+  faceA(cible: Cible): void {
+    const dx = cible.x + cible.w / 2 - this.cx;
+    if (Math.abs(dx) > 6) this.dir = dx > 0 ? 1 : -1;
   }
 
   /** Va vers une position horizontale sans tomber dans le vide. */
@@ -231,7 +239,7 @@ export class Ennemi implements Cible, EntiteSimulee {
             : ANIM.DEBOUT;
     return {
       id: this.id,
-      g: this.genre,
+      g: this.def.genre,
       x: this.cx,
       y: this.corps.y + this.corps.h,
       gauche: this.dir < 0,

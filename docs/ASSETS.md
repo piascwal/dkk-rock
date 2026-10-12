@@ -66,13 +66,17 @@ L'instrument n'est pas sur la planche : le jeu le dessine par-dessus, à l'épau
 **Pour un nouveau personnage** : son sprite de base (de profil ou 3/4, pieds visibles), puis un gabarit dans
 `outils/gabarits.py` (réutiliser celui d'un corps de même pose, sinon de nouveaux polygones).
 
-## Sprites fixes (ennemis sans animation)
+## Sprites fixes et apparences multiples (ennemis)
 
-Un ennemi peut n'avoir qu'une seule image : `images: [1]` dans `feuilles.ts`. Il se déplace alors sans
-cycle de marche. Les videurs (2 apparences) et les fêtards (4) fonctionnent ainsi
-(`outils/fixe-ennemis.py`, depuis `assets-sources/ennemis/`). Pour qu'un ennemi existe en plusieurs apparences, ajouter un genre dans
-`src/jeu/vue.ts` et le lister dans `genres` de sa définition : une apparence est tirée au sort à chaque
-apparition.
+Un ennemi peut n'avoir qu'une image : il se déplace alors sans cycle de marche. Il peut aussi avoir **plusieurs
+apparences** (par exemple quatre fêtards différents) : le jeu en choisit une d'après l'identifiant de chaque
+ennemi, et elle ne change pas.
+
+**Ajouter une apparence** : déposer son sprite de base dans `assets-sources/ennemis/`, nommé
+`<type>-<numéro>-base.png` avec le numéro suivant (`fetard-5-base.png`, `yeti-2-base.png`...), puis lancer
+`python3 outils/fixe-ennemis.py`. Le script refait la planche du type (`public/sprites/<type>s.png`) et
+déclare tout au jeu (`src/rendu/feuilles-ennemis.ts`, généré). Types connus : fetard, videur, influenceur,
+yeti ; pour un nouveau type, ajouter une ligne à `TYPES` dans le script, avec sa hauteur en jeu.
 
 ## À savoir
 

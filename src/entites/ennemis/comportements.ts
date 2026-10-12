@@ -38,17 +38,16 @@ function lobeVers(e: Ennemi, ctx: Contexte, def: DefProjectile, cible: Cible, du
   ctx.ajoute(new Projectile(ctx, def, 'ennemis', e.cx, e.corps.y, vx, Math.max(-7, vy)));
 }
 
-const faceA = (e: Ennemi, cible: Cible) => {
-  e.dir = cible.x + cible.w / 2 > e.cx ? 1 : -1;
-};
-
 /** Fêtard autotuné : garde ses distances et chante des notes parfaitement justes (hélas). */
 export const tireur: Comportement = (e, ctx, cible) => {
-  faceA(e, cible);
+  e.faceA(cible);
+  // « vers » : le côté du héros ; reculer, c'est aller du côté opposé, sans jamais se retourner pour autant
+  const vers = e.dir;
   const dx = Math.abs(cible.x - e.cx);
-  if (dx < 70) e.marcheVers(ctx, e.cx - e.dir * 30, e.def.vitesse);
+  if (dx < 70) e.marcheVers(ctx, e.cx - vers * 30, e.def.vitesse);
   else if (dx > 150) e.marcheVers(ctx, cible.x, e.def.vitesse);
   else e.corps.vx = 0;
+  e.dir = vers;
   if (e.recharge === 0) {
     tireVers(e, ctx, NOTE_AUTOTUNE, cible);
     e.memoire++;
@@ -58,7 +57,7 @@ export const tireur: Comportement = (e, ctx, cible) => {
   }
 };
 
-/** Videur : fonce bouclier en avant. */
+/** Videur : fonce droit sur le héros. */
 export const charge: Comportement = (e, ctx, cible) => {
   e.marcheVers(ctx, cible.x + cible.w / 2, e.def.vitesse * 1.6);
 };
@@ -74,7 +73,7 @@ export const kamikaze: Comportement = (e, ctx, cible) => {
 
 /** Lanceur de drops : reste en retrait et lobe des bombes. */
 export const lobeur: Comportement = (e, ctx, cible) => {
-  faceA(e, cible);
+  e.faceA(cible);
   e.corps.vx = 0;
   if (e.recharge === 0) {
     lobeVers(e, ctx, DROP, cible, 55);
@@ -102,7 +101,7 @@ export const influenceur: Comportement = (e, ctx, cible) => {
     e.marcheVers(ctx, e.cx - (cible.x - e.cx), e.def.vitesse * 1.8);
     return;
   }
-  faceA(e, cible);
+  e.faceA(cible);
   e.corps.vx = 0;
   if (e.recharge === 0 && Math.abs(cible.x - e.cx) < 110) {
     tireVers(e, ctx, FLASH_SELFIE, cible);
@@ -115,7 +114,7 @@ export const influenceur: Comportement = (e, ctx, cible) => {
 
 /** Yéti minimal : ne lance ses boules de neige que sur le temps, un temps sur deux. */
 export const yeti: Comportement = (e, ctx, cible) => {
-  faceA(e, cible);
+  e.faceA(cible);
   e.corps.vx = 0;
   if (ctx.surLeTemps && ctx.numeroTemps % 2 === 0) {
     lobeVers(e, ctx, BOULE_NEIGE, cible, 40);
@@ -127,7 +126,7 @@ export const yeti: Comportement = (e, ctx, cible) => {
 
 /** Robot vocodeur : avance lentement et tire des rafales de lasers. */
 export const robot: Comportement = (e, ctx, cible) => {
-  faceA(e, cible);
+  e.faceA(cible);
   if (Math.abs(cible.x - e.cx) > 60) e.marcheVers(ctx, cible.x, e.def.vitesse);
   else e.corps.vx = 0;
   if (e.recharge === 0) {
