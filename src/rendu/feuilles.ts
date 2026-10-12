@@ -51,60 +51,30 @@ export interface Feuille {
 /**
  * Les planches fournies. Une entrée par genre (voir `G` dans jeu/vue.ts), par exemple :
  *
- *   [G.JBT]: { fichier: 'jbt.png', w: 116, h: 124, densite: 3, images: [2, 6, 1, 4, 1, 1, 1], rythme: 6 },
+ *   [G.JBT]: { fichier: 'jbt.png', w: 38, h: 41, images: [2, 6, 1, 4, 1, 1, 1], rythme: 6 },
  */
-const ANIMATIONS_HEROS = [4, 6, 1, 2, 1, 1, 1, 0, 0, 0, 2];
+// repos 4, course 6, saut, échelle 2, tyrolienne, mur, mort, tir 2, puis la course en visant (codes 1 à 4)
+const ANIMATIONS_HEROS = [4, 6, 1, 2, 1, 1, 1, 0, 0, 0, 2, 6, 6, 6, 6];
+
+/** Un héros avec son instrument dans le sprite (outils/anime-instrument.py) ; `pied` : milieu des pieds dans l'image. */
+const heros = (fichier: string, w: number, h: number, pied: number): Feuille => ({
+  fichier,
+  w,
+  h,
+  pied,
+  densite: 6,
+  visees: 11,
+  images: ANIMATIONS_HEROS,
+  rythme: 5,
+});
 
 export const FEUILLES: Partial<Record<Genre, Feuille>> = {
   ...FEUILLES_ENNEMIS,
-  // les héros, fabriqués par outils/anime-heros.py : repos 4, course 6, saut, échelle 2, tyrolienne, mur, mort, tir 2
-  [G.JBT]: {
-    fichier: 'jbt.png',
-    w: 116,
-    h: 124,
-    densite: 3,
-    images: ANIMATIONS_HEROS,
-    rythme: 5,
-    epaule: { x: 4, y: 24 },
-  },
-  [G.JBM]: {
-    fichier: 'jbm.png',
-    w: 108,
-    h: 125,
-    densite: 3,
-    images: ANIMATIONS_HEROS,
-    rythme: 5,
-    epaule: { x: 4, y: 24 },
-  },
-  [G.JBG]: {
-    fichier: 'jbg.png',
-    w: 116,
-    h: 124,
-    densite: 3,
-    images: ANIMATIONS_HEROS,
-    rythme: 5,
-    epaule: { x: 4, y: 24 },
-  },
-  [G.MAT]: {
-    fichier: 'mat.png',
-    w: 94,
-    h: 112,
-    densite: 3,
-    images: ANIMATIONS_HEROS,
-    rythme: 5,
-    epaule: { x: 4, y: 24 },
-  },
-  // Tom tient sa guitare dans le sprite (outils/anime-guitare.py) : pas d'instrument dessiné en code par-dessus
-  [G.TOM]: {
-    fichier: 'tom-guitare.png',
-    w: 329,
-    h: 288,
-    densite: 6,
-    pied: 232,
-    visees: 11,
-    images: [4, 6, 1, 2, 1, 1, 1, 0, 0, 0, 2, 6, 6, 6, 6],
-    rythme: 5,
-  },
+  [G.JBT]: heros('jbt-instrument.png', 241, 242, 129),
+  [G.JBM]: heros('jbm-instrument.png', 236, 246, 137),
+  [G.JBG]: heros('jbg-instrument.png', 241, 245, 134),
+  [G.MAT]: heros('mat-instrument.png', 247, 248, 139),
+  [G.TOM]: heros('tom-instrument.png', 250, 288, 146),
   // Fadatchi, fabriqué par outils/anime-kiwi.py : debout 8 images (il respire), court 4, saut 1, coup de bec 4
   [G.KIWI]: { fichier: 'fadatchi.png', w: 41, h: 23, images: [8, 4, 1, 0, 0, 0, 0, 0, 0, 0, 4], rythme: 5 },
 };

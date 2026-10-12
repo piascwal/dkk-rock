@@ -14,7 +14,9 @@ K = 8  # agrandissement pour la rotation
 
 
 class Membre:
-    def __init__(self, nom, polygone, pivot, parent=None, retient=0, derriere=False, coupe=None, filtre=None, z=0):
+    def __init__(self, nom, polygone, pivot, parent=None, retient=0, derriere=False, coupe=None, filtre=None, z=0, epure=False):
+        # rend au tronc les contours sombres qui ne touchent aucun pixel clair de la pièce (traits du maillot, par exemple)
+        self.epure = epure
         self.z = z  # ordre de dessin parmi les membres de devant
         self.nom, self.polygone, self.pivot = nom, polygone, pivot
         self.parent = parent  # nom du membre dont il suit le mouvement (tibia -> cuisse, par exemple)
@@ -122,6 +124,17 @@ class Personnage:
                     libres[y, x] = False
                     if math.hypot(x + 0.5 - m.pivot[0], y + 0.5 - m.pivot[1]) > m.retient:
                         self.tronc[y, x] = 0
+            if m.epure:
+                clair = piece[..., :3].sum(-1) >= 60
+                clair &= piece[..., 3] > 0
+                pr = np.pad(clair, 4)
+                proche = np.zeros_like(clair)
+                for dy in range(-3, 4):
+                    for dx in range(-3, 4):
+                        proche |= pr[4 + dy : 4 + dy + clair.shape[0], 4 + dx : 4 + dx + clair.shape[1]]
+                rendu = (piece[..., 3] > 0) & ~proche
+                self.tronc[rendu] = a[rendu]
+                piece[rendu] = 0
             self.pieces[m.nom] = Image.fromarray(piece)
         if masque:
             self.tronc = comble(self.tronc, a, masque, source)

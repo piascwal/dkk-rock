@@ -1,4 +1,4 @@
-import { DENSITE_RENDU, HAUTEUR_VUE, TUILE } from '../config';
+import { DENSITE_MAX, DENSITE_MIN, HAUTEUR_VUE, TUILE } from '../config';
 import { G, type EtatVue, type Evenement } from '../jeu/vue';
 import { Carte } from '../monde/carte';
 import { proprietes } from '../monde/tuiles';
@@ -29,6 +29,11 @@ export class Rendu {
   private decor: ReturnType<typeof semeDecor> = [];
   private carteDecor: Carte | null = null;
   private tick = 0;
+  /** pixels du canvas par pixel du jeu : limité par l'écran, puis abaissé si l'appareil n'arrive pas à tenir 60 images/s */
+  private densite = DENSITE_MAX;
+  private instant = 0;
+  private duree = 0;
+  private images = 0;
 
   constructor(private readonly toile: HTMLCanvasElement) {
     this.ctx = toile.getContext('2d', { alpha: false })!;
@@ -40,12 +45,35 @@ export class Rendu {
     const w = window.innerWidth;
     const h = window.innerHeight;
     this.largeur = Math.round(Math.min(520, Math.max(320, (HAUTEUR_VUE * w) / h)));
-    this.toile.width = this.largeur * DENSITE_RENDU;
-    this.toile.height = HAUTEUR_VUE * DENSITE_RENDU;
     const k = Math.min(w / this.largeur, h / HAUTEUR_VUE);
+    // inutile de dessiner plus fin que les pixels de l'écran (ceux d'un téléphone sont 2 à 3 fois plus petits qu'un pixel CSS)
+    const ecran = Math.floor((HAUTEUR_VUE * k * (window.devicePixelRatio || 1)) / HAUTEUR_VUE);
+    this.densite = Math.min(this.densite, Math.max(DENSITE_MIN, ecran));
+    this.toile.width = this.largeur * this.densite;
+    this.toile.height = HAUTEUR_VUE * this.densite;
     this.toile.style.width = `${Math.floor(this.largeur * k)}px`;
     this.toile.style.height = `${Math.floor(HAUTEUR_VUE * k)}px`;
     this.ctx.imageSmoothingEnabled = false;
+  }
+
+  /** Mesure la durée moyenne des images ; si elle dépasse ~22 ms, baisse la densité (jamais l'inverse). */
+  private adapteDensite(): void {
+    const maintenant = performance.now();
+    const ecart = maintenant - this.instant;
+    this.instant = maintenant;
+    if (ecart > 500) return; // pause, onglet caché : pas une mesure
+    this.duree += ecart;
+    if (++this.images < 40) return;
+    const moyenne = this.duree / this.images;
+    this.duree = this.images = 0;
+    if (moyenne > 22 && this.densite > DENSITE_MIN) {
+      // le coût suit à peu près le nombre de pixels du canvas, donc le carré de la densité
+      this.densite = Math.max(
+        DENSITE_MIN,
+        Math.min(this.densite - 1, Math.floor(this.densite * Math.sqrt(17 / moyenne))),
+      );
+      this.redimensionne();
+    }
   }
 
   prepareNiveau(niveau: number): void {
@@ -85,7 +113,8 @@ export class Rendu {
     this.tick++;
     const ctx = this.ctx;
     // tout se dessine en pixels du jeu ; la densité est appliquée ici, une fois
-    ctx.setTransform(DENSITE_RENDU, 0, 0, DENSITE_RENDU, 0, 0);
+    this.adapteDensite();
+    ctx.setTransform(this.densite, 0, 0, this.densite, 0, 0);
     ctx.imageSmoothingEnabled = false;
     this.prepareNiveau(vue.niveau);
     const moi = vue.joueurs[siegeLocal];

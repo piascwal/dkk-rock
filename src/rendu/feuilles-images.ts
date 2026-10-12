@@ -41,6 +41,9 @@ export function dessineFeuille(
   const k = (f.echelle ?? 1) / d;
   // les planches en pleine définition se posent au tiers de pixel près, les autres au pixel du jeu
   const arrondi = (v: number) => Math.round(v * d) / d;
+  // planche plus fine que le canvas (appareil lent) : lissage, sinon on perdrait des pixels au hasard
+  const { a, b } = ctx.getTransform();
+  ctx.imageSmoothingEnabled = Math.hypot(a, b) < d;
   ctx.drawImage(
     img,
     col * f.w,
@@ -52,5 +55,6 @@ export function dessineFeuille(
     f.w * k,
     f.h * k,
   );
+  ctx.imageSmoothingEnabled = false;
   return true;
 }

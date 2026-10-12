@@ -85,12 +85,22 @@ yeti ; pour un nouveau type, ajouter une ligne à `TYPES` dans le script, avec s
 - Idéalement, continuer maintenant par les ennemis les plus fréquents (fêtard,
   videur, danseur, yéti).
 
-## Héros avec leur instrument dans le sprite (Tom)
+## Héros avec leur instrument dans le sprite
 
-Le sprite de référence `assets-sources/heros/tom-guitare-base.png` (1024 px, cases de 2 px) montre Tom avec sa
-guitare. `python3 outils/anime-guitare.py` en fait `public/sprites/tom-guitare.png` : la guitare et les bras forment
-une pièce qui pivote à l'épaule (lignes 11 à 14 : course en visant, codes de visée 1 à 4) ; `epaule` est donc absent
-de sa planche, le jeu ne dessine pas d'instrument par-dessus. Le sprite sans instrument (`tom-base.png`) est conservé.
-La planche est à `densite: 6` : le canvas est dessiné à 6 pixels par pixel du jeu (`DENSITE_RENDU`), les autres héros
-(sprites de 128 px, `densite: 3`) sont simplement agrandis ×2. Pour un autre héros : un gabarit comme
-`outils/gabarit_guitare.py`, puis une entrée dans `FEUILLES` avec `pied`, `visees` et `densite`.
+Les sprites `assets-sources/heros/<nom>-instrument-base.png` (Tom : `tom-guitare-base.png`) montrent chaque héros avec son
+instrument. Les fichiers de 1024 px n'ont pas tous la même taille de case (2, 5, 10 ou 11 px) :
+`outils/prepare_instrument.py` détecte la grille, lit le centre de chaque case, puis agrandit au plus proche voisin pour que
+tous les héros fassent ~240 px de haut. `python3 outils/anime-instrument.py [nom]` en fait `public/sprites/<nom>-instrument.png` :
+l'instrument et les bras qui le tiennent forment une pièce qui pivote pour viser (lignes 11 à 14 : course en visant, codes de visée
+1 à 4), les jambes bougent par découpe (`outils/gabarits_instrument.py`, polygones en pixels de travail). Les sprites sans
+instrument (`<nom>-base.png`, `outils/anime-heros.py`) sont conservés mais plus utilisés.
+
+Les planches ont `densite: 6` : 6 de leurs pixels valent un pixel du jeu, un héros fait ~40 px de haut. Les ennemis
+(`outils/fixe-ennemis.py`) sont fabriqués de la même façon, sans réduction.
+
+Le canvas est dessiné à `DENSITE_MAX` = 6 pixels par pixel du jeu, limité à ce que l'écran peut montrer. Si l'appareil ne tient pas
+60 images/s (moyenne > 22 ms sur 40 images), `Rendu` baisse la densité jusqu'à `DENSITE_MIN` = 3 (les planches sont alors lissées).
+Mesure en navigateur sans carte graphique, processeur ralenti 4× : 52 images/s (densité baissée à 3 automatiquement), 60 sans ralentissement.
+
+Pour un autre héros : un gabarit comme ceux de `gabarits_instrument.py`, puis `heros(...)` dans `FEUILLES` avec la taille et `pied`
+affichés par le script.

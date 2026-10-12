@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Planche de Tom avec sa guitare, à partir du sprite de référence qui la tient (assets-sources/heros/tom-guitare-base.png).
+"""Planche d'un héros avec son instrument, à partir du sprite de référence qui le tient (assets-sources/heros/).
 
-Usage : python3 outils/anime-guitare.py        Sortie : public/sprites/tom-guitare.png + aperçu + méta (affichée).
+Usage : python3 outils/anime-instrument.py [tom|jbm|mat|jbt|jbg ...]     (Pillow et numpy requis)
+Sortie : public/sprites/<nom>-instrument.png + aperçu ; la méta (taille, lignes, pied) est affichée.
 
-Le sprite du fichier 1024 a des cases de 2 px : on travaille sur la grille 512. La guitare et les bras forment
-une seule pièce qui pivote à l'épaule pour viser ; les jambes bougent comme pour les autres héros. Lignes de la
+Le sprite est remis sur sa grille (prepare_instrument.py). L'instrument et les bras qui le tiennent forment une
+seule pièce qui pivote pour viser ; les jambes bougent comme pour les autres héros (gabarits_instrument.py). Lignes de la
 planche : celles de ANIM (0 repos, 1 course, 2 saut, 3 échelle, 4 tyrolienne, 5 mur, 6 mort, 10 tir), puis les
 lignes 11 à 14 : course en visant en diagonale haut, haut, diagonale bas, bas (code de visée 1 à 4).
 """
@@ -22,13 +23,13 @@ import squelette
 
 squelette.K = 4
 from squelette import Personnage, vote
-from gabarit_guitare import CORPS, MEMBRES, source_remplissage
+from gabarits_instrument import HEROS
+from prepare_instrument import espace_de_travail
 
 RACINE = pathlib.Path(__file__).resolve().parent.parent
 SRC = RACINE / 'assets-sources' / 'heros'
 SORTIE = RACINE / 'public' / 'sprites'
-DENSITE = 6  # pixels de planche par pixel du jeu : Tom fait ~39 px de haut en jeu
-VISEES = {1: -28, 2: -48, 3: 26, 4: 46}  # angle de la guitare (degrés, + = vers le bas) par code de visée
+DENSITE = 6  # pixels de planche par pixel du jeu : un héros fait ~39 px de haut en jeu
 
 
 def cos(d):
@@ -53,7 +54,7 @@ def course(arme=0):
     return poses
 
 
-def poses():
+def poses(visees):
     return {
         0: [dict(jambes(), arme=a) for a in (0, -1.5, -2.5, -1.5)],
         1: course(),
@@ -63,7 +64,7 @@ def poses():
         5: [dict(jambes(-25, 12, 45, 35), arme=-4)],
         6: [dict(jambes(-20, 15, 30, 25), arme=-10)],
         10: [dict(jambes(), arme=-2), dict(jambes(), arme=-5)],
-        **{10 + k: course(a) for k, a in VISEES.items()},
+        **{10 + k: course(a) for k, a in visees.items()},
     }
 
 
@@ -75,9 +76,14 @@ def au_sol(im, base):
     return res
 
 
-def nettoie(im, mini=14):
+def nettoie(im, mini=40):
     """Retire les îlots de moins de `mini` pixels (miettes des découpes) et bouche les trous d'un pixel."""
     a = np.array(im)
+    al = a[..., 3] > 0
+    pr = np.pad(al, 1)
+    voisins = sum(pr[1 + dy : 1 + dy + al.shape[0], 1 + dx : 1 + dx + al.shape[1]]
+                  for dy in (-1, 0, 1) for dx in (-1, 0, 1) if (dy, dx) != (0, 0))
+    a[al & (voisins < 2)] = 0  # points isolés et bouts de fil
     al = a[..., 3] > 0
     vu = np.zeros_like(al)
     for y0, x0 in zip(*np.nonzero(al)):
@@ -100,25 +106,32 @@ def nettoie(im, mini=14):
     return Image.fromarray(a)
 
 
+MARGE = 130  # place autour du personnage pour qu'il puisse tomber sans sortir de l'image
+
+
 def renverse(im, angle, centre):
+    """Fait basculer l'image (déjà élargie de MARGE de chaque côté) autour de `centre`, sans lissage."""
     k = 4
     grand = im.resize((im.width * k, im.height * k), Image.NEAREST)
-    return Image.fromarray(vote(np.array(grand.rotate(-angle, resample=Image.NEAREST, center=(centre[0] * k, centre[1] * k)))))
+    r = grand.rotate(-angle, resample=Image.NEAREST, center=(centre[0] * k, centre[1] * k))
+    return Image.fromarray(vote(np.array(r)))
 
 
-def main():
-    brut = np.array(Image.open(SRC / 'tom-guitare-base.png').convert('RGBA'))[1::2, 1::2]
-    nat = Image.fromarray(brut)
-    perso = Personnage(nat, MEMBRES, CORPS, source_remplissage)
+def fabrique(nom):
+    membres, corps, source, ancre, visees = HEROS[nom]
+    brut = espace_de_travail(nom)
+    perso = Personnage(Image.fromarray(brut), membres, corps, source)
     base = int(np.where(brut[..., 3].any(1))[0].max())
-    ancre = 262
     lignes = {}
-    for ligne, ps in poses().items():
+    for ligne, ps in poses(visees).items():
         fr = []
         for p in ps:
             f = perso.pose(p)
+            large = Image.new('RGBA', (f.width + 2 * MARGE, f.height), (0, 0, 0, 0))
+            large.alpha_composite(f, (MARGE, 0))
+            f = large
             if ligne == 6:
-                f = renverse(f, -80, (ancre, base))
+                f = renverse(f, -80, (ancre + MARGE, base - 100))
             fr.append(nettoie(au_sol(f, base)))
         lignes[ligne] = fr
     boite = None
@@ -134,14 +147,14 @@ def main():
     for i, fr in lignes.items():
         for j, f in enumerate(fr):
             planche.alpha_composite(f, (j * w, i * h))
-    planche.save(SORTIE / 'tom-guitare.png')
+    planche.save(SORTIE / f'{nom}-instrument.png')
     ap = Image.new('RGBA', planche.size, (255, 0, 255, 255))
     ap.alpha_composite(planche)
-    ap.resize((ap.width // 2, ap.height // 2), Image.NEAREST).save(SRC / 'apercu-tom-guitare.png')
-    # milieu du personnage dans l'image : les pieds sont posés au milieu du bas, on le centre sur son cadre
-    print(json.dumps({'fichier': 'tom-guitare.png', 'w': w, 'h': h, 'images': images, 'densite': DENSITE,
-                      'visees': 11, 'cadre_x': ancre - boite[0]}))
+    ap.resize((ap.width // 2, ap.height // 2), Image.NEAREST).save(SRC / f'apercu-{nom}-instrument.png')
+    print(nom, json.dumps({'fichier': f'{nom}-instrument.png', 'w': w, 'h': h, 'images': images, 'densite': DENSITE,
+                           'visees': 11, 'pied': ancre + MARGE - boite[0]}))
 
 
 if __name__ == '__main__':
-    main()
+    for n in sys.argv[1:] or list(HEROS):
+        fabrique(n)

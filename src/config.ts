@@ -10,11 +10,12 @@ export const HAUTEUR_VUE = 168;
 export const TICKS_PAR_SECONDE = 60;
 
 /**
- * Le canvas est dessiné avec 3 pixels par pixel du jeu : le monde (tuiles, décor, ennemis) garde son
- * apparence, un pixel du jeu valant 3×3 ; les planches de sprites à `densite: 3` s'affichent en pleine
- * définition, un de leurs pixels valant un tiers de pixel du jeu.
+ * Le canvas est dessiné avec plusieurs pixels par pixel du jeu : le monde (tuiles, décor) garde son apparence,
+ * un pixel du jeu valant n×n ; les planches de sprites (6 de leurs pixels par pixel du jeu) s'affichent en pleine
+ * définition. Le rendu part du maximum que l'écran peut montrer et descend si l'appareil rame (voir `Rendu`).
  */
-export const DENSITE_RENDU = 6;
+export const DENSITE_MAX = 6;
+export const DENSITE_MIN = 3;
 
 export const GRAVITE = 0.32;
 export const CHUTE_MAX = 7;

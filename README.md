@@ -85,8 +85,8 @@ npm run build      # dist/, servi sous /dkk-rock/
 Chaque poussée sur `main` est vérifiée puis publiée par GitHub Actions
 (réglage du dépôt, une seule fois : Settings → Pages → Source « GitHub Actions »).
 
-**Pile :** TypeScript strict, Vite, Canvas 2D, Web Audio, Vitest, ESLint, Prettier. Aucune image
-ni aucun son à charger : les sprites sont dessinés en code, les sons synthétisés.
+**Pile :** TypeScript strict, Vite, Canvas 2D, Web Audio, Vitest, ESLint, Prettier. Les sons sont
+synthétisés ; les personnages sont des sprites (`public/sprites`, voir docs/ASSETS.md), les autres éléments dessinés en code.
 
 ### Architecture
 
