@@ -190,7 +190,8 @@ def fabrique(nom):
 
 
 # cadre du portrait (tête et épaules) dans le sprite natif de 128 px
-PORTRAITS = {'tom': (60, 0, 104, 44), 'jbt': (54, 0, 98, 44), 'jbm': (46, 0, 90, 44)}
+PORTRAITS = {'tom': (60, 0, 104, 44), 'jbt': (54, 0, 98, 44), 'jbm': (46, 0, 90, 44), 'mat': (44, 4, 88, 48),
+             'jbg': (50, 0, 94, 44)}
 
 
 def portrait(nom):

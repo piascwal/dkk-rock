@@ -73,7 +73,7 @@ const cache = new Map<Qui, string>();
 
 /** Le portrait d'un personnage, en image (data URL) pour le HTML. */
 /** Les portraits fournis en pleine définition (public/portraits/) : ils remplacent les dessins en code. */
-const IMAGES: Partial<Record<Qui, string>> = { JBT: 'jbt', JBM: 'jbm', TOM: 'tom' };
+const IMAGES: Partial<Record<Qui, string>> = { JBT: 'jbt', JBM: 'jbm', JBG: 'jbg', MAT: 'mat', TOM: 'tom' };
 
 export function portrait(qui: Qui): string {
   const fichier = IMAGES[qui];

@@ -41,6 +41,8 @@ export const FEUILLES: Partial<Record<Genre, Feuille>> = {
   // les héros, fabriqués par outils/anime-heros.py : repos 4, course 6, saut, échelle 2, tyrolienne, mur, mort, tir 2
   [G.JBT]: { fichier: 'jbt.png', w: 27, h: 29, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 3, y: 17 } },
   [G.JBM]: { fichier: 'jbm.png', w: 25, h: 28, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 3, y: 17 } },
+  [G.JBG]: { fichier: 'jbg.png', w: 27, h: 29, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 3, y: 17 } },
+  [G.MAT]: { fichier: 'mat.png', w: 24, h: 28, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 3, y: 17 } },
   [G.TOM]: { fichier: 'tom.png', w: 27, h: 29, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 3, y: 17 } },
   // Fadatchi, fabriqué par outils/anime-kiwi.py : debout 8 images (il respire), court 4, saut 1, coup de bec 4
   [G.KIWI]: { fichier: 'fadatchi.png', w: 29, h: 16, images: [8, 4, 1, 0, 0, 0, 0, 0, 0, 0, 4], rythme: 5 },

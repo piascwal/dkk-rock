@@ -50,26 +50,25 @@ Le kiwi est animé à partir de trois poses de référence (`assets-sources/fada
 pixels, les recale, découpe la tête au cou pour le coup de bec, retourne vers la droite et réduit
 à la taille du jeu : aucun pixel n'est redessiné. Il sert de modèle pour les autres personnages.
 
-## Déjà fait : JBT, JBM et Tom
+## Déjà fait : les cinq héros
 
-Les trois héros viennent de leur sprite de base (`assets-sources/heros/`) par
-`python3 outils/anime-heros.py [jbt|jbm|tom]`. Le script découpe le sprite en membres (bras, cuisses,
+Les héros viennent de leur sprite de base (`assets-sources/heros/`) par
+`python3 outils/anime-heros.py [jbt|jbm|jbg|mat|tom]`. Le script découpe le sprite en membres (bras, cuisses,
 tibias ; polygones et pivots dans `outils/gabarits.py`), les fait tourner autour des articulations
 (`outils/squelette.py`), puis réduit à 28 px de haut en gardant la palette. Tom et JBT partagent le même
-gabarit de corps ; JBM a le sien. Il produit aussi les portraits de `public/portraits/` (tête et épaules,
+gabarit de corps (en foulée) ; JBM, Mat (debout, de face) et JBG (long manteau, dont les pans restent fixes) ont chacun le leur. Il produit aussi les portraits de `public/portraits/` (tête et épaules,
 pleine définition) pour les dialogues et le choix du héros.
 
 Lignes de la planche : repos 4 images, course 6, saut, échelle 2, tyrolienne, mur, mort, tir 2.
 L'instrument n'est pas sur la planche : le jeu le dessine par-dessus, à l'épaule (`epaule` dans
 `feuilles.ts`), et le fait pivoter avec la visée.
 
-**Pour JBG et Mat** : même principe. Il faut leur sprite de base (de profil, pieds visibles), puis
-l'entrée du gabarit correspondant dans `outils/gabarits.py` (le corps de Tom et JBT, ou celui de JBM,
-si la pose est la même ; sinon de nouveaux polygones).
+**Pour un nouveau personnage** : son sprite de base (de profil ou 3/4, pieds visibles), puis un gabarit dans
+`outils/gabarits.py` (réutiliser celui d'un corps de même pose, sinon de nouveaux polygones).
 
 ## À savoir
 
 - Le **bras** d'un héros ne suit pas la visée (seul l'instrument pivote) : des lignes dédiées (tir en
   l'air, en diagonale) pourront être ajoutées plus tard.
-- Idéalement, continuer par JBG et Mat, puis les ennemis les plus fréquents (fêtard,
+- Idéalement, continuer maintenant par les ennemis les plus fréquents (fêtard,
   videur, danseur, yéti).
