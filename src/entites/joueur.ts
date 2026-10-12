@@ -1,11 +1,12 @@
-import { INVULNERABLE, PV_HEROS, SPECIAUX_DEPART, TUILE } from '../config';
+import { TUILE } from '../config';
 import { borne } from '../moteur/maths';
-import { appliqueGravite, deplace, nouveauCorps, toucheMur, type Corps } from '../monde/physique';
-import { C, EtatCommandes, inverse, type Commandes } from '../jeu/commandes';
-import type { Camp, Cible, Contexte, Tyrolienne } from '../jeu/contexte';
+import { appliqueGravite, deplace, toucheMur } from '../monde/physique';
+import { C, inverse, type Commandes } from '../jeu/commandes';
+import type { Contexte } from '../jeu/contexte';
 import { ANIM, type EntiteVue } from '../jeu/vue';
-import { tire, armeRamassee, type DefArme } from './armes';
-import { HEROS, type DefHeros, type EtatSpecial } from './heros';
+import { tire } from './armes';
+import { angleVisee, codeVisee } from './visee';
+import { JoueurBase } from './joueur-base';
 import { SOLO } from './projectiles-defs';
 
 const VITESSE = 1.75;
@@ -15,137 +16,14 @@ const VITESSE_ECHELLE = 1.4;
 const GRIMPE_MAX = 40;
 
 /** Un héros contrôlé par un joueur (local ou distant : la simulation ne fait pas la différence). */
-export class Joueur implements Cible, EtatSpecial {
-  readonly camp: Camp = 'heros';
-  readonly corps: Corps;
-  readonly commandes = new EtatCommandes();
-  dir: 1 | -1 = 1;
-  pv = PV_HEROS;
-  speciaux = SPECIAUX_DEPART;
-  /** 0 = l'instrument, sinon index dans ARMES_RAMASSABLES + 1 */
-  arme = 0;
-  munitions = 0;
-  mort = false;
-  delaiReapparition = 0;
-  invulnerable = INVULNERABLE;
-  solo = 0;
-  slam = false;
-  /** ébloui par un selfie : ne peut plus tirer */
-  ebloui = 0;
-  /** hypnotisé par le DJ : commandes inversées */
-  hypnose = 0;
-  private recharge = 0;
+export class Joueur extends JoueurBase {
   private coyote = 0;
   private tamponSaut = 0;
   private verrouHorizontal = 0;
   private grimpe = GRIMPE_MAX;
   private traverse = 0;
-  private echelle = false;
-  private tyro: Tyrolienne | null = null;
   private lacheTyro = 0;
-  private anim = 0;
   private contreMur = false;
-  /** dégâts encaissés ce pas-ci (les effets de zone ne comptent qu'une fois) */
-  private dejaBlesse = -1;
-
-  constructor(
-    readonly id: number,
-    readonly siege: number,
-    public membre: number,
-    x: number,
-    y: number,
-  ) {
-    this.corps = nouveauCorps(x, y, 10, 14);
-  }
-
-  get def(): DefHeros {
-    return HEROS[this.membre]!;
-  }
-
-  get armeActuelle(): DefArme {
-    return armeRamassee(this.arme) ?? this.def.arme;
-  }
-
-  // ——— Cible ———
-  get x(): number {
-    return this.corps.x;
-  }
-  get y(): number {
-    return this.corps.y;
-  }
-  get w(): number {
-    return this.corps.w;
-  }
-  get h(): number {
-    return this.corps.h;
-  }
-  /** pour le recul des tirs */
-  get vx(): number {
-    return this.corps.vx;
-  }
-  set vx(v: number) {
-    this.corps.vx = v;
-  }
-  get cx(): number {
-    return this.corps.x + this.corps.w / 2;
-  }
-  get cy(): number {
-    return this.corps.y + this.corps.h / 2;
-  }
-
-  vivant(): boolean {
-    return !this.mort;
-  }
-
-  blesse(degats: number, ctx: Contexte, dx: number): void {
-    if (this.mort || this.invulnerable > 0 || this.dejaBlesse === ctx.tick) return;
-    this.dejaBlesse = ctx.tick;
-    this.pv -= Math.max(1, Math.round(degats));
-    this.invulnerable = INVULNERABLE;
-    this.corps.vx = dx * 2.5;
-    this.corps.vy = -2.5;
-    this.tyro = null;
-    this.echelle = false;
-    ctx.son('aie', this.cx, this.cy);
-    if (this.pv <= 0) this.meurt(ctx);
-  }
-
-  subitEffet(effet: 'hypnose' | 'eblouit'): void {
-    if (this.mort) return;
-    if (effet === 'hypnose') this.hypnose = 240;
-    else this.ebloui = 60;
-  }
-
-  meurt(ctx: Contexte): void {
-    if (this.mort) return;
-    this.mort = true;
-    this.pv = 0;
-    this.solo = 0;
-    this.tyro = null;
-    this.echelle = false;
-    ctx.son('mort', this.cx, this.cy);
-    ctx.evenement({ k: 'bulle', qui: this.def.qui, texte: ctx.rng.choix(this.def.mort) });
-  }
-
-  /** Remet le héros en jeu (réapparition ou changement de membre). */
-  reapparait(x: number, y: number, membre: number): void {
-    Object.assign(this.corps, { x, y, vx: 0, vy: 0 });
-    this.membre = membre;
-    this.mort = false;
-    this.pv = PV_HEROS;
-    this.speciaux = Math.max(this.speciaux, SPECIAUX_DEPART);
-    this.arme = 0;
-    this.invulnerable = INVULNERABLE;
-    this.hypnose = 0;
-    this.ebloui = 0;
-  }
-
-  ramasseArme(i: number): void {
-    const a = armeRamassee(i);
-    if (!a) return;
-    this.arme = i;
-    this.munitions = a.munitions;
-  }
 
   maj(ctx: Contexte, cmd: Commandes): void {
     this.commandes.avance(this.hypnose > 0 ? inverse(cmd) : cmd);
@@ -188,17 +66,25 @@ export class Joueur implements Cible, EtatSpecial {
       this.tamponSaut = 0;
     }
 
-    const contreMur = !c.auSol && h !== 0 && toucheMur(c, ctx.carte, h > 0 ? 1 : -1);
+    // le mur à portée (côté tenu, sinon côté regardé) : on s'y accroche en poussant vers lui
+    const sensMur = c.auSol ? 0 : this.murProche(ctx, h || this.dir);
+    const contreMur = sensMur !== 0 && h === sensMur;
     this.contreMur = contreMur;
-    if (this.tamponSaut > 0 && (this.coyote > 0 || contreMur)) {
+    if (this.tamponSaut > 0 && (this.coyote > 0 || sensMur !== 0)) {
       this.tamponSaut = 0;
       this.coyote = 0;
-      if (contreMur && !c.auSol) {
-        // saut contre le mur, à la Broforce
+      if (sensMur !== 0 && !c.auSol) {
         c.vy = -SAUT_MUR;
-        c.vx = -h * 2.4;
-        this.dir = h > 0 ? -1 : 1;
-        this.verrouHorizontal = 10;
+        if (h === -sensMur) {
+          // en poussant à l'opposé : on rebondit sur le mur, à la Broforce
+          c.vx = -sensMur * 2.4;
+          this.dir = sensMur > 0 ? -1 : 1;
+          this.verrouHorizontal = 10;
+        } else {
+          // en poussant vers lui, ou sans rien : on monte le long du mur pour passer le bord
+          c.vx = sensMur * 1.2;
+          this.dir = sensMur > 0 ? 1 : -1;
+        }
       } else c.vy = -SAUT;
       ctx.son('saut', this.cx, this.cy);
     }
@@ -213,6 +99,14 @@ export class Joueur implements Cible, EtatSpecial {
     deplace(c, ctx.carte, this.traverse > 0);
     if (this.slam && c.auSol) this.atterrissageSlam(ctx);
     if (this.lacheTyro === 0) this.chercheTyrolienne(ctx);
+  }
+
+  /** -1 ou 1 si un mur est collé à ce côté (ou à l'autre), 0 sinon. */
+  private murProche(ctx: Contexte, cote: number): -1 | 0 | 1 {
+    const d = cote > 0 ? 1 : -1;
+    // 4 px de tolérance : on peut déjà s'être décollé du mur en poussant dans l'autre sens
+    if (toucheMur(this.corps, ctx.carte, d, 4)) return d;
+    return toucheMur(this.corps, ctx.carte, d === 1 ? -1 : 1, 4) ? (d === 1 ? -1 : 1) : 0;
   }
 
   private atterrissageSlam(ctx: Contexte): void {
@@ -293,7 +187,15 @@ export class Joueur implements Cible, EtatSpecial {
 
   private majTir(ctx: Contexte): void {
     const k = this.commandes;
-    const bouche = { x: this.cx + this.dir * 7, y: this.corps.y + 7, dir: this.dir };
+    this.angle = angleVisee(k, !this.corps.auSol);
+    const cos = Math.cos(this.angle);
+    const sin = Math.sin(this.angle);
+    const bouche = {
+      x: this.cx + this.dir * 7 * cos,
+      y: this.corps.y + 7 - 9 * sin,
+      dir: this.dir,
+      angle: this.angle,
+    };
     if (this.solo > 0) {
       this.solo--;
       if (this.solo % 3 === 0) tire(ctx, bouche, SOLO, ctx.rng.entre(-0.5, 0.5));
@@ -301,7 +203,7 @@ export class Joueur implements Cible, EtatSpecial {
     }
     if (k.appuye(C.SPECIAL) && this.speciaux > 0 && !this.slam) {
       this.speciaux--;
-      this.def.special.lance(ctx, bouche, this);
+      this.def.special.lance(ctx, { ...bouche, angle: 0 }, this);
       ctx.son('special', this.cx, this.cy);
     }
     if (!k.tenu(C.TIR) || this.recharge > 0 || this.ebloui > 0) return;
@@ -329,7 +231,8 @@ export class Joueur implements Cible, EtatSpecial {
       gauche: this.dir < 0,
       clignote: this.invulnerable > 0 && this.invulnerable % 8 < 4,
       e,
-      f: (this.anim & 127) | (tire ? 128 : 0),
+      // 4 bits de phase d'animation (un pas = 2 ticks), 3 bits de visée, 1 bit « tire »
+      f: ((this.anim >> 1) & 15) | (codeVisee(this.angle) << 4) | (tire ? 128 : 0),
     };
   }
 }

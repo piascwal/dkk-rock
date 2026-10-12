@@ -95,9 +95,9 @@ export function deplace(c: Corps, carte: Carte, traverse = false): void {
   }
 }
 
-/** Y a-t-il un mur plein juste à côté, du côté `dir` ? */
-export function toucheMur(c: Corps, carte: Carte, dir: -1 | 1): boolean {
-  const px = dir > 0 ? c.x + c.w + 1 : c.x - 1;
+/** Y a-t-il un mur plein à côté, du côté `dir`, à moins de `marge` pixels ? */
+export function toucheMur(c: Corps, carte: Carte, dir: -1 | 1, marge = 1): boolean {
+  const px = dir > 0 ? c.x + c.w + marge : c.x - marge;
   const tx = Math.floor(px / TUILE);
   const [y0, y1] = plage(c.y + 2, c.y + c.h - 2);
   for (let ty = y0; ty <= y1; ty++) if (carte.solide(tx, ty)) return true;

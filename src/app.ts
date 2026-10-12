@@ -14,6 +14,7 @@ import type { AnnonceDkk } from './reseau/annonce';
 import { Client, type Recherche } from './reseau/client';
 import { Hote } from './reseau/hote';
 import type { Carte } from './monde/carte';
+import { chargeFeuilles } from './rendu/feuilles-images';
 import { Rendu } from './rendu/rendu';
 import { Bulles, Histoire } from './ui/dialogues';
 import { Hud } from './ui/hud';
@@ -54,6 +55,7 @@ export class App implements Actions {
   }
 
   demarre(): void {
+    chargeFeuilles(import.meta.env.BASE_URL);
     const geste = () => {
       this.synthe.demarre();
       this.appliqueOptions();

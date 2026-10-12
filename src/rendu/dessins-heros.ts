@@ -1,3 +1,4 @@
+import { angleDuCode } from '../entites/visee';
 import { ANIM } from '../jeu/vue';
 import { humain, type Humain, type Pinceau } from './pinceau';
 
@@ -104,9 +105,19 @@ const INSTRUMENTS: Detail[] = [
   },
 ];
 
-/** Un héros : `membre` 0..4, `e` état d'animation, `f` image (bit 7 : en train de tirer). */
-export function dessineHeros(p: Pinceau, membre: number, e: number, f: number): void {
-  const anim = f & 127;
+/**
+ * Un héros : `membre` 0..4, `e` état d'animation, `f` image (bits 0-3 : phase, 4-6 : visée,
+ * bit 7 : en train de tirer). Avec `ctx`, l'instrument pivote vers la visée.
+ */
+export function dessineHeros(
+  p: Pinceau,
+  membre: number,
+  e: number,
+  f: number,
+  ctx?: CanvasRenderingContext2D,
+): void {
+  const anim = (f & 15) * 2;
+  const angle = angleDuCode((f >> 4) & 7);
   const tire = (f & 128) !== 0;
   const brasLeves = e === ANIM.TYROLIENNE || e === ANIM.ECHELLE;
   const pas =
@@ -118,7 +129,17 @@ export function dessineHeros(p: Pinceau, membre: number, e: number, f: number): 
     rebond: e === ANIM.DEBOUT && anim % 40 < 20 ? 0 : e === ANIM.DEBOUT ? 1 : 0,
   });
   COIFFURES[membre]?.(p, yt, tire, anim);
-  if (!brasLeves) INSTRUMENTS[membre]?.(p, yt, tire, anim);
+  if (brasLeves) return;
+  if (ctx && angle !== 0) {
+    // l'instrument pivote autour de l'épaule
+    const epaule = yt + 8;
+    ctx.save();
+    ctx.translate(0, epaule);
+    ctx.rotate(-angle);
+    ctx.translate(0, -epaule);
+    INSTRUMENTS[membre]?.(p, yt, tire, anim);
+    ctx.restore();
+  } else INSTRUMENTS[membre]?.(p, yt, tire, anim);
 }
 
 /** Fadatchi le kiwi, avec son petit chapeau de cow-boy. */

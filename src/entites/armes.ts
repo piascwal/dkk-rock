@@ -10,11 +10,12 @@ import {
   type DefProjectile,
 } from './projectiles-defs';
 
-/** Celui qui tire : la bouche de l'arme et le sens. */
+/** Celui qui tire : la bouche de l'arme, le sens, et l'angle au-dessus de l'horizontale (radians). */
 export interface Tireur {
   x: number;
   y: number;
   dir: 1 | -1;
+  angle?: number;
 }
 
 export interface DefArme {
@@ -33,7 +34,11 @@ export interface DefArme {
 
 /** Tire un projectile depuis la bouche de l'arme, avec un angle vertical. */
 export function tire(ctx: Contexte, t: Tireur, def: DefProjectile, vy = 0, vitesse = def.vitesse): void {
-  ctx.ajoute(new Projectile(ctx, def, 'heros', t.x, t.y, t.dir * vitesse, vy));
+  // `vy` est un écart perpendiculaire à la visée (éventail, cloche) : on tourne le tout avec l'angle
+  const a = t.angle ?? 0;
+  const vx = t.dir * (vitesse * Math.cos(a) + vy * Math.sin(a));
+  const vyFinal = -vitesse * Math.sin(a) + vy * Math.cos(a);
+  ctx.ajoute(new Projectile(ctx, def, 'heros', t.x, t.y, vx, vyFinal));
 }
 
 /** Les armes que l'on trouve en chemin. L'index 0 est réservé à l'instrument du héros. */

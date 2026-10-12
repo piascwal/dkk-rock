@@ -51,7 +51,7 @@ export class Bulles {
     }
     replique(this.element, r.qui, r.texte);
     this.element.hidden = false;
-    this.finA = maintenant + Math.max(2600, r.texte.length * 55);
+    this.finA = maintenant + Math.max(2200, r.texte.length * 48);
   }
 }
 

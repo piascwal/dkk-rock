@@ -47,6 +47,10 @@ minimale, et le Yéti Alpha) → la Plage du Tube de l'Été → la Ville Autotu
 Commandes : joystick et boutons à l'écran ; clavier flèches/ZQSD/WASD, Espace saut, J tir, L
 spécial, Échap pause ; manette standard.
 
+- **Viser :** haut tire droit en l'air, haut + côté en diagonale ; en l'air, bas tire vers le sol.
+- **Contre un mur :** saut en poussant à l'opposé = rebond ; en poussant vers le mur (ou sans
+  rien) = on monte le long du mur pour passer le bord. Haut = escalade, un court moment.
+
 ## À plusieurs
 
 Grâce à [lan-kit](https://github.com/piascwal/lan-kit) (figé sur `v0.2.0`), **sans serveur** :
@@ -84,7 +88,7 @@ src/
   jeu/               la Partie (simulation), règles, explosions, sauvegarde, la vue (EtatVue)
   niveaux/           format ASCII, cartes/, textes/ (dialogues), index
   histoire/          épilogue et défaite
-  rendu/             caméra, fonds, tuiles, sprites dessinés en code, particules
+  rendu/             caméra, trois plans de fond, décor du plan proche, tuiles, sprites, particules
   audio/             synthé, bruitages, séquenceur musical
   entrees/           clavier, manette, tactile
   reseau/            protocole binaire, hôte, client (sur lan-kit)
@@ -98,6 +102,7 @@ validé.
 
 ### Ajouter du contenu
 
+- **Remplacer un personnage par un vrai sprite :** voir [docs/ASSETS.md](docs/ASSETS.md).
 - **Un niveau :** une carte ASCII dans `src/niveaux/cartes/` (légende dans `format.ts`), ses
   textes dans `src/niveaux/textes/`, une ligne dans `src/niveaux/index.ts`. Le test
   d'accessibilité vérifie qu'on atteint la fin sans rien détruire.

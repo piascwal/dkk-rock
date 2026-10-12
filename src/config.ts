@@ -3,8 +3,8 @@
 /** Côté d'une tuile, en pixels du monde. */
 export const TUILE = 16;
 
-/** Hauteur de la vue en pixels du monde (13,5 tuiles) ; la largeur suit la forme de l'écran. */
-export const HAUTEUR_VUE = 216;
+/** Hauteur de la vue en pixels du monde (10,5 tuiles : la caméra est près des héros) ; la largeur suit la forme de l'écran. */
+export const HAUTEUR_VUE = 168;
 
 /** La simulation avance par pas fixes de 1/60 s. */
 export const TICKS_PAR_SECONDE = 60;

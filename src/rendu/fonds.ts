@@ -154,16 +154,26 @@ function palmier(c: CanvasRenderingContext2D, x: number, y: number, h: number, c
   }
 }
 
-/** Le fond d'un monde : un ciel en dégradé et deux plans de décor qui défilent moins vite que le jeu. */
+/** Vitesse de défilement des trois plans (1 = la même que le jeu) : lointain, moyen, proche. */
+const PARALLAXE = [0.12, 0.3, 0.55];
+
+/** Le fond d'un monde : un ciel en dégradé et trois plans de décor qui défilent moins vite que le jeu. */
 export class Fond {
   private readonly plans: HTMLCanvasElement[];
 
   constructor(private readonly theme: Theme) {
-    this.plans = ([0, 1] as const).map((plan) => {
+    // le plan proche reprend le dessin du plan moyen, autre graine, assombri : plus près, plus sombre
+    this.plans = ([0, 1, 1] as const).map((plan, i) => {
       const toile = document.createElement('canvas');
       toile.width = LARGEUR_BANDE;
       toile.height = HAUTEUR_BANDE;
-      DECORS[theme.decor](toile.getContext('2d')!, new Aleatoire(7 + plan * 13), theme, plan);
+      const c = toile.getContext('2d')!;
+      DECORS[theme.decor](c, new Aleatoire(7 + i * 13), theme, plan);
+      if (i === 2) {
+        c.globalCompositeOperation = 'source-atop';
+        c.fillStyle = 'rgba(0,0,0,0.35)';
+        c.fillRect(0, 0, LARGEUR_BANDE, HAUTEUR_BANDE);
+      }
       return toile;
     });
   }
@@ -185,9 +195,9 @@ export class Fond {
     this.astres(ctx, largeur, tick);
     // en haut d'un niveau, le décor descend : on voit plus de ciel
     const hauteurAuDessus = Math.max(0, basMonde - HAUTEUR_VUE - camY);
-    [0.15, 0.4].forEach((f, i) => {
+    PARALLAXE.forEach((f, i) => {
       const x = -((camX * f) % LARGEUR_BANDE);
-      const y = HAUTEUR_VUE - HAUTEUR_BANDE + Math.round(hauteurAuDessus * f * 0.6);
+      const y = HAUTEUR_VUE - HAUTEUR_BANDE + Math.round(hauteurAuDessus * f * 0.6) + i * 6;
       for (let k = 0; x + k * LARGEUR_BANDE < largeur; k++)
         ctx.drawImage(this.plans[i]!, Math.round(x + k * LARGEUR_BANDE), y);
     });

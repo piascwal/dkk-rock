@@ -1,0 +1,43 @@
+import { G, type Genre } from '../jeu/vue';
+
+/**
+ * Les planches de sprites : des images (PNG à fond transparent) qui remplacent les dessins faits
+ * en code, genre par genre. Tant qu'une planche manque ou n'est pas chargée, le dessin en code
+ * sert de repli : on peut donc en ajouter une à la fois.
+ *
+ * Mode d'emploi complet : docs/ASSETS.md.
+ */
+export interface Feuille {
+  /** nom du fichier dans public/sprites/ */
+  fichier: string;
+  /** taille d'une image de la planche, en pixels */
+  w: number;
+  h: number;
+  /**
+   * Nombre d'images de chaque ligne ; la ligne `n` sert à l'animation `n` (valeurs de ANIM :
+   * 0 debout, 1 court, 2 saut, 3 échelle, 4 tyrolienne, 5 mur, 6 mort, 7 alerte, 8 perdu,
+   * 9 étourdi, 10 attaque). Une ligne à 0 (ou absente) retombe sur la ligne 0.
+   */
+  images: number[];
+  /** durée d'une image, en ticks de 1/60 s (6 par défaut) */
+  rythme?: number;
+  /** agrandissement du sprite (1 par défaut) : la planche peut être plus fine que le jeu */
+  echelle?: number;
+}
+
+/**
+ * Les planches fournies. Une entrée par genre (voir `G` dans jeu/vue.ts), par exemple :
+ *
+ *   [G.JBT]: { fichier: 'jbt.png', w: 32, h: 32, images: [2, 6, 1, 4, 1, 1, 1], rythme: 6 },
+ */
+export const FEUILLES: Partial<Record<Genre, Feuille>> = {};
+
+/** Pour les tests et la lisibilité : tous les genres de héros. */
+export const GENRES_HEROS: Genre[] = [G.JBT, G.JBM, G.JBG, G.MAT, G.TOM];
+
+/** La case de la planche à dessiner : colonne et ligne, pour l'animation `e` à l'instant `compteur`. */
+export function caseDeLaPlanche(f: Feuille, e: number, compteur: number): { col: number; ligne: number } {
+  const ligne = (f.images[e] ?? 0) > 0 ? e : 0;
+  const n = Math.max(1, f.images[ligne] ?? 1);
+  return { col: Math.floor(compteur / (f.rythme ?? 6)) % n, ligne };
+}

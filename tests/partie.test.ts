@@ -102,6 +102,24 @@ describe('la partie', () => {
     expect(p.niveau).toBe(1);
   });
 
+  it.each([1, 2, 3, 4, 5])(
+    'au niveau %i, le groupe démarre au départ, pas à la fin du niveau précédent',
+    (n) => {
+      const p = nouvelle(n - 1);
+      p.ajouteJoueur(1, 2);
+      // les héros se trouvent loin, comme à la fin d'un niveau long
+      for (const j of p.joueurs) if (j) Object.assign(j.corps, { x: 190 * TUILE, y: 5 * TUILE });
+      p.termineNiveau();
+      while (p.phase === 'bilan') p.suivant();
+      expect(p.niveau).toBe(n);
+      for (const j of p.joueurs) {
+        if (!j) continue;
+        expect(Math.abs(j.corps.x - p.lu.depart.x)).toBeLessThan(2 * TUILE);
+        expect(j.corps.x).toBeLessThan(p.carte.largeur * TUILE);
+      }
+    },
+  );
+
   it('sans vies, le groupe se sépare puis reprend au dernier drapeau', () => {
     const p = nouvelle();
     p.vies = 0;

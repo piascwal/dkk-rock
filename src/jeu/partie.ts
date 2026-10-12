@@ -137,11 +137,17 @@ export class Partie implements Contexte {
     } else if (this.phase === 'fin') this.phase = 'fin';
   }
 
+  /** Le départ du niveau, ou le dernier drapeau levé. */
+  private pointDeDepart(): [number, number] {
+    const r = this.drapeau >= 0 ? this.lu.drapeaux[this.drapeau]! : this.lu.depart;
+    return [r.x + 3, r.y + 2];
+  }
+
+  /** Où réapparaît un héros : près d'un autre héros vivant, sinon au départ. */
   pointApparition(): [number, number] {
     const vivant = this.joueurs.find((j) => j && !j.mort);
     if (vivant) return [vivant.corps.x, vivant.corps.y - 4];
-    const r = this.drapeau >= 0 ? this.lu.drapeaux[this.drapeau]! : this.lu.depart;
-    return [r.x + 3, r.y + 2];
+    return this.pointDeDepart();
   }
 
   // ——— niveaux ———
@@ -159,7 +165,8 @@ export class Partie implements Contexte {
     this.finDans = -1;
     this.dejaDit = new Set();
     peuple(this);
-    const [x, y] = this.pointApparition();
+    // un nouveau niveau, ou une reprise : tout le monde repart du départ, pas de là où il était
+    const [x, y] = this.pointDeDepart();
     for (const j of this.joueurs) if (j) j.reapparait(x, y, j.membre);
   }
 

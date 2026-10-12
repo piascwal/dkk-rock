@@ -5,7 +5,7 @@ import { appliqueGravite, deplace, nouveauCorps, type Corps } from '../monde/phy
 import { Projectile } from './projectile';
 import { OEUF_KIWI } from './projectiles-defs';
 
-const CRIS = ['Kiii-wiii !', 'KIWI !', '*picore*', 'Kiwi. (Il a l’air déçu.)'];
+const CRIS = ['Kiii-wiii !', 'FADATCHI !', '*picore*', 'Kiwi. (Il a l’air déçu.)'];
 
 /**
  * Fadatchi, le kiwi mascotte du groupe : « espèce totalement disparue », selon

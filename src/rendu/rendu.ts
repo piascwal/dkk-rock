@@ -1,11 +1,12 @@
 import { HAUTEUR_VUE, TUILE } from '../config';
 import { G, type EtatVue, type Evenement } from '../jeu/vue';
-import type { Carte } from '../monde/carte';
+import { Carte } from '../monde/carte';
 import { proprietes } from '../monde/tuiles';
 import { NIVEAUX, niveauLu } from '../niveaux';
 import { AtlasTuiles } from './atlas-tuiles';
 import { Camera } from './camera';
 import { dessineEntite } from './dessin-entites';
+import { dessineDecor, semeDecor } from './decor';
 import { dessineTuiles, dessineTyroliennes } from './dessin-tuiles';
 import { Fond } from './fonds';
 import { Particules } from './particules';
@@ -25,6 +26,8 @@ export class Rendu {
   private atlas = new AtlasTuiles(THEMES.garage);
   private fond = new Fond(THEMES.garage);
   private niveau = -1;
+  private decor: ReturnType<typeof semeDecor> = [];
+  private carteDecor: Carte | null = null;
   private tick = 0;
 
   constructor(private readonly toile: HTMLCanvasElement) {
@@ -90,6 +93,17 @@ export class Rendu {
     const camY = this.camera.y + (s ? (Math.random() - 0.5) * s * 0.6 : 0);
 
     this.fond.dessine(ctx, camX, camY, this.largeur, carte.hauteur * TUILE, this.tick);
+    // le décor est semé à partir de la carte d'origine (avant destruction) : au chargement de chaque carte
+    if (this.carteDecor !== carte) {
+      this.carteDecor = carte;
+      const lu = niveauLu(vue.niveau);
+      this.decor = semeDecor(
+        new Carte(lu.largeur, lu.hauteur, lu.tuiles, lu.fond),
+        NIVEAUX[vue.niveau]!.theme,
+        11 + vue.niveau,
+      );
+    }
+    dessineDecor(ctx, this.decor, carte, camX, camY, this.largeur, false, this.theme.dessus);
     dessineTuiles(ctx, carte, this.atlas, camX, camY, this.largeur);
     dessineTyroliennes(ctx, niveauLu(vue.niveau).tyroliennes, carte, camX, camY);
     this.particules.meteo(this.theme.meteo, camX, camY, this.largeur);
@@ -99,6 +113,7 @@ export class Rendu {
     const tri = (g: number) => (g >= G.CAGE ? 0 : g >= G.P_BAGUETTE ? 2 : 1);
     for (const passe of [0, 1, 2])
       for (const v of vue.entites) if (tri(v.g) === passe) dessineEntite(ctx, v, camX, camY, this.atlas);
+    dessineDecor(ctx, this.decor, carte, camX, camY, this.largeur, true, this.theme.dessus);
     this.particules.dessine(ctx, camX, camY);
   }
 }

@@ -3,6 +3,7 @@ import { ANIM, G, type EntiteVue } from '../jeu/vue';
 import type { AtlasTuiles } from './atlas-tuiles';
 import { DESSINS_BOSS } from './dessins-boss';
 import { DESSINS_ENNEMIS } from './dessins-ennemis';
+import { dessineFeuille } from './feuilles-images';
 import { dessineHeros, dessineKiwi } from './dessins-heros';
 import { DESSINS_OBJETS, iconeArme } from './dessins-objets';
 import { DEMI_TAILLE, DESSINS_TIRS } from './dessins-tirs';
@@ -40,7 +41,10 @@ export function dessineEntite(
   const blanc = v.clignote && !heros && !estTir;
   const pb = blanc ? (x0: number, y0: number, w: number, h: number) => p(x0, y0, w, h, '#ffffff') : p;
 
-  if (heros) dessineHeros(p, v.g, v.e, v.f);
+  const compteur = heros ? (v.f & 15) * 2 : v.f;
+  if (dessineFeuille(ctx, v.g, v.e, compteur, heros !== undefined && (v.f & 128) !== 0)) {
+    // une planche fournie remplace le dessin en code
+  } else if (heros) dessineHeros(p, v.g, v.e, v.f, ctx);
   else if (v.g === G.KIWI) dessineKiwi(p, v.e, v.f);
   else if (estTir) DESSINS_TIRS[v.g]?.(pb, v.f, v.e);
   else if (DESSINS_ENNEMIS[v.g]) DESSINS_ENNEMIS[v.g]!(pb, v.e, v.f);
