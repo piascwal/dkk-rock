@@ -1,4 +1,13 @@
-import { BPM, DELAI_REAPPARITION, MAX_JOUEURS, TICKS_PAR_SECONDE, TUILE, VIES_DEPART } from '../config';
+import {
+  BPM,
+  DELAI_REAPPARITION,
+  HEROS_HAUTEUR,
+  HEROS_LARGEUR,
+  MAX_JOUEURS,
+  TICKS_PAR_SECONDE,
+  TUILE,
+  VIES_DEPART,
+} from '../config';
 import { Aleatoire } from '../moteur/maths';
 import { Carte } from '../monde/carte';
 import { Joueur } from '../entites/joueur';
@@ -140,7 +149,8 @@ export class Partie implements Contexte {
   /** Le départ du niveau, ou le dernier drapeau levé. */
   private pointDeDepart(): [number, number] {
     const r = this.drapeau >= 0 ? this.lu.drapeaux[this.drapeau]! : this.lu.depart;
-    return [r.x + 3, r.y + 2];
+    // les pieds sur le sol de la case de départ
+    return [r.x + (TUILE - HEROS_LARGEUR) / 2, r.y + TUILE - HEROS_HAUTEUR];
   }
 
   /** Où réapparaît un héros : près d'un autre héros vivant, sinon au départ. */

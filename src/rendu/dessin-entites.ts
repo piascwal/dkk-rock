@@ -4,7 +4,8 @@ import type { AtlasTuiles } from './atlas-tuiles';
 import { DESSINS_BOSS } from './dessins-boss';
 import { DESSINS_ENNEMIS } from './dessins-ennemis';
 import { dessineFeuille } from './feuilles-images';
-import { dessineHeros, dessineKiwi } from './dessins-heros';
+import { FEUILLES } from './feuilles';
+import { dessineHeros, dessineInstrument, dessineKiwi } from './dessins-heros';
 import { DESSINS_OBJETS, iconeArme } from './dessins-objets';
 import { DEMI_TAILLE, DESSINS_TIRS } from './dessins-tirs';
 import { pinceau } from './pinceau';
@@ -43,7 +44,10 @@ export function dessineEntite(
 
   const compteur = heros ? (v.f & 15) * 2 : v.f;
   if (dessineFeuille(ctx, v.g, v.e, compteur, heros !== undefined && (v.f & 128) !== 0)) {
-    // une planche fournie remplace le dessin en code
+    // une planche fournie remplace le dessin en code ; l'instrument d'un héros se pose par-dessus
+    const epaule = FEUILLES[v.g]?.epaule;
+    if (heros && epaule && v.e !== ANIM.ECHELLE && v.e !== ANIM.TYROLIENNE && v.e !== ANIM.MORT)
+      dessineInstrument(p, ctx, v.g, v.f, epaule);
   } else if (heros) dessineHeros(p, v.g, v.e, v.f, ctx);
   else if (v.g === G.KIWI) dessineKiwi(p, v.e, v.f);
   else if (estTir) DESSINS_TIRS[v.g]?.(pb, v.f, v.e);

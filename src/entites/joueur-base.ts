@@ -1,4 +1,4 @@
-import { INVULNERABLE, PV_HEROS, SPECIAUX_DEPART } from '../config';
+import { HEROS_HAUTEUR, HEROS_LARGEUR, INVULNERABLE, PV_HEROS, SPECIAUX_DEPART } from '../config';
 import { EtatCommandes } from '../jeu/commandes';
 import type { Camp, Cible, Contexte, Tyrolienne } from '../jeu/contexte';
 import { nouveauCorps, type Corps } from '../monde/physique';
@@ -40,7 +40,7 @@ export abstract class JoueurBase implements Cible, EtatSpecial {
     x: number,
     y: number,
   ) {
-    this.corps = nouveauCorps(x, y, 10, 14);
+    this.corps = nouveauCorps(x, y, HEROS_LARGEUR, HEROS_HAUTEUR);
   }
 
   get def(): DefHeros {

@@ -198,6 +198,11 @@ h2 {
   height: 48px;
 }
 
+.rocker img {
+  width: 88px;
+  height: 88px;
+}
+
 .liste {
   display: flex;
   flex-direction: column;
@@ -311,8 +316,8 @@ h2 {
 }
 
 #bulle .portrait {
-  width: 26px;
-  height: 26px;
+  width: 36px;
+  height: 36px;
   flex: none;
 }
 

@@ -27,11 +27,9 @@ export function dessineFeuille(
   const f = FEUILLES[genre];
   const img = images.get(genre);
   if (!f || !img) return false;
-  const { col, ligne } = caseDeLaPlanche(
-    f,
-    tire && (f.images[ANIM.ATTAQUE] ?? 0) > 0 ? ANIM.ATTAQUE : e,
-    compteur,
-  );
+  // à l'arrêt, un héros qui tire tend le bras ; en mouvement, ses bras balancent et l'instrument montre le tir
+  const tendu = tire && e === ANIM.DEBOUT && (f.images[ANIM.ATTAQUE] ?? 0) > 0;
+  const { col, ligne } = caseDeLaPlanche(f, tendu ? ANIM.ATTAQUE : e, compteur);
   const k = f.echelle ?? 1;
   ctx.drawImage(
     img,

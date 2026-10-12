@@ -72,7 +72,12 @@ const DESSINS: Record<Qui, [number, number, (p: Pinceau) => void]> = {
 const cache = new Map<Qui, string>();
 
 /** Le portrait d'un personnage, en image (data URL) pour le HTML. */
+/** Les portraits fournis en pleine définition (public/portraits/) : ils remplacent les dessins en code. */
+const IMAGES: Partial<Record<Qui, string>> = { JBT: 'jbt', JBM: 'jbm', TOM: 'tom' };
+
 export function portrait(qui: Qui): string {
+  const fichier = IMAGES[qui];
+  if (fichier) return `${import.meta.env.BASE_URL}portraits/${fichier}.png`;
   let url = cache.get(qui);
   if (url) return url;
   const [w, h, dessin] = DESSINS[qui];

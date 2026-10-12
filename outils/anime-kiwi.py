@@ -22,7 +22,7 @@ SORTIE = RACINE / 'public' / 'sprites'
 # repère commun (coordonnées de la pose A) : x de -2 à 66, y de -8 à 54
 X0, Y0, LARGEUR, HAUTEUR = -2, -8, 68, 64
 DECALAGE = {'A': (0, 0), 'B': (0, -6), 'C': (-1, -7)}  # recalage des torses, mesuré par corrélation
-LARGEUR_JEU = 30  # largeur du kiwi en jeu, en pixels (un héros fait environ 25 px de haut)
+LARGEUR_JEU = 19  # largeur du kiwi en jeu, en pixels : il arrive aux genoux d'un héros de 28 px
 PIVOT_COU = (24, 13)
 TETE = [(-2, -8), (27, -8), (27, 13), (22, 18), (16, 18.5), (15, 19), (15, 34), (-2, 34)]
 # la base du cou reste en place sous la tête qui pivote
@@ -176,17 +176,19 @@ def reduit(im, palette, largeur_cible, cadre):
     toile.alpha_composite(im.transpose(Image.FLIP_LEFT_RIGHT), (demi - x_pieds, 0))
     echelle = largeur_cible / (cadre[0])
     nl, nh = round(toile.width * echelle), round(toile.height * echelle)
-    # moyenne par cases, avec alpha prémultiplié, puis retour à la palette
-    a = np.array(toile).astype(float)
-    a[..., :3] *= a[..., 3:4] / 255
-    pm = Image.fromarray(a.astype(np.uint8), 'RGBA').resize((nl, nh), Image.BOX)
-    b = np.array(pm).astype(float)
-    al = b[..., 3]
-    rgb = np.where(al[..., None] > 0, b[..., :3] / np.maximum(al[..., None], 1) * 255, 0)
-    dist = ((rgb[..., None, :] - palette[None, None].astype(float)) ** 2).sum(3)
+    # chaque case prend la couleur la plus fréquente de sa zone (la moyenne crée des pixels parasites)
+    a = np.array(toile)
     res = np.zeros((nh, nl, 4), np.uint8)
-    res[..., :3] = palette[dist.argmin(2)]
-    res[..., 3] = np.where(al >= 128, 255, 0)
+    xs, ys = np.linspace(0, toile.width, nl + 1), np.linspace(0, toile.height, nh + 1)
+    for j in range(nh):
+        for i in range(nl):
+            y0, x0 = int(ys[j]), int(xs[i])
+            blk = a[y0 : max(y0 + 1, int(ys[j + 1])), x0 : max(x0 + 1, int(xs[i + 1]))].reshape(-1, 4)
+            pleins = blk[blk[:, 3] > 0]
+            if len(pleins) * 2 < len(blk):
+                continue
+            couleurs, nb = np.unique(pleins, axis=0, return_counts=True)
+            res[j, i] = couleurs[nb.argmax()]
     return Image.fromarray(res)
 
 

@@ -142,6 +142,33 @@ export function dessineHeros(
   } else INSTRUMENTS[membre]?.(p, yt, tire, anim);
 }
 
+/**
+ * L'instrument d'un héros dessiné avec une planche de sprites : il n'est pas sur la planche (il pivote
+ * avec la visée), on le pose à l'épaule. `epaule` : décalage horizontal du centre, hauteur au-dessus des pieds.
+ */
+export function dessineInstrument(
+  p: Pinceau,
+  ctx: CanvasRenderingContext2D,
+  membre: number,
+  f: number,
+  epaule: { x: number; y: number },
+): void {
+  const anim = (f & 15) * 2;
+  const angle = angleDuCode((f >> 4) & 7);
+  const tire = (f & 128) !== 0;
+  // les instruments sont dessinés par rapport au haut de la tête, l'épaule est 8 px plus bas
+  const yt = -epaule.y - 8;
+  ctx.save();
+  ctx.translate(epaule.x, 0);
+  if (angle !== 0) {
+    ctx.translate(0, yt + 8);
+    ctx.rotate(-angle);
+    ctx.translate(0, -(yt + 8));
+  }
+  INSTRUMENTS[membre]?.(p, yt, tire, anim);
+  ctx.restore();
+}
+
 /** Fadatchi le kiwi, avec son petit chapeau de cow-boy. */
 export function dessineKiwi(p: Pinceau, e: number, f: number): void {
   const rebond = e === ANIM.COURT && f % 8 < 4 ? -1 : 0;
