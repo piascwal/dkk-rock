@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"
+    />
+    <meta name="theme-color" content="#120914" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="description"
+      content="DKK : Rock Never Dies — un jeu de plateforme et de tir où tout se détruit. Un groupe de rock du collège se reforme pour débrancher DJ Boucle. Jusqu'à 4 joueurs."
+    />
+    <title>DKK : Rock Never Dies</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icone.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <main id="jeu">
+      <canvas id="toile" aria-label="Le jeu"></canvas>
+      <div id="hud" hidden></div>
+      <div id="bulle" hidden></div>
+      <div id="histoire" hidden></div>
+      <div id="ecran" class="ecran"></div>
+      <button id="bouton-pause" type="button" aria-label="Pause" hidden>II</button>
+      <div id="tourne" aria-live="polite">
+        <div class="icone-tourne">📱↻</div>
+        <p>Tournez votre téléphone : DKK se joue en paysage.</p>
+      </div>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
