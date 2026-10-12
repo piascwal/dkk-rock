@@ -43,11 +43,18 @@ export const FEUILLES: Partial<Record<Genre, Feuille>> = {
 `echelle` agrandit l'image (2 = deux fois plus grande) si la planche est plus fine que le jeu.
 Une planche faite pour le jeu a des personnages d'environ 24 à 32 px de haut (une tuile = 16 px).
 
+## Déjà fait : Fadatchi
+
+Le kiwi est animé à partir de trois poses de référence (`assets-sources/fadatchi/`) par
+`python3 outils/anime-kiwi.py` (Pillow et numpy). Le script remet les poses sur leur grille de
+pixels, les recale, découpe la tête au cou pour le coup de bec, retourne vers la droite et réduit
+à la taille du jeu : aucun pixel n'est redessiné. Il sert de modèle pour les autres personnages.
+
 ## À savoir
 
 - Les **héros** viseraient en diagonale et en l'air : avec une planche, le jeu ne tourne plus
   l'instrument tout seul. Prévoir, si on le souhaite, des lignes dédiées (à ajouter ensuite).
 - Les **portraits** des dialogues sont encore faits en code ; ils suivront quand les planches
   seront là.
-- Idéalement, commencer par les cinq héros et Fadatchi, puis les ennemis les plus fréquents (fêtard,
+- Idéalement, continuer par les cinq héros, puis les ennemis les plus fréquents (fêtard,
   videur, danseur, yéti).

@@ -30,7 +30,10 @@ export interface Feuille {
  *
  *   [G.JBT]: { fichier: 'jbt.png', w: 32, h: 32, images: [2, 6, 1, 4, 1, 1, 1], rythme: 6 },
  */
-export const FEUILLES: Partial<Record<Genre, Feuille>> = {};
+export const FEUILLES: Partial<Record<Genre, Feuille>> = {
+  // Fadatchi, fabriqué par outils/anime-kiwi.py : debout 8 images (il respire), court 4, saut 1, coup de bec 4
+  [G.KIWI]: { fichier: 'fadatchi.png', w: 46, h: 25, images: [8, 4, 1, 0, 0, 0, 0, 0, 0, 0, 4], rythme: 5 },
+};
 
 /** Pour les tests et la lisibilité : tous les genres de héros. */
 export const GENRES_HEROS: Genre[] = [G.JBT, G.JBM, G.JBG, G.MAT, G.TOM];

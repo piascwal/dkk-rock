@@ -87,6 +87,11 @@ export class Kiwi implements EntiteSimulee {
 
   vue(): EntiteVue {
     const c = this.corps;
+    const pique = this.bec > 12;
+    let e: number = ANIM.DEBOUT;
+    if (pique) e = ANIM.ATTAQUE;
+    else if (!c.auSol) e = ANIM.SAUT;
+    else if (Math.abs(c.vx) > 0.2) e = ANIM.COURT;
     return {
       id: this.id,
       g: G.KIWI,
@@ -94,8 +99,9 @@ export class Kiwi implements EntiteSimulee {
       y: c.y + c.h,
       gauche: this.dir < 0,
       clignote: false,
-      e: this.bec > 20 ? ANIM.ATTAQUE : Math.abs(c.vx) > 0.2 ? ANIM.COURT : ANIM.DEBOUT,
-      f: this.anim & 255,
+      e,
+      // un coup de bec se joue depuis son début : l'image dépend du temps écoulé depuis le coup
+      f: pique ? 30 - this.bec : this.anim & 255,
     };
   }
 }
