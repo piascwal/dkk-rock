@@ -191,8 +191,8 @@ export class Joueur extends JoueurBase {
     const cos = Math.cos(this.angle);
     const sin = Math.sin(this.angle);
     const bouche = {
-      x: this.cx + this.dir * 7 * cos,
-      y: this.corps.y + 8 - 9 * sin,
+      x: this.cx + this.dir * 10 * cos,
+      y: this.corps.y + 10 - 13 * sin,
       dir: this.dir,
       angle: this.angle,
     };

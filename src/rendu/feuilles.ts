@@ -33,19 +33,19 @@ export interface Feuille {
 /**
  * Les planches fournies. Une entrée par genre (voir `G` dans jeu/vue.ts), par exemple :
  *
- *   [G.JBT]: { fichier: 'jbt.png', w: 32, h: 32, images: [2, 6, 1, 4, 1, 1, 1], rythme: 6 },
+ *   [G.JBT]: { fichier: 'jbt.png', w: 38, h: 41, images: [2, 6, 1, 4, 1, 1, 1], rythme: 6 },
  */
 const ANIMATIONS_HEROS = [4, 6, 1, 2, 1, 1, 1, 0, 0, 0, 2];
 
 export const FEUILLES: Partial<Record<Genre, Feuille>> = {
   // les héros, fabriqués par outils/anime-heros.py : repos 4, course 6, saut, échelle 2, tyrolienne, mur, mort, tir 2
-  [G.JBT]: { fichier: 'jbt.png', w: 27, h: 29, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 3, y: 17 } },
-  [G.JBM]: { fichier: 'jbm.png', w: 25, h: 28, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 3, y: 17 } },
-  [G.JBG]: { fichier: 'jbg.png', w: 27, h: 29, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 3, y: 17 } },
-  [G.MAT]: { fichier: 'mat.png', w: 24, h: 28, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 3, y: 17 } },
-  [G.TOM]: { fichier: 'tom.png', w: 27, h: 29, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 3, y: 17 } },
+  [G.JBT]: { fichier: 'jbt.png', w: 38, h: 41, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 4, y: 24 } },
+  [G.JBM]: { fichier: 'jbm.png', w: 35, h: 41, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 4, y: 24 } },
+  [G.JBG]: { fichier: 'jbg.png', w: 38, h: 41, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 4, y: 24 } },
+  [G.MAT]: { fichier: 'mat.png', w: 34, h: 40, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 4, y: 24 } },
+  [G.TOM]: { fichier: 'tom.png', w: 39, h: 42, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 4, y: 24 } },
   // Fadatchi, fabriqué par outils/anime-kiwi.py : debout 8 images (il respire), court 4, saut 1, coup de bec 4
-  [G.KIWI]: { fichier: 'fadatchi.png', w: 29, h: 16, images: [8, 4, 1, 0, 0, 0, 0, 0, 0, 0, 4], rythme: 5 },
+  [G.KIWI]: { fichier: 'fadatchi.png', w: 41, h: 23, images: [8, 4, 1, 0, 0, 0, 0, 0, 0, 0, 4], rythme: 5 },
 };
 
 /** Pour les tests et la lisibilité : tous les genres de héros. */

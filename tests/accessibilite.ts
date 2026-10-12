@@ -4,13 +4,14 @@ import type { NiveauLu } from '../src/niveaux/format';
 
 /**
  * Peut-on aller du départ à une case, sans rien détruire et sans saut contre
- * les murs ? Modèle prudent du héros (une case de large, une de haut) :
+ * les murs ? Modèle prudent du héros (une case de large, deux de haut) :
  * marcher, tomber, sauter de 2 cases vers le haut et 3 de côté, grimper aux
  * échelles, prendre les tyroliennes.
  */
 export function casesAccessibles(lu: NiveauLu): Set<string> {
   const c = new Carte(lu.largeur, lu.hauteur, lu.tuiles, lu.fond);
-  const libre = (x: number, y: number) => y >= 0 && !c.solide(x, y);
+  // le héros fait presque deux tuiles de haut : il lui faut la case et celle du dessus
+  const libre = (x: number, y: number) => y >= 1 && !c.solide(x, y) && !c.solide(x, y - 1);
   const porte = (x: number, y: number) => {
     const p = c.props(x, y + 1);
     return p.solide || (p.echelle && !c.props(x, y).echelle);

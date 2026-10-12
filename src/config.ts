@@ -15,9 +15,9 @@ export const CHUTE_MAX = 7;
 /** Tempo du monde : les ennemis « techno » n'attaquent que sur le temps. */
 export const BPM = 124;
 
-/** Boîte de collision d'un héros ; le sprite fait environ 28 px, la tête dépasse un peu. */
-export const HEROS_LARGEUR = 11;
-export const HEROS_HAUTEUR = 22;
+/** Boîte de collision d'un héros ; le sprite fait environ 40 px, la tête dépasse un peu. */
+export const HEROS_LARGEUR = 14;
+export const HEROS_HAUTEUR = 30;
 
 export const MAX_JOUEURS = 4;
 export const VIES_DEPART = 5;

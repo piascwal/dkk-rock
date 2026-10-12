@@ -55,7 +55,7 @@ pixels, les recale, découpe la tête au cou pour le coup de bec, retourne vers 
 Les héros viennent de leur sprite de base (`assets-sources/heros/`) par
 `python3 outils/anime-heros.py [jbt|jbm|jbg|mat|tom]`. Le script découpe le sprite en membres (bras, cuisses,
 tibias ; polygones et pivots dans `outils/gabarits.py`), les fait tourner autour des articulations
-(`outils/squelette.py`), puis réduit à 28 px de haut en gardant la palette. Tom et JBT partagent le même
+(`outils/squelette.py`), puis réduit à 40 px de haut en gardant la palette. Tom et JBT partagent le même
 gabarit de corps (en foulée) ; JBM, Mat (debout, de face) et JBG (long manteau, dont les pans restent fixes) ont chacun le leur. Il produit aussi les portraits de `public/portraits/` (tête et épaules,
 pleine définition) pour les dialogues et le choix du héros.
 

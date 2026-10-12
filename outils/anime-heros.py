@@ -25,7 +25,7 @@ from squelette import Personnage
 RACINE = pathlib.Path(__file__).resolve().parent.parent
 SRC = RACINE / 'assets-sources' / 'heros'
 SORTIE = RACINE / 'public' / 'sprites'
-HAUTEUR_JEU = 28  # hauteur d'un héros debout, en pixels du jeu (tuile = 16)
+HAUTEUR_JEU = 40  # hauteur d'un héros debout, en pixels du jeu (tuile = 16)
 TAILLE = 128
 
 # angle de repos des jambes dans le sprite de référence (degrés, + = pied vers l'arrière)

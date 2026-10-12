@@ -156,10 +156,13 @@ export function dessineInstrument(
   const anim = (f & 15) * 2;
   const angle = angleDuCode((f >> 4) & 7);
   const tire = (f & 128) !== 0;
-  // les instruments sont dessinés par rapport au haut de la tête, l'épaule est 8 px plus bas
-  const yt = -epaule.y - 8;
+  // les instruments sont dessinés par rapport au haut de la tête (l'épaule est 8 px plus bas), pour un héros
+  // de 28 px dont l'épaule est à 17 px : on les agrandit dans la proportion de la planche
+  const k = epaule.y / 17;
+  const yt = -17 - 8;
   ctx.save();
   ctx.translate(epaule.x, 0);
+  ctx.scale(k, k);
   if (angle !== 0) {
     ctx.translate(0, yt + 8);
     ctx.rotate(-angle);

@@ -22,7 +22,7 @@ SORTIE = RACINE / 'public' / 'sprites'
 # repère commun (coordonnées de la pose A) : x de -2 à 66, y de -8 à 54
 X0, Y0, LARGEUR, HAUTEUR = -2, -8, 68, 64
 DECALAGE = {'A': (0, 0), 'B': (0, -6), 'C': (-1, -7)}  # recalage des torses, mesuré par corrélation
-LARGEUR_JEU = 19  # largeur du kiwi en jeu, en pixels : il arrive aux genoux d'un héros de 28 px
+LARGEUR_JEU = 27  # largeur du kiwi en jeu, en pixels : il arrive aux genoux d'un héros de 40 px
 PIVOT_COU = (24, 13)
 TETE = [(-2, -8), (27, -8), (27, 13), (22, 18), (16, 18.5), (15, 19), (15, 34), (-2, 34)]
 # la base du cou reste en place sous la tête qui pivote
