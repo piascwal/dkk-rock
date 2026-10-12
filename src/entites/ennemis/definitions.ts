@@ -40,9 +40,10 @@ export const ENNEMIS_PAR_LETTRE: Record<string, DefEnnemi> = {
   a: {
     nom: 'Fêtard autotuné',
     genre: G.FETARD,
+    genres: [G.FETARD, G.FETARD_2, G.FETARD_3, G.FETARD_4],
     pv: 2,
-    w: 10,
-    h: 15,
+    w: 14,
+    h: 38,
     vitesse: 0.9,
     vision: 170,
     visionVerticale: 60,

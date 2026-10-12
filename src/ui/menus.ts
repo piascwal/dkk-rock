@@ -8,6 +8,7 @@ import type { Hote } from '../reseau/hote';
 import { bouton, el } from './elements';
 import { ecranInviter, ecranRejoindre } from './menus-reseau';
 import { QUI_DES_MEMBRES, portrait } from './portraits';
+import { texteVersion } from '../version';
 
 /** Ce que les menus demandent à l'application. */
 export interface Actions {
@@ -81,6 +82,7 @@ export class Menus {
         'Clavier : flèches ou ZQSD, Espace saut, J tir, L spécial, Échap pause. Manette acceptée. Jusqu’à 4 joueurs.',
         'aide',
       ),
+      el('p', texteVersion(), 'version'),
     );
   }
 
@@ -176,6 +178,7 @@ export class Menus {
       el('h2', 'Pause'),
       boutons,
       el('p', 'À plusieurs, la partie continue pendant la pause.', 'aide'),
+      el('p', texteVersion(), 'version'),
     );
   }
 

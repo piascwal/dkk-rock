@@ -1,4 +1,5 @@
 import { ANIM } from '../jeu/vue';
+import { VERSION } from '../version';
 import { FEUILLES, caseDeLaPlanche } from './feuilles';
 import type { Genre } from '../jeu/vue';
 
@@ -9,7 +10,8 @@ export function chargeFeuilles(base: string): void {
   for (const [genre, f] of Object.entries(FEUILLES)) {
     const img = new Image();
     img.onload = () => images.set(Number(genre) as Genre, img);
-    img.src = `${base}sprites/${f.fichier}`;
+    // la version dans l'adresse : après une mise à jour, le navigateur ne ressert pas l'ancienne image
+    img.src = `${base}sprites/${f.fichier}?v=${VERSION}`;
   }
 }
 

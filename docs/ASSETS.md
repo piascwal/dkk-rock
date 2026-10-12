@@ -69,8 +69,8 @@ L'instrument n'est pas sur la planche : le jeu le dessine par-dessus, à l'épau
 ## Sprites fixes (ennemis sans animation)
 
 Un ennemi peut n'avoir qu'une seule image : `images: [1]` dans `feuilles.ts`. Il se déplace alors sans
-cycle de marche. Les videurs fonctionnent ainsi (`outils/fixe-ennemis.py`, depuis
-`assets-sources/ennemis/`). Pour qu'un ennemi existe en plusieurs apparences, ajouter un genre dans
+cycle de marche. Les videurs (2 apparences) et les fêtards (4) fonctionnent ainsi
+(`outils/fixe-ennemis.py`, depuis `assets-sources/ennemis/`). Pour qu'un ennemi existe en plusieurs apparences, ajouter un genre dans
 `src/jeu/vue.ts` et le lister dans `genres` de sa définition : une apparence est tirée au sort à chaque
 apparition.
 

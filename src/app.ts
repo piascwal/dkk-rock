@@ -18,7 +18,9 @@ import { chargeFeuilles } from './rendu/feuilles-images';
 import { Rendu } from './rendu/rendu';
 import { Bulles, Histoire } from './ui/dialogues';
 import { Hud } from './ui/hud';
+import { afficheNouvelleVersion } from './ui/maj';
 import { Menus, type Actions } from './ui/menus';
+import { verifieVersion } from './version';
 
 const PAS_MS = 1000 / 60;
 const $ = (id: string) => document.getElementById(id)!;
@@ -68,13 +70,27 @@ export class App implements Actions {
     });
     document.addEventListener('visibilitychange', () => {
       if (document.hidden && this.partie && !this.multijoueur) this.mettreEnPause();
+      if (!document.hidden) void this.controleVersion();
     });
     this.clavier.onPause = () => (this.enPause ? this.reprend() : this.mettreEnPause());
     $('bouton-pause').addEventListener('click', () => this.mettreEnPause());
     this.tactile.montre(false);
+    // après un rechargement de mise à jour, on retire le paramètre ?v= de l'adresse
+    if (location.search.includes('v=')) history.replaceState(null, '', location.pathname + location.hash);
+    void this.controleVersion();
     if (location.hash.startsWith('#salon=')) this.menus.rejoindre();
     else this.menus.titre();
     requestAnimationFrame((t) => this.boucle(t));
+  }
+
+  private derniereVerification = 0;
+
+  /** À l'ouverture et au retour sur l'onglet (au plus une fois par minute) : une version plus récente est-elle publiée ? */
+  private async controleVersion(): Promise<void> {
+    if (Date.now() - this.derniereVerification < 60_000) return;
+    this.derniereVerification = Date.now();
+    const r = await verifieVersion(import.meta.env.BASE_URL);
+    if (r.etat === 'nouvelle' && r.derniere) afficheNouvelleVersion($('maj'), r.derniere);
   }
 
   private get multijoueur(): boolean {

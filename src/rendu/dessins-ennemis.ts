@@ -7,18 +7,6 @@ const pasDe = (e: number, f: number) => (e === ANIM.COURT ? Math.floor(f / 5) % 
 
 /** Les ennemis ordinaires, par genre. */
 export const DESSINS_ENNEMIS: Partial<Record<number, Dessin>> = {
-  [G.FETARD]: (p, e, f) => {
-    const yt = humain(
-      p,
-      { peau: '#e8b48a', haut: '#ff4fd8', bas: '#1f3b73', chaussures: '#fff' },
-      { pas: pasDe(e, f) },
-    );
-    p(-4, yt - 1, 7, 2, '#ffd23f');
-    p(-5, yt, 2, 1, '#ffd23f');
-    p(0, yt + 2, 4, 1, '#111');
-    p(3, yt + 7, 2, 3, '#222');
-    if (e === ANIM.ATTAQUE) p(2, yt + 4, 2, 1, '#600');
-  },
   [G.DANSEUR]: (p, e, f) => {
     const danse = Math.floor(f / 8) % 2 === 0;
     const yt = humain(

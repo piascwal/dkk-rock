@@ -4,7 +4,7 @@
 Usage : python3 outils/fixe-ennemis.py      (Pillow et numpy requis)
 Entrées : assets-sources/ennemis/<nom>-base.png      Sorties : public/sprites/<nom>.png
 
-Le sprite est remis sur sa grille de pixels, recadré sur sa silhouette, puis réduit à HAUTEUR pixels
+Le sprite est remis sur sa grille de pixels, recadré sur sa silhouette, puis réduit à la hauteur voulue (SPRITES)
 en gardant la palette (vote majoritaire par case, comme pour les héros). Aucun pixel n'est redessiné.
 """
 import pathlib
@@ -15,8 +15,8 @@ from PIL import Image
 RACINE = pathlib.Path(__file__).resolve().parent.parent
 SRC = RACINE / 'assets-sources' / 'ennemis'
 SORTIE = RACINE / 'public' / 'sprites'
-HAUTEUR = 46  # hauteur du sprite en jeu, en pixels : le videur fait environ 46 px (voir la description)
-SPRITES = ['videur-polo', 'videur-costume']
+# hauteur de chaque sprite en jeu, en pixels (un héros fait 40 px)
+SPRITES = {'videur-polo': 46, 'videur-costume': 46, 'fetard-1': 40, 'fetard-2': 40, 'fetard-3': 40, 'fetard-4': 40}
 
 
 def natif(chemin):
@@ -46,9 +46,9 @@ def reduit(a, echelle):
 
 def main():
     SORTIE.mkdir(parents=True, exist_ok=True)
-    for nom in SPRITES:
+    for nom, hauteur in SPRITES.items():
         nat = natif(SRC / f'{nom}-base.png')
-        echelle = HAUTEUR / nat.shape[0]
+        echelle = hauteur / nat.shape[0]
         im = reduit(nat, echelle)
         im.save(SORTIE / f'{nom}.png')
         print(nom, 'taille en jeu', im.width, 'x', im.height)

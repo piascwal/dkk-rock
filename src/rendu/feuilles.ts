@@ -43,6 +43,11 @@ export const FEUILLES: Partial<Record<Genre, Feuille>> = {
   [G.JBM]: { fichier: 'jbm.png', w: 35, h: 41, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 4, y: 24 } },
   [G.JBG]: { fichier: 'jbg.png', w: 38, h: 41, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 4, y: 24 } },
   [G.MAT]: { fichier: 'mat.png', w: 34, h: 40, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 4, y: 24 } },
+  // les fêtards autotunés, quatre apparences en sprites fixes : outils/fixe-ennemis.py
+  [G.FETARD]: { fichier: 'fetard-1.png', w: 25, h: 40, images: [1] },
+  [G.FETARD_2]: { fichier: 'fetard-2.png', w: 26, h: 40, images: [1] },
+  [G.FETARD_3]: { fichier: 'fetard-3.png', w: 22, h: 40, images: [1] },
+  [G.FETARD_4]: { fichier: 'fetard-4.png', w: 20, h: 40, images: [1] },
   // les videurs, sprites fixes (une seule image, sans animation) : outils/fixe-ennemis.py
   [G.VIDEUR]: { fichier: 'videur-polo.png', w: 22, h: 46, images: [1] },
   [G.VIDEUR_COSTUME]: { fichier: 'videur-costume.png', w: 27, h: 46, images: [1] },

@@ -528,3 +528,45 @@ h2 {
   background: #8a5cf6;
   font-size: 1.3rem;
 }
+
+/* ——— version et mise à jour ——— */
+.version {
+  font-size: 0.8rem;
+  opacity: 0.85;
+  letter-spacing: 0.05em;
+}
+
+#maj {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  max-width: min(94vw, 34rem);
+  padding: 0.4rem 0.7rem;
+  background: rgba(10, 5, 12, 0.94);
+  border: 2px solid var(--jaune);
+  border-radius: 6px;
+  font-size: clamp(0.7rem, 3vh, 0.9rem);
+  box-shadow: 3px 3px 0 #000;
+}
+
+#maj button {
+  font: inherit;
+  font-family: var(--titre);
+  padding: 0.3em 0.8em;
+  border: 2px solid #000;
+  border-radius: 4px;
+  background: var(--rouge);
+  color: #fff;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#maj button.discret {
+  background: var(--encre);
+  color: #111;
+}

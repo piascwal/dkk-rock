@@ -62,6 +62,17 @@ L'hôte fait tourner la simulation ; les autres envoient leurs commandes (1 octe
 seconde) et reçoivent des instantanés (30 par seconde, moins de 4 Ko) qu'ils lissent, plus les
 évènements fiables (tuiles détruites, sons, dialogues).
 
+## Version et mise à jour
+
+Le numéro de version s'affiche sur l'écran titre et dans le menu pause, par exemple `v0.1.12 · a1b2c3d` :
+« majeur.mineur » de `package.json`, puis le numéro d'exécution de la CI, qui augmente à **chaque
+déploiement**, puis le commit publié. En développement : « version de développement ».
+
+À l'ouverture du jeu (et au retour sur l'onglet), le jeu compare sa version à `version.json`, publié avec le
+site : s'il en existe une plus récente, un bandeau propose de recharger (le rechargement contourne le cache de
+la page). Les images (sprites, portraits) portent la version dans leur adresse, pour qu'un ancien sprite ne
+reste jamais en cache.
+
 ## Développer
 
 ```bash
