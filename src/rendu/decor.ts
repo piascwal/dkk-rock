@@ -59,6 +59,9 @@ const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAccessoire[]
   },
 };
 
+/** Les accessoires sont dessinés pour un héros de 28 px : on les agrandit pour celui de 40 px. */
+const ECHELLE_ACCESSOIRES = 1.4;
+
 const SOLS_DECORES: number[] = [T.TERRE, T.NEIGE, T.SABLE, T.BETON, T.ROCHE, T.METAL, T.BOIS, T.GLACE];
 
 /**
@@ -81,7 +84,7 @@ export function semeDecor(carte: Carte, theme: NomTheme, graine: number): Pose[]
       const liste = dedans ? semis.dedans : semis.dehors;
       const quoi = rng.choix(liste);
       poses.push({ tx, ty, quoi, v: rng.entier(0, 255), devant: false });
-      libreDepuis = tx + (quoi === 'voiture' || quoi === 'vacheCasque' ? 3 : 2);
+      libreDepuis = tx + (quoi === 'voiture' || quoi === 'vacheCasque' ? 4 : 3);
       break;
     }
   }
@@ -121,7 +124,10 @@ export function dessineDecor(
       p(-3, -h, 1, h, couleurTouffe);
       p(0, -h - 1, 1, h + 1, couleurTouffe);
       p(3, -h, 1, h, couleurTouffe);
-    } else ACCESSOIRES[o.quoi](p, o.v);
+    } else {
+      ctx.scale(ECHELLE_ACCESSOIRES, ECHELLE_ACCESSOIRES);
+      ACCESSOIRES[o.quoi](p, o.v);
+    }
     ctx.restore();
   }
 }
