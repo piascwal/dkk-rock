@@ -1,0 +1,10 @@
+{
+  "name": "DKK : Rock Never Dies",
+  "short_name": "DKK",
+  "start_url": ".",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#120914",
+  "theme_color": "#120914",
+  "icons": [{ "src": "icone.svg", "sizes": "any", "type": "image/svg+xml" }]
+}
