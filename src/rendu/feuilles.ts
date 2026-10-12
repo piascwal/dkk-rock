@@ -43,6 +43,9 @@ export const FEUILLES: Partial<Record<Genre, Feuille>> = {
   [G.JBM]: { fichier: 'jbm.png', w: 35, h: 41, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 4, y: 24 } },
   [G.JBG]: { fichier: 'jbg.png', w: 38, h: 41, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 4, y: 24 } },
   [G.MAT]: { fichier: 'mat.png', w: 34, h: 40, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 4, y: 24 } },
+  // les videurs, sprites fixes (une seule image, sans animation) : outils/fixe-ennemis.py
+  [G.VIDEUR]: { fichier: 'videur-polo.png', w: 22, h: 46, images: [1] },
+  [G.VIDEUR_COSTUME]: { fichier: 'videur-costume.png', w: 27, h: 46, images: [1] },
   [G.TOM]: { fichier: 'tom.png', w: 39, h: 42, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 4, y: 24 } },
   // Fadatchi, fabriqué par outils/anime-kiwi.py : debout 8 images (il respire), court 4, saut 1, coup de bec 4
   [G.KIWI]: { fichier: 'fadatchi.png', w: 41, h: 23, images: [8, 4, 1, 0, 0, 0, 0, 0, 0, 0, 4], rythme: 5 },

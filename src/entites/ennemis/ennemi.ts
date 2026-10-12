@@ -1,7 +1,7 @@
 import { TUILE } from '../../config';
 import { appliqueGravite, deplace, ligneDeVue, nouveauCorps, type Corps } from '../../monde/physique';
 import type { Camp, Cible, Contexte, EntiteSimulee } from '../../jeu/contexte';
-import { ANIM, type EntiteVue } from '../../jeu/vue';
+import { ANIM, type EntiteVue, type Genre } from '../../jeu/vue';
 import type { DefEnnemi } from './definitions';
 
 export type EtatEnnemi = 'patrouille' | 'alerte' | 'attaque' | 'perdu';
@@ -14,6 +14,8 @@ export type EtatEnnemi = 'patrouille' | 'alerte' | 'attaque' | 'perdu';
 export class Ennemi implements Cible, EntiteSimulee {
   readonly camp: Camp = 'ennemis';
   readonly id: number;
+  /** l'apparence tirée au sort (voir DefEnnemi.genres) */
+  readonly genre: Genre;
   readonly corps: Corps;
   fini = false;
   pv: number;
@@ -36,6 +38,7 @@ export class Ennemi implements Cible, EntiteSimulee {
     y: number,
   ) {
     this.id = ctx.prochainId();
+    this.genre = def.genres && def.genres.length > 1 ? ctx.rng.choix(def.genres) : def.genre;
     this.pv = def.pv;
     this.corps = nouveauCorps(x + (TUILE - def.w) / 2, y + TUILE - def.h, def.w, def.h);
     this.dir = ctx.rng.suivant() < 0.5 ? -1 : 1;
@@ -228,7 +231,7 @@ export class Ennemi implements Cible, EntiteSimulee {
             : ANIM.DEBOUT;
     return {
       id: this.id,
-      g: this.def.genre,
+      g: this.genre,
       x: this.cx,
       y: this.corps.y + this.corps.h,
       gauche: this.dir < 0,

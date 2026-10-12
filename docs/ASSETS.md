@@ -66,6 +66,14 @@ L'instrument n'est pas sur la planche : le jeu le dessine par-dessus, à l'épau
 **Pour un nouveau personnage** : son sprite de base (de profil ou 3/4, pieds visibles), puis un gabarit dans
 `outils/gabarits.py` (réutiliser celui d'un corps de même pose, sinon de nouveaux polygones).
 
+## Sprites fixes (ennemis sans animation)
+
+Un ennemi peut n'avoir qu'une seule image : `images: [1]` dans `feuilles.ts`. Il se déplace alors sans
+cycle de marche. Les videurs fonctionnent ainsi (`outils/fixe-ennemis.py`, depuis
+`assets-sources/ennemis/`). Pour qu'un ennemi existe en plusieurs apparences, ajouter un genre dans
+`src/jeu/vue.ts` et le lister dans `genres` de sa définition : une apparence est tirée au sort à chaque
+apparition.
+
 ## À savoir
 
 - Le **bras** d'un héros ne suit pas la visée (seul l'instrument pivote) : des lignes dédiées (tir en

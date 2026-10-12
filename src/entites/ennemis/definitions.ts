@@ -14,6 +14,8 @@ import {
 export interface DefEnnemi {
   nom: string;
   genre: Genre;
+  /** plusieurs apparences possibles : une est tirée au sort à chaque apparition */
+  genres?: Genre[];
   pv: number;
   w: number;
   h: number;
@@ -52,9 +54,10 @@ export const ENNEMIS_PAR_LETTRE: Record<string, DefEnnemi> = {
   b: {
     nom: 'Videur de club',
     genre: G.VIDEUR,
+    genres: [G.VIDEUR, G.VIDEUR_COSTUME],
     pv: 8,
-    w: 12,
-    h: 17,
+    w: 20,
+    h: 44,
     vitesse: 0.8,
     vision: 140,
     visionVerticale: 40,

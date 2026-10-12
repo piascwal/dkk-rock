@@ -19,19 +19,6 @@ export const DESSINS_ENNEMIS: Partial<Record<number, Dessin>> = {
     p(3, yt + 7, 2, 3, '#222');
     if (e === ANIM.ATTAQUE) p(2, yt + 4, 2, 1, '#600');
   },
-  [G.VIDEUR]: (p, e, f) => {
-    const yt = humain(
-      p,
-      { peau: '#8d5524', haut: '#111', bas: '#111', chaussures: '#000', carrure: 8, jambes: 6 },
-      { pas: pasDe(e, f) },
-    );
-    p(-3, yt, 6, 1, '#a0683a');
-    p(0, yt + 2, 4, 1, '#000');
-    // la liste VIP, en guise de bouclier
-    p(4, yt + 3, 4, 13, '#e8e8e8');
-    p(4, yt + 3, 1, 13, '#888');
-    for (let y = yt + 5; y < yt + 15; y += 2) p(5, y, 2, 1, '#555');
-  },
   [G.DANSEUR]: (p, e, f) => {
     const danse = Math.floor(f / 8) % 2 === 0;
     const yt = humain(

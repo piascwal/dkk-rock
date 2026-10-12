@@ -15,6 +15,7 @@ export const G = {
   KIWI: 5,
   FETARD: 10,
   VIDEUR: 11,
+  VIDEUR_COSTUME: 18,
   DANSEUR: 12,
   LANCEUR: 13,
   DRONE: 14,
