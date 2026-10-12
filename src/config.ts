@@ -9,6 +9,13 @@ export const HAUTEUR_VUE = 168;
 /** La simulation avance par pas fixes de 1/60 s. */
 export const TICKS_PAR_SECONDE = 60;
 
+/**
+ * Le canvas est dessiné avec 3 pixels par pixel du jeu : le monde (tuiles, décor, ennemis) garde son
+ * apparence, un pixel du jeu valant 3×3 ; les planches de sprites à `densite: 3` s'affichent en pleine
+ * définition, un de leurs pixels valant un tiers de pixel du jeu.
+ */
+export const DENSITE_RENDU = 3;
+
 export const GRAVITE = 0.32;
 export const CHUTE_MAX = 7;
 

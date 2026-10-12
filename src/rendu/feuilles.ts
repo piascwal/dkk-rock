@@ -32,6 +32,11 @@ export interface Feuille {
    * le jeu en choisit une d'après l'identifiant de l'ennemi (sprites fixes, voir outils/fixe-ennemis.py).
    */
   variantes?: boolean;
+  /**
+   * Pixels de la planche par pixel du jeu (1 par défaut). À 3, la planche est en pleine définition : le
+   * canvas dessine en 3× (voir DENSITE_RENDU), un pixel de la planche vaut un tiers de pixel du jeu.
+   */
+  densite?: number;
   /** agrandissement du sprite (1 par défaut) : la planche peut être plus fine que le jeu */
   echelle?: number;
 }
@@ -39,18 +44,58 @@ export interface Feuille {
 /**
  * Les planches fournies. Une entrée par genre (voir `G` dans jeu/vue.ts), par exemple :
  *
- *   [G.JBT]: { fichier: 'jbt.png', w: 38, h: 41, images: [2, 6, 1, 4, 1, 1, 1], rythme: 6 },
+ *   [G.JBT]: { fichier: 'jbt.png', w: 116, h: 124, densite: 3, images: [2, 6, 1, 4, 1, 1, 1], rythme: 6 },
  */
 const ANIMATIONS_HEROS = [4, 6, 1, 2, 1, 1, 1, 0, 0, 0, 2];
 
 export const FEUILLES: Partial<Record<Genre, Feuille>> = {
   ...FEUILLES_ENNEMIS,
   // les héros, fabriqués par outils/anime-heros.py : repos 4, course 6, saut, échelle 2, tyrolienne, mur, mort, tir 2
-  [G.JBT]: { fichier: 'jbt.png', w: 38, h: 41, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 4, y: 24 } },
-  [G.JBM]: { fichier: 'jbm.png', w: 35, h: 41, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 4, y: 24 } },
-  [G.JBG]: { fichier: 'jbg.png', w: 38, h: 41, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 4, y: 24 } },
-  [G.MAT]: { fichier: 'mat.png', w: 34, h: 40, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 4, y: 24 } },
-  [G.TOM]: { fichier: 'tom.png', w: 39, h: 42, images: ANIMATIONS_HEROS, rythme: 5, epaule: { x: 4, y: 24 } },
+  [G.JBT]: {
+    fichier: 'jbt.png',
+    w: 116,
+    h: 124,
+    densite: 3,
+    images: ANIMATIONS_HEROS,
+    rythme: 5,
+    epaule: { x: 4, y: 24 },
+  },
+  [G.JBM]: {
+    fichier: 'jbm.png',
+    w: 108,
+    h: 125,
+    densite: 3,
+    images: ANIMATIONS_HEROS,
+    rythme: 5,
+    epaule: { x: 4, y: 24 },
+  },
+  [G.JBG]: {
+    fichier: 'jbg.png',
+    w: 116,
+    h: 124,
+    densite: 3,
+    images: ANIMATIONS_HEROS,
+    rythme: 5,
+    epaule: { x: 4, y: 24 },
+  },
+  [G.MAT]: {
+    fichier: 'mat.png',
+    w: 94,
+    h: 112,
+    densite: 3,
+    images: ANIMATIONS_HEROS,
+    rythme: 5,
+    epaule: { x: 4, y: 24 },
+  },
+  [G.TOM]: {
+    fichier: 'tom.png',
+    w: 114,
+    h: 123,
+    densite: 3,
+    images: ANIMATIONS_HEROS,
+    rythme: 5,
+    epaule: { x: 4, y: 24 },
+  },
   // Fadatchi, fabriqué par outils/anime-kiwi.py : debout 8 images (il respire), court 4, saut 1, coup de bec 4
   [G.KIWI]: { fichier: 'fadatchi.png', w: 41, h: 23, images: [8, 4, 1, 0, 0, 0, 0, 0, 0, 0, 4], rythme: 5 },
 };

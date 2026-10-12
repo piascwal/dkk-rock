@@ -25,7 +25,10 @@ from squelette import Personnage
 RACINE = pathlib.Path(__file__).resolve().parent.parent
 SRC = RACINE / 'assets-sources' / 'heros'
 SORTIE = RACINE / 'public' / 'sprites'
-HAUTEUR_JEU = 40  # hauteur d'un héros debout, en pixels du jeu (tuile = 16)
+# Les planches sont en pleine définition (celle des sprites de base, 128 px) : le jeu dessine en 3× (voir
+# DENSITE_RENDU), un pixel de planche vaut un tiers de pixel du jeu, donc un héros fait environ 40 px de haut
+# (tuile = 16). Aucune réduction : on garde tous les détails du sprite de base.
+DENSITE = 3
 TAILLE = 128
 
 # angle de repos des jambes dans le sprite de référence (degrés, + = pied vers l'arrière)
@@ -118,25 +121,6 @@ def renverse(im, angle):
     return Image.fromarray(vote(np.array(r)))
 
 
-def reduit(im, echelle):
-    """Réduit en gardant la palette : chaque case prend la couleur la plus fréquente de sa zone source
-    (le calcul de moyenne crée des pixels parasites sur les aplats ; le vote garde contours et aplats nets)."""
-    nl, nh = round(im.width * echelle), round(im.height * echelle)
-    a = np.array(im)
-    res = np.zeros((nh, nl, 4), np.uint8)
-    xs, ys = np.linspace(0, im.width, nl + 1), np.linspace(0, im.height, nh + 1)
-    for j in range(nh):
-        for i in range(nl):
-            y0, x0 = int(ys[j]), int(xs[i])
-            blk = a[y0:max(y0 + 1, int(ys[j + 1])), x0:max(x0 + 1, int(xs[i + 1]))].reshape(-1, 4)
-            pleins = blk[blk[:, 3] > 0]
-            if len(pleins) * 2 < len(blk):
-                continue
-            couleurs, nb = np.unique(pleins, axis=0, return_counts=True)
-            res[j, i] = couleurs[nb.argmax()]
-    return Image.fromarray(res)
-
-
 def fabrique(nom):
     g = GABARITS[nom]
     brut = np.array(Image.open(SRC / f'{nom}-base.png').convert('RGBA'))
@@ -165,9 +149,7 @@ def fabrique(nom):
     ancre = g.ancre_x
     demi = max(ancre - boite[0], boite[2] - ancre)
     cadre = (ancre - demi, boite[1], ancre + demi, base + 1)
-    ref = Image.fromarray(np.array(nat)).getbbox()
-    echelle = HAUTEUR_JEU / (ref[3] - ref[1])
-    finales = {k: [reduit(f.crop(cadre), echelle) for f in v] for k, v in lignes.items()}
+    finales = {k: [f.crop(cadre) for f in v] for k, v in lignes.items()}
     w, h = finales[0][0].size
     images = [len(finales.get(i, [])) for i in range(max(finales) + 1)]
     planche = Image.new('RGBA', (w * max(images), h * len(images)), (0, 0, 0, 0))
@@ -176,7 +158,7 @@ def fabrique(nom):
             planche.alpha_composite(f, (j * w, i * h))
     SORTIE.mkdir(parents=True, exist_ok=True)
     planche.save(SORTIE / f'{nom}.png')
-    for suffixe, d, z in (('natif', {k: [f.crop(cadre) for f in v] for k, v in lignes.items()}, 3), ('jeu', finales, 8)):
+    for suffixe, d, z in (('natif', finales, 3),):
         fw, fh = d[0][0].size
         n = max(len(v) for v in d.values())
         ap = Image.new('RGBA', (fw * n, fh * len(d)), (255, 0, 255, 255))
@@ -184,8 +166,7 @@ def fabrique(nom):
             for j, f in enumerate(v):
                 ap.alpha_composite(f, (j * fw, r * fh))
         ap.resize((ap.width * z, ap.height * z), Image.NEAREST).save(SRC / f'apercu-{nom}-{suffixe}.png')
-    meta = {'fichier': f'{nom}.png', 'w': w, 'h': h, 'images': images, 'rythme': 5,
-            'pieds_x': (ancre - cadre[0]) * echelle, 'hauteur_debout': HAUTEUR_JEU}
+    meta = {'fichier': f'{nom}.png', 'w': w, 'h': h, 'images': images, 'rythme': 5, 'densite': DENSITE}
     print(nom, json.dumps(meta))
 
 

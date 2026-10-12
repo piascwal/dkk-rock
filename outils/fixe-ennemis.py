@@ -31,6 +31,8 @@ TYPES = {
     'videur': ('VIDEUR', 46),
     'influenceur': ('INFLUENCEUR', 40),
     'yeti': ('YETI', 50),
+    'danseur': ('DANSEUR', 40),
+    'lanceur': ('LANCEUR', 40),
 }
 
 

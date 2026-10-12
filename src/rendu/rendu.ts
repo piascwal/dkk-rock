@@ -1,4 +1,4 @@
-import { HAUTEUR_VUE, TUILE } from '../config';
+import { DENSITE_RENDU, HAUTEUR_VUE, TUILE } from '../config';
 import { G, type EtatVue, type Evenement } from '../jeu/vue';
 import { Carte } from '../monde/carte';
 import { proprietes } from '../monde/tuiles';
@@ -40,8 +40,8 @@ export class Rendu {
     const w = window.innerWidth;
     const h = window.innerHeight;
     this.largeur = Math.round(Math.min(520, Math.max(320, (HAUTEUR_VUE * w) / h)));
-    this.toile.width = this.largeur;
-    this.toile.height = HAUTEUR_VUE;
+    this.toile.width = this.largeur * DENSITE_RENDU;
+    this.toile.height = HAUTEUR_VUE * DENSITE_RENDU;
     const k = Math.min(w / this.largeur, h / HAUTEUR_VUE);
     this.toile.style.width = `${Math.floor(this.largeur * k)}px`;
     this.toile.style.height = `${Math.floor(HAUTEUR_VUE * k)}px`;
@@ -84,6 +84,9 @@ export class Rendu {
   dessine(vue: EtatVue, carte: Carte, siegeLocal: number): void {
     this.tick++;
     const ctx = this.ctx;
+    // tout se dessine en pixels du jeu ; la densité est appliquée ici, une fois
+    ctx.setTransform(DENSITE_RENDU, 0, 0, DENSITE_RENDU, 0, 0);
+    ctx.imageSmoothingEnabled = false;
     this.prepareNiveau(vue.niveau);
     const moi = vue.joueurs[siegeLocal];
     const suivi = moi && moi.present && !moi.mort ? moi : vue.joueurs.find((j) => j.present && !j.mort);

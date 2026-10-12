@@ -32,15 +32,18 @@ export function dessineFeuille(
   // à l'arrêt, un héros qui tire tend le bras ; en mouvement, ses bras balancent et l'instrument montre le tir
   const tendu = tire && e === ANIM.DEBOUT && (f.images[ANIM.ATTAQUE] ?? 0) > 0;
   const { col, ligne } = caseDeLaPlanche(f, tendu ? ANIM.ATTAQUE : e, compteur);
-  const k = f.echelle ?? 1;
+  const d = f.densite ?? 1;
+  const k = (f.echelle ?? 1) / d;
+  // les planches en pleine définition se posent au tiers de pixel près, les autres au pixel du jeu
+  const arrondi = (v: number) => Math.round(v * d) / d;
   ctx.drawImage(
     img,
     col * f.w,
     ligne * f.h,
     f.w,
     f.h,
-    Math.round((-f.w * k) / 2),
-    Math.round(-f.h * k),
+    arrondi((-f.w * k) / 2),
+    arrondi(-f.h * k),
     f.w * k,
     f.h * k,
   );

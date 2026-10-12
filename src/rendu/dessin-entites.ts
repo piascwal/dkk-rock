@@ -21,8 +21,10 @@ export function dessineEntite(
   camY: number,
   atlas: AtlasTuiles,
 ): void {
-  const x = Math.round(v.x - camX);
-  let y = Math.round(v.y - camY);
+  // la position se cale sur la grille de la planche : le pixel du jeu, ou son tiers pour une planche en pleine définition
+  const d = FEUILLES[v.g]?.densite ?? 1;
+  const x = Math.round((v.x - Math.round(camX)) * d) / d;
+  let y = Math.round((v.y - Math.round(camY)) * d) / d;
   const estTir = v.g >= G.P_BAGUETTE && v.g < G.CAGE;
   if (estTir) y -= DEMI_TAILLE[v.g] ?? 2;
 
