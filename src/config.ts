@@ -14,7 +14,7 @@ export const TICKS_PAR_SECONDE = 60;
  * apparence, un pixel du jeu valant 3×3 ; les planches de sprites à `densite: 3` s'affichent en pleine
  * définition, un de leurs pixels valant un tiers de pixel du jeu.
  */
-export const DENSITE_RENDU = 3;
+export const DENSITE_RENDU = 6;
 
 export const GRAVITE = 0.32;
 export const CHUTE_MAX = 7;

@@ -2,7 +2,7 @@
 from squelette import Membre
 
 
-def peau_ou_contour(r, g, b):
+def peau_ou_contour(r, g, b, *_):
     """Peau (tons chauds) ou contour sombre : de quoi isoler un bras nu du vêtement."""
     return (r > g > b and r - b > 40 and r > 110) or r + g + b < 150
 

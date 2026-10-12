@@ -37,6 +37,13 @@ export interface Feuille {
    * canvas dessine en 3× (voir DENSITE_RENDU), un pixel de la planche vaut un tiers de pixel du jeu.
    */
   densite?: number;
+  /** Abscisse (pixels de la planche) du milieu des pieds, si le personnage n'est pas centré dans son image. */
+  pied?: number;
+  /**
+   * Première ligne des images « en visant » (héros dont l'instrument est dans le sprite) : la ligne
+   * `visees + code - 1` montre la course ou la pose avec l'instrument orienté selon le code de visée 1 à 4.
+   */
+  visees?: number;
   /** agrandissement du sprite (1 par défaut) : la planche peut être plus fine que le jeu */
   echelle?: number;
 }
@@ -87,14 +94,16 @@ export const FEUILLES: Partial<Record<Genre, Feuille>> = {
     rythme: 5,
     epaule: { x: 4, y: 24 },
   },
+  // Tom tient sa guitare dans le sprite (outils/anime-guitare.py) : pas d'instrument dessiné en code par-dessus
   [G.TOM]: {
-    fichier: 'tom.png',
-    w: 114,
-    h: 123,
-    densite: 3,
-    images: ANIMATIONS_HEROS,
+    fichier: 'tom-guitare.png',
+    w: 329,
+    h: 288,
+    densite: 6,
+    pied: 232,
+    visees: 11,
+    images: [4, 6, 1, 2, 1, 1, 1, 0, 0, 0, 2, 6, 6, 6, 6],
     rythme: 5,
-    epaule: { x: 4, y: 24 },
   },
   // Fadatchi, fabriqué par outils/anime-kiwi.py : debout 8 images (il respire), court 4, saut 1, coup de bec 4
   [G.KIWI]: { fichier: 'fadatchi.png', w: 41, h: 23, images: [8, 4, 1, 0, 0, 0, 0, 0, 0, 0, 4], rythme: 5 },

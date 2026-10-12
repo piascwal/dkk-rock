@@ -84,3 +84,13 @@ yeti ; pour un nouveau type, ajouter une ligne à `TYPES` dans le script, avec s
   l'air, en diagonale) pourront être ajoutées plus tard.
 - Idéalement, continuer maintenant par les ennemis les plus fréquents (fêtard,
   videur, danseur, yéti).
+
+## Héros avec leur instrument dans le sprite (Tom)
+
+Le sprite de référence `assets-sources/heros/tom-guitare-base.png` (1024 px, cases de 2 px) montre Tom avec sa
+guitare. `python3 outils/anime-guitare.py` en fait `public/sprites/tom-guitare.png` : la guitare et les bras forment
+une pièce qui pivote à l'épaule (lignes 11 à 14 : course en visant, codes de visée 1 à 4) ; `epaule` est donc absent
+de sa planche, le jeu ne dessine pas d'instrument par-dessus. Le sprite sans instrument (`tom-base.png`) est conservé.
+La planche est à `densite: 6` : le canvas est dessiné à 6 pixels par pixel du jeu (`DENSITE_RENDU`), les autres héros
+(sprites de 128 px, `densite: 3`) sont simplement agrandis ×2. Pour un autre héros : un gabarit comme
+`outils/gabarit_guitare.py`, puis une entrée dans `FEUILLES` avec `pied`, `visees` et `densite`.

@@ -46,7 +46,16 @@ export function dessineEntite(
 
   // sprites à apparences : l'identifiant choisit l'apparence ; héros : phase d'animation ; autres : compteur
   const compteur = FEUILLES[v.g]?.variantes ? v.id : heros ? (v.f & 15) * 2 : v.f;
-  if (dessineFeuille(ctx, v.g, v.e, compteur, heros !== undefined && (v.f & 128) !== 0)) {
+  if (
+    dessineFeuille(
+      ctx,
+      v.g,
+      v.e,
+      compteur,
+      heros !== undefined && (v.f & 128) !== 0,
+      heros ? (v.f >> 4) & 7 : 0,
+    )
+  ) {
     // une planche fournie remplace le dessin en code ; l'instrument d'un héros se pose par-dessus
     const epaule = FEUILLES[v.g]?.epaule;
     if (heros && epaule && v.e !== ANIM.ECHELLE && v.e !== ANIM.TYROLIENNE && v.e !== ANIM.MORT)
