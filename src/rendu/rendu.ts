@@ -2,11 +2,11 @@ import { HAUTEUR_VUE, TUILE } from '../config';
 import { G, type EtatVue, type Evenement } from '../jeu/vue';
 import type { Carte } from '../monde/carte';
 import { proprietes } from '../monde/tuiles';
-import { NIVEAUX } from '../niveaux';
+import { NIVEAUX, niveauLu } from '../niveaux';
 import { AtlasTuiles } from './atlas-tuiles';
 import { Camera } from './camera';
 import { dessineEntite } from './dessin-entites';
-import { dessineTuiles } from './dessin-tuiles';
+import { dessineTuiles, dessineTyroliennes } from './dessin-tuiles';
 import { Fond } from './fonds';
 import { Particules } from './particules';
 import { THEMES, type Theme } from './themes';
@@ -91,6 +91,7 @@ export class Rendu {
 
     this.fond.dessine(ctx, camX, camY, this.largeur, carte.hauteur * TUILE, this.tick);
     dessineTuiles(ctx, carte, this.atlas, camX, camY, this.largeur);
+    dessineTyroliennes(ctx, niveauLu(vue.niveau).tyroliennes, carte, camX, camY);
     this.particules.meteo(this.theme.meteo, camX, camY, this.largeur);
     this.particules.maj(carte);
 

@@ -91,7 +91,6 @@ export class Client {
   /** Rejoint la partie annoncée ; échoue (Error) si elle est pleine, d'une autre version ou injoignable. */
   static async rejoins(r: Recherche, a: Annonce<AnnonceDkk>, nom: string, membre: number): Promise<Client> {
     const liaison = new Liaison(true, r.ips, { enLigne: r.enLigne });
-    const c = new Client(liaison, r.enLigne);
     const reponse = new Promise<void>((ok, ko) => {
       r.annuaire.onSignal = (de, _salon, s) => {
         if (de !== a.id) return;
@@ -105,10 +104,20 @@ export class Client {
       await r.annuaire.signale(a.id, a.salon, { type: 'offre', sdp, nom, spect: false });
       await reponse;
       await liaison.ouverte();
-      await c.accueil(nom, membre);
     } catch (e) {
       liaison.ferme();
-      c.veille.arrete();
+      throw e;
+    }
+    return Client.surLiaison(liaison, r.enLigne, nom, membre);
+  }
+
+  /** Sur une liaison ouverte : se présente à l'hôte et attend son accueil. */
+  static async surLiaison(liaison: Liaison, enLigne: boolean, nom: string, membre: number): Promise<Client> {
+    const c = new Client(liaison, enLigne);
+    try {
+      await c.accueil(nom, membre);
+    } catch (e) {
+      c.ferme();
       throw e;
     }
     return c;

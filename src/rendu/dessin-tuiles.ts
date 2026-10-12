@@ -1,5 +1,6 @@
 import { HAUTEUR_VUE, TUILE } from '../config';
 import { bruit } from '../moteur/maths';
+import type { Tyrolienne } from '../jeu/contexte';
 import type { Carte } from '../monde/carte';
 import { T } from '../monde/tuiles';
 import type { AtlasTuiles } from './atlas-tuiles';
@@ -62,5 +63,34 @@ function fissures(
     cx += bruit(tx + i, ty, 10) < 0.5 ? -1 : 1;
     cy += 1;
     if (cx < 1 || cx > 14 || cy > 14) break;
+  }
+}
+
+/** Les tyroliennes : un câble et un poteau à chaque bout, planté jusqu'au sol. */
+export function dessineTyroliennes(
+  ctx: CanvasRenderingContext2D,
+  liste: readonly Tyrolienne[],
+  carte: Carte,
+  camX: number,
+  camY: number,
+): void {
+  for (const t of liste) {
+    for (const [x, y] of [
+      [t.x1, t.y1],
+      [t.x2, t.y2],
+    ] as const) {
+      let bas = y;
+      while (bas < carte.hauteur * TUILE && !carte.solideEnPixel(x, bas + 1)) bas += TUILE / 2;
+      ctx.fillStyle = '#5e3b1a';
+      ctx.fillRect(Math.round(x - camX) - 1, Math.round(y - camY) - 4, 3, Math.round(bas - y) + 4);
+      ctx.fillStyle = '#ffd23f';
+      ctx.fillRect(Math.round(x - camX) - 2, Math.round(y - camY) - 5, 5, 2);
+    }
+    ctx.strokeStyle = '#2b2b2b';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(Math.round(t.x1 - camX) + 0.5, Math.round(t.y1 - camY) + 0.5);
+    ctx.lineTo(Math.round(t.x2 - camX) + 0.5, Math.round(t.y2 - camY) + 0.5);
+    ctx.stroke();
   }
 }

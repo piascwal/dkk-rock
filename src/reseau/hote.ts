@@ -116,6 +116,11 @@ export class Hote {
       liaison.ferme();
       return;
     }
+    this.accueilleLiaison(liaison, enLigne);
+  }
+
+  /** Une liaison ouverte : on attend le « salut » du joueur, puis il a un siège. */
+  accueilleLiaison(liaison: Liaison, enLigne: boolean): void {
     let distant: Distant | null = null;
     const veille = new Veille(liaison, () => liaison.ferme(), enLigne ? 15_000 : 6000);
     liaison.onCtrl = (brut) => {

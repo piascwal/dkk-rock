@@ -79,7 +79,7 @@ export class Ennemi implements Cible, EntiteSimulee {
       return;
     }
     this.pv -= degats;
-    this.flash = 6;
+    this.flash = 4;
     if (explosion) this.corps.vy = -3;
     if (this.etat === 'patrouille' && dx) {
       this.dir = dx > 0 ? -1 : 1;

@@ -272,7 +272,7 @@ h2 {
 
 #barre-boss {
   position: absolute;
-  top: max(30px, 9vh);
+  top: max(30px, 8vh);
   left: 50%;
   transform: translateX(-50%);
   width: min(50vw, 22rem);
@@ -291,7 +291,7 @@ h2 {
 /* ——— bulle de dialogue (pendant le jeu) ——— */
 #bulle {
   position: absolute;
-  bottom: max(10px, env(safe-area-inset-bottom));
+  top: calc(env(safe-area-inset-top) + 54px);
   left: 50%;
   transform: translateX(-50%);
   width: min(92vw, 40rem);
@@ -317,7 +317,7 @@ h2 {
 
 @keyframes apparait {
   from {
-    transform: translate(-50%, 20px);
+    transform: translate(-50%, -20px);
     opacity: 0;
   }
 }

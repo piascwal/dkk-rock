@@ -71,7 +71,7 @@ export abstract class Boss implements Cible, EntiteSimulee {
   blesse(degats: number, ctx: Contexte): void {
     if (this.fini || !this.eveille) return;
     this.pv -= degats * this.resistance();
-    this.flash = 5;
+    this.flash = 3;
     if (this.pv <= 0) {
       this.fini = true;
       this.meurt(ctx);

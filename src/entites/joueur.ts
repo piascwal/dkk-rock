@@ -178,7 +178,7 @@ export class Joueur implements Cible, EtatSpecial {
     else if (this.tamponSaut > 0) this.tamponSaut--;
 
     // descendre d'une plateforme, ou attraper une échelle
-    if (this.surEchelle(ctx, k.vertical) && (k.tenu(C.HAUT) || k.tenu(C.BAS)) && !k.tenu(C.SAUT)) {
+    if (this.colonneEchelle(ctx, k.vertical) >= 0 && (k.tenu(C.HAUT) || k.tenu(C.BAS)) && !k.tenu(C.SAUT)) {
       this.echelle = true;
       c.vx = 0;
       return;
@@ -223,27 +223,30 @@ export class Joueur implements Cible, EtatSpecial {
     ctx.texte(this.cx, y - 24, 'SLAP !', '#9b5de5');
   }
 
-  private surEchelle(ctx: Contexte, vertical: number): boolean {
-    const tx = Math.floor(this.cx / TUILE);
-    const pied = this.corps.y + this.corps.h + (vertical > 0 ? 2 : -2);
-    return (
-      ctx.carte.props(tx, Math.floor(this.cy / TUILE)).echelle ||
-      ctx.carte.props(tx, Math.floor(pied / TUILE)).echelle
-    );
+  /** La colonne de l'échelle à portée de main (un peu de tolérance au pouce), ou -1. */
+  private colonneEchelle(ctx: Contexte, vertical: number): number {
+    const pied = Math.floor((this.corps.y + this.corps.h + (vertical > 0 ? 2 : -2)) / TUILE);
+    const milieu = Math.floor(this.cy / TUILE);
+    for (const dx of [0, -6, 6]) {
+      const tx = Math.floor((this.cx + dx) / TUILE);
+      if (ctx.carte.props(tx, milieu).echelle || ctx.carte.props(tx, pied).echelle) return tx;
+    }
+    return -1;
   }
 
   private majEchelle(ctx: Contexte): void {
     const c = this.corps;
     const k = this.commandes;
     const v = k.vertical;
-    if (k.appuye(C.SAUT) || !this.surEchelle(ctx, v)) {
+    const colonne = this.colonneEchelle(ctx, v);
+    if (k.appuye(C.SAUT) || colonne < 0) {
       this.echelle = false;
       if (k.appuye(C.SAUT)) c.vy = -SAUT * 0.8;
       return;
     }
     // on se recentre sur l'échelle
-    const centre = (Math.floor(this.cx / TUILE) + 0.5) * TUILE - c.w / 2;
-    c.x += borne(centre - c.x, -1, 1);
+    const centre = (colonne + 0.5) * TUILE - c.w / 2;
+    c.x += borne(centre - c.x, -1.5, 1.5);
     c.vx = k.horizontal * 0.8;
     c.vy = v * VITESSE_ECHELLE;
     if (k.horizontal) this.dir = k.horizontal > 0 ? 1 : -1;
@@ -280,7 +283,8 @@ export class Joueur implements Cible, EtatSpecial {
     c.y = t.y1 + ((mx - t.x1) / (t.x2 - t.x1)) * (t.y2 - t.y1) + 2;
     c.vy = 0;
     const lache = k.appuye(C.SAUT) || k.tenu(C.BAS) || mx <= t.x1 || mx >= t.x2;
-    if (lache || ctx.carte.solideEnPixel(mx, c.y + c.h / 2)) {
+    // on ne lâche que si le câble rentre dans un mur (la tête cogne), pas si les pieds frôlent le sol
+    if (lache || ctx.carte.solideEnPixel(mx, c.y + 2)) {
       this.tyro = null;
       this.lacheTyro = 20;
       if (k.appuye(C.SAUT)) c.vy = -SAUT * 0.8;
