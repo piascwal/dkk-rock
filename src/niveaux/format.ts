@@ -20,7 +20,7 @@ import type { NomTheme } from '../rendu/themes';
  *   Y : le Yéti Alpha   Z : DJ Boucle (boss final)
  */
 
-export type Qui = 'JBT' | 'JBM' | 'JBG' | 'MAT' | 'TOM' | 'LEMMY' | 'NARRATEUR' | 'YETI' | 'DJ' | 'RADIO';
+export type Qui = 'JBT' | 'JBM' | 'JBG' | 'MAT' | 'TOM' | 'FADATCHI' | 'NARRATEUR' | 'YETI' | 'DJ' | 'RADIO';
 
 export interface Replique {
   qui: Qui;

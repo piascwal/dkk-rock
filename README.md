@@ -20,7 +20,7 @@ sur téléphone** (ou au clavier, ou à la manette), **seul ou jusqu'à 4**.
 | **Mat** | basse             | ondes lourdes qui creusent la roche | slap : piqué qui fait trembler le sol |
 | **Tom** | guitare rythmique | rythmique en éventail               | larsen qui se colle et explose        |
 
-Ils sont aidés par **Lemmy**, le kiwi du groupe (« espèce totalement disparue », selon JBM, qui
+Ils sont aidés par **Fadatchi**, le kiwi du groupe (« espèce totalement disparue », selon JBM, qui
 n'a jamais vérifié) : il picore les ennemis et pond des œufs explosifs.
 
 Tout au long de la tournée, les héros découvrent la richesse des autres musiques (jazz modal,
@@ -67,8 +67,8 @@ npm run typecheck && npm run lint && npm run format:check && npm test
 npm run build      # dist/, servi sous /dkk-rock/
 ```
 
-Chaque poussée sur `main` est vérifiée puis publiée sur la branche `gh-pages` par GitHub Actions
-(réglage du dépôt : Pages → « Deploy from a branch » → `gh-pages`).
+Chaque poussée sur `main` est vérifiée puis publiée par GitHub Actions
+(réglage du dépôt, une seule fois : Settings → Pages → Source « GitHub Actions »).
 
 **Pile :** TypeScript strict, Vite, Canvas 2D, Web Audio, Vitest, ESLint, Prettier. Aucune image
 ni aucun son à charger : les sprites sont dessinés en code, les sons synthétisés.
@@ -80,7 +80,7 @@ src/
   config.ts          constantes globales (tuile, vue, gravité, tempo...)
   moteur/maths.ts    outils, aléatoire reproductible
   monde/             tuiles (types, points de vie), carte, physique
-  entites/           héros, armes, tirs, ennemis et boss, objets, Lemmy
+  entites/           héros, armes, tirs, ennemis et boss, objets, Fadatchi
   jeu/               la Partie (simulation), règles, explosions, sauvegarde, la vue (EtatVue)
   niveaux/           format ASCII, cartes/, textes/ (dialogues), index
   histoire/          épilogue et défaite

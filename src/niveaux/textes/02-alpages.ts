@@ -48,11 +48,11 @@ export const ALPAGES: Omit<DefNiveau, 'carte'> = {
     ],
   },
   outro: [
-    { qui: 'LEMMY', texte: 'Kiwi.' },
+    { qui: 'FADATCHI', texte: 'Kiwi.' },
     {
       qui: 'JBM',
       texte:
-        'Lemmy a raison. Direction les cimes : on dit qu’un yéti y mixe de la techno minimale depuis 1997.',
+        'Fadatchi a raison. Direction les cimes : on dit qu’un yéti y mixe de la techno minimale depuis 1997.',
     },
   ],
 };

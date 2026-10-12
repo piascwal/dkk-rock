@@ -32,7 +32,7 @@ export const GARAGE: Omit<DefNiveau, 'carte'> = {
     {
       qui: 'NARRATEUR',
       texte:
-        'Lemmy, le kiwi mascotte du groupe — dernier représentant d’une espèce totalement disparue, selon JBM, qui n’a jamais vérifié — hoche la tête.',
+        'Fadatchi, le kiwi mascotte du groupe — dernier représentant d’une espèce totalement disparue, selon JBM, qui n’a jamais vérifié — hoche la tête.',
     },
     { qui: 'JBM', texte: 'Prenez vos instruments. On repart en tournée. ROCK NEVER DIES.' },
   ],

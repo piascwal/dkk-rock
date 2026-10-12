@@ -20,7 +20,8 @@ export const FIN: Replique[] = [
   },
   {
     qui: 'NARRATEUR',
-    texte: 'Le morceau dure 2 minutes 40. Il a un solo. Et un synthé. Lemmy le kiwi est crédité aux chœurs.',
+    texte:
+      'Le morceau dure 2 minutes 40. Il a un solo. Et un synthé. Fadatchi le kiwi est crédité aux chœurs.',
   },
   { qui: 'NARRATEUR', texte: 'FIN. Rock never dies. (Les autres musiques non plus, apparemment.)' },
 ];

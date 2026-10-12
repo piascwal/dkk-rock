@@ -121,7 +121,7 @@ export function dessineHeros(p: Pinceau, membre: number, e: number, f: number): 
   if (!brasLeves) INSTRUMENTS[membre]?.(p, yt, tire, anim);
 }
 
-/** Lemmy le kiwi, avec son petit chapeau de cow-boy. */
+/** Fadatchi le kiwi, avec son petit chapeau de cow-boy. */
 export function dessineKiwi(p: Pinceau, e: number, f: number): void {
   const rebond = e === ANIM.COURT && f % 8 < 4 ? -1 : 0;
   const pique = e === ANIM.ATTAQUE ? 1 : 0;

@@ -8,7 +8,7 @@ import { OEUF_KIWI } from './projectiles-defs';
 const CRIS = ['Kiii-wiii !', 'KIWI !', '*picore*', 'Kiwi. (Il a l’air déçu.)'];
 
 /**
- * Lemmy, le kiwi mascotte du groupe : « espèce totalement disparue », selon
+ * Fadatchi, le kiwi mascotte du groupe : « espèce totalement disparue », selon
  * JBM, qui n'a jamais vérifié. Il suit un héros, picore les ennemis proches et
  * pond de temps en temps un œuf (énorme, comme tous les œufs de kiwi) qui explose.
  */

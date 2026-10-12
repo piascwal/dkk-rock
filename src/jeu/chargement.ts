@@ -9,7 +9,7 @@ import { BlocTombant, Objet } from '../entites/objets';
 import { T, proprietes } from '../monde/tuiles';
 import type { Partie } from './partie';
 
-/** Place tout ce que la carte du niveau annonce : objets, ennemis, boss, et Lemmy le kiwi. */
+/** Place tout ce que la carte du niveau annonce : objets, ennemis, boss, et Fadatchi le kiwi. */
 export function peuple(p: Partie): void {
   const lu = p.lu;
   if (lu.fin) p.ajoute(new Objet(p, 'van', lu.fin.x, lu.fin.y));
