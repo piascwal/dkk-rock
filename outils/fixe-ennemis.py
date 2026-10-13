@@ -32,14 +32,14 @@ TS = RACINE / 'src' / 'rendu' / 'feuilles-ennemis.ts'
 # pixels de planche par pixel du jeu (le canvas est dessiné à cette densité : voir DENSITE_RENDU)
 DENSITE = 6
 
-# type d'ennemi : (genre dans jeu/vue.ts, hauteur en jeu en pixels ; un héros fait 40 px)
+# type d'ennemi : (genre dans jeu/vue.ts, hauteur en jeu en pixels ; un héros fait 20 px)
 TYPES = {
-    'fetard': ('FETARD', 40),
-    'videur': ('VIDEUR', 46),
-    'influenceur': ('INFLUENCEUR', 40),
-    'yeti': ('YETI', 50),
-    'danseur': ('DANSEUR', 40),
-    'lanceur': ('LANCEUR', 40),
+    'fetard': ('FETARD', 20),
+    'videur': ('VIDEUR', 23),
+    'influenceur': ('INFLUENCEUR', 20),
+    'yeti': ('YETI', 25),
+    'danseur': ('DANSEUR', 20),
+    'lanceur': ('LANCEUR', 20),
 }
 
 

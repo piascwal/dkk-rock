@@ -106,6 +106,7 @@ def nettoie(im, mini=40):
     return Image.fromarray(a)
 
 
+REDUCTION = 2  # un pixel de planche vaut 2×2 pixels de travail (vote majoritaire) : un héros fait 20 px de haut en jeu
 MARGE = 130  # place autour du personnage pour qu'il puisse tomber sans sortir de l'image
 
 
@@ -139,8 +140,10 @@ def fabrique(nom):
         for f in fr:
             b = f.getbbox()
             boite = b if boite is None else (min(boite[0], b[0]), min(boite[1], b[1]), max(boite[2], b[2]), max(boite[3], b[3]))
-    cadre = (boite[0], boite[1], boite[2], base + 1)
-    lignes = {k: [f.crop(cadre) for f in v] for k, v in lignes.items()}
+    x0, y0 = boite[0] - (boite[0] % 2), boite[1] - (boite[1] % 2)
+    x1, y1 = boite[2] + (boite[2] % 2), base + 1 + ((base + 1) % 2)
+    cadre = (x0, y0, x1, y1)
+    lignes = {k: [Image.fromarray(vote(np.array(f.crop(cadre)), REDUCTION)) for f in v] for k, v in lignes.items()}
     w, h = lignes[0][0].size
     images = [len(lignes.get(i, [])) for i in range(max(lignes) + 1)]
     planche = Image.new('RGBA', (w * max(images), h * len(images)), (0, 0, 0, 0))
@@ -151,10 +154,36 @@ def fabrique(nom):
     ap = Image.new('RGBA', planche.size, (255, 0, 255, 255))
     ap.alpha_composite(planche)
     ap.resize((ap.width // 2, ap.height // 2), Image.NEAREST).save(SRC / f'apercu-{nom}-instrument.png')
-    print(nom, json.dumps({'fichier': f'{nom}-instrument.png', 'w': w, 'h': h, 'images': images, 'densite': DENSITE,
-                           'visees': 11, 'pied': ancre + MARGE - boite[0]}))
+    meta = {'fichier': f'{nom}-instrument.png', 'w': w, 'h': h, 'pied': (ancre + MARGE - x0) // REDUCTION}
+    (SRC / f'meta-{nom}.json').write_text(json.dumps(meta))
+    print(nom, json.dumps(meta))
+
+
+GENRES = {'jbt': 'JBT', 'jbm': 'JBM', 'jbg': 'JBG', 'mat': 'MAT', 'tom': 'TOM'}
+
+
+def ecrit_ts():
+    """Déclare les planches au jeu : src/rendu/feuilles-heros.ts, d'après les méta de chaque héros."""
+    lignes = []
+    for nom, genre in GENRES.items():
+        f = SRC / f'meta-{nom}.json'
+        if f.exists():
+            m = json.loads(f.read_text())
+            lignes.append(f"  [G.{genre}]: heros('{m['fichier']}', {m['w']}, {m['h']}, {m['pied']}),")
+    (RACINE / 'src' / 'rendu' / 'feuilles-heros.ts').write_text(
+        "// Fichier généré par outils/anime-instrument.py : ne pas modifier à la main.\n"
+        "import { G, type Genre } from '../jeu/vue';\n"
+        "import type { Feuille } from './feuilles';\n\n"
+        "// repos 4, course 6, saut, échelle 2, tyrolienne, mur, mort, tir 2, puis la course en visant (codes 1 à 4)\n"
+        "const ANIMATIONS_HEROS = [4, 6, 1, 2, 1, 1, 1, 0, 0, 0, 2, 6, 6, 6, 6];\n\n"
+        "/** Un héros avec son instrument dans le sprite ; `pied` : milieu des pieds dans l'image. */\n"
+        "const heros = (fichier: string, w: number, h: number, pied: number): Feuille => ({\n"
+        "  fichier,\n  w,\n  h,\n  pied,\n  densite: 6,\n  visees: 11,\n  images: ANIMATIONS_HEROS,\n  rythme: 5,\n});\n\n"
+        "export const FEUILLES_HEROS: Partial<Record<Genre, Feuille>> = {\n" + '\n'.join(lignes) + '\n};\n'
+    )
 
 
 if __name__ == '__main__':
     for n in sys.argv[1:] or list(HEROS):
         fabrique(n)
+    ecrit_ts()

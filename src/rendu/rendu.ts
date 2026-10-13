@@ -44,7 +44,7 @@ export class Rendu {
   redimensionne(): void {
     const w = window.innerWidth;
     const h = window.innerHeight;
-    this.largeur = Math.round(Math.min(520, Math.max(320, (HAUTEUR_VUE * w) / h)));
+    this.largeur = Math.round(Math.min(520, Math.max(220, (HAUTEUR_VUE * w) / h)));
     const k = Math.min(w / this.largeur, h / HAUTEUR_VUE);
     // inutile de dessiner plus fin que les pixels de l'écran (ceux d'un téléphone sont 2 à 3 fois plus petits qu'un pixel CSS)
     const ecran = Math.floor((HAUTEUR_VUE * k * (window.devicePixelRatio || 1)) / HAUTEUR_VUE);

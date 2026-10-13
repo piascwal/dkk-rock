@@ -121,7 +121,7 @@ export class Joueur extends JoueurBase {
   private colonneEchelle(ctx: Contexte, vertical: number): number {
     const pied = Math.floor((this.corps.y + this.corps.h + (vertical > 0 ? 2 : -2)) / TUILE);
     const milieu = Math.floor(this.cy / TUILE);
-    for (const dx of [0, -6, 6]) {
+    for (const dx of [0, -4, 4]) {
       const tx = Math.floor((this.cx + dx) / TUILE);
       if (ctx.carte.props(tx, milieu).echelle || ctx.carte.props(tx, pied).echelle) return tx;
     }
@@ -191,8 +191,8 @@ export class Joueur extends JoueurBase {
     const cos = Math.cos(this.angle);
     const sin = Math.sin(this.angle);
     const bouche = {
-      x: this.cx + this.dir * 10 * cos,
-      y: this.corps.y + 10 - 13 * sin,
+      x: this.cx + this.dir * 5 * cos,
+      y: this.corps.y + 5 - 6.5 * sin,
       dir: this.dir,
       angle: this.angle,
     };

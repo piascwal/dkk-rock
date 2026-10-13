@@ -3,8 +3,8 @@
 /** Côté d'une tuile, en pixels du monde. */
 export const TUILE = 16;
 
-/** Hauteur de la vue en pixels du monde (10,5 tuiles : la caméra est près des héros) ; la largeur suit la forme de l'écran. */
-export const HAUTEUR_VUE = 168;
+/** Hauteur de la vue en pixels du monde (7,5 tuiles : un héros fait une tuile) ; la largeur suit la forme de l'écran. */
+export const HAUTEUR_VUE = 120;
 
 /** La simulation avance par pas fixes de 1/60 s. */
 export const TICKS_PAR_SECONDE = 60;
@@ -23,9 +23,9 @@ export const CHUTE_MAX = 7;
 /** Tempo du monde : les ennemis « techno » n'attaquent que sur le temps. */
 export const BPM = 124;
 
-/** Boîte de collision d'un héros ; le sprite fait environ 40 px, la tête dépasse un peu. */
-export const HEROS_LARGEUR = 14;
-export const HEROS_HAUTEUR = 30;
+/** Boîte de collision d'un héros : une tuile de haut (15 sur 16), pour qu'il passe dans une galerie d'un bloc ; le sprite fait 20 px. */
+export const HEROS_LARGEUR = 9;
+export const HEROS_HAUTEUR = 15;
 
 export const MAX_JOUEURS = 4;
 export const VIES_DEPART = 5;

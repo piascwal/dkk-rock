@@ -1,5 +1,6 @@
 import { G, type Genre } from '../jeu/vue';
 import { FEUILLES_ENNEMIS } from './feuilles-ennemis';
+import { FEUILLES_HEROS } from './feuilles-heros';
 
 /**
  * Les planches de sprites : des images (PNG à fond transparent) qui remplacent les dessins faits
@@ -53,30 +54,18 @@ export interface Feuille {
  *
  *   [G.JBT]: { fichier: 'jbt.png', w: 38, h: 41, images: [2, 6, 1, 4, 1, 1, 1], rythme: 6 },
  */
-// repos 4, course 6, saut, échelle 2, tyrolienne, mur, mort, tir 2, puis la course en visant (codes 1 à 4)
-const ANIMATIONS_HEROS = [4, 6, 1, 2, 1, 1, 1, 0, 0, 0, 2, 6, 6, 6, 6];
-
-/** Un héros avec son instrument dans le sprite (outils/anime-instrument.py) ; `pied` : milieu des pieds dans l'image. */
-const heros = (fichier: string, w: number, h: number, pied: number): Feuille => ({
-  fichier,
-  w,
-  h,
-  pied,
-  densite: 6,
-  visees: 11,
-  images: ANIMATIONS_HEROS,
-  rythme: 5,
-});
-
 export const FEUILLES: Partial<Record<Genre, Feuille>> = {
   ...FEUILLES_ENNEMIS,
-  [G.JBT]: heros('jbt-instrument.png', 241, 242, 129),
-  [G.JBM]: heros('jbm-instrument.png', 236, 246, 137),
-  [G.JBG]: heros('jbg-instrument.png', 241, 245, 134),
-  [G.MAT]: heros('mat-instrument.png', 247, 248, 139),
-  [G.TOM]: heros('tom-instrument.png', 250, 288, 146),
+  ...FEUILLES_HEROS,
   // Fadatchi, fabriqué par outils/anime-kiwi.py : debout 8 images (il respire), court 4, saut 1, coup de bec 4
-  [G.KIWI]: { fichier: 'fadatchi.png', w: 41, h: 23, images: [8, 4, 1, 0, 0, 0, 0, 0, 0, 0, 4], rythme: 5 },
+  [G.KIWI]: {
+    fichier: 'fadatchi.png',
+    w: 41,
+    h: 23,
+    images: [8, 4, 1, 0, 0, 0, 0, 0, 0, 0, 4],
+    rythme: 5,
+    echelle: 0.5,
+  },
 };
 
 /** Pour les tests et la lisibilité : tous les genres de héros. */
