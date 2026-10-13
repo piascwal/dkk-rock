@@ -46,20 +46,12 @@ const synthe80 = (s: Synthe, v: number, f: number) => {
   s.note({ freq: f / 2, duree: 0.22, type: 'square', volume: 0.04 * v, filtre: 1200 });
 };
 
-/** JBT : un coup de batterie. K grosse caisse, S caisse claire, H charleston, T tom ; « K+H » : les deux ensemble. */
-const batterie = (s: Synthe, v: number, coup: string) => {
-  for (const c of coup.split('+')) {
-    if (c === 'K') s.note({ freq: 150, vers: 45, duree: 0.16, type: 'sine', volume: 0.5 * v });
-    if (c === 'S') {
-      s.bruit({ duree: 0.13, volume: 0.28 * v, passeHaut: 1500 });
-      s.note({ freq: 190, duree: 0.07, type: 'triangle', volume: 0.15 * v });
-    }
-    if (c === 'H') s.bruit({ duree: 0.03, volume: 0.1 * v, passeHaut: 7000 });
-    if (c === 'T') s.note({ freq: 140, vers: 85, duree: 0.2, type: 'sine', volume: 0.35 * v });
-  }
+/** JBT : une guitare lead lourde et saturée, façon Marilyn Manson (doublée à la quinte grave pour l'épaisseur). */
+const guitareLourde = (s: Synthe, v: number, f: number) => {
+  s.note({ freq: f, duree: 0.3, type: 'sawtooth', volume: 0.13 * v, distordu: true, filtre: 2200 });
+  s.note({ freq: f * 1.003, duree: 0.3, type: 'square', volume: 0.06 * v, distordu: true, filtre: 1400 });
+  s.note({ freq: f / 1.5, duree: 0.3, type: 'sawtooth', volume: 0.07 * v, filtre: 800 });
 };
-
-const groove = 'K+H H S+H K K+H H S+H H K+H H S+H K K+H K S+H H';
 
 export const MELODIES: Record<string, Melodie> = {
   // Mat : Come as You Are (Nirvana)
@@ -82,10 +74,10 @@ export const MELODIES: Record<string, Melodie> = {
     pas: notes('do#5 si4 do#5 fa#4 re5 do#5 re5 do#5 si4 re5 do#5 re5 fa#4 si4 la4 si4 la4 sol#4 si4 la4'),
     joue: (s, v, p) => synthe80(s, v, p as number),
   },
-  // JBT : Smells Like Teen Spirit (Nirvana), le roulement d'entrée puis le rythme
+  // JBT : Sweet Dreams (la reprise de Marilyn Manson), transcrit de mémoire : à corriger au besoin
   baguette: {
-    pas: ['S', 'S', 'S', 'S', 'T', 'T', 'T', 'T', ...groove.split(' '), ...groove.split(' ')],
-    joue: (s, v, p) => batterie(s, v, p as string),
+    pas: notes('do3 do3 mib3 do3 lab2 sol2 lab2 sol2 fa2 mib2 fa2 mib2'),
+    joue: (s, v, p) => guitareLourde(s, v, p as number),
   },
 };
 
