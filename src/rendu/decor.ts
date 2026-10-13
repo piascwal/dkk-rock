@@ -124,6 +124,7 @@ export function dessineDecor(
   largeur: number,
   devant: boolean,
   couleurTouffe: string,
+  voile: string,
 ): void {
   const p = pinceau(ctx);
   for (const o of poses) {
@@ -139,9 +140,12 @@ export function dessineDecor(
       p(-3, -h, 1, h, couleurTouffe);
       p(0, -h - 1, 1, h + 1, couleurTouffe);
       p(3, -h, 1, h, couleurTouffe);
-    } else if (o.quoi === 'enceinte34' && dessineEnceinte(ctx, o.v)) {
+    } else if (o.quoi === 'enceinte34' && dessineEnceinte(ctx, o.v, voile)) {
       // dessinée par sa planche
-    } else if ((o.quoi === 'vacheCasque' || o.quoi === 'lampadaire') && dessineSprite(ctx, o.quoi, o.v)) {
+    } else if (
+      (o.quoi === 'vacheCasque' || o.quoi === 'lampadaire') &&
+      dessineSprite(ctx, o.quoi, o.v, voile)
+    ) {
       // la vache ou le lampadaire, dessinés par leur planche
     } else if (o.quoi === 'caisseDeco' && dessineCaisses(ctx, o.v)) {
       // le sprite de la caisse, en plus petit et plus sombre : on ne la confond pas avec une vraie
@@ -154,9 +158,9 @@ export function dessineDecor(
 }
 
 /** Une enceinte de 3/4 (grise ou en bois), tournée d'un côté ou de l'autre selon `v`. */
-function dessineEnceinte(ctx: CanvasRenderingContext2D, v: number): boolean {
+function dessineEnceinte(ctx: CanvasRenderingContext2D, v: number, voile: string): boolean {
   if (v & 2) ctx.scale(-1, 1);
-  return dessineDecorFeuille(ctx, 'enceinte-34', v & 1);
+  return dessineDecorFeuille(ctx, 'enceinte-34', v & 1, voile);
 }
 
 /** Des caisses de fond : le sprite de la caisse, réduit et assombri, parfois une petite posée dessus. */
@@ -180,10 +184,11 @@ function dessineSprite(
   ctx: CanvasRenderingContext2D,
   quoi: 'vacheCasque' | 'lampadaire',
   v: number,
+  voile: string,
 ): boolean {
   if (quoi === 'lampadaire') {
-    return dessineDecorFeuille(ctx, 'lampadaire', 0);
+    return dessineDecorFeuille(ctx, 'lampadaire', 0, voile);
   }
   if (v & 8) ctx.scale(-1, 1);
-  return dessineDecorFeuille(ctx, 'vache', v % 6);
+  return dessineDecorFeuille(ctx, 'vache', v % 6, voile);
 }

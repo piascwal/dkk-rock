@@ -25,12 +25,46 @@ export function chargeFeuilles(base: string): void {
 }
 
 /** Dessine l'apparence `ligne` d'une planche du décor, pieds au point courant. False si elle n'est pas chargée. */
-export function dessineDecorFeuille(ctx: CanvasRenderingContext2D, nom: string, ligne: number): boolean {
+export function dessineDecorFeuille(
+  ctx: CanvasRenderingContext2D,
+  nom: string,
+  ligne: number,
+  voile?: string,
+): boolean {
   const f = FEUILLES_DECOR[nom];
   const img = imagesDecor.get(nom);
   if (!f || !img) return false;
-  dessineCase(ctx, img, f, 0, ligne % f.images.length);
+  const l = ligne % f.images.length;
+  const brumee = voile ? voilee(nom, l, voile, img, f) : null;
+  if (brumee) dessineCase(ctx, brumee, f, 0, 0);
+  else dessineCase(ctx, img, f, 0, l);
   return true;
+}
+
+const voilees = new Map<string, HTMLCanvasElement>();
+
+/** Le plan de fond vu de loin : l'image teintée de la couleur du lointain du monde (moins de contraste, comme dans la brume). */
+function voilee(
+  nom: string,
+  ligne: number,
+  voile: string,
+  img: HTMLImageElement,
+  f: Feuille,
+): HTMLCanvasElement {
+  const cle = `${nom}|${ligne}|${voile}`;
+  let toile = voilees.get(cle);
+  if (toile) return toile;
+  toile = document.createElement('canvas');
+  toile.width = f.w;
+  toile.height = f.h;
+  const c = toile.getContext('2d')!;
+  c.drawImage(img, 0, ligne * f.h, f.w, f.h, 0, 0, f.w, f.h);
+  c.globalCompositeOperation = 'source-atop';
+  c.globalAlpha = 0.32;
+  c.fillStyle = voile;
+  c.fillRect(0, 0, f.w, f.h);
+  voilees.set(cle, toile);
+  return toile;
 }
 
 /** L'image chargée d'une planche (pour la dessiner hors du jeu, sur la carte du monde par exemple). */
@@ -65,7 +99,7 @@ export function dessineFeuille(
 /** Une case de la planche, pieds au point courant. */
 function dessineCase(
   ctx: CanvasRenderingContext2D,
-  img: HTMLImageElement,
+  img: CanvasImageSource,
   f: Feuille,
   col: number,
   ligne: number,

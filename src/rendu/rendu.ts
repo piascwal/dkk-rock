@@ -165,7 +165,17 @@ export class Rendu {
         11 + vue.niveau,
       );
     }
-    dessineDecor(ctx, this.decor, carte, camX, camY, this.largeur, false, this.theme.dessus);
+    dessineDecor(
+      ctx,
+      this.decor,
+      carte,
+      camX,
+      camY,
+      this.largeur,
+      false,
+      this.theme.dessus,
+      this.theme.lointain,
+    );
     dessineTuiles(ctx, carte, this.atlas, camX, camY, this.largeur);
     dessineTyroliennes(ctx, niveauLu(vue.niveau).tyroliennes, carte, camX, camY);
     this.particules.meteo(this.theme.meteo, camX, camY, this.largeur);
@@ -176,7 +186,17 @@ export class Rendu {
     for (const passe of [0, 1, 2])
       for (const v of vue.entites) if (tri(v.g) === passe) dessineEntite(ctx, v, camX, camY, this.atlas);
     for (const v of vue.entites) if (v.g === G.VAN && v.e === 2) this.particules.van(v.x, v.y, v.f / 20);
-    dessineDecor(ctx, this.decor, carte, camX, camY, this.largeur, true, this.theme.dessus);
+    dessineDecor(
+      ctx,
+      this.decor,
+      carte,
+      camX,
+      camY,
+      this.largeur,
+      true,
+      this.theme.dessus,
+      this.theme.lointain,
+    );
     this.particules.dessine(ctx, camX, camY);
   }
 }
