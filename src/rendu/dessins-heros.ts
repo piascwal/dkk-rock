@@ -116,7 +116,7 @@ export function dessineHeros(
   f: number,
   ctx?: CanvasRenderingContext2D,
 ): void {
-  const anim = (f & 15) * 2;
+  const anim = (f & 15) * 3;
   const angle = angleDuCode((f >> 4) & 7);
   const tire = (f & 128) !== 0;
   const brasLeves = e === ANIM.TYROLIENNE || e === ANIM.ECHELLE;
@@ -153,7 +153,7 @@ export function dessineInstrument(
   f: number,
   epaule: { x: number; y: number },
 ): void {
-  const anim = (f & 15) * 2;
+  const anim = (f & 15) * 3;
   const angle = angleDuCode((f >> 4) & 7);
   const tire = (f & 128) !== 0;
   // les instruments sont dessinés par rapport au haut de la tête (l'épaule est 8 px plus bas), pour un héros

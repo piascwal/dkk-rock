@@ -22,6 +22,7 @@ export interface Actions {
   ouvreHote(): Hote | null;
   readonly estClient: boolean;
   appliqueOptions(): void;
+  diagnostic(): string;
 }
 
 /** Les écrans de menu, en HTML. Un seul écran à la fois dans `#ecran`. */
@@ -159,6 +160,14 @@ export class Menus {
         this.a.appliqueOptions();
         this.options();
       });
+    const qualites = { auto: 'automatique', max: 'maximale', eco: 'économe' } as const;
+    const suivante = { auto: 'max', max: 'eco', eco: 'auto' } as const;
+    const qualite = bouton(`Affichage : ${qualites[s.qualite]}`, () => {
+      s.qualite = suivante[s.qualite];
+      this.a.enregistre();
+      this.a.appliqueOptions();
+      this.options();
+    });
     const efface = bouton('Effacer la sauvegarde', () => {
       if (!confirm('Effacer la progression ?')) return;
       s.enCours = null;
@@ -170,6 +179,8 @@ export class Menus {
       el('h2', 'Options'),
       bascule('Bruitages', 'son'),
       bascule('Musique', 'musique'),
+      qualite,
+      el('p', `Affichage actuel : ${this.a.diagnostic()}`, 'aide'),
       pseudo,
       efface,
       bouton('Retour', () => this.titre()),
@@ -188,7 +199,7 @@ export class Menus {
       el('h2', 'Pause'),
       boutons,
       el('p', 'À plusieurs, la partie continue pendant la pause.', 'aide'),
-      el('p', texteVersion(), 'version'),
+      el('p', `${texteVersion()} · ${this.a.diagnostic()}`, 'version'),
     );
   }
 

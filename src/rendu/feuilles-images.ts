@@ -1,6 +1,6 @@
 import { ANIM } from '../jeu/vue';
 import { VERSION } from '../version';
-import { FEUILLES, caseDeLaPlanche } from './feuilles';
+import { FEUILLES, caseDeLaPlanche, colonneDuCycle } from './feuilles';
 import type { Genre } from '../jeu/vue';
 
 const images = new Map<Genre, HTMLImageElement>();
@@ -35,7 +35,7 @@ export function dessineFeuille(
   let { col, ligne } = caseDeLaPlanche(f, tendu ? ANIM.ATTAQUE : e, compteur);
   if (f.visees !== undefined && visee > 0 && (e === ANIM.DEBOUT || e === ANIM.COURT || e === ANIM.SAUT)) {
     ligne = f.visees + visee - 1;
-    col = e === ANIM.COURT ? Math.floor(compteur / (f.rythme ?? 5)) % (f.images[ligne] ?? 1) : 0;
+    col = e === ANIM.COURT ? colonneDuCycle(f, f.images[ligne] ?? 1, compteur) : 0;
   }
   const d = f.densite ?? 1;
   const k = (f.echelle ?? 1) / d;

@@ -242,8 +242,9 @@ export class Joueur extends JoueurBase {
       gauche: this.dir < 0,
       clignote: this.invulnerable > 0 && this.invulnerable % 8 < 4,
       e,
-      // 4 bits de phase d'animation (un pas = 2 ticks), 3 bits de visée, 1 bit « tire »
-      f: ((this.anim >> 1) & 15) | (codeVisee(this.angle) << 4) | (tire ? 128 : 0),
+      // 4 bits de phase d'animation (cycle de 12 pas de 3 ticks : 6 images de course de 6 ticks chacune, sans à-coup),
+      // 3 bits de visée, 1 bit « tire »
+      f: (Math.floor(this.anim / 3) % 12) | (codeVisee(this.angle) << 4) | (tire ? 128 : 0),
     };
   }
 }

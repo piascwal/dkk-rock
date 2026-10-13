@@ -178,7 +178,7 @@ def ecrit_ts():
         "const ANIMATIONS_HEROS = [4, 6, 1, 2, 1, 1, 1, 0, 0, 0, 2, 6, 6, 6, 6];\n\n"
         "/** Un héros avec son instrument dans le sprite ; `pied` : milieu des pieds dans l'image. */\n"
         "const heros = (fichier: string, w: number, h: number, pied: number): Feuille => ({\n"
-        "  fichier,\n  w,\n  h,\n  pied,\n  densite: 6,\n  visees: 11,\n  images: ANIMATIONS_HEROS,\n  rythme: 5,\n});\n\n"
+        "  fichier,\n  w,\n  h,\n  pied,\n  densite: 6,\n  visees: 11,\n  images: ANIMATIONS_HEROS,\n  rythme: 5,\n  cycle: 12,\n});\n\n"
         "export const FEUILLES_HEROS: Partial<Record<Genre, Feuille>> = {\n" + '\n'.join(lignes) + '\n};\n'
     )
 

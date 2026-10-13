@@ -20,7 +20,7 @@ const ACCELERATION_VAN = 0.3;
 const VITESSE_VAN = 10;
 
 const TAILLES: Record<SorteObjet, [number, number]> = {
-  cage: [16, 18],
+  cage: [20, 18],
   drapeau: [10, 32],
   van: [48, 28],
   arme: [12, 12],

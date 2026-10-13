@@ -102,8 +102,14 @@ export class App implements Actions {
     enregistre(this.sauvegarde);
   }
 
+  /** « 6× · 60 i/s » : la finesse d'affichage et la fluidité mesurée */
+  diagnostic(): string {
+    return this.rendu.diagnostic();
+  }
+
   appliqueOptions(): void {
     this.synthe.volumes(this.sauvegarde.son, this.sauvegarde.musique);
+    this.rendu.regle(this.sauvegarde.qualite);
   }
 
   lance(niveau: number, membre: number, reprise: Progression | null): void {

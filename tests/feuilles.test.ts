@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { FEUILLES, caseDeLaPlanche, type Feuille } from '../src/rendu/feuilles';
+import { G } from '../src/jeu/vue';
+import { FEUILLES, caseDeLaPlanche, colonneDuCycle, type Feuille } from '../src/rendu/feuilles';
 
 const f: Feuille = { fichier: 'x.png', w: 32, h: 32, images: [2, 4, 1], rythme: 5 };
 
@@ -45,4 +46,13 @@ describe('les planches déclarées', () => {
       expect(f!.images[0]).toBeGreaterThan(0);
     },
   );
+});
+
+describe('le cycle d’animation des héros', () => {
+  it('répartit la course à parts égales : chaque image dure autant de ticks', () => {
+    const f = FEUILLES[G.TOM]!;
+    const duree = new Array<number>(6).fill(0);
+    for (let tick = 0; tick < 36; tick++) duree[colonneDuCycle(f, 6, Math.floor(tick / 3) % 12)]!++;
+    expect(duree).toEqual([6, 6, 6, 6, 6, 6]);
+  });
 });

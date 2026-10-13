@@ -47,7 +47,7 @@ export function dessineEntite(
   const pb = blanc ? (x0: number, y0: number, w: number, h: number) => p(x0, y0, w, h, '#ffffff') : p;
 
   // sprites à apparences : l'identifiant choisit l'apparence ; héros : phase d'animation ; autres : compteur
-  const compteur = FEUILLES[v.g]?.variantes ? v.id : heros ? (v.f & 15) * 2 : v.f;
+  const compteur = FEUILLES[v.g]?.variantes ? v.id : heros ? v.f & 15 : v.f;
   if (
     dessineFeuille(
       ctx,

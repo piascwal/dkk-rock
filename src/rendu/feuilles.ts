@@ -46,6 +46,11 @@ export interface Feuille {
    * `visees + code - 1` montre la course ou la pose avec l'instrument orienté selon le code de visée 1 à 4.
    */
   visees?: number;
+  /**
+   * Animation en cycle (les héros) : `compteur` est une phase de 0 à `cycle` - 1, répartie à parts égales entre les images
+   * de la ligne ; sinon `compteur` est un nombre de ticks, une image durant `rythme` ticks.
+   */
+  cycle?: number;
   /** agrandissement du sprite (1 par défaut) : la planche peut être plus fine que le jeu */
   echelle?: number;
 }
@@ -79,5 +84,10 @@ export function caseDeLaPlanche(f: Feuille, e: number, compteur: number): { col:
   if (f.variantes) return { col: compteur % Math.max(1, f.images[0] ?? 1), ligne: 0 };
   const ligne = (f.images[e] ?? 0) > 0 ? e : 0;
   const n = Math.max(1, f.images[ligne] ?? 1);
-  return { col: Math.floor(compteur / (f.rythme ?? 6)) % n, ligne };
+  return { col: colonneDuCycle(f, n, compteur), ligne };
+}
+
+/** L'image d'une ligne de `n` images à l'instant `compteur` (voir `cycle`). */
+export function colonneDuCycle(f: Feuille, n: number, compteur: number): number {
+  return (f.cycle ? Math.floor((compteur * n) / f.cycle) : Math.floor(compteur / (f.rythme ?? 6))) % n;
 }

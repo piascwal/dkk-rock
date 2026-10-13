@@ -11,6 +11,9 @@ export interface Progression {
   score: number;
 }
 
+/** Qualité de l'affichage : automatique, toujours au maximum, ou économe (appareil lent). */
+export type Qualite = 'auto' | 'max' | 'eco';
+
 export interface Sauvegarde {
   version: 1;
   /** la partie en cours, à reprendre avec « Continuer » */
@@ -21,6 +24,7 @@ export interface Sauvegarde {
   pseudo: string;
   son: boolean;
   musique: boolean;
+  qualite: Qualite;
 }
 
 const CLE = 'dkk-rock.sauvegarde';
@@ -33,6 +37,7 @@ export const SAUVEGARDE_VIDE: Sauvegarde = {
   pseudo: '',
   son: true,
   musique: true,
+  qualite: 'auto',
 };
 
 const entier = (v: unknown, min: number, max: number, defaut: number): number =>
@@ -70,6 +75,7 @@ export function valideSauvegarde(brut: unknown, nbNiveaux: number): Sauvegarde {
     pseudo: typeof o.pseudo === 'string' ? o.pseudo.slice(0, 14) : '',
     son: o.son !== false,
     musique: o.musique !== false,
+    qualite: o.qualite === 'max' || o.qualite === 'eco' ? o.qualite : 'auto',
   };
 }
 

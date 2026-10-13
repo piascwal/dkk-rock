@@ -15,6 +15,7 @@ const heros = (fichier: string, w: number, h: number, pied: number): Feuille => 
   visees: 11,
   images: ANIMATIONS_HEROS,
   rythme: 5,
+  cycle: 12,
 });
 
 export const FEUILLES_HEROS: Partial<Record<Genre, Feuille>> = {
