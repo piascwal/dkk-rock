@@ -10,11 +10,28 @@ import { Boss } from './boss';
  * premier temps de chaque mesure (avalanche à l'atterrissage) et fait rouler
  * une énorme boule sur le troisième.
  */
+/** Les poses de sa planche (voir outils/fixe-objets.py) : repos, bras levés (deux), touché (trois). */
+const POSE = { REPOS: 0, ARME: 1, LANCE: 2, TOUCHE: 3 } as const;
+
 export class YetiAlpha extends Boss {
   private enLAir = false;
+  /** ticks restants de la pose « bras levés » (la grosse boule) et de la pose « touché » */
+  private lancer = 0;
+  private touche = 0;
+  private coups = 0;
 
   constructor(ctx: Contexte, x: number, y: number) {
-    super(ctx, G.YETI_ALPHA, 70, x, y, 28, 34, 3000, 220);
+    super(ctx, G.YETI_ALPHA, 70, x, y, 26, 40, 3000, 220);
+  }
+
+  override blesse(degats: number, ctx: Contexte): void {
+    const avant = this.pv;
+    super.blesse(degats, ctx);
+    // une pose d'impact sur trois, tour à tour, et pas à chaque petit tir (sinon il ne ferait que ça)
+    if (this.pv < avant && this.touche <= 0) {
+      this.touche = 14;
+      this.coups++;
+    }
   }
 
   protected override reveille(ctx: Contexte): void {
@@ -36,6 +53,7 @@ export class YetiAlpha extends Boss {
         c.vx = Math.max(-2.5, Math.min(2.5, (cible.x - this.cx) / 40));
         this.enLAir = true;
       } else if (temps === 2) {
+        this.lancer = 26;
         ctx.ajoute(
           new Projectile(ctx, GROSSE_BOULE, 'ennemis', this.cx + this.dir * 18, this.cy, this.dir * 2.6, -1),
         );
@@ -45,7 +63,13 @@ export class YetiAlpha extends Boss {
     appliqueGravite(c);
     deplace(c, ctx.carte);
     if (c.auSol) c.vx *= 0.8;
-    this.pose = c.auSol ? ctx.numeroTemps % 2 : 2;
+    if (this.lancer > 0) this.lancer--;
+    if (this.touche > -20) this.touche--;
+    // la pose : touché, bras levés (en lançant la boule ou en l'air), sinon le repos
+    if (this.touche > 0) this.pose = POSE.TOUCHE + (this.coups % 3);
+    else if (!c.auSol) this.pose = POSE.LANCE;
+    else if (this.lancer > 0) this.pose = this.lancer > 14 ? POSE.ARME : POSE.LANCE;
+    else this.pose = POSE.REPOS;
     if (this.enLAir && c.auSol) {
       this.enLAir = false;
       ctx.secoue(14);

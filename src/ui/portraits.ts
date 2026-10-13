@@ -3,7 +3,6 @@ import { VERSION } from '../version';
 import type { Qui } from '../niveaux/format';
 import { HEROS } from '../entites/heros';
 import { DESSINS_BOSS } from '../rendu/dessins-boss';
-import { DESSINS_ENNEMIS } from '../rendu/dessins-ennemis';
 import { dessineHeros, dessineKiwi } from '../rendu/dessins-heros';
 import { pinceau, type Pinceau } from '../rendu/pinceau';
 
@@ -37,7 +36,7 @@ export const NOMS: Record<Qui, string> = {
 const MEMBRES: Partial<Record<Qui, number>> = { JBT: 0, JBM: 1, JBG: 2, MAT: 3, TOM: 4 };
 
 /** [largeur, hauteur, dessin] du portrait de chaque personnage, pieds au milieu du bas. */
-const DESSINS: Record<Qui, [number, number, (p: Pinceau) => void]> = {
+const DESSINS: Record<Exclude<Qui, 'YETI'>, [number, number, (p: Pinceau) => void]> = {
   ...(Object.fromEntries(
     Object.entries(MEMBRES).map(([q, m]) => [
       q,
@@ -45,7 +44,6 @@ const DESSINS: Record<Qui, [number, number, (p: Pinceau) => void]> = {
     ]),
   ) as Record<'JBT' | 'JBM' | 'JBG' | 'MAT' | 'TOM', [number, number, (p: Pinceau) => void]>),
   FADATCHI: [16, 14, (p) => dessineKiwi(p, ANIM.DEBOUT, 0)],
-  YETI: [22, 22, (p) => DESSINS_ENNEMIS[G.YETI]!(p, 0, 0)],
   DJ: [40, 44, (p) => DESSINS_BOSS[G.DJ]!(p, 1, 0)],
   RADIO: [
     18,
@@ -74,14 +72,21 @@ const cache = new Map<Qui, string>();
 
 /** Le portrait d'un personnage, en image (data URL) pour le HTML. */
 /** Les portraits fournis en pleine définition (public/portraits/) : ils remplacent les dessins en code. */
-const IMAGES: Partial<Record<Qui, string>> = { JBT: 'jbt', JBM: 'jbm', JBG: 'jbg', MAT: 'mat', TOM: 'tom' };
+const IMAGES: Partial<Record<Qui, string>> = {
+  JBT: 'jbt',
+  JBM: 'jbm',
+  JBG: 'jbg',
+  MAT: 'mat',
+  TOM: 'tom',
+  YETI: 'yeti',
+};
 
 export function portrait(qui: Qui): string {
   const fichier = IMAGES[qui];
   if (fichier) return `${import.meta.env.BASE_URL}portraits/${fichier}.png?v=${VERSION}`;
   let url = cache.get(qui);
   if (url) return url;
-  const [w, h, dessin] = DESSINS[qui];
+  const [w, h, dessin] = DESSINS[qui as Exclude<Qui, 'YETI'>];
   const toile = document.createElement('canvas');
   toile.width = w;
   toile.height = h;

@@ -22,6 +22,8 @@ DENSITE = 6
 OBJETS = {
     'van': (['van-base.png'], 'VAN', 56),
     'cage': (['cage-1-base.png', 'cage-2-base.png'], 'CAGE', 22),  # fermée, puis ouverte
+    # le Yéti Alpha : repos, bras levés (deux), touché (trois) ; les poses gardent leur place (cadre commun)
+    'yeti-alpha': ([f'boss/yeti-alpha-{k}-base.png' for k in range(1, 7)], 'YETI_ALPHA', 46, True),
 }
 
 
@@ -32,12 +34,30 @@ def agrandit(chemin, largeur):
     return nat[ys.min() : ys.max() + 1, xs.min() : xs.max() + 1], case
 
 
+def cadre_commun(chemins):
+    """Toutes les images recadrées sur la même boîte (l'union de leurs silhouettes) : d'une pose à l'autre, le
+    personnage ne glisse pas."""
+    nats = [natif_et_case(c)[0] for c in chemins]
+    h = min(n.shape[0] for n in nats)
+    w = min(n.shape[1] for n in nats)
+    nats = [n[:h, :w] for n in nats]
+    plein = np.zeros((h, w), bool)
+    for n in nats:
+        plein |= n[..., 3] > 0
+    ys, xs = np.nonzero(plein)
+    return [(n[ys.min() : ys.max() + 1, xs.min() : xs.max() + 1], 0) for n in nats]
+
+
 def main():
     lignes = []
-    for nom, (sources, genre, largeur) in OBJETS.items():
-        etats = [agrandit(RACINE / 'assets-sources' / s, largeur) for s in sources]
+    for nom, (sources, genre, largeur, *commun) in OBJETS.items():
+        if commun:
+            etats = cadre_commun([RACINE / 'assets-sources' / s for s in sources])
+        else:
+            etats = [agrandit(RACINE / 'assets-sources' / s, largeur) for s in sources]
         # tous les états ont la même échelle (celle du premier) pour que l'objet ne change pas de taille en s'ouvrant
-        h0, w0 = etats[0][0].shape[:2]
+        premier = etats[0][0]
+        w0 = np.ptp(np.nonzero(premier[..., 3].any(0))[0]) + 1  # la largeur du personnage, pas celle du cadre commun
         echelle = largeur * DENSITE / w0
         images = []
         for nat, _ in etats:
