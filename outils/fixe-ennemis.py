@@ -7,6 +7,8 @@ Entrées : assets-sources/ennemis/<type>-<n>-base.png, n = 1, 2, 3... (une appar
 Sorties : public/sprites/<type>s.png (une image par apparence, côte à côte)
           src/rendu/feuilles-ennemis.ts (généré : déclare les planches au jeu)
 
+Pour une animation (drone), les fichiers sont les images successives.
+
 Pour ajouter une apparence : déposer `<type>-<n suivant>-base.png` dans assets-sources/ennemis/ et relancer
 ce script. Le jeu en choisit une selon l'identifiant de l'ennemi (voir `variantes` dans feuilles.ts).
 
@@ -40,6 +42,8 @@ TYPES = {
     'yeti': ('YETI', 25),
     'danseur': ('DANSEUR', 20),
     'lanceur': ('LANCEUR', 20),
+    # une animation : les fichiers sont les images successives (le drone-boule à facettes clignote), 3e valeur : durée d'une image
+    'drone': ('DRONE', 22, 8),
 }
 
 
@@ -72,7 +76,7 @@ def apparences(type_):
 def main():
     SORTIE.mkdir(parents=True, exist_ok=True)
     lignes = []
-    for type_, (genre, hauteur) in TYPES.items():
+    for type_, (genre, hauteur, *anim) in TYPES.items():
         fichiers = apparences(type_)
         if not fichiers:
             continue
@@ -89,8 +93,9 @@ def main():
         nom = f'{type_}s.png'
         planche.save(SORTIE / nom)
         print(f'{nom} : {len(images)} apparence(s), {largeur} x {h} px chacune (silhouettes : {[im.width for im in images]})')
+        mode = f'rythme: {anim[0]}' if anim else 'variantes: true'
         lignes.append(
-            f"  [G.{genre}]: {{ fichier: '{nom}', w: {largeur}, h: {h}, images: [{len(images)}], variantes: true, densite: {DENSITE} }},"
+            f"  [G.{genre}]: {{ fichier: '{nom}', w: {largeur}, h: {h}, images: [{len(images)}], {mode}, densite: {DENSITE} }},"
         )
     TS.write_text(
         "// Fichier généré par outils/fixe-ennemis.py : ne pas modifier à la main.\n"
