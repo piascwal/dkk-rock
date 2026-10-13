@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { TUILE, VIES_DEPART } from '../src/config';
 import { C } from '../src/jeu/commandes';
 import { Partie } from '../src/jeu/partie';
+import { DUREE_CARTE } from '../src/jeu/vue';
 import { Objet } from '../src/entites/objets';
 import { NIVEAUX } from '../src/niveaux';
 import { T } from '../src/monde/tuiles';
@@ -33,7 +34,7 @@ describe('la partie', () => {
       p.commande(1, t % 2 ? C.TIR | C.GAUCHE : C.SAUT);
       p.avance();
       p.releveEvenements();
-      if (p.phase === 'perdu' || p.phase === 'bilan') p.suivant();
+      if (p.phase === 'perdu' || p.phase === 'bilan' || p.phase === 'carte') p.suivant();
     }
     expect(p.vue().entites.length).toBeGreaterThan(0);
   });
@@ -109,7 +110,7 @@ describe('la partie', () => {
     avance(p, 200);
     expect(p.phase).toBe('bilan');
     expect(sauvegardes).toEqual([1]);
-    while (p.phase === 'bilan') p.suivant();
+    while (p.phase === 'bilan' || p.phase === 'carte') p.suivant();
     expect(p.phase).toBe('histoire');
     expect(p.niveau).toBe(1);
   });
@@ -122,7 +123,7 @@ describe('la partie', () => {
       // les héros se trouvent loin, comme à la fin d'un niveau long
       for (const j of p.joueurs) if (j) Object.assign(j.corps, { x: 190 * TUILE, y: 5 * TUILE });
       p.termineNiveau();
-      while (p.phase === 'bilan') p.suivant();
+      while (p.phase === 'bilan' || p.phase === 'carte') p.suivant();
       expect(p.niveau).toBe(n);
       for (const j of p.joueurs) {
         if (!j) continue;
@@ -182,5 +183,16 @@ describe('la partie', () => {
     expect(Math.abs(j.cx - van.corps.x - van.corps.w / 2)).toBeLessThan(2); // la caméra suit le van
     avance(p, 120);
     expect(p.phase).toBe('bilan');
+  });
+
+  it('entre deux niveaux, le van roule sur la carte du monde, puis le niveau suivant commence', () => {
+    const p = nouvelle();
+    p.termineNiveau();
+    while (p.phase === 'bilan') p.suivant();
+    expect(p.phase).toBe('carte');
+    expect(p.niveau).toBe(0);
+    avance(p, DUREE_CARTE + 1);
+    expect(p.phase).toBe('histoire');
+    expect(p.niveau).toBe(1);
   });
 });

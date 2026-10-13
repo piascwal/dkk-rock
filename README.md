@@ -126,7 +126,8 @@ validé.
 - **Un arc de l'histoire :** les niveaux d'un arc s'enchaînent, avec leur épilogue ; l'arc principal est « La tournée ».
   Pour un autre (un voyage en Jamaïque, par exemple) : ajouter ses niveaux à la fin de `NIVEAUX`, puis une entrée dans
   `ARCS` (`niveaux/arcs.ts`) avec son titre, son résumé, son épilogue et, si on veut, `apres` (le niveau à terminer pour
-  l'ouvrir). Le menu « Choisir un niveau » les liste par arc.
+  l'ouvrir). Le menu « Choisir un niveau » les liste par arc. Entre deux niveaux, la carte du monde de l'arc montre le van
+  qui roule vers le suivant (`rendu/carte-monde.ts`) : un nouveau thème doit y avoir sa région.
 - **Un ennemi :** une définition dans `entites/ennemis/definitions.ts` (lettre de carte), un
   comportement dans `comportements.ts`, un dessin dans `rendu/dessins-ennemis.ts`.
 - **Une arme :** un tir dans `entites/projectiles-defs.ts`, une entrée dans `entites/armes.ts`,

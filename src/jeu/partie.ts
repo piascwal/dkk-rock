@@ -24,7 +24,7 @@ import { peuple, releveCarte } from './chargement';
 import { interactions, membreLibre } from './interactions';
 import type { Progression } from './sauvegarde';
 import { construitVue } from './vue-partie';
-import type { EtatVue, Evenement, Phase } from './vue';
+import { DUREE_CARTE, type EtatVue, type Evenement, type Phase } from './vue';
 
 const estCible = (e: EntiteSimulee): e is EntiteSimulee & Cible => 'blesse' in e && 'camp' in e;
 
@@ -138,6 +138,10 @@ export class Partie implements Contexte {
   /** Un joueur veut passer la page d'histoire (ou recommencer après une défaite). */
   suivant(): void {
     if (this.phase === 'jeu') return;
+    if (this.phase === 'carte') {
+      this.chargeNiveauSuivant(); // on peut passer le trajet
+      return;
+    }
     const pages = pagesDe(this.phase, this.niveau);
     if (this.page + 1 < pages.length) {
       this.page++;
@@ -146,8 +150,11 @@ export class Partie implements Contexte {
     this.page = 0;
     if (this.phase === 'histoire') this.phase = 'jeu';
     else if (this.phase === 'bilan') {
-      if (suivantDansArc(this.niveau) !== null) this.chargeNiveauSuivant();
-      else this.phase = 'fin';
+      if (suivantDansArc(this.niveau) !== null) {
+        // le van roule vers le niveau suivant sur la carte du monde
+        this.phase = 'carte';
+        this.page = 0;
+      } else this.phase = 'fin';
     } else if (this.phase === 'perdu') {
       this.vies = VIES_DEPART;
       this.charge(this.niveau, this.drapeau);
@@ -208,6 +215,7 @@ export class Partie implements Contexte {
     this.surLeTemps = temps !== this.numeroTemps;
     this.numeroTemps = temps;
     if (this.secousse > 0) this.secousse = Math.max(0, this.secousse - 1);
+    if (this.phase === 'carte' && ++this.page >= DUREE_CARTE) this.chargeNiveauSuivant();
     if (this.phase !== 'jeu') return;
 
     this.recalculeCibles();

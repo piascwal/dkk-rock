@@ -12,7 +12,7 @@ import { PHASES, type EntiteVue, type EtatVue, type Evenement, type Genre, type 
  *
  * Changer ce fichier de façon incompatible : augmenter VERSION_PROTOCOLE.
  */
-export const VERSION_PROTOCOLE = 2;
+export const VERSION_PROTOCOLE = 3;
 export const APP_DKK = { id: 'dkk-rock', version: VERSION_PROTOCOLE };
 
 const TYPE_ETAT = 1;

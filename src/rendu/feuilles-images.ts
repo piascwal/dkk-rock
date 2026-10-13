@@ -15,6 +15,9 @@ export function chargeFeuilles(base: string): void {
   }
 }
 
+/** L'image chargée d'une planche (pour la dessiner hors du jeu, sur la carte du monde par exemple). */
+export const imageDe = (genre: Genre): HTMLImageElement | undefined => images.get(genre);
+
 /**
  * Dessine l'entité avec sa planche si elle existe et qu'elle est chargée, pieds au milieu du bas.
  * Renvoie false sinon : l'appelant utilise alors le dessin en code.

@@ -389,6 +389,22 @@ h2 {
   text-align: center;
 }
 
+/* la carte du monde : le canvas reste visible, seul l'avis « pour passer » est en bas */
+#histoire.carte {
+  background: transparent;
+  justify-content: flex-end;
+}
+
+#histoire.carte .suite {
+  background: rgba(10, 5, 12, 0.75);
+  padding: 0.2rem 0.6rem;
+}
+
+/* pendant le trajet sur la carte, le HUD du jeu s'efface */
+#jeu:has(#histoire.carte:not([hidden])) #hud {
+  display: none;
+}
+
 #histoire .titre-niveau {
   font-family: var(--titre);
   color: var(--rouge);

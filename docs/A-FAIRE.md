@@ -15,3 +15,9 @@ Idées et finitions notées en route, pour ne pas les perdre.
 - **Arc de l'histoire en Jamaïque** (les reggae-men deviennent des amis) : le mécanisme d'arcs est prêt (`niveaux/arcs.ts`),
   il manque les niveaux, les textes et les ennemis.
 - **Décors de premier plan non jouables :** prévoir une couche devant les héros quand les sprites seront fournis.
+
+## À ne pas oublier
+
+- **Nouvel arc ou nouveau thème → la carte du monde** (`src/rendu/carte-monde.ts`) : elle se construit d'après les
+  niveaux de l'arc et leur thème, mais un thème nouveau (la Jamaïque, par exemple) doit y avoir sa région (`REGIONS`,
+  une entrée par décor) ; vérifier ensuite l'allure de la carte de l'arc.

@@ -6,6 +6,7 @@ import { proprietes } from '../monde/tuiles';
 import { NIVEAUX, niveauLu } from '../niveaux';
 import { AtlasTuiles } from './atlas-tuiles';
 import { Camera } from './camera';
+import { dessineCarteMonde } from './carte-monde';
 import { dessineEntite } from './dessin-entites';
 import { dessineDecor, semeDecor } from './decor';
 import { dessineTuiles, dessineTyroliennes } from './dessin-tuiles';
@@ -141,6 +142,10 @@ export class Rendu {
     this.adapteDensite();
     ctx.setTransform(this.densite, 0, 0, this.densite, 0, 0);
     ctx.imageSmoothingEnabled = false;
+    if (vue.phase === 'carte') {
+      dessineCarteMonde(ctx, this.largeur, vue.niveau, vue.page, this.tick);
+      return;
+    }
     this.prepareNiveau(vue.niveau);
     const moi = vue.joueurs[siegeLocal];
     const suivi = moi && moi.present && !moi.mort ? moi : vue.joueurs.find((j) => j.present && !j.mort);

@@ -9,3 +9,4 @@ Lire le README avant toute modification.
 - Un niveau modifié doit rester atteignable : le test `niveaux.test.ts` le vérifie.
 - Changer le format réseau (`src/reseau/protocole.ts`) : augmenter `VERSION_PROTOCOLE`.
 - `@piascwal/lan-kit` est figé sur une étiquette ; d'autres jeux en dépendent : ne rien y changer pour ce jeu.
+- Un nouvel arc ou un nouveau thème : faire évoluer la carte du monde (`src/rendu/carte-monde.ts`, une région par décor).

@@ -75,6 +75,19 @@ export class Histoire {
       this.cle = '';
       return;
     }
+    if (v.phase === 'carte') {
+      // la carte du monde se dessine dans le canvas : juste de quoi passer le trajet
+      if (this.cle === `carte-${v.niveau}`) return;
+      this.cle = `carte-${v.niveau}`;
+      const suite = document.createElement('p');
+      suite.className = 'suite';
+      suite.textContent = 'Touchez l’écran ou appuyez sur Entrée pour passer';
+      this.element.replaceChildren(suite);
+      this.element.classList.add('carte');
+      this.element.hidden = false;
+      return;
+    }
+    this.element.classList.remove('carte');
     const cle = `${v.phase}-${v.niveau}-${v.page}`;
     if (cle === this.cle) return;
     this.cle = cle;
