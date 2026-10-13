@@ -159,6 +159,23 @@ export class Joueur extends JoueurBase {
     if (k.horizontal) this.dir = k.horizontal > 0 ? 1 : -1;
     deplace(c, ctx.carte, true);
     if (v > 0 && c.auSol) this.echelle = false;
+    if (v < 0) this.poseEnHautDeLEchelle(ctx, colonne);
+  }
+
+  /**
+   * Arrivé au sommet d'une échelle (aucun échelon au-dessus), on se pose dessus comme sur un sol : joystick vers le bas,
+   * on redescend. Sans ça, on sortait de l'échelle quelques pixels trop bas et on retombait dedans.
+   */
+  private poseEnHautDeLEchelle(ctx: Contexte, colonne: number): void {
+    const c = this.corps;
+    const carte = ctx.carte;
+    const ty = Math.floor((c.y + c.h - 1) / TUILE);
+    if (!carte.props(colonne, ty).echelle || carte.props(colonne, ty - 1).echelle) return;
+    if (c.y + c.h > ty * TUILE + 1) return;
+    c.y = ty * TUILE - c.h;
+    c.vy = 0;
+    c.auSol = true;
+    this.echelle = false;
   }
 
   private chercheTyrolienne(ctx: Contexte): void {

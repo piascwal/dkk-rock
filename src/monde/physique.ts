@@ -76,7 +76,9 @@ export function deplace(c: Corps, carte: Carte, traverse = false): void {
       // le haut d'une échelle porte comme une plateforme
       const sommetEchelle = p.echelle && !carte.props(tx, ty - 1).echelle;
       if (!p.solide && !sommetEchelle) continue;
-      if ((p.traversable || sommetEchelle) && (traverse || ancienBas > ty * TUILE + 0.01)) continue;
+      // le haut d'une échelle est indulgent (quelques pixels) : on s'y pose même en le frôlant par en dessous
+      const marge = sommetEchelle ? 3 : 0.01;
+      if ((p.traversable || sommetEchelle) && (traverse || ancienBas > ty * TUILE + marge)) continue;
       c.y = ty * TUILE - c.h;
       c.vy = 0;
       c.auSol = true;
