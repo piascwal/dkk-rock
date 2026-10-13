@@ -1,3 +1,4 @@
+import { TUILE } from '../config';
 import { herosDuGenre } from '../entites/heros';
 import { ANIM, G, type EntiteVue } from '../jeu/vue';
 import type { AtlasTuiles } from './atlas-tuiles';
@@ -32,7 +33,7 @@ export function dessineEntite(
 
   if (v.g === G.BLOC) {
     const toile = atlas.toile(v.f, 0, 0);
-    if (toile) ctx.drawImage(toile, x - 8, y - 16);
+    if (toile) ctx.drawImage(toile, x - TUILE / 2, y - TUILE, TUILE, TUILE);
     return;
   }
   // un héros invulnérable clignote ; un ennemi touché passe au blanc

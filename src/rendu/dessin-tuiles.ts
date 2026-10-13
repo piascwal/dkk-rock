@@ -20,6 +20,7 @@ export function dessineTuiles(
   const tx1 = Math.min(carte.largeur - 1, Math.floor((camX + largeur) / TUILE));
   const ty1 = Math.min(carte.hauteur - 1, Math.floor((camY + HAUTEUR_VUE) / TUILE));
 
+  const finesse = Math.hypot(ctx.getTransform().a, ctx.getTransform().b);
   for (let ty = ty0; ty <= ty1; ty++) {
     for (let tx = tx0; tx <= tx1; tx++) {
       const t = carte.get(tx, ty);
@@ -37,7 +38,10 @@ export function dessineTuiles(
       if (habillee) ctx.drawImage(habillee, x, y - DEBORD);
       else {
         const toile = atlas.toile(t, tx, ty);
-        if (toile) ctx.drawImage(toile, x, y);
+        // un sprite fourni (96 px) sur un affichage moins fin : lissé, sinon des pixels sautent au hasard
+        if (toile instanceof HTMLImageElement) ctx.imageSmoothingEnabled = finesse < 6;
+        if (toile) ctx.drawImage(toile, x, y, TUILE, TUILE);
+        ctx.imageSmoothingEnabled = false;
       }
       const usure = carte.usure(tx, ty);
       if (usure < 0.7) fissures(ctx, x, y, usure, tx, ty);

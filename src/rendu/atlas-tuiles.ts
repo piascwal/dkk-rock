@@ -144,6 +144,24 @@ const PEINTRES: Partial<Record<number, Peintre>> = {
   },
 };
 
+/** Les tuiles fournies en sprite (outils/fixe-tuiles.py), 96 × 96 : elles remplacent le dessin en code dès qu'elles sont chargées. */
+const IMAGES_TUILES: Partial<Record<number, string>> = {
+  [T.CAISSE]: 'tuile-caisse.png',
+  [T.CAISSON]: 'tuile-caisson.png',
+};
+const imagesTuiles = new Map<number, HTMLImageElement>();
+
+export function chargeTuiles(base: string, version: string): void {
+  for (const [t, fichier] of Object.entries(IMAGES_TUILES)) {
+    const img = new Image();
+    img.onload = () => imagesTuiles.set(Number(t), img);
+    img.src = `${base}sprites/${fichier}?v=${version}`;
+  }
+}
+
+/** Le sprite d'une tuile, s'il est chargé (aussi pour le décor : caisses de fond). */
+export const imageTuile = (t: number): HTMLImageElement | undefined => imagesTuiles.get(t);
+
 /** Les textures des tuiles d'un thème, dessinées une fois au chargement du niveau. */
 export class AtlasTuiles {
   private readonly toiles: (HTMLCanvasElement | null)[][] = [];
@@ -173,8 +191,9 @@ export class AtlasTuiles {
     return toile;
   }
 
-  toile(t: number, tx: number, ty: number): HTMLCanvasElement | null {
-    return this.toiles[t]?.[this.variante(tx, ty)] ?? null;
+  /** À dessiner en TUILE × TUILE : un sprite fourni est plus fin que le jeu. */
+  toile(t: number, tx: number, ty: number): HTMLCanvasElement | HTMLImageElement | null {
+    return imagesTuiles.get(t) ?? this.toiles[t]?.[this.variante(tx, ty)] ?? null;
   }
 
   private variante(tx: number, ty: number): number {
@@ -186,7 +205,7 @@ export class AtlasTuiles {
   /** La tuile habillée selon ses côtés libres (voir bords-tuiles.ts), haute de 16 + DEBORD, faite à la demande. */
   habillee(t: number, tx: number, ty: number, cotes: number): HTMLCanvasElement | null {
     const v = this.variante(tx, ty);
-    const cle = (t * VARIANTES + v) * 16 + cotes;
+    const cle = (t * VARIANTES + v) * 32 + cotes;
     let toile = this.habillees.get(cle);
     if (toile) return toile;
     const source = this.toiles[t]?.[v];

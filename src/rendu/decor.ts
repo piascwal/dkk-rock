@@ -4,6 +4,7 @@ import type { Carte } from '../monde/carte';
 import { T } from '../monde/tuiles';
 import { ACCESSOIRES, type NomAccessoire } from './decor-objets';
 import { dessineDecorFeuille } from './feuilles-images';
+import { imageTuile } from './atlas-tuiles';
 import { pinceau } from './pinceau';
 import type { NomTheme } from './themes';
 
@@ -127,6 +128,8 @@ export function dessineDecor(
       p(3, -h, 1, h, couleurTouffe);
     } else if (o.quoi === 'enceinte34' && dessineEnceinte(ctx, o.v)) {
       // dessinée par sa planche
+    } else if (o.quoi === 'caisseDeco' && dessineCaisses(ctx, o.v)) {
+      // le sprite de la caisse, en plus petit et plus sombre : on ne la confond pas avec une vraie
     } else {
       ctx.scale(ECHELLE_ACCESSOIRES, ECHELLE_ACCESSOIRES);
       ACCESSOIRES[o.quoi](p, o.v);
@@ -139,4 +142,20 @@ export function dessineDecor(
 function dessineEnceinte(ctx: CanvasRenderingContext2D, v: number): boolean {
   if (v & 2) ctx.scale(-1, 1);
   return dessineDecorFeuille(ctx, 'enceinte-34', v & 1);
+}
+
+/** Des caisses de fond : le sprite de la caisse, réduit et assombri, parfois une petite posée dessus. */
+function dessineCaisses(ctx: CanvasRenderingContext2D, v: number): boolean {
+  const img = imageTuile(T.CAISSE);
+  if (!img) return false;
+  const pile: [number, number, number][] = [[-7, -14, 14]];
+  if (v % 2) pile.push([-4 + (v % 3), -24, 10]);
+  ctx.imageSmoothingEnabled = true;
+  for (const [x, y, c] of pile) {
+    ctx.drawImage(img, x, y, c, c);
+    ctx.fillStyle = 'rgba(20,10,30,0.3)';
+    ctx.fillRect(x, y, c, c);
+  }
+  ctx.imageSmoothingEnabled = false;
+  return true;
 }

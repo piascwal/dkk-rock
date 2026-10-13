@@ -2,6 +2,7 @@ import { ANIM } from '../jeu/vue';
 import { VERSION } from '../version';
 import { FEUILLES, caseDeLaPlanche, colonneDuCycle, type Feuille } from './feuilles';
 import { FEUILLES_DECOR } from './feuilles-objets';
+import { chargeTuiles } from './atlas-tuiles';
 import type { Genre } from '../jeu/vue';
 
 const images = new Map<Genre, HTMLImageElement>();
@@ -9,6 +10,7 @@ const imagesDecor = new Map<string, HTMLImageElement>();
 
 /** Lance le chargement de toutes les planches déclarées ; celles qui échouent sont ignorées (repli sur le dessin en code). */
 export function chargeFeuilles(base: string): void {
+  chargeTuiles(base, VERSION);
   for (const [genre, f] of Object.entries(FEUILLES)) {
     const img = new Image();
     img.onload = () => images.set(Number(genre) as Genre, img);

@@ -10,7 +10,10 @@ import { T } from '../monde/tuiles';
  */
 
 /** Côtés à l'air libre, en bits. */
-export const COTE = { HAUT: 1, DROITE: 2, BAS: 4, GAUCHE: 8 } as const;
+export const COTE = { HAUT: 1, DROITE: 2, BAS: 4, GAUCHE: 8, SOUS_OBJET: 16 } as const;
+
+/** Les tuiles « posées » ou construites (caisses, caissons, murs) : la terre en dessous garde son herbe. */
+const POSEES = new Set<number>([T.CAISSE, T.CAISSON, T.BOIS, T.BRIQUE, T.METAL, T.BETON, T.VITRE]);
 
 /** Pixels de touffes au-dessus de la tuile : la toile habillée est plus haute d'autant. */
 export const DEBORD = 3;
@@ -27,6 +30,7 @@ export function cotesLibres(carte: Carte, t: number, tx: number, ty: number): nu
   if (ARRONDIES.has(t)) {
     let c = 0;
     if (!carte.solide(tx, ty - 1)) c |= COTE.HAUT;
+    else if (t === T.TERRE && POSEES.has(carte.get(tx, ty - 1))) c |= COTE.SOUS_OBJET;
     if (!carte.solide(tx + 1, ty)) c |= COTE.DROITE;
     if (!carte.solide(tx, ty + 1)) c |= COTE.BAS;
     if (!carte.solide(tx - 1, ty)) c |= COTE.GAUCHE;
@@ -88,7 +92,7 @@ export function habille(
   if (d) px(15, 0, 1, 16, 'rgba(0,0,0,0.3)');
   if (cotes & COTE.HAUT && t !== T.TERRE) px(0, 0, 16, 1, 'rgba(255,255,255,0.22)');
 
-  if (t === T.TERRE && cotes & COTE.HAUT) dessusHerbeux(c, px, v, g, d, dessus);
+  if (t === T.TERRE && cotes & (COTE.HAUT | COTE.SOUS_OBJET)) dessusHerbeux(c, px, v, g, d, dessus);
 
   // coins arrondis
   c.globalCompositeOperation = 'destination-out';
