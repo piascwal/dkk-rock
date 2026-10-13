@@ -79,6 +79,10 @@ const ECHELLE_ACCESSOIRES = 1.4;
 
 const SOLS_DECORES: number[] = [T.TERRE, T.NEIGE, T.SABLE, T.BETON, T.ROCHE, T.METAL, T.BOIS, T.GLACE];
 
+/** Une tuile d'herbe : de la terre à l'air libre (rien de plein au-dessus, pas de paroi de fond). */
+const dehors = (carte: Carte, tx: number, ty: number): boolean =>
+  carte.get(tx, ty) === T.TERRE && !carte.solide(tx, ty - 1) && !carte.aFond(tx, ty - 1);
+
 /**
  * Le décor « bien chargé » du plan proche, derrière les héros : arbres, mobilier, panneaux, vaches
  * à casque... semés au chargement du niveau, toujours au même endroit pour une même carte.
@@ -98,6 +102,12 @@ export function semeDecor(carte: Carte, theme: NomTheme, graine: number): Pose[]
       if (tx < libreDepuis || rng.suivant() > semis.densite) continue;
       const liste = dedans ? semis.dedans : semis.dehors;
       const quoi = rng.choix(liste);
+      // une vache a besoin de pré : de l'herbe sous elle et sous ses voisines, sinon elle finit dans le sous-sol
+      if (
+        quoi === 'vacheCasque' &&
+        !(dehors(carte, tx - 1, ty) && dehors(carte, tx, ty) && dehors(carte, tx + 1, ty))
+      )
+        break;
       poses.push({ tx, ty, quoi, v: rng.entier(0, 255), devant: false });
       libreDepuis = tx + (quoi === 'voiture' || quoi === 'vacheCasque' ? 4 : 3);
       break;
@@ -189,6 +199,8 @@ function dessineSprite(
   if (quoi === 'lampadaire') {
     return dessineDecorFeuille(ctx, 'lampadaire', 0, voile);
   }
+  // un peu enfoncée : l'herbe des tuiles, dessinée ensuite, cache le bas des pattes
+  ctx.translate(0, 2);
   if (v & 8) ctx.scale(-1, 1);
   return dessineDecorFeuille(ctx, 'vache', v % 6, voile);
 }
