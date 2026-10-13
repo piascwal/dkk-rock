@@ -12,6 +12,7 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent / 'niveaux'))
 
 from peintre import Niveau
+from verrous import barrage, bunker, gouffre, patrouilles, trou
 
 RACINE = pathlib.Path(__file__).resolve().parent.parent
 CARTES = RACINE / 'src' / 'niveaux' / 'cartes'
@@ -40,6 +41,8 @@ class Recette:
         self.x = 6
         self.digits = declencheurs(fichier_textes)
         self.pieces = []  # (x0, x1, genre)
+        self.gouffres = []  # (x0, largeur) : à recreuser avec leurs échelles après les galeries
+        self.barrages = []  # (x du mur, rangée du sommet) : à reposer après le creusement des galeries
         self.flags = []
 
     @property
@@ -123,6 +126,14 @@ class Recette:
         cx, cy = n.cheminee(x0 + 3, haut)
         n.repere(cx, '+', ymin=cy - 1)
         self.combat(x0, x1, lettres)
+
+    def p_barrage(self, x0, x1, haut=12, lettres='a', tyro=0, butin='*'):
+        self.barrages.append(barrage(self.n, x0 + 2, haut, lettres, tyro, butin))
+        self.n.ennemis(x1 - 9, x1 - 1, lettres, 2)
+
+    def p_gouffre(self, x0, x1, lettres='a', nb=4):
+        self.gouffres.append((x0 + 3, x1 - x0 - 6))
+        gouffre(self.n, x0 + 3, x1 - x0 - 6, lettres, nb)
 
     def p_arene(self, x0, x1, lettres='ab', plus=2):
         n = self.n
@@ -230,11 +241,15 @@ def souterrain(r, seq_puits, caveau=None, ennemis='a'):
         c = objets[i % len(objets)]
         n.repere(x, c, ymin=n.yg - 4)
         n.ennemis(x - 3, x + 4, ennemis, 1 + i % 2, ymin=n.yg - 4)
-    # des caches murées, à creuser (on les devine au creux dans le plafond du tunnel)
+    # des caches murées, à creuser (on les devine au creux dans le plafond du tunnel) : une cache une cage (+1 vie)
     for frac in (0.1, 0.33, 0.55, 0.7, 0.9):
         x = int(w * frac)
-        cx, cy = n.cache(x, n.yg - 2 + 0, 4, 3) if False else n.cache(x, n.yg - 5, 4, 3)
-        n.set(cx, cy, '+' if (x // 7) % 2 else '*')
+        cx, cy = n.cache(x, n.yg - 5, 4, 3)
+        n.set(cx, cy, 'K' if frac == 0.7 else '+' if (x // 7) % 2 else '*')
+    # des ennemis tout au long de la galerie, et des bunkers : des salles tenues par un escadron, avec du butin
+    patrouilles(n, 14, w - 14, ennemis)
+    for frac, butin in ((0.27, '*'), (0.5, 'K'), (0.77, '+'), (0.93, '*')):
+        bunker(n, int(w * frac), 20, ennemis * 2, 5 + int(frac * 3), butin)
     if caveau:
         x0, x1 = caveau
         y2 = n.yg + 8
@@ -244,6 +259,49 @@ def souterrain(r, seq_puits, caveau=None, ennemis='a'):
         for i, x in enumerate(s2):
             n.repere(x, '+' if i == 0 else '*', ymin=y2 - 4)
             n.ennemis(x - 3, x + 4, ennemis, 1, ymin=y2 - 4)
+    verrouille_galerie(r, seq_puits)
+
+
+def verrouille_galerie(r, seq_puits):
+    """Les murs des barrages coupent la galerie (on ne les contourne pas par en dessous) ; chaque tronçon ainsi isolé
+    garde au moins un puits depuis la surface, sinon on n'y entrerait pas."""
+    n = r.n
+    murs = sorted(x for x, _ in r.barrages)
+    for xw, top in r.barrages:
+        n.rect(xw, top, xw + 3, n.h, 'X')
+    for x0, largeur in r.gouffres:  # les salles creusées dans la galerie ont pu entamer les trous et les puits
+        trou(n, x0, largeur)
+    for x in seq_puits:
+        n.puits(x)
+    bornes = [10] + [b for xw in murs for b in (xw, xw + 3)] + [n.w - 10]
+    puits = list(seq_puits)
+    for a, b in zip(bornes[::2], bornes[1::2]):
+        if any(a <= x < b for x in puits):
+            continue
+        for x in range(a + 6, b - 3):  # une colonne de terrain plein, hors des trous et des échelles
+            if n.get(x, n.haut[x]) in n.t['sol'] and all(n.get(x, y) not in 'H ' for y in range(n.haut[x], n.yg)):
+                n.puits(x)
+                puits.append(x)
+                break
+
+
+def avec_verrous(plan, lettres='a'):
+    """Insère dans le plan, tous les ~14 % du niveau et après une plate-forme, un barrage (il faut monter) puis un
+    gouffre (il faut descendre), en alternance : plus de rue droite, on change d'étage pour avancer."""
+    total = sum(p[1] for p in plan)
+    cibles = [0.14, 0.28, 0.42, 0.56, 0.70, 0.84]
+    sortie, acc, k = [], 0, 0
+    for i, (genre, w, kw) in enumerate(plan):
+        sortie.append((genre, w, kw))
+        acc += w
+        if k < len(cibles) and acc >= total * cibles[k] and genre == 'plat' and i < len(plan) - 3:
+            if k % 2 == 0:
+                haut = 16 if k == 2 else 12
+                sortie.append(('barrage', 28, dict(haut=haut, lettres=lettres, tyro=11 if k == 4 else 0, butin='+' if k else '*')))
+            else:
+                sortie.append(('gouffre', 20, dict(lettres=lettres, nb=4 + k // 2)))
+            k += 1
+    return sortie
 
 
 def garage():
@@ -287,6 +345,7 @@ def garage():
         ('plat', 14, dict(lettres='ac')),
         ('arene', 40, dict(lettres='ac')),
     ]
+    plan = avec_verrous(plan, 'ac')
     r = construit('Le Garage', 'garage', '01-garage.ts', plan, '01-garage.ts', 'CARTE_GARAGE', 11)
     n = r.n
     plats = [p for p in r.pieces if p[2] == 'plat']
@@ -340,6 +399,7 @@ def alpages():
         ('plat', 14, dict(lettres='adf')),
         ('arene', 44, dict(lettres='adf')),
     ]
+    plan = avec_verrous(plan, 'ad')
     r = construit('Les Alpages Lounge', 'alpages', '02-alpages.ts', plan, '', '', 22, base=34)
     n = r.n
     plats = [p for p in r.pieces if p[2] == 'plat']
@@ -375,6 +435,7 @@ def cimes():
         ('palier', 22, dict(dy=4)),
         ('plat', 18, dict(lettres='ya')),
     ]
+    plan = avec_verrous(plan, 'ya')
     r = construit('Les Cimes Minimales', 'cimes', '03-cimes.ts', plan, '', '', 33, base=34)
     n = r.n
     plats = [p for p in r.pieces if p[2] == 'plat']
@@ -423,6 +484,7 @@ def plage():
         ('plat', 16, dict(lettres='cdb')),
         ('arene', 44, dict(lettres='acdbf')),
     ]
+    plan = avec_verrous(plan, 'acd')
     r = construit('La Plage du Tube de l’Été', 'plage', '04-plage.ts', plan, '', '', 44)
     plats = [p for p in r.pieces if p[2] == 'plat']
     finis(r, '04-plage.ts', 'CARTE_PLAGE', plats, ennemis='acd')
@@ -461,6 +523,7 @@ def ville():
         ('plat', 16, dict(lettres='arrf')),
         ('arene', 48, dict(lettres='acdrf')),
     ]
+    plan = avec_verrous(plan, 'acr')
     r = construit('La Ville Autotunée', 'ville', '05-ville.ts', plan, '', '', 55)
     plats = [p for p in r.pieces if p[2] == 'plat']
     finis(r, '05-ville.ts', 'CARTE_VILLE', plats, ennemis='acr')
