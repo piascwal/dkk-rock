@@ -10,6 +10,7 @@ import { bouton, el } from './elements';
 import { ecranInviter, ecranRejoindre } from './menus-reseau';
 import { QUI_DES_MEMBRES, portrait } from './portraits';
 import { texteVersion } from '../version';
+import { installe, peutInstaller, surIPhone } from './installation';
 
 /** Ce que les menus demandent à l'application. */
 export interface Actions {
@@ -75,6 +76,8 @@ export class Menus {
       bouton('Rejoindre des amis', () => this.rejoindre()),
       bouton('Options', () => this.options()),
     );
+    if (peutInstaller())
+      boutons.append(bouton('Installer le jeu', () => void installe().then(() => this.rafraichitTitre())));
     this.montre(
       el('h1', 'DKK', 'logo'),
       el('p', 'ROCK NEVER DIES', 'slogan'),
@@ -84,8 +87,20 @@ export class Menus {
         'Clavier : flèches ou ZQSD, Espace saut, J tir, L spécial, Échap pause. Manette acceptée. Jusqu’à 4 joueurs.',
         'aide',
       ),
+      surIPhone()
+        ? el(
+            'p',
+            'Pour installer le jeu (plein écran, hors ligne) : Partager → Sur l’écran d’accueil.',
+            'aide',
+          )
+        : el('span'),
       el('p', texteVersion(), 'version'),
     );
+  }
+
+  /** Redessine l'écran titre s'il est affiché (le bouton d'installation vient d'apparaître ou de disparaître). */
+  rafraichitTitre(): void {
+    if (this.ecran.querySelector('.logo')) this.titre();
   }
 
   rockers(niveau: number, reprise: Progression | null = null): void {

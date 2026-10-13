@@ -17,6 +17,8 @@ import type { Carte } from './monde/carte';
 import { chargeFeuilles } from './rendu/feuilles-images';
 import { Rendu } from './rendu/rendu';
 import { Intro } from './ui/intro';
+import { prepareInstallation } from './ui/installation';
+import { pleinEcran } from './ui/plein-ecran';
 import { Bulles, Histoire } from './ui/dialogues';
 import { Hud } from './ui/hud';
 import { afficheNouvelleVersion } from './ui/maj';
@@ -59,6 +61,10 @@ export class App implements Actions {
 
   demarre(): void {
     chargeFeuilles(import.meta.env.BASE_URL);
+    // l'application installable : quand le navigateur propose de l'installer, le menu titre affiche le bouton
+    prepareInstallation(import.meta.env.BASE_URL, () => {
+      if (!this.partie && !this.client) this.menus.rafraichitTitre();
+    });
     const geste = () => {
       this.synthe.demarre();
       this.appliqueOptions();
@@ -117,6 +123,7 @@ export class App implements Actions {
   }
 
   lance(niveau: number, membre: number, reprise: Progression | null): void {
+    pleinEcran(); // si on en était sorti
     this.arreteTout();
     const p = new Partie(reprise ?? { niveau, drapeau: -1, vies: VIES_DEPART, score: 0 });
     p.ajouteJoueur(0, membre);

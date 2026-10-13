@@ -65,6 +65,16 @@ L'hôte fait tourner la simulation ; les autres envoient leurs commandes (1 octe
 seconde) et reçoivent des instantanés (30 par seconde, moins de 4 Ko) qu'ils lissent, plus les
 évènements fiables (tuiles détruites, sons, dialogues).
 
+## Installer le jeu, jouer hors ligne
+
+Le jeu est une application installable (PWA) : sur Android ou un ordinateur, le bouton « Installer le jeu » apparaît
+dans le menu ; sur iPhone, Partager → Sur l'écran d'accueil. Installé, il s'ouvre en plein écran, en paysage, avec
+Fadatchi pour icône, et il se joue hors ligne (seul : jouer à plusieurs demande le réseau). Dans le navigateur, le plein
+écran est demandé au premier toucher, sur l'écran d'intro.
+
+Un service worker (`sw.js`, généré au déploiement d'après `outils/sw-modele.js`) garde tous les fichiers en cache ; la
+page et `version.json` passent par le réseau d'abord, pour que les mises à jour soient vues.
+
 ## Version et mise à jour
 
 Le numéro de version s'affiche sur l'écran titre et dans le menu pause, par exemple `v0.1.12 · a1b2c3d` :

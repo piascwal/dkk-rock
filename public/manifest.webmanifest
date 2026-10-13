@@ -1,10 +1,20 @@
 {
+  "id": "/dkk-rock/",
   "name": "DKK : Rock Never Dies",
   "short_name": "DKK",
+  "description": "Un jeu de plateforme et de tir où tout se détruit. Jusqu'à 4 joueurs.",
+  "lang": "fr",
   "start_url": ".",
+  "scope": ".",
   "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
   "orientation": "landscape",
   "background_color": "#120914",
   "theme_color": "#120914",
-  "icons": [{ "src": "icone.svg", "sizes": "any", "type": "image/svg+xml" }]
+  "categories": ["games"],
+  "icons": [
+    { "src": "icone-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icone-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icone-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
 }

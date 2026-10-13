@@ -1,4 +1,5 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { join, relative } from 'node:path';
 import { defineConfig, type Plugin } from 'vite';
 
 /**
@@ -45,6 +46,32 @@ const fichierVersion = (info: { version: string; commit: string }): Plugin => ({
   },
 });
 
+/** Tous les fichiers de public/, chemins relatifs (sprites, portraits, icônes...). */
+function fichiersPublics(dossier = 'public', base = dossier): string[] {
+  return readdirSync(dossier).flatMap((nom) => {
+    const chemin = join(dossier, nom);
+    return statSync(chemin).isDirectory() ? fichiersPublics(chemin, base) : [relative(base, chemin)];
+  });
+}
+
+/**
+ * Le service worker : il garde le jeu entier en cache pour jouer hors ligne (et installer l'application).
+ * Sa liste de fichiers et sa version changent à chaque déploiement : le navigateur installe alors le nouveau, qui
+ * remplace l'ancien dès qu'on recharge (voir outils/sw-modele.js pour la stratégie).
+ */
+const serviceWorker = (info: { version: string }): Plugin => ({
+  name: 'dkk-sw',
+  apply: 'build',
+  generateBundle(_options, bundle) {
+    const fichiers = ['./', ...Object.keys(bundle), ...fichiersPublics()];
+    const modele = readFileSync(new URL('./outils/sw-modele.js', import.meta.url), 'utf8');
+    const source = modele
+      .replace('__VERSION__', JSON.stringify(info.version))
+      .replace('__FICHIERS__', JSON.stringify(fichiers));
+    this.emitFile({ type: 'asset', fileName: 'sw.js', source });
+  },
+});
+
 // GitHub Pages sert le jeu sous /dkk-rock/ ; en développement, à la racine.
 export default defineConfig(({ command, isPreview }) => {
   const construit = command === 'build';
@@ -54,6 +81,6 @@ export default defineConfig(({ command, isPreview }) => {
     // pas de ressource en data: (la politique de sécurité ne l'autorise pas pour les polices)
     build: { target: 'es2022', assetsInlineLimit: 0 },
     define: { __VERSION__: JSON.stringify(info.version), __COMMIT__: JSON.stringify(info.commit) },
-    plugins: [csp(), fichierVersion(info)],
+    plugins: [csp(), fichierVersion(info), serviceWorker(info)],
   };
 });

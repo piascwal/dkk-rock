@@ -5,6 +5,7 @@ import { imageDe } from '../rendu/feuilles-images';
 import { ecritCentre } from '../rendu/police';
 import { VERSION } from '../version';
 import { DUREE_CASE, dessineCase } from './intro-comics';
+import { pleinEcran } from './plein-ecran';
 import { CASES, ENTREES, FIN, IMPACT, INSTRUMENTS, joueIntro } from './intro-son';
 
 /**
@@ -74,6 +75,7 @@ export class Intro {
     if (!this.lancee) {
       // le premier toucher : le son devient possible, l'intro démarre
       this.synthe.demarre();
+      pleinEcran();
       this.lancee = true;
       this.debut = performance.now();
       setTimeout(() => joueIntro(this.synthe), 30);
