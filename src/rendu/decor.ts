@@ -30,12 +30,25 @@ const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAccessoire[]
       'boiteAuxLettres',
       'cloture',
       'cloture',
+      'vacheCasque',
+      'vacheCasque',
     ],
     dedans: ['caisseDeco', 'etagere', 'caisseDeco', 'enceinte34'],
     densite: 0.55,
   },
   montagne: {
-    dehors: ['sapin', 'sapin', 'sapin', 'buisson', 'rocher', 'cloture', 'vacheCasque', 'panneauLounge'],
+    dehors: [
+      'sapin',
+      'sapin',
+      'sapin',
+      'buisson',
+      'rocher',
+      'cloture',
+      'vacheCasque',
+      'vacheCasque',
+      'vacheCasque',
+      'panneauLounge',
+    ],
     dedans: ['caisseDeco', 'etagere'],
     densite: 0.6,
   },
@@ -128,6 +141,8 @@ export function dessineDecor(
       p(3, -h, 1, h, couleurTouffe);
     } else if (o.quoi === 'enceinte34' && dessineEnceinte(ctx, o.v)) {
       // dessinée par sa planche
+    } else if ((o.quoi === 'vacheCasque' || o.quoi === 'lampadaire') && dessineSprite(ctx, o.quoi, o.v)) {
+      // la vache ou le lampadaire, dessinés par leur planche
     } else if (o.quoi === 'caisseDeco' && dessineCaisses(ctx, o.v)) {
       // le sprite de la caisse, en plus petit et plus sombre : on ne la confond pas avec une vraie
     } else {
@@ -158,4 +173,17 @@ function dessineCaisses(ctx: CanvasRenderingContext2D, v: number): boolean {
   }
   ctx.imageSmoothingEnabled = false;
   return true;
+}
+
+/** Une vache (apparence tirée au sort, tournée d'un côté ou de l'autre) ou un lampadaire, par leur planche. */
+function dessineSprite(
+  ctx: CanvasRenderingContext2D,
+  quoi: 'vacheCasque' | 'lampadaire',
+  v: number,
+): boolean {
+  if (quoi === 'lampadaire') {
+    return dessineDecorFeuille(ctx, 'lampadaire', 0);
+  }
+  if (v & 8) ctx.scale(-1, 1);
+  return dessineDecorFeuille(ctx, 'vache', v % 6);
 }

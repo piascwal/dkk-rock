@@ -27,6 +27,16 @@ export const FEUILLES_OBJETS: Partial<Record<Genre, Feuille>> = {
 
 /** Les planches du décor, sans genre : une ligne par apparence. */
 export const FEUILLES_DECOR: Record<string, Feuille> = {
+  vache: {
+    fichier: 'vache.png',
+    w: 124,
+    h: 117,
+    images: [1, 1, 1, 1, 1, 1],
+    rythme: 1,
+    densite: 6,
+    pied: 62,
+  },
+  lampadaire: { fichier: 'lampadaire.png', w: 90, h: 240, images: [1], rythme: 1, densite: 6, pied: 45 },
   'enceinte-34': {
     fichier: 'enceinte-34.png',
     w: 156,

@@ -27,6 +27,9 @@ OBJETS = {
     # les enceintes du DJ, de face : membrane au repos, puis de plus en plus gonflée
     'enceinte': ([f'boss/enceinte-{k}-base.png' for k in range(1, 5)], 'ENCEINTE', 22, True),
     # décor sans genre (FEUILLES_DECOR) : enceintes de 3/4, grise puis en bois, posées au fond
+    # les vaches du décor (apparences tirées au sort ; même échelle pour toutes : les assises sont plus grandes) et le lampadaire
+    'vache': ([f'decor/vache-{k}-base.png' for k in range(1, 7)], None, 19),
+    'lampadaire': (['decor/lampadaire-base.png'], None, 15),
     'enceinte-34': ([f'decor/enceinte-34-{k}-base.png' for k in (1, 2)], None, 26, True),
 }
 
