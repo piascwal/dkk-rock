@@ -51,6 +51,17 @@ body {
   place-items: center;
 }
 
+#intro {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 30;
+  background: #120914;
+  image-rendering: pixelated;
+  touch-action: none;
+}
+
 #toile {
   image-rendering: pixelated;
   image-rendering: crisp-edges;

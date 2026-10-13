@@ -16,6 +16,7 @@ import { Hote } from './reseau/hote';
 import type { Carte } from './monde/carte';
 import { chargeFeuilles } from './rendu/feuilles-images';
 import { Rendu } from './rendu/rendu';
+import { Intro } from './ui/intro';
 import { Bulles, Histoire } from './ui/dialogues';
 import { Hud } from './ui/hud';
 import { afficheNouvelleVersion } from './ui/maj';
@@ -79,7 +80,10 @@ export class App implements Actions {
     if (location.search.includes('v=')) history.replaceState(null, '', location.pathname + location.hash);
     void this.controleVersion();
     if (location.hash.startsWith('#salon=')) this.menus.rejoindre();
-    else this.menus.titre();
+    else {
+      this.menus.titre();
+      new Intro($('intro') as HTMLCanvasElement, this.synthe, () => this.appliqueOptions()).lance();
+    }
     requestAnimationFrame((t) => this.boucle(t));
   }
 
