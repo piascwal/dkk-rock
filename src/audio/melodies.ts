@@ -27,7 +27,7 @@ const basse = (s: Synthe, v: number, f: number) => {
 export const MELODIES: Record<string, Melodie> = {
   // Mat : le riff de Come as You Are (Nirvana), pour essayer
   basse: {
-    notes: [MI2, MI2, FA2, FAD2, LA2, FAD2, LA2, FAD2, FAD2, FA2, MI2, SI1, MI2, MI2, SI1, MI2],
+    notes: [MI2, MI2, FA2, FAD2, LA2, FAD2, LA2, FAD2, FAD2, FA2, MI2, SI1, MI2, MI2, SI1],
     joue: basse,
   },
 };
