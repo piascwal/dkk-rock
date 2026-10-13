@@ -2,7 +2,7 @@ import { HAUTEUR_VUE } from '../config';
 import type { Carte } from '../monde/carte';
 import { ecritCentre } from './police';
 
-type Sorte = 'carre' | 'fumee' | 'eclat' | 'texte' | 'flocon' | 'luciole' | 'onde';
+type Sorte = 'carre' | 'fumee' | 'poussiere' | 'eclat' | 'texte' | 'flocon' | 'luciole' | 'onde';
 
 interface Particule {
   sorte: Sorte;
@@ -92,6 +92,49 @@ export class Particules {
         taille: 1,
         couleur,
         gravite: 0,
+      });
+  }
+
+  /** Le van qui démarre : fumée d'échappement, nuage de poussière et graviers projetés vers l'arrière. */
+  van(x: number, y: number, vitesse: number): void {
+    const rapide = Math.min(1, vitesse / 6);
+    for (let i = 0; i < 2; i++)
+      this.ajoute({
+        sorte: 'poussiere',
+        x: x - 20 + Math.random() * 4,
+        y: y - 3 - Math.random() * 3,
+        vx: -0.3 - vitesse * 0.35 * Math.random(),
+        vy: -0.15 - Math.random() * 0.35,
+        vie: 40 + Math.random() * 30,
+        taille: 4 + Math.random() * 4,
+        couleur: i ? '#d9d4c7' : '#a7a29a',
+        gravite: -0.004,
+      });
+    // la fumée sombre du pot d'échappement, à l'arrière bas
+    if (Math.random() < 0.7)
+      this.ajoute({
+        sorte: 'poussiere',
+        x: x - 27,
+        y: y - 7,
+        vx: -0.6 - rapide,
+        vy: -0.1 - Math.random() * 0.2,
+        vie: 30 + Math.random() * 20,
+        taille: 3 + Math.random() * 3,
+        couleur: '#4c4c52',
+        gravite: -0.01,
+      });
+    if (vitesse < 0.3) return;
+    for (let i = 0; i < 2 + Math.round(rapide * 4); i++)
+      this.ajoute({
+        sorte: 'carre',
+        x: x - 16 + Math.random() * 4,
+        y: y - 1,
+        vx: -1 - vitesse * 0.3 - Math.random() * 3,
+        vy: -1.2 - Math.random() * 2.6,
+        vie: 35 + Math.random() * 25,
+        taille: Math.random() < 0.3 ? 2 : 1,
+        couleur: ['#8a8378', '#b9b2a3', '#5f5a52', '#d2c9b4'][Math.floor(Math.random() * 4)]!,
+        gravite: 0.22,
       });
   }
 
@@ -186,6 +229,16 @@ export class Particules {
           const r = p.taille * (1.4 - t * 0.6);
           ctx.globalAlpha = Math.min(1, t * 1.5);
           ctx.fillStyle = t > 0.6 ? p.couleur : t > 0.35 ? '#c0502a' : '#4a4a4a';
+          ctx.beginPath();
+          ctx.arc(x, y, r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+          break;
+        }
+        case 'poussiere': {
+          ctx.globalAlpha = Math.min(0.8, t * 1.2);
+          ctx.fillStyle = p.couleur;
+          const r = p.taille * (0.7 + (1 - t) * 0.9);
           ctx.beginPath();
           ctx.arc(x, y, r, 0, Math.PI * 2);
           ctx.fill();

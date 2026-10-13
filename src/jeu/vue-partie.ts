@@ -43,7 +43,7 @@ export function construitVue(p: Partie): EtatVue {
       mort: j.mort,
     });
     reperes.push([j.cx, j.cy]);
-    if (!j.mort) entites.push(j.vue());
+    if (!j.mort && !j.embarque) entites.push(j.vue());
   }
   if (!reperes.length) reperes.push([p.lu.depart.x, p.lu.depart.y]);
 

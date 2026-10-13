@@ -30,6 +30,10 @@ export class Joueur extends JoueurBase {
   maj(ctx: Contexte, cmd: Commandes): void {
     this.commandes.avance(this.hypnose > 0 ? inverse(cmd) : cmd);
     if (this.mort) return;
+    if (this.embarque) {
+      this.invulnerable = 2;
+      return;
+    }
     for (const k of ['invulnerable', 'ebloui', 'hypnose', 'recharge', 'lacheTyro', 'traverse'] as const)
       if (this[k] > 0) this[k]--;
     this.anim++;

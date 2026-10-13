@@ -13,6 +13,7 @@ import { Carte } from '../monde/carte';
 import { Joueur } from '../entites/joueur';
 import { Boss } from '../entites/ennemis/boss';
 import { DjBoucle } from '../entites/ennemis/dj';
+import { ATTENTE_VAN, Objet } from '../entites/objets';
 import { niveauLu } from '../niveaux';
 import { suivantDansArc } from '../niveaux/arcs';
 import type { NiveauLu } from '../niveaux/format';
@@ -32,6 +33,9 @@ const estCible = (e: EntiteSimulee): e is EntiteSimulee & Cible => 'blesse' in e
  * les commandes de chaque siège, avance d'un pas, et produit une vue
  * (EtatVue) et des évènements que le rendu dessine et que le réseau transmet.
  */
+/** Le van file : ticks entre le démarrage de l'accélération et le bilan (il a alors quitté l'écran). */
+const DUREE_FUITE = 100;
+
 export class Partie implements Contexte {
   tick = 0;
   phase: Phase = 'histoire';
@@ -54,6 +58,9 @@ export class Partie implements Contexte {
   /** explosions de caissons en attente : [tick, x, y] */
   enAttente: [number, number, number][] = [];
   finDans = -1;
+  /** le van qui part, et le nombre de ticks avant le bilan (-1 : il n'est pas parti) */
+  private van: Objet | null = null;
+  departDans = -1;
   /** change à chaque chargement de carte : le réseau renvoie alors la carte aux clients */
   generation = 0;
   /** prévenu à chaque drapeau et à chaque niveau fini */
@@ -175,6 +182,8 @@ export class Partie implements Contexte {
     this.entites = [];
     this.enAttente = [];
     this.finDans = -1;
+    this.departDans = -1;
+    this.van = null;
     this.dejaDit = new Set();
     peuple(this);
     // un nouveau niveau, ou une reprise : tout le monde repart du départ, pas de là où il était
@@ -224,6 +233,7 @@ export class Partie implements Contexte {
     this.entites = this.entites.filter((e) => !e.fini);
     releveCarte(this);
     this.finDeNiveau();
+    this.majDepart();
   }
 
   private gereMort(j: Joueur): void {
@@ -247,6 +257,31 @@ export class Partie implements Contexte {
     const dj = this.entites.find((e) => e instanceof DjBoucle);
     if (this.lu.boss.some((b) => b.lettre === 'Z') && !dj && this.finDans < 0) this.finDans = 180;
     if (this.finDans > 0 && --this.finDans === 0) this.termineNiveau();
+  }
+
+  /** Les héros montent dans le van : il démarre, la caméra le suit, le bilan vient quand il a disparu. */
+  lanceDepart(van: Objet): void {
+    if (this.phase !== 'jeu' || this.departDans >= 0) return;
+    van.demarre();
+    this.van = van;
+    this.departDans = ATTENTE_VAN + DUREE_FUITE;
+    for (const j of this.joueurs) if (j) j.embarque = true;
+    this.son('demarrage', van.corps.x, van.corps.y);
+  }
+
+  private majDepart(): void {
+    if (this.departDans < 0) return;
+    // les héros (invisibles) restent dans le van : la caméra le suit
+    const v = this.van!.corps;
+    for (const j of this.joueurs)
+      if (j) {
+        j.corps.x = v.x + v.w / 2 - j.corps.w / 2;
+        j.corps.y = v.y + v.h - j.corps.h;
+      }
+    if (--this.departDans === 0) {
+      this.departDans = -1;
+      this.termineNiveau();
+    }
   }
 
   termineNiveau(): void {

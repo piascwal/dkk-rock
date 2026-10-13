@@ -1,6 +1,7 @@
 import { G, type Genre } from '../jeu/vue';
 import { FEUILLES_ENNEMIS } from './feuilles-ennemis';
 import { FEUILLES_HEROS } from './feuilles-heros';
+import { FEUILLES_OBJETS } from './feuilles-objets';
 
 /**
  * Les planches de sprites : des images (PNG à fond transparent) qui remplacent les dessins faits
@@ -57,6 +58,7 @@ export interface Feuille {
 export const FEUILLES: Partial<Record<Genre, Feuille>> = {
   ...FEUILLES_ENNEMIS,
   ...FEUILLES_HEROS,
+  ...FEUILLES_OBJETS,
   // Fadatchi, fabriqué par outils/anime-kiwi.py : debout 8 images (il respire), court 4, saut 1, coup de bec 4
   [G.KIWI]: {
     fichier: 'fadatchi.png',

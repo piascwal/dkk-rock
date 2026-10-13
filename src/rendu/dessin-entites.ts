@@ -9,7 +9,7 @@ import { dessineHeros, dessineInstrument, dessineKiwi } from './dessins-heros';
 import { DESSINS_OBJETS, iconeArme } from './dessins-objets';
 import { DEMI_TAILLE, DESSINS_TIRS } from './dessins-tirs';
 import { pinceau } from './pinceau';
-import { ecrit, ecritCentre } from './police';
+import { ecritCentre } from './police';
 
 const DRAPEAUX_SANS_MIROIR = new Set<number>([G.CAGE, G.DRAPEAU, G.VAN, G.ARME, G.SOIN, G.BLOC]);
 
@@ -25,6 +25,8 @@ export function dessineEntite(
   const d = FEUILLES[v.g]?.densite ?? 1;
   const x = Math.round((v.x - Math.round(camX)) * d) / d;
   let y = Math.round((v.y - Math.round(camY)) * d) / d;
+  // le van qui démarre tressaute sur ses amortisseurs
+  if (v.g === G.VAN && v.e === 2) y -= (Math.floor(performance.now() / 45) % 2) * 0.5;
   const estTir = v.g >= G.P_BAGUETTE && v.g < G.CAGE;
   if (estTir) y -= DEMI_TAILLE[v.g] ?? 2;
 
@@ -72,7 +74,6 @@ export function dessineEntite(
   ctx.restore();
   ctx.globalAlpha = 1;
 
-  if (v.g === G.VAN) ecrit(ctx, 'DKK', x - 8, y - 18, '#c1121f');
   if (v.e === ANIM.ALERTE && !heros) ecritCentre(ctx, '!', x, y - 30, '#ff2a2a');
   if (v.e === ANIM.PERDU && !heros) ecritCentre(ctx, '?', x, y - 30, '#ffd23f');
 }

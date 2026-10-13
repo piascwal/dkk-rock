@@ -44,7 +44,7 @@ export function interactions(p: Partie): void {
           p.onProgression(p.progression(), false);
           break;
         case 'van':
-          p.termineNiveau();
+          p.lanceDepart(e);
           break;
         case 'arme': {
           const a = armeRamassee(e.variante);

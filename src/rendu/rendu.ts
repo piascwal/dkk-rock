@@ -145,6 +145,7 @@ export class Rendu {
     const tri = (g: number) => (g >= G.CAGE ? 0 : g >= G.P_BAGUETTE ? 2 : 1);
     for (const passe of [0, 1, 2])
       for (const v of vue.entites) if (tri(v.g) === passe) dessineEntite(ctx, v, camX, camY, this.atlas);
+    for (const v of vue.entites) if (v.g === G.VAN && v.e === 2) this.particules.van(v.x, v.y, v.f / 20);
     dessineDecor(ctx, this.decor, carte, camX, camY, this.largeur, true, this.theme.dessus);
     this.particules.dessine(ctx, camX, camY);
   }

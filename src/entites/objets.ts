@@ -14,10 +14,15 @@ const GENRES: Record<SorteObjet, Genre> = {
   soin: G.SOIN,
 };
 
+/** Le départ du van : ticks d'attente moteur lancé, puis accélération (px/tick²) jusqu'à la vitesse maximale (px/tick). */
+export const ATTENTE_VAN = 28;
+const ACCELERATION_VAN = 0.3;
+const VITESSE_VAN = 10;
+
 const TAILLES: Record<SorteObjet, [number, number]> = {
   cage: [16, 18],
   drapeau: [10, 32],
-  van: [44, 24],
+  van: [48, 28],
   arme: [12, 12],
   soin: [10, 10],
 };
@@ -33,6 +38,10 @@ export class Objet implements EntiteSimulee {
   /** cage ouverte, drapeau levé */
   active = false;
   private anim = 0;
+  /** le van qui démarre : il attend un instant, puis file vers la droite en accélérant à fond */
+  partant = false;
+  private vx = 0;
+  private depuis = 0;
 
   constructor(
     ctx: Contexte,
@@ -48,8 +57,21 @@ export class Objet implements EntiteSimulee {
     this.corps = nouveauCorps(tx + (TUILE - w) / 2, ty + TUILE - h, w, h);
   }
 
+  /** Les héros sont montés : le van démarre. */
+  demarre(): void {
+    this.partant = true;
+  }
+
   maj(ctx: Contexte): void {
     this.anim++;
+    if (this.partant) {
+      this.depuis++;
+      if (this.depuis > ATTENTE_VAN) {
+        this.vx = Math.min(VITESSE_VAN, this.vx + ACCELERATION_VAN);
+        this.corps.x += this.vx;
+        if (this.depuis === ATTENTE_VAN + 1) ctx.son('derapage', this.corps.x, this.corps.y);
+      } else if (this.depuis % 8 === 0) ctx.secoue(2);
+    }
     // tout retombe si on détruit le sol dessous (sauf le van, garé pour de bon)
     if (this.sorte !== 'van') {
       appliqueGravite(this.corps);
@@ -67,8 +89,13 @@ export class Objet implements EntiteSimulee {
       y: c.y + c.h,
       gauche: false,
       clignote: false,
-      e: this.active ? 1 : 0,
-      f: this.sorte === 'arme' || this.sorte === 'cage' ? this.variante : this.anim & 255,
+      // e = 2 : le van démarre ; f est alors sa vitesse (×20), de quoi fabriquer fumée et graviers côté rendu
+      e: this.partant ? 2 : this.active ? 1 : 0,
+      f: this.partant
+        ? Math.round(this.vx * 20)
+        : this.sorte === 'arme' || this.sorte === 'cage'
+          ? this.variante
+          : this.anim & 255,
     };
   }
 }

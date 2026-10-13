@@ -49,6 +49,32 @@ const SONS: Record<string, Son> = {
     s.note({ freq: 110, duree: 1.4, type: 'sine', volume: 0.3 * v });
     s.note({ freq: 157, duree: 1.2, type: 'triangle', volume: 0.12 * v });
   },
+  // le van démarre : un moteur qui s'emballe, puis les pneus qui crissent et les graviers
+  demarrage: (s, v) => {
+    s.note({
+      freq: 60,
+      vers: 140,
+      duree: 0.5,
+      type: 'sawtooth',
+      volume: 0.16 * v,
+      filtre: 600,
+      distordu: true,
+    });
+    s.bruit({ duree: 0.4, volume: 0.1 * v, passeBas: 900 });
+  },
+  derapage: (s, v) => {
+    s.note({
+      freq: 140,
+      vers: 420,
+      duree: 1.3,
+      type: 'sawtooth',
+      volume: 0.16 * v,
+      filtre: 900,
+      distordu: true,
+    });
+    s.bruit({ duree: 0.9, volume: 0.18 * v, passeHaut: 1800 });
+    s.bruit({ duree: 1.2, volume: 0.14 * v, passeBas: 2200 });
+  },
   saut: (s, v) => s.note({ freq: 260, vers: 520, duree: 0.1, type: 'square', volume: 0.05 * v }),
   aie: (s, v) => s.note({ freq: 300, vers: 120, duree: 0.2, type: 'square', volume: 0.12 * v }),
   mort: (s, v) =>

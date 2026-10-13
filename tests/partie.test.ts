@@ -105,6 +105,8 @@ describe('la partie', () => {
     const van = p.entites.find((e): e is Objet => e instanceof Objet && e.sorte === 'van')!;
     Object.assign(p.joueurs[0]!.corps, { x: van.corps.x + 10, y: van.corps.y + 6 });
     avance(p, 2);
+    expect(p.phase).toBe('jeu'); // le van doit d'abord partir
+    avance(p, 200);
     expect(p.phase).toBe('bilan');
     expect(sauvegardes).toEqual([1]);
     while (p.phase === 'bilan') p.suivant();
@@ -161,5 +163,24 @@ describe('la partie', () => {
     expect(j.mort).toBe(false);
     expect(p.vies).toBe(VIES_DEPART - 1);
     expect(j.membre).not.toBe(membre);
+  });
+
+  it('le van démarre quand on le touche : les héros montent, il file, puis le bilan arrive', () => {
+    const p = nouvelle();
+    const van = p.entites.find((e): e is Objet => e instanceof Objet && e.sorte === 'van')!;
+    const j = p.joueurs[0]!;
+    Object.assign(j.corps, { x: van.corps.x + 4, y: van.corps.y, vx: 0, vy: 0 });
+    const x0 = van.corps.x;
+    avance(p, 2);
+    expect(j.embarque).toBe(true);
+    expect(p.phase).toBe('jeu');
+    avance(p, 20);
+    expect(van.corps.x).toBe(x0); // il attend, moteur lancé
+    avance(p, 40);
+    expect(van.corps.x).toBeGreaterThan(x0 + 20); // puis il file
+    expect(van.vue().e).toBe(2);
+    expect(Math.abs(j.cx - van.corps.x - van.corps.w / 2)).toBeLessThan(2); // la caméra suit le van
+    avance(p, 120);
+    expect(p.phase).toBe('bilan');
   });
 });

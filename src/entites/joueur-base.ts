@@ -19,6 +19,8 @@ export abstract class JoueurBase implements Cible, EtatSpecial {
   mort = false;
   delaiReapparition = 0;
   invulnerable = INVULNERABLE;
+  /** monté dans le van qui part : ni vu, ni touché, ni commandé */
+  embarque = false;
   solo = 0;
   slam = false;
   /** ébloui par un selfie : ne peut plus tirer */
@@ -114,6 +116,7 @@ export abstract class JoueurBase implements Cible, EtatSpecial {
 
   /** Remet le héros en jeu (réapparition ou changement de membre). */
   reapparait(x: number, y: number, membre: number): void {
+    this.embarque = false;
     Object.assign(this.corps, { x, y, vx: 0, vy: 0 });
     this.membre = membre;
     this.mort = false;
