@@ -7,6 +7,8 @@ export class Synthe {
   private maitre!: GainNode;
   effets!: GainNode;
   musique!: GainNode;
+  /** s'efface un instant sous les riffs des héros (la musique reste réglée par `musique`) */
+  private retrait!: GainNode;
   private bruitBlanc!: AudioBuffer;
   private distorsion!: WaveShaperNode;
 
@@ -30,7 +32,8 @@ export class Synthe {
     this.effets.connect(this.maitre);
     this.musique = ctx.createGain();
     this.musique.gain.value = 0.35;
-    this.musique.connect(this.maitre);
+    this.retrait = ctx.createGain();
+    this.musique.connect(this.retrait).connect(this.maitre);
     this.bruitBlanc = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
     const d = this.bruitBlanc.getChannelData(0);
     for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
@@ -42,6 +45,20 @@ export class Synthe {
     }
     this.distorsion.curve = courbe;
     this.distorsion.connect(this.maitre);
+  }
+
+  /**
+   * La musique de fond se retire sous une note de riff, puis revient en douceur : des rampes lentes (pas de coupure
+   * nette), si bien qu'un tir continu la laisse simplement plus basse, sans hachures. `force` : de 0 à 1.
+   */
+  retireMusique(force: number): void {
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime;
+    const g = this.retrait.gain;
+    g.cancelScheduledValues(t);
+    g.setValueAtTime(g.value, t);
+    g.setTargetAtTime(1 - 0.55 * force, t, 0.03);
+    g.setTargetAtTime(1, t + 0.25, 0.35);
   }
 
   get pret(): boolean {

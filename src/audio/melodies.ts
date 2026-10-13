@@ -48,8 +48,8 @@ const synthe80 = (s: Synthe, v: number, f: number) => {
 
 /** JBT : une guitare claire et nerveuse, façon John Frusciante (notes courtes, un peu de mordant). */
 const guitareClaire = (s: Synthe, v: number, f: number) => {
-  s.note({ freq: f, duree: 0.2, type: 'triangle', volume: 0.16 * v });
-  s.note({ freq: f, duree: 0.12, type: 'sawtooth', volume: 0.05 * v, filtre: 2500 });
+  s.note({ freq: f, duree: 0.2, type: 'triangle', volume: 0.26 * v });
+  s.note({ freq: f, duree: 0.12, type: 'sawtooth', volume: 0.08 * v, filtre: 2500 });
 };
 
 export const MELODIES: Record<string, Melodie> = {

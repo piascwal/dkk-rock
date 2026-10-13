@@ -9,41 +9,19 @@
   --titre: 'Silkscreen', 'Pixelify Sans', monospace;
   --texte: 'Pixelify Sans', monospace;
   /* coins « en escalier » des boutons et cadres : un pixel de 4 px de côté coupé à chaque angle */
-  --rond: polygon(
-    25% 0,
-    75% 0,
-    75% 12%,
-    88% 12%,
-    88% 25%,
-    100% 25%,
-    100% 75%,
-    88% 75%,
-    88% 88%,
-    75% 88%,
-    75% 100%,
-    25% 100%,
-    25% 88%,
-    12% 88%,
-    12% 75%,
-    0 75%,
-    0 25%,
-    12% 25%,
-    12% 12%,
-    25% 12%
-  );
   --coins: polygon(
-    0 4px,
-    4px 4px,
-    4px 0,
-    calc(100% - 4px) 0,
-    calc(100% - 4px) 4px,
-    100% 4px,
-    100% calc(100% - 4px),
-    calc(100% - 4px) calc(100% - 4px),
-    calc(100% - 4px) 100%,
-    4px 100%,
-    4px calc(100% - 4px),
-    0 calc(100% - 4px)
+    0 2px,
+    2px 2px,
+    2px 0,
+    calc(100% - 2px) 0,
+    calc(100% - 2px) 2px,
+    100% 2px,
+    100% calc(100% - 2px),
+    calc(100% - 2px) calc(100% - 2px),
+    calc(100% - 2px) 100%,
+    2px 100%,
+    2px calc(100% - 2px),
+    0 calc(100% - 2px)
   );
 }
 
@@ -171,17 +149,17 @@ h2 {
 .ecran select {
   font: inherit;
   font-family: var(--titre);
-  font-size: clamp(0.8rem, 3.4vh, 1.05rem);
-  padding: 0.55em 1em;
-  border: 4px solid #000;
+  font-size: clamp(0.72rem, 3vh, 0.95rem);
+  padding: 0.45em 0.85em;
+  border: 2px solid #000;
   border-radius: 0;
   clip-path: var(--coins);
   background: var(--encre);
   color: #111;
   /* biseau : lumière en haut à gauche, ombre en bas à droite, comme un vrai bouton de console */
   box-shadow:
-    inset 4px 4px 0 rgba(255, 255, 255, 0.6),
-    inset -4px -4px 0 rgba(0, 0, 0, 0.3);
+    inset 2px 2px 0 rgba(255, 255, 255, 0.6),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3);
   cursor: pointer;
   touch-action: manipulation;
 }
@@ -194,8 +172,8 @@ h2 {
 .ecran button:active {
   transform: translate(2px, 2px);
   box-shadow:
-    inset -4px -4px 0 rgba(255, 255, 255, 0.4),
-    inset 4px 4px 0 rgba(0, 0, 0, 0.3);
+    inset -2px -2px 0 rgba(255, 255, 255, 0.4),
+    inset 2px 2px 0 rgba(0, 0, 0, 0.3);
 }
 
 .ecran button:disabled {
@@ -521,9 +499,9 @@ h2 {
   width: 96px;
   height: 96px;
   margin: -48px 0 0 -48px;
-  clip-path: var(--rond);
-  background: rgba(255, 255, 255, 0.28);
-  box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.55);
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.08);
   display: none;
 }
 
@@ -538,8 +516,8 @@ h2 {
   width: 44px;
   height: 44px;
   margin: -22px 0 0 -22px;
-  clip-path: var(--rond);
-  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
 }
 
 .boutons {
@@ -554,11 +532,11 @@ h2 {
 .bouton {
   position: absolute;
   pointer-events: auto;
-  clip-path: var(--rond);
-  border: none;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.55);
   box-shadow:
-    inset 5px 5px 0 rgba(255, 255, 255, 0.45),
-    inset -5px -5px 0 rgba(0, 0, 0, 0.4);
+    inset 2px 2px 0 rgba(255, 255, 255, 0.35),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3);
   font-family: var(--titre);
   color: #fff;
   font-size: 0.85rem;
@@ -570,31 +548,31 @@ h2 {
   opacity: 1;
   transform: scale(0.92);
   box-shadow:
-    inset -5px -5px 0 rgba(255, 255, 255, 0.35),
-    inset 5px 5px 0 rgba(0, 0, 0, 0.45);
+    inset -2px -2px 0 rgba(255, 255, 255, 0.3),
+    inset 2px 2px 0 rgba(0, 0, 0, 0.35);
 }
 
 .bouton.saut {
   right: 0;
   bottom: 0;
-  width: 84px;
-  height: 84px;
+  width: 72px;
+  height: 72px;
   background: #2e8b57;
 }
 
 .bouton.tir {
-  right: 96px;
-  bottom: 14px;
-  width: 76px;
-  height: 76px;
+  right: 84px;
+  bottom: 12px;
+  width: 64px;
+  height: 64px;
   background: var(--rouge);
 }
 
 .bouton.special {
-  right: 52px;
-  bottom: 100px;
-  width: 58px;
-  height: 58px;
+  right: 46px;
+  bottom: 86px;
+  width: 50px;
+  height: 50px;
   background: #8a5cf6;
   font-size: 1.3rem;
 }
