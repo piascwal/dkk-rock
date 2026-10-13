@@ -152,11 +152,8 @@ export function dessineDecor(
       p(3, -h, 1, h, couleurTouffe);
     } else if (o.quoi === 'enceinte34' && dessineEnceinte(ctx, o.v, voile)) {
       // dessinée par sa planche
-    } else if (
-      (o.quoi === 'vacheCasque' || o.quoi === 'lampadaire') &&
-      dessineSprite(ctx, o.quoi, o.v, voile)
-    ) {
-      // la vache ou le lampadaire, dessinés par leur planche
+    } else if (SPRITES.has(o.quoi) && dessineSprite(ctx, o.quoi as Sprite, o.v, voile)) {
+      // dessiné par sa planche
     } else if (o.quoi === 'caisseDeco' && dessineCaisses(ctx, o.v)) {
       // le sprite de la caisse, en plus petit et plus sombre : on ne la confond pas avec une vraie
     } else {
@@ -189,18 +186,24 @@ function dessineCaisses(ctx: CanvasRenderingContext2D, v: number): boolean {
   return true;
 }
 
-/** Une vache (apparence tirée au sort, tournée d'un côté ou de l'autre) ou un lampadaire, par leur planche. */
-function dessineSprite(
-  ctx: CanvasRenderingContext2D,
-  quoi: 'vacheCasque' | 'lampadaire',
-  v: number,
-  voile: string,
-): boolean {
-  if (quoi === 'lampadaire') {
-    return dessineDecorFeuille(ctx, 'lampadaire', 0, voile);
-  }
-  // un peu enfoncée : l'herbe des tuiles, dessinée ensuite, cache le bas des pattes
-  ctx.translate(0, 2);
+type Sprite = 'vacheCasque' | 'lampadaire' | 'sapin' | 'sapinNeige' | 'buisson' | 'buissonSable';
+const SPRITES: ReadonlySet<string> = new Set<Sprite>([
+  'vacheCasque',
+  'lampadaire',
+  'sapin',
+  'sapinNeige',
+  'buisson',
+  'buissonSable',
+]);
+
+/** Les accessoires dessinés par une planche fournie (apparence tirée au sort selon `v`, tournée d'un côté ou de l'autre). */
+function dessineSprite(ctx: CanvasRenderingContext2D, quoi: Sprite, v: number, voile: string): boolean {
+  if (quoi === 'lampadaire') return dessineDecorFeuille(ctx, 'lampadaire', 0, voile);
+  // un peu enfoncé : l'herbe des tuiles, dessinée ensuite, cache le pied
+  ctx.translate(0, quoi === 'vacheCasque' ? 2 : 1);
   if (v & 8) ctx.scale(-1, 1);
-  return dessineDecorFeuille(ctx, 'vache', v % 6, voile);
+  if (quoi === 'vacheCasque') return dessineDecorFeuille(ctx, 'vache', v % 6, voile);
+  if (quoi === 'sapin') return dessineDecorFeuille(ctx, 'sapin', 0, voile);
+  if (quoi === 'sapinNeige') return dessineDecorFeuille(ctx, 'sapin', 1 + ((v >> 4) & 1), voile);
+  return dessineDecorFeuille(ctx, 'buisson', v % 3, voile);
 }
