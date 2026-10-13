@@ -109,7 +109,7 @@ export type Phase = 'histoire' | 'jeu' | 'bilan' | 'fin' | 'perdu' | 'carte';
 export const PHASES: readonly Phase[] = ['histoire', 'jeu', 'bilan', 'fin', 'perdu', 'carte'];
 
 /** Durée du trajet sur la carte du monde, en ticks (tient dans un octet : c'est `page`). */
-export const DUREE_CARTE = 240;
+export const DUREE_CARTE = 255;
 
 export interface EtatVue {
   tick: number;

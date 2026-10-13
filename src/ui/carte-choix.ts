@@ -76,13 +76,23 @@ export function ecranCarte(
     tick++;
     // le van roule jusqu'au niveau choisi
     const ecart = choix - pos;
-    pos += Math.sign(ecart) * Math.min(Math.abs(ecart), 0.05);
+    pos += Math.sign(ecart) * Math.min(Math.abs(ecart), 0.018); // environ une seconde d'une étape à l'autre
     const etats = arc.niveaux.map((n, k): EtatEtape =>
       k === choix ? 'cible' : faits.includes(n) ? 'faite' : ouverts[k] ? 'ouverte' : 'fermee',
     );
     ctx.fillStyle = '#2f86d8';
     ctx.fillRect(0, 0, largeur, HAUTEUR_VUE);
-    dessineCarte(ctx, largeur, HAUTEUR_VUE, arc, pos, etats, '', tick, Math.abs(ecart) > 0.01);
+    dessineCarte(
+      ctx,
+      largeur,
+      HAUTEUR_VUE,
+      arc,
+      pos,
+      etats,
+      '',
+      tick,
+      Math.abs(ecart) > 0.01 ? Math.sign(ecart) : 0,
+    );
     requestAnimationFrame(image);
   };
   requestAnimationFrame(image);
