@@ -29,7 +29,7 @@ export class Tactile {
 
     const zone = this.element.querySelector<HTMLElement>('.zone-joystick')!;
     zone.addEventListener('pointerdown', (e) => {
-      if (this.joystick) return;
+      // un nouveau doigt remplace un joystick resté « tenu » par un doigt dont on n'a jamais vu la fin
       zone.setPointerCapture(e.pointerId);
       this.joystick = { id: e.pointerId, x: e.clientX, y: e.clientY, dx: 0, dy: 0 };
       this.base.style.left = `${e.clientX}px`;
@@ -46,11 +46,21 @@ export class Tactile {
     });
     const lache = (e: PointerEvent) => {
       if (this.joystick?.id !== e.pointerId) return;
-      this.joystick = null;
-      this.base.classList.remove('actif');
+      this.relacheJoystick();
     };
-    zone.addEventListener('pointerup', lache);
-    zone.addEventListener('pointercancel', lache);
+    for (const nom of ['pointerup', 'pointercancel', 'lostpointercapture'] as const)
+      zone.addEventListener(nom, lache);
+    // filets de sécurité : le navigateur « perd » parfois la fin d'un toucher (doigt qui glisse hors de l'écran,
+    // geste système, notification, trois doigts...) ; sans eux le joystick ou un bouton reste enfoncé
+    window.addEventListener('pointerup', lache);
+    window.addEventListener('pointercancel', lache);
+    const toutLacher = () => this.relache();
+    window.addEventListener('blur', toutLacher);
+    document.addEventListener('visibilitychange', toutLacher);
+    for (const nom of ['touchend', 'touchcancel'] as const)
+      window.addEventListener(nom, (e) => {
+        if (e.touches.length === 0) toutLacher();
+      });
 
     for (const b of this.element.querySelectorAll<HTMLElement>('.bouton')) {
       const c = Number(b.dataset.c);
@@ -63,11 +73,26 @@ export class Tactile {
       });
       const fin = (e: PointerEvent) => {
         this.boutons.delete(e.pointerId);
-        b.classList.remove('appuye');
+        if (![...this.boutons.values()].includes(c)) b.classList.remove('appuye');
       };
-      b.addEventListener('pointerup', fin);
-      b.addEventListener('pointercancel', fin);
+      for (const nom of ['pointerup', 'pointercancel', 'lostpointercapture'] as const)
+        b.addEventListener(nom, fin);
+      window.addEventListener('pointerup', fin);
+      window.addEventListener('pointercancel', fin);
     }
+  }
+
+  private relacheJoystick(): void {
+    this.joystick = null;
+    this.base.classList.remove('actif');
+    this.manche.style.transform = '';
+  }
+
+  /** Lâche tout : joystick et boutons. */
+  relache(): void {
+    this.relacheJoystick();
+    this.boutons.clear();
+    for (const b of this.element.querySelectorAll('.bouton')) b.classList.remove('appuye');
   }
 
   private place(): void {
@@ -96,5 +121,6 @@ export class Tactile {
 
   montre(visible: boolean): void {
     this.element.hidden = !visible;
+    if (!visible) this.relache();
   }
 }

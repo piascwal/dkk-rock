@@ -51,7 +51,8 @@ export default defineConfig(({ command, isPreview }) => {
   const info = construit ? versionDuBuild() : { version: 'dev', commit: '' };
   return {
     base: construit || isPreview ? '/dkk-rock/' : '/',
-    build: { target: 'es2022' },
+    // pas de ressource en data: (la politique de sécurité ne l'autorise pas pour les polices)
+    build: { target: 'es2022', assetsInlineLimit: 0 },
     define: { __VERSION__: JSON.stringify(info.version), __COMMIT__: JSON.stringify(info.commit) },
     plugins: [csp(), fichierVersion(info)],
   };
