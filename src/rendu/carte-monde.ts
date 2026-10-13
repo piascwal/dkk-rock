@@ -1,147 +1,175 @@
 import { HAUTEUR_VUE } from '../config';
 import { DUREE_CARTE, G } from '../jeu/vue';
-import { Aleatoire } from '../moteur/maths';
+import { Aleatoire, borne } from '../moteur/maths';
 import { NIVEAUX } from '../niveaux';
 import { arcDe, suivantDansArc, type DefArc } from '../niveaux/arcs';
+import { C, SOLS, mer, type Px } from './carte-monde-decor';
 import { imageDe } from './feuilles-images';
-import { ecritCentre } from './police';
-import { THEMES, type Decor } from './themes';
+import { ecrit, ecritCentre } from './police';
+import { THEMES } from './themes';
 
 /**
- * La carte du monde, entre deux niveaux : la région de chaque niveau de l'arc (prairie, montagne, neige, plage, ville,
- * club), une route qui les relie et le van qui roule de l'un à l'autre. Elle se construit d'après l'arc et le thème de
- * ses niveaux : un nouvel arc a sa carte sans rien dessiner, mais un nouveau thème doit avoir sa région ici (REGIONS).
+ * La carte du monde entre deux niveaux, façon Super Mario Bros 3 : une île vue de dessus, une route qui serpente
+ * d'étape en étape, une région par niveau (aux bords irréguliers) avec son sol et ses décors, et le van qui roule.
+ * Elle se construit d'après l'arc et le thème de ses niveaux : un nouvel arc a sa carte tout seul, un nouveau thème doit
+ * avoir son sol dans carte-monde-decor.ts (SOLS).
  */
+const LT = 46; // largeur de la carte, en tuiles
+const HT = 27;
 
-type Px = (x: number, y: number, w: number, h: number, c: string) => void;
-type Region = (p: Px, x0: number, x1: number, h: number, r: Aleatoire) => void;
-
-const REGIONS: Record<Decor, Region> = {
-  pavillons: (p, x0, x1, h, r) => {
-    p(x0, 0, x1 - x0, h, '#4f8f3a');
-    for (let i = 0; i < (x1 - x0) / 5; i++) p(r.entier(x0, x1), r.entier(0, h), 1, 1, '#3d7a2c');
-    for (let i = 0; i < 4; i++) {
-      const x = r.entier(x0 + 2, x1 - 8);
-      const y = r.entier(12, h - 12);
-      p(x, y, 6, 4, '#e8d8b8');
-      p(x - 1, y - 2, 8, 2, '#b8322a');
-      p(x + 2, y + 2, 2, 2, '#5a3a22');
-    }
-    for (let i = 0; i < 6; i++) p(r.entier(x0, x1 - 3), r.entier(4, h - 6), 3, 3, '#2e6b22');
-  },
-  montagnes: (p, x0, x1, h, r) => {
-    p(x0, 0, x1 - x0, h, '#6aa84f');
-    for (let i = 0; i < 5; i++) {
-      const cx = r.entier(x0, x1);
-      const cy = r.entier(10, h - 10);
-      for (let k = 0; k < 8; k++) p(cx - 8 + k, cy - k / 2, 16 - 2 * k, 1, k > 5 ? '#8fc46f' : '#4f8a3a');
-    }
-    for (let i = 0; i < 3; i++) {
-      const x = r.entier(x0 + 2, x1 - 6);
-      const y = r.entier(14, h - 14);
-      p(x, y, 5, 3, '#8a5a2b');
-      p(x - 1, y - 2, 7, 2, '#5e3b1a');
-    }
-  },
-  pics: (p, x0, x1, h, r) => {
-    p(x0, 0, x1 - x0, h, '#e6f0fb');
-    for (let i = 0; i < 6; i++) {
-      const cx = r.entier(x0 + 4, x1 - 4);
-      const cy = r.entier(16, h - 8);
-      for (let k = 0; k < 12; k++) p(cx - k, cy - 12 + k, 2 * k + 1, 1, k < 4 ? '#ffffff' : '#8d96a5');
-    }
-    for (let i = 0; i < (x1 - x0) / 4; i++) p(r.entier(x0, x1), r.entier(0, h), 1, 1, '#c4d6ec');
-  },
-  palmiers: (p, x0, x1, h, r) => {
-    const mer = Math.round(h * 0.35);
-    p(x0, 0, x1 - x0, mer, '#3fa7f2');
-    p(x0, mer, x1 - x0, h - mer, '#e8cf8a');
-    for (let i = 0; i < (x1 - x0) / 6; i++) p(r.entier(x0, x1 - 3), r.entier(2, mer - 2), 3, 1, '#a8dcff');
-    p(x0, mer, x1 - x0, 1, '#fff4d0');
-    for (let i = 0; i < 4; i++) {
-      const x = r.entier(x0 + 3, x1 - 3);
-      const y = r.entier(mer + 8, h - 6);
-      p(x, y - 4, 1, 5, '#8a5a2b');
-      p(x - 2, y - 5, 5, 1, '#2e8b57');
-      p(x - 1, y - 6, 3, 1, '#2e8b57');
-    }
-  },
-  immeubles: (p, x0, x1, h, r) => {
-    p(x0, 0, x1 - x0, h, '#7d7f8a');
-    for (let y = 6; y < h; y += 14) p(x0, y, x1 - x0, 2, '#5d5f68');
-    for (let i = 0; i < 7; i++) {
-      const x = r.entier(x0 + 1, x1 - 8);
-      const y = r.entier(4, h - 12);
-      p(x, y, 7, 8, '#4a4c56');
-      for (let k = 0; k < 4; k++) p(x + 1 + (k % 2) * 3, y + 1 + Math.floor(k / 2) * 3, 2, 2, '#ffd23f');
-    }
-  },
-  club: (p, x0, x1, h, r) => {
-    p(x0, 0, x1 - x0, h, '#2a1440');
-    for (let i = 0; i < (x1 - x0) / 2; i++)
-      p(r.entier(x0, x1), r.entier(0, h), 1, 1, r.choix(['#ff4fd8', '#3fe0ff']));
-    const x = Math.round((x0 + x1) / 2) - 4;
-    p(x, 10, 8, h - 30, '#14081f');
-    for (let y = 14; y < h - 22; y += 4) p(x + 2, y, 4, 1, '#ff4fd8');
-  },
-};
-
-/** Les positions des niveaux de l'arc sur la carte : de gauche à droite, la route ondule. */
-function points(arc: DefArc, largeur: number): [number, number][] {
-  const n = arc.niveaux.length;
-  const marge = 22;
-  return arc.niveaux.map((_, i) => [
-    Math.round(marge + (i * (largeur - 2 * marge)) / Math.max(1, n - 1)),
-    Math.round(HAUTEUR_VUE * 0.56 + Math.sin(i * 1.9) * HAUTEUR_VUE * 0.16),
-  ]);
+interface Plan {
+  /** la route : une ligne brisée (en tuiles), et la distance de chaque étape le long d'elle */
+  route: [number, number][];
+  etapes: number[];
+  fond: HTMLCanvasElement;
 }
 
-const fonds = new Map<string, HTMLCanvasElement>();
+const longueur = (r: [number, number][], i: number) =>
+  Math.abs(r[i + 1]![0] - r[i]![0]) + Math.abs(r[i + 1]![1] - r[i]![1]);
 
-/** Le fond de la carte (régions, route), dessiné une fois par arc et par largeur d'écran. */
-function fond(arc: DefArc, largeur: number): HTMLCanvasElement {
-  const cle = `${arc.id}-${largeur}`;
-  const deja = fonds.get(cle);
+/** Le point de la route à la distance `d` (en tuiles). */
+function surRoute(route: [number, number][], d: number): [number, number] {
+  for (let i = 0; i + 1 < route.length; i++) {
+    const l = longueur(route, i);
+    if (d <= l || i + 2 === route.length) {
+      const t = l ? Math.min(1, d / l) : 0;
+      return [
+        route[i]![0] + (route[i + 1]![0] - route[i]![0]) * t,
+        route[i]![1] + (route[i + 1]![1] - route[i]![1]) * t,
+      ];
+    }
+    d -= l;
+  }
+  return route[0]!;
+}
+
+const plans = new Map<string, Plan>();
+
+function plan(arc: DefArc): Plan {
+  const deja = plans.get(arc.id);
   if (deja) return deja;
+  // la route serpente : trois allers-retours sur l'île, avec des détours
+  const route: [number, number][] = [
+    [5, 21],
+    [12, 21],
+    [12, 17],
+    [20, 17],
+    [20, 21],
+    [30, 21],
+    [30, 18],
+    [40, 18],
+    [40, 12],
+    [33, 12],
+    [33, 8],
+    [24, 8],
+    [24, 12],
+    [14, 12],
+    [14, 6],
+    [6, 6],
+  ];
+  let total = 0;
+  for (let i = 0; i + 1 < route.length; i++) total += longueur(route, i);
+  const n = arc.niveaux.length;
+  const etapes = arc.niveaux.map((_, i) => Math.round((i * total) / Math.max(1, n - 1)));
+  const pos = etapes.map((d) => surRoute(route, d));
+  const r = new Aleatoire(arc.id.length * 31 + 5);
+
+  // chaque case appartient à la région de l'étape la plus proche (bruitée : des bords irréguliers)
+  const region: number[] = [];
+  const surRouteOuPres = new Set<number>();
+  for (let i = 0; i + 1 < route.length; i++) {
+    const [ax, ay] = route[i]!;
+    const [bx, by] = route[i + 1]!;
+    for (let k = 0; k <= longueur(route, i); k++) {
+      const t = k / Math.max(1, longueur(route, i));
+      const x = Math.round(ax + (bx - ax) * t);
+      const y = Math.round(ay + (by - ay) * t);
+      for (let dy = -1; dy <= 1; dy++)
+        for (let dx = -1; dx <= 1; dx++) surRouteOuPres.add((y + dy) * LT + x + dx);
+    }
+  }
   const toile = document.createElement('canvas');
-  toile.width = largeur;
-  toile.height = HAUTEUR_VUE;
+  toile.width = LT * C;
+  toile.height = HT * C;
   const c = toile.getContext('2d')!;
   const p: Px = (x, y, w, h, col) => {
     c.fillStyle = col;
     c.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
   };
-  const pts = points(arc, largeur);
-  const r = new Aleatoire(7);
-  arc.niveaux.forEach((niv, i) => {
-    const x0 = i === 0 ? 0 : Math.round((pts[i - 1]![0] + pts[i]![0]) / 2);
-    const x1 = i === pts.length - 1 ? largeur : Math.round((pts[i]![0] + pts[i + 1]![0]) / 2);
-    REGIONS[THEMES[NIVEAUX[niv]!.theme].decor](p, x0, x1, HAUTEUR_VUE, r);
-    // frontière en damier : les régions se fondent l'une dans l'autre
-    if (i > 0) {
-      const g = c.getImageData(x0 - 3, 0, 3, HAUTEUR_VUE);
-      for (let y = 0; y < HAUTEUR_VUE; y++)
-        for (let k = 0; k < 3; k++) if ((y + k) % 2) c.putImageData(g, x0, 0, k, y, 1, 1);
+  const ile = (x: number, y: number) => {
+    const nx = (x - LT / 2) / (LT / 2 - 2.2);
+    const ny = (y - HT / 2) / (HT / 2 - 2.2);
+    return nx * nx * nx * nx + ny * ny * ny * ny + Math.sin(x * 1.3 + y * 0.7) * 0.08 < 1;
+  };
+  for (let y = 0; y < HT; y++)
+    for (let x = 0; x < LT; x++) {
+      let mieux = 0;
+      let dmin = Infinity;
+      pos.forEach(([px, py], k) => {
+        const d = Math.hypot(px - x, py - y) + Math.sin(x * 0.9 + k) * 0.7 + Math.cos(y * 1.1 - k) * 0.7;
+        if (d < dmin) [dmin, mieux] = [d, k];
+      });
+      region.push(mieux);
     }
-  });
-  // la route : un chemin de terre, en pointillés
-  for (let i = 0; i + 1 < pts.length; i++) {
-    const [ax, ay] = pts[i]!;
-    const [bx, by] = pts[i + 1]!;
-    const n = Math.ceil(Math.hypot(bx - ax, by - ay));
-    for (let k = 0; k <= n; k++) {
-      const x = ax + ((bx - ax) * k) / n;
-      const y = ay + ((by - ay) * k) / n;
-      p(x - 1, y - 1, 3, 3, '#3a2a1a');
-      if (k % 4 < 2) p(x, y, 1, 1, '#f0e0b0');
+  // sol, côtes et décors
+  const occupe = new Set<number>();
+  for (let y = 0; y < HT; y++)
+    for (let x = 0; x < LT; x++) {
+      if (!ile(x, y)) continue;
+      const sol = SOLS[THEMES[NIVEAUX[arc.niveaux[region[y * LT + x]!]!]!.theme].decor];
+      p(x * C, y * C, C, C, (x + y) % 2 ? sol.clair : sol.sombre);
     }
-  }
-  p(0, 0, largeur, 2, '#120914');
-  p(0, HAUTEUR_VUE - 2, largeur, 2, '#120914');
-  p(0, 0, 2, HAUTEUR_VUE, '#120914');
-  p(largeur - 2, 0, 2, HAUTEUR_VUE, '#120914');
-  fonds.set(cle, toile);
-  return toile;
+  // la plage autour de l'île : un liseré de sable et d'écume
+  for (let y = 0; y < HT; y++)
+    for (let x = 0; x < LT; x++) {
+      if (!ile(x, y)) continue;
+      for (const [dx, dy] of [
+        [0, -1],
+        [0, 1],
+        [-1, 0],
+        [1, 0],
+      ] as const) {
+        if (ile(x + dx, y + dy)) continue;
+        const bx = x * C + (dx > 0 ? C - 2 : 0);
+        const by = y * C + (dy > 0 ? C - 2 : 0);
+        p(bx, by, dx ? 2 : C, dy ? 2 : C, '#f6e7b8');
+      }
+    }
+  for (let y = 1; y < HT - 2; y++)
+    for (let x = 1; x < LT - 2; x++) {
+      const k = y * LT + x;
+      const libre = (i: number) =>
+        ile(i % LT, Math.floor(i / LT)) && !surRouteOuPres.has(i) && !occupe.has(i);
+      if (!libre(k) || r.suivant() > 0.42) continue;
+      const sol = SOLS[THEMES[NIVEAUX[arc.niveaux[region[k]!]!]!.theme].decor];
+      const grand =
+        [k, k + 1, k + LT, k + LT + 1].every(libre) && region[k + LT + 1] === region[k] && r.suivant() < 0.35;
+      if (grand) {
+        r.choix(sol.grands)(p, x * C, y * C);
+        for (const i of [k, k + 1, k + LT, k + LT + 1]) occupe.add(i);
+      } else {
+        r.choix(sol.petits)(p, x * C, y * C, r);
+        occupe.add(k);
+      }
+    }
+  // la route : un chemin clair bordé de sombre, en pointillés au milieu
+  for (const pass of [0, 1])
+    for (let i = 0; i + 1 < route.length; i++) {
+      const [ax, ay] = route[i]!;
+      const [bx, by] = route[i + 1]!;
+      const x0 = Math.min(ax, bx) * C + C / 2;
+      const y0 = Math.min(ay, by) * C + C / 2;
+      const w = Math.abs(bx - ax) * C;
+      const h = Math.abs(by - ay) * C;
+      if (pass === 0) p(x0 - 3, y0 - 3, w + 6, h + 6, '#4a2e12');
+      else {
+        p(x0 - 2, y0 - 2, w + 4, h + 4, '#f2dca4');
+        for (let k = 0; k <= Math.max(w, h); k += 4) p(x0 + (w ? k : 0), y0 + (h ? k : 0), 1, 1, '#c8a868');
+      }
+    }
+  const pl = { route, etapes, fond: toile };
+  plans.set(arc.id, pl);
+  return pl;
 }
 
 /** Dessine la carte : `niveau` est celui qu'on vient de finir, `page` les ticks du trajet vers le suivant. */
@@ -153,47 +181,69 @@ export function dessineCarteMonde(
   tick: number,
 ): void {
   const arc = arcDe(niveau);
-  const pts = points(arc, largeur);
-  ctx.drawImage(fond(arc, largeur), 0, 0);
+  const pl = plan(arc);
   const i = arc.niveaux.indexOf(niveau);
   const suivant = suivantDansArc(niveau);
   const j = suivant === null ? i : arc.niveaux.indexOf(suivant);
-  // les étapes : faites (or), la prochaine (clignote), les autres (gris)
-  pts.forEach(([x, y], k) => {
+  // le trajet : un temps d'arrêt, la route (accélération puis freinage), l'arrivée
+  const t = borne((page / DUREE_CARTE - 0.12) / 0.7, 0, 1);
+  const d = pl.etapes[i]! + (pl.etapes[j]! - pl.etapes[i]!) * t * t * (3 - 2 * t);
+  const [vx, vy] = surRoute(pl.route, d);
+  const vanX = vx * C + C / 2;
+  const vanY = vy * C + C / 2;
+  // la caméra suit le van, sans sortir de la carte
+  const camX = Math.round(borne(vanX - largeur / 2, 0, Math.max(0, LT * C - largeur)));
+  const camY = Math.round(borne(vanY - HAUTEUR_VUE / 2, 0, Math.max(0, HT * C - HAUTEUR_VUE)));
+  ctx.fillStyle = '#2f86d8';
+  ctx.fillRect(0, 0, largeur, HAUTEUR_VUE);
+  const p: Px = (x, y, w, h, col) => {
+    ctx.fillStyle = col;
+    ctx.fillRect(Math.round(x), Math.round(y), w, h);
+  };
+  // la mer qui scintille, puis l'île
+  for (let gy = Math.floor(camY / C); gy <= (camY + HAUTEUR_VUE) / C; gy++)
+    for (let gx = Math.floor(camX / C); gx <= (camX + largeur) / C; gx++)
+      mer(p, gx * C - camX, gy * C - camY, tick, gx, gy);
+  ctx.drawImage(pl.fond, -camX, -camY);
+  // les étapes : faites (or, coche), la prochaine (clignote), les autres (cartes numérotées)
+  pl.etapes.forEach((e, k) => {
+    const [ex, ey] = surRoute(pl.route, e);
+    const x = ex * C + C / 2 - camX;
+    const y = ey * C + C / 2 - camY;
     const faite = k <= i;
     const cible = k === j && Math.floor(tick / 15) % 2 === 0;
-    ctx.fillStyle = '#120914';
-    ctx.fillRect(x - 4, y - 4, 9, 9);
-    ctx.fillStyle = faite ? '#ffd23f' : cible ? '#ff4fd8' : '#9a9aa6';
-    ctx.fillRect(x - 3, y - 3, 7, 7);
-    ecritCentre(ctx, String(k + 1), x + 1, y - 13, faite ? '#ffd23f' : '#ffffff');
+    p(x - 6, y - 6, 12, 12, '#1a0f0a');
+    p(x - 5, y - 5, 10, 10, faite ? '#e0701f' : cible ? '#ff4fd8' : '#2a3a8a');
+    p(x - 5, y - 5, 10, 2, faite ? '#ffd23f' : cible ? '#ffa8ec' : '#4a5ab0');
+    ecrit(ctx, String(k + 1), x - 1, y - 2, '#ffffff');
   });
-  // le trajet : un temps d'arrêt, la route (accélération puis freinage), l'arrivée
-  const t = Math.min(1, Math.max(0, (page / DUREE_CARTE - 0.12) / 0.7));
-  const lisse = t * t * (3 - 2 * t);
-  const [ax, ay] = pts[i]!;
-  const [bx, by] = pts[j]!;
-  const x = ax + (bx - ax) * lisse;
-  const y = ay + (by - ay) * lisse;
+  // le van, sa poussière
   const roule = t > 0 && t < 1;
-  // la poussière derrière le van
   if (roule)
     for (let k = 1; k <= 4; k++) {
-      ctx.globalAlpha = 0.5 - k * 0.1;
-      ctx.fillStyle = '#d9d4c7';
-      ctx.fillRect(Math.round(x - 12 - k * 3), Math.round(y - 2 + ((tick + k) % 3) - 1), 2, 2);
+      ctx.globalAlpha = 0.6 - k * 0.12;
+      p(vanX - camX - 10 - k * 3, vanY - camY - 1 + ((tick + k) % 3) - 1, 2, 2, '#e9e2d0');
     }
   ctx.globalAlpha = 1;
   const img = imageDe(G.VAN);
   const saut = roule && Math.floor(tick / 4) % 2 ? -1 : 0;
   if (img) {
     ctx.imageSmoothingEnabled = true;
-    ctx.drawImage(img, 0, 0, img.width, img.height, Math.round(x - 11), Math.round(y - 12 + saut), 22, 13);
+    ctx.drawImage(
+      img,
+      0,
+      0,
+      img.width,
+      img.height,
+      Math.round(vanX - camX - 10),
+      Math.round(vanY - camY - 13 + saut),
+      20,
+      12,
+    );
     ctx.imageSmoothingEnabled = false;
-  } else {
-    ctx.fillStyle = '#efe6cc';
-    ctx.fillRect(Math.round(x - 8), Math.round(y - 9 + saut), 16, 7);
   }
+  // le bandeau du haut
+  p(0, 0, largeur, 11, 'rgba(10,5,12,0.75)');
   const def = suivant === null ? null : NIVEAUX[suivant];
-  if (def) ecritCentre(ctx, `En route : ${def.titre}`, largeur / 2, 6, '#ffffff');
+  ecritCentre(ctx, def ? `En route : ${def.titre}` : arc.titre, largeur / 2, 3, '#ffd23f');
 }
