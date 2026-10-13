@@ -56,7 +56,9 @@ export class Intro {
     this.toile.hidden = false;
     this.dimensionne();
     window.addEventListener('resize', this.dimensionne);
-    this.toile.addEventListener('pointerdown', this.touche);
+    // « click » (doigt relevé) et non « pointerdown » : sur téléphone, le navigateur n'accorde le plein écran et le son
+    // qu'à un toucher terminé
+    this.toile.addEventListener('click', this.touche);
     window.addEventListener('keydown', this.touche);
     requestAnimationFrame(this.image);
   }
@@ -90,7 +92,7 @@ export class Intro {
     this.passer.remove();
     window.removeEventListener('resize', this.dimensionne);
     window.removeEventListener('keydown', this.touche);
-    this.toile.removeEventListener('pointerdown', this.touche);
+    this.toile.removeEventListener('click', this.touche);
     this.ensuite();
   }
 
