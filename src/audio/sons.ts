@@ -1,3 +1,4 @@
+import { noteDe } from './melodies';
 import type { Synthe } from './synthe';
 
 type Son = (s: Synthe, v: number) => void;
@@ -149,8 +150,11 @@ export class Bruitages {
     const v = Math.max(0, 1 - distance / 450);
     if (v <= 0.05) return;
     const t = performance.now();
-    if (t - (this.derniers.get(nom) ?? 0) < 45) return;
-    this.derniers.set(nom, t);
-    SONS[nom]?.(this.s, v);
+    const base = nom.split(':')[0]!;
+    if (t - (this.derniers.get(base) ?? 0) < 45) return;
+    this.derniers.set(base, t);
+    const note = noteDe(nom);
+    if (note) note.m.joue(this.s, v, note.f);
+    else SONS[base]?.(this.s, v);
   }
 }

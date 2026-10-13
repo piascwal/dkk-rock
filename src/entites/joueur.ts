@@ -26,6 +26,8 @@ export class Joueur extends JoueurBase {
   private traverse = 0;
   private lacheTyro = 0;
   private contreMur = false;
+  /** numéro du prochain tir de l'instrument : la note de la mélodie */
+  private notes = 0;
 
   maj(ctx: Contexte, cmd: Commandes): void {
     this.commandes.avance(this.hypnose > 0 ? inverse(cmd) : cmd);
@@ -221,7 +223,8 @@ export class Joueur extends JoueurBase {
     const a = this.armeActuelle;
     a.tir(ctx, bouche);
     this.recharge = a.cadence;
-    ctx.son(a.son, this.cx, this.cy);
+    // l'instrument du héros joue la note suivante de son riff (voir audio/melodies.ts) ; une arme ramassée, son bruit
+    ctx.son(this.arme ? a.son : `${a.son}:${this.notes++ % 256}`, this.cx, this.cy);
     if (this.arme && --this.munitions <= 0) this.arme = 0;
   }
 
