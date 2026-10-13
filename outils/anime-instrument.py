@@ -155,7 +155,7 @@ def fabrique(nom):
     ap.alpha_composite(planche)
     ap.resize((ap.width // 2, ap.height // 2), Image.NEAREST).save(SRC / f'apercu-{nom}-instrument.png')
     meta = {'fichier': f'{nom}-instrument.png', 'w': w, 'h': h, 'pied': (ancre + MARGE - x0) // REDUCTION}
-    (SRC / f'meta-{nom}.json').write_text(json.dumps(meta))
+    (SRC / f'meta-{nom}.json').write_text(json.dumps(meta, indent=2) + '\n')
     print(nom, json.dumps(meta))
 
 
