@@ -46,11 +46,10 @@ const synthe80 = (s: Synthe, v: number, f: number) => {
   s.note({ freq: f / 2, duree: 0.22, type: 'square', volume: 0.04 * v, filtre: 1200 });
 };
 
-/** JBT : une guitare lead lourde et saturée, façon Marilyn Manson (doublée à la quinte grave pour l'épaisseur). */
-const guitareLourde = (s: Synthe, v: number, f: number) => {
-  s.note({ freq: f, duree: 0.3, type: 'sawtooth', volume: 0.13 * v, distordu: true, filtre: 2200 });
-  s.note({ freq: f * 1.003, duree: 0.3, type: 'square', volume: 0.06 * v, distordu: true, filtre: 1400 });
-  s.note({ freq: f / 1.5, duree: 0.3, type: 'sawtooth', volume: 0.07 * v, filtre: 800 });
+/** JBT : une guitare claire et nerveuse, façon John Frusciante (notes courtes, un peu de mordant). */
+const guitareClaire = (s: Synthe, v: number, f: number) => {
+  s.note({ freq: f, duree: 0.2, type: 'triangle', volume: 0.16 * v });
+  s.note({ freq: f, duree: 0.12, type: 'sawtooth', volume: 0.05 * v, filtre: 2500 });
 };
 
 export const MELODIES: Record<string, Melodie> = {
@@ -74,10 +73,13 @@ export const MELODIES: Record<string, Melodie> = {
     pas: notes('do#5 si4 do#5 fa#4 re5 do#5 re5 do#5 si4 re5 do#5 re5 fa#4 si4 la4 si4 la4 sol#4 si4 la4'),
     joue: (s, v, p) => synthe80(s, v, p as number),
   },
-  // JBT : Sweet Dreams (la reprise de Marilyn Manson), transcrit de mémoire : à corriger au besoin
+  // JBT : Snow (Hey Oh) des Red Hot Chili Peppers, l'arpège d'introduction (tirés-poussés et glissé joués note à note)
   baguette: {
-    pas: notes('do3 do3 mib3 do3 lab2 sol2 lab2 sol2 fa2 mib2 fa2 mib2'),
-    joue: (s, v, p) => guitareLourde(s, v, p as number),
+    pas: notes(
+      're#3 sol#3 si3 sol#3 si3 do#4 si3 sol#3 si3 mi3 sol#3 si3 sol#3 si3 do#4 si3 sol#3 ' +
+        'si2 re#3 fa#3 re#3 fa#3 sol#3 fa#3 re#3 fa#3 re#3 fa#3 la#3 do#4 la#3 do#4 re#4 do#4 la#3',
+    ),
+    joue: (s, v, p) => guitareClaire(s, v, p as number),
   },
 };
 
