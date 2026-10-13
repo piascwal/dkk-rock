@@ -1,6 +1,7 @@
 import { TUILE } from '../config';
 import { bruit } from '../moteur/maths';
 import { NB_TUILES, T } from '../monde/tuiles';
+import { DEBORD, habille } from './bords-tuiles';
 import type { Theme } from './themes';
 
 const VARIANTES = 4;
@@ -173,6 +174,28 @@ export class AtlasTuiles {
   }
 
   toile(t: number, tx: number, ty: number): HTMLCanvasElement | null {
-    return this.toiles[t]?.[Math.floor(bruit(tx, ty, 3) * VARIANTES)] ?? null;
+    return this.toiles[t]?.[this.variante(tx, ty)] ?? null;
+  }
+
+  private variante(tx: number, ty: number): number {
+    return Math.floor(bruit(tx, ty, 3) * VARIANTES);
+  }
+
+  private readonly habillees = new Map<number, HTMLCanvasElement>();
+
+  /** La tuile habillée selon ses côtés libres (voir bords-tuiles.ts), haute de 16 + DEBORD, faite à la demande. */
+  habillee(t: number, tx: number, ty: number, cotes: number): HTMLCanvasElement | null {
+    const v = this.variante(tx, ty);
+    const cle = (t * VARIANTES + v) * 16 + cotes;
+    let toile = this.habillees.get(cle);
+    if (toile) return toile;
+    const source = this.toiles[t]?.[v];
+    if (!source) return null;
+    toile = document.createElement('canvas');
+    toile.width = TUILE;
+    toile.height = TUILE + DEBORD;
+    habille(toile.getContext('2d')!, source, t, v, cotes, this.theme.dessus);
+    this.habillees.set(cle, toile);
+    return toile;
   }
 }

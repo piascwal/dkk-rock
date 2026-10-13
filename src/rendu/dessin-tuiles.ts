@@ -4,6 +4,7 @@ import type { Tyrolienne } from '../jeu/contexte';
 import type { Carte } from '../monde/carte';
 import { T } from '../monde/tuiles';
 import type { AtlasTuiles } from './atlas-tuiles';
+import { aUnCoin, COTE, cotesLibres, DEBORD } from './bords-tuiles';
 
 /** Dessine les tuiles visibles : parois de fond, tuiles, dessus herbeux ou enneigés, fissures. */
 export function dessineTuiles(
@@ -18,7 +19,6 @@ export function dessineTuiles(
   const ty0 = Math.max(0, Math.floor(camY / TUILE));
   const tx1 = Math.min(carte.largeur - 1, Math.floor((camX + largeur) / TUILE));
   const ty1 = Math.min(carte.hauteur - 1, Math.floor((camY + HAUTEUR_VUE) / TUILE));
-  const dessus = atlas.theme.dessus;
 
   for (let ty = ty0; ty <= ty1; ty++) {
     for (let tx = tx0; tx <= tx1; tx++) {
@@ -26,19 +26,18 @@ export function dessineTuiles(
       const x = tx * TUILE - Math.round(camX);
       const y = ty * TUILE - Math.round(camY);
       const plein = t !== T.VIDE && t !== T.ECHELLE && t !== T.PLATEFORME;
-      if (!plein && carte.aFond(tx, ty)) ctx.drawImage(atlas.paroi, x, y);
+      const cotes = t === T.VIDE ? 0 : cotesLibres(carte, t, tx, ty);
+      // derrière un coin arrondi, la paroi seulement si elle continue de ce côté (sinon le ciel)
+      const fondDuCoin =
+        aUnCoin(cotes) && (cotes & COTE.HAUT ? carte.aFond(tx, ty - 1) : carte.aFond(tx, ty + 1));
+      if ((!plein || fondDuCoin) && carte.aFond(tx, ty)) ctx.drawImage(atlas.paroi, x, y);
       if (t === T.VIDE) continue;
-      const toile = atlas.toile(t, tx, ty);
-      if (toile) ctx.drawImage(toile, x, y);
-
-      // le dessus d'une terre à l'air libre : herbe, neige ou sable selon le monde
-      if (t === T.TERRE && !carte.props(tx, ty - 1).solide) {
-        ctx.fillStyle = dessus;
-        ctx.fillRect(x, y, TUILE, 3);
-        for (let i = 0; i < TUILE; i += 2)
-          if (bruit(tx * 16 + i, ty, 4) < 0.5) ctx.fillRect(x + i, y + 3, 2, 1);
-        ctx.fillStyle = 'rgba(255,255,255,0.25)';
-        ctx.fillRect(x, y, TUILE, 1);
+      // bords à l'air libre : coins arrondis, ombrage, dessus herbeux (voir bords-tuiles.ts)
+      const habillee = cotes ? atlas.habillee(t, tx, ty, cotes) : null;
+      if (habillee) ctx.drawImage(habillee, x, y - DEBORD);
+      else {
+        const toile = atlas.toile(t, tx, ty);
+        if (toile) ctx.drawImage(toile, x, y);
       }
       const usure = carte.usure(tx, ty);
       if (usure < 0.7) fissures(ctx, x, y, usure, tx, ty);
