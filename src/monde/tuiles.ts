@@ -1,6 +1,6 @@
 /**
- * Les types de tuiles du monde. Tout est destructible sauf le socle : chaque
- * tuile a des points de vie, et certaines tombent quand on leur retire le sol
+ * Les types de tuiles du monde. Tout est destructible sauf le socle, les échelons et les pitons (de quoi sauter de
+ * bloc en bloc quand on a tout détruit autour) : chaque tuile a des points de vie, et certaines tombent quand on leur retire le sol
  * (caisses, sable, neige tassée) ou explosent (caissons de basses).
  */
 
@@ -21,6 +21,8 @@ export const T = {
   SABLE: 13,
   VITRE: 14,
   BETON: 15,
+  ECHELON: 16,
+  PITON: 17,
 } as const;
 
 export type Tuile = (typeof T)[keyof typeof T];
@@ -73,6 +75,17 @@ export const PROPRIETES: Record<Tuile, ProprietesTuile> = {
   [T.SABLE]: base({ nom: 'sable', car: 'S', pv: 1, tombe: true, debris: '#e8cf8a' }),
   [T.VITRE]: base({ nom: 'vitre', car: 'V', pv: 1, debris: '#bfe9ff' }),
   [T.BETON]: base({ nom: 'béton', car: 'D', pv: 6, debris: '#9a9a92' }),
+  // un barreau d'échelle scellé : on y monte comme à une échelle, et il reste quand le reste a sauté
+  [T.ECHELON]: base({
+    nom: 'échelon',
+    car: 'E',
+    pv: Infinity,
+    traversable: true,
+    echelle: true,
+    debris: '#8a96a3',
+  }),
+  // une plateforme scellée au mur, incassable : le pas d'un chemin qu'on ne doit pas pouvoir couper
+  [T.PITON]: base({ nom: 'piton', car: '=', pv: Infinity, traversable: true, debris: '#8a96a3' }),
 };
 
 const PAR_CARACTERE = new Map<string, Tuile>(

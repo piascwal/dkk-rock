@@ -48,8 +48,11 @@ Commandes : joystick et boutons à l'écran ; clavier flèches/ZQSD/WASD, Espace
 spécial, Échap pause ; manette standard.
 
 - **Viser :** haut tire droit en l'air, haut + côté en diagonale ; en l'air, bas tire vers le sol.
-- **Contre un mur :** saut en poussant à l'opposé = rebond ; en poussant vers le mur (ou sans
-  rien) = on monte le long du mur pour passer le bord. Haut = escalade, un court moment.
+- **Contre un mur :** pas d'escalade, des sauts. Saut en poussant vers le mur = petit saut qui remonte la paroi (on
+  enchaîne) ; sans direction ou en poussant à l'opposé = on décolle du mur (plus loin si on pousse). En haut du mur, on a
+  un instant pour sauter de n'importe quel côté et passer le bord.
+- **Échelons et pitons :** les échelles gardent un barreau sur deux (et leur sommet) incassable, les plateformes
+  « pitons » sont scellées : on peut tout détruire autour sans se couper la route.
 
 ## À plusieurs
 

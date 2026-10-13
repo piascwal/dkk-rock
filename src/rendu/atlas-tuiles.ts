@@ -90,6 +90,25 @@ const PEINTRES: Partial<Record<number, Peintre>> = {
     px(c, 12, 0, 2, 16, '#9a6a35');
     for (let y = 2; y < 16; y += 5) px(c, 2, y, 12, 2, '#c49a5a');
   },
+  [T.ECHELON]: (c) => {
+    px(c, 2, 0, 2, 16, '#9a6a35');
+    px(c, 12, 0, 2, 16, '#9a6a35');
+    for (let y = 2; y < 16; y += 5) px(c, 2, y, 12, 2, '#c49a5a');
+    // le barreau scellé : une ferrure d'acier qui dépasse de chaque côté
+    px(c, 0, 0, 16, 3, '#8a96a3');
+    px(c, 0, 0, 16, 1, '#c9d3dc');
+    px(c, 0, 3, 16, 1, '#3d4650');
+    px(c, 1, 1, 1, 1, '#3d4650');
+    px(c, 14, 1, 1, 1, '#3d4650');
+  },
+  [T.PITON]: (c) => {
+    px(c, 0, 0, 16, 4, '#8a96a3');
+    px(c, 0, 0, 16, 1, '#c9d3dc');
+    px(c, 0, 4, 16, 1, '#3d4650');
+    px(c, 2, 1, 1, 2, '#3d4650');
+    px(c, 13, 1, 1, 2, '#3d4650');
+    px(c, 6, 5, 4, 3, '#5b6670');
+  },
   [T.CAISSE]: (c) => {
     px(c, 0, 0, 16, 16, '#6b4520');
     px(c, 1, 1, 14, 14, '#b07d3c');

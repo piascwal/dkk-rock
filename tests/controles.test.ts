@@ -78,13 +78,41 @@ describe('le saut contre un mur', () => {
     expect(j.corps.vx).toBeLessThan(-1);
   });
 
-  it('en poussant vers le mur, ou sans rien : on monte le long du mur', () => {
-    for (const bits of [C.DROITE, 0]) {
+  it('sans direction : on décolle du mur, face à nous', () => {
+    const { p, j } = contreUnMur();
+    pas(p, 1, 0);
+    pas(p, 1, C.SAUT);
+    expect(j.corps.vy).toBeLessThan(-3);
+    expect(j.corps.vx).toBeLessThan(-0.5);
+  });
+
+  it('en poussant vers le mur : un petit saut qui remonte la paroi, sans escalade', () => {
+    const { p, j } = contreUnMur();
+    pas(p, 1, C.DROITE);
+    pas(p, 1, C.DROITE | C.SAUT);
+    expect(j.corps.vy).toBeLessThan(-3);
+    expect(j.corps.vy).toBeGreaterThan(-4.5); // plus petit qu'un saut normal
+    expect(j.corps.vx).toBeGreaterThanOrEqual(0);
+    // haut tenu sans sauter : on ne grimpe pas
+    const k = contreUnMur();
+    pas(k.p, 30, C.DROITE | C.HAUT);
+    expect(k.j.corps.y).toBeGreaterThanOrEqual(8 * TUILE - 1);
+  });
+
+  it('en haut du mur, on peut encore sauter de chaque côté un instant', () => {
+    for (const [bits, signe] of [
+      [C.GAUCHE, -1],
+      [C.DROITE, 1],
+    ] as const) {
       const { p, j } = contreUnMur();
-      pas(p, 1, bits);
+      pas(p, 1, C.DROITE);
+      // le haut du mur : on retire la paroi au niveau du héros, il vient de la quitter
+      const tx = Math.floor(j.cx / TUILE) + 1;
+      for (let ty = 0; ty < p.carte.hauteur - 2; ty++) p.carte.pose(tx, ty, T.VIDE);
+      pas(p, 2, 0);
       pas(p, 1, bits | C.SAUT);
       expect(j.corps.vy).toBeLessThan(-3);
-      expect(j.corps.vx).toBeGreaterThanOrEqual(0);
+      expect(Math.sign(j.corps.vx)).toBe(signe);
     }
   });
 });

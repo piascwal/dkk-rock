@@ -9,6 +9,7 @@ import type { NomTheme } from '../rendu/themes';
  *   ' ' vide   # terre   R roche   B brique   M métal   X socle (indestructible)
  *   N neige    G glace   W bois    - plateforme   H échelle   C caisse
  *   T caisson de basses (explose)   S sable   V vitre   D béton
+ *   E échelon scellé (échelle incassable)   = piton (plateforme incassable)
  *   . mur de fond (décor d'intérieur, on passe devant)
  *
  * Repères (la case est vide une fois lue) :
@@ -130,6 +131,7 @@ export function litNiveau(def: DefNiveau): NiveauLu {
     }
   }
 
+  scelleLesEchelles(tuiles, largeur, hauteur);
   if (!lu.depart) throw new ErreurNiveau(`${def.id} : pas de départ (@)`);
   if (!lu.fin && !lu.boss.some((b) => b.lettre === 'Z'))
     throw new ErreurNiveau(`${def.id} : ni van (F) ni boss final (Z)`);
@@ -144,4 +146,22 @@ export function litNiveau(def: DefNiveau): NiveauLu {
   for (const d of lu.declencheurs)
     if (!def.dialogues[d.cle]) throw new ErreurNiveau(`${def.id} : dialogue ${d.cle} non écrit`);
   return { ...lu, depart: lu.depart, fin: lu.fin ?? null } as NiveauLu;
+}
+
+/**
+ * Dans chaque colonne d'échelle, le haut et un barreau sur deux deviennent des échelons scellés : même si le reste de
+ * l'échelle saute, on peut remonter de barreau en barreau (deux tuiles d'écart, moins qu'un saut) et sortir en haut.
+ */
+function scelleLesEchelles(tuiles: Uint8Array, largeur: number, hauteur: number): void {
+  for (let tx = 0; tx < largeur; tx++) {
+    let rang = -1; // rang depuis le haut de l'échelle en cours
+    for (let ty = 0; ty < hauteur; ty++) {
+      const i = ty * largeur + tx;
+      if (tuiles[i] === T.ECHELLE) {
+        rang++;
+        if (rang % 2 === 0) tuiles[i] = T.ECHELON;
+      } else if (tuiles[i] !== T.ECHELON) rang = -1;
+      else rang++;
+    }
+  }
 }

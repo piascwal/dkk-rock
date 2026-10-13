@@ -13,14 +13,16 @@ const VITESSE = 1.75;
 const SAUT = 5.5;
 const SAUT_MUR = 5;
 const VITESSE_ECHELLE = 1.4;
-const GRIMPE_MAX = 40;
+const DELAI_MUR = 8;
+const PETIT_SAUT_MUR = 3.6;
 
 /** Un héros contrôlé par un joueur (local ou distant : la simulation ne fait pas la différence). */
 export class Joueur extends JoueurBase {
   private coyote = 0;
   private tamponSaut = 0;
   private verrouHorizontal = 0;
-  private grimpe = GRIMPE_MAX;
+  private murVu: -1 | 0 | 1 = 0;
+  private delaiMur = 0;
   private traverse = 0;
   private lacheTyro = 0;
   private contreMur = false;
@@ -50,7 +52,6 @@ export class Joueur extends JoueurBase {
     }
     if (c.auSol) {
       this.coyote = 6;
-      this.grimpe = GRIMPE_MAX;
     } else if (this.coyote > 0) this.coyote--;
     if (k.appuye(C.SAUT)) this.tamponSaut = 6;
     else if (this.tamponSaut > 0) this.tamponSaut--;
@@ -66,32 +67,38 @@ export class Joueur extends JoueurBase {
       this.tamponSaut = 0;
     }
 
-    // le mur à portée (côté tenu, sinon côté regardé) : on s'y accroche en poussant vers lui
-    const sensMur = c.auSol ? 0 : this.murProche(ctx, h || this.dir);
-    const contreMur = sensMur !== 0 && h === sensMur;
-    this.contreMur = contreMur;
+    // le mur à portée (côté tenu, sinon côté regardé) ; un instant après l'avoir quitté (le haut du mur), on s'en
+    // souvient : on peut encore sauter « depuis le mur », de n'importe quel côté, pour passer le bord
+    const vu = c.auSol ? 0 : this.murProche(ctx, h || this.dir);
+    if (vu !== 0) {
+      this.murVu = vu;
+      this.delaiMur = DELAI_MUR;
+    } else if (this.delaiMur > 0) this.delaiMur--;
+    else this.murVu = 0;
+    const sensMur = c.auSol ? 0 : this.murVu;
+    const contreMur = vu !== 0 && h === vu;
+    this.contreMur = vu !== 0;
     if (this.tamponSaut > 0 && (this.coyote > 0 || sensMur !== 0)) {
       this.tamponSaut = 0;
       this.coyote = 0;
       if (sensMur !== 0 && !c.auSol) {
-        c.vy = -SAUT_MUR;
-        if (h === -sensMur) {
-          // en poussant à l'opposé : on rebondit sur le mur, à la Broforce
-          c.vx = -sensMur * 2.4;
+        this.delaiMur = 0;
+        if (h === sensMur) {
+          // vers le mur : un petit saut qui remonte le long de la paroi (pas d'escalade : on enchaîne les sauts)
+          c.vy = -PETIT_SAUT_MUR;
+          c.vx = sensMur * 0.6;
+          this.dir = sensMur > 0 ? 1 : -1;
+        } else {
+          // sans direction ou à l'opposé : on décolle du mur, face à nous (plus loin si on pousse dans ce sens)
+          c.vy = -SAUT_MUR;
+          c.vx = -sensMur * (h === 0 ? 1.4 : 2.4);
           this.dir = sensMur > 0 ? -1 : 1;
           this.verrouHorizontal = 10;
-        } else {
-          // en poussant vers lui, ou sans rien : on monte le long du mur pour passer le bord
-          c.vx = sensMur * 1.2;
-          this.dir = sensMur > 0 ? 1 : -1;
         }
       } else c.vy = -SAUT;
       ctx.son('saut', this.cx, this.cy);
     }
-    if (contreMur && k.tenu(C.HAUT) && this.grimpe > 0) {
-      this.grimpe--;
-      c.vy = -1.6;
-    } else if (contreMur && c.vy > 1.2) c.vy = 1.2;
+    if (contreMur && c.vy > 1.2) c.vy = 1.2;
 
     const gravite = c.vy < 0 && !k.tenu(C.SAUT) ? 2 : 1;
     if (this.slam) c.vy = Math.max(c.vy, 0) + 0.5;
