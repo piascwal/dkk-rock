@@ -1,5 +1,6 @@
 import { HAUTEUR_VUE } from '../config';
 import type { Carte } from '../monde/carte';
+import { anneau, disque } from './formes-pixels';
 import { ecritCentre } from './police';
 
 type Sorte = 'carre' | 'fumee' | 'poussiere' | 'eclat' | 'texte' | 'flocon' | 'luciole' | 'onde';
@@ -19,6 +20,10 @@ interface Particule {
 }
 
 const MAX = 700;
+/** Les paliers de couleur d'un nuage d'explosion, [cœur, liseré] : feu vif, braise, cendre. */
+const FEU_VIF = ['#fff3b0', '#ffb347'];
+const BRAISE = ['#c0502a', '#7a2a14'];
+const CENDRE = ['#4a4a4a', '#2a2a2a'];
 const CONFETTIS = ['#ff4fd8', '#ffd23f', '#3fa7f2', '#7cfc7c', '#ff6b35', '#ffffff'];
 
 /**
@@ -219,41 +224,69 @@ export class Particules {
     this.liste = this.liste.filter((p) => p.vie > 0);
   }
 
+  /**
+   * Les nuages d'explosion : tous les liserés d'abord, puis tous les cœurs, pour que les boules qui se chevauchent
+   * forment une seule masse (et non des bulles qui montrent chacune leur contour), puis les reflets.
+   */
+  private nuages(ctx: CanvasRenderingContext2D, camX: number, camY: number): void {
+    const nuages = this.liste
+      .filter((p) => p.sorte === 'fumee')
+      .map((p) => {
+        const t = p.vie / p.vieMax;
+        const r = p.taille * (1.4 - t * 0.6) * (t < 0.25 ? t * 4 : 1);
+        const [coeur, bord] =
+          t > 0.8 ? FEU_VIF : t > 0.6 ? [p.couleur, '#c0502a'] : t > 0.35 ? BRAISE : CENDRE;
+        return { x: Math.round(p.x - camX), y: Math.round(p.y - camY), r, t, coeur, bord };
+      })
+      .filter((n) => n.r >= 1);
+    for (const n of nuages) {
+      ctx.fillStyle = n.bord;
+      disque(ctx, n.x, n.y, n.r + 1);
+    }
+    for (const n of nuages) {
+      ctx.fillStyle = n.coeur;
+      disque(ctx, n.x, n.y, n.r);
+    }
+    for (const n of nuages) {
+      if (n.t <= 0.35) continue;
+      // un reflet plus clair en haut à gauche
+      ctx.fillStyle = n.t > 0.6 ? '#fff3b0' : '#ff9b2f';
+      disque(ctx, n.x - Math.round(n.r * 0.3), n.y - Math.round(n.r * 0.3), n.r * 0.4);
+    }
+  }
+
   dessine(ctx: CanvasRenderingContext2D, camX: number, camY: number): void {
+    this.nuages(ctx, camX, camY);
     for (const p of this.liste) {
       const x = Math.round(p.x - camX);
       const y = Math.round(p.y - camY);
       const t = p.vie / p.vieMax;
       switch (p.sorte) {
-        case 'fumee': {
-          const r = p.taille * (1.4 - t * 0.6);
-          ctx.globalAlpha = Math.min(1, t * 1.5);
-          ctx.fillStyle = t > 0.6 ? p.couleur : t > 0.35 ? '#c0502a' : '#4a4a4a';
-          ctx.beginPath();
-          ctx.arc(x, y, r, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.globalAlpha = 1;
-          break;
-        }
+        case 'fumee':
+          break; // dessinée avant, en bloc (voir nuages)
         case 'poussiere': {
-          ctx.globalAlpha = Math.min(0.8, t * 1.2);
+          // même principe, sans transparence : de la poussière qui pâlit puis rétrécit
+          const r = p.taille * (0.7 + (1 - t) * 0.9) * (t < 0.3 ? t / 0.3 : 1);
+          if (r < 1) break;
           ctx.fillStyle = p.couleur;
-          const r = p.taille * (0.7 + (1 - t) * 0.9);
-          ctx.beginPath();
-          ctx.arc(x, y, r, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.globalAlpha = 1;
+          disque(ctx, x, y, r);
+          if (r > 2.5) {
+            ctx.fillStyle = 'rgba(255,255,255,0.35)';
+            disque(ctx, x - 1, y - 1, r * 0.5);
+          }
           break;
         }
-        case 'onde':
-          ctx.strokeStyle = p.couleur;
-          ctx.globalAlpha = t;
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.arc(x, y, p.taille * (1 - t * 0.7), 0, Math.PI * 2);
-          ctx.stroke();
-          ctx.globalAlpha = 1;
+        case 'onde': {
+          // l'onde de choc : un éclair blanc plein les premières images, puis un anneau d'un pixel qui s'élargit par à-coups
+          const r = Math.round((p.taille * (1 - t * 0.7)) / 3) * 3;
+          if (t > 0.7) {
+            ctx.fillStyle = '#ffffff';
+            disque(ctx, x, y, p.taille * 0.45 * (1.3 - t));
+          }
+          ctx.fillStyle = t > 0.4 ? p.couleur : '#ff9b2f';
+          if (t > 0.15) anneau(ctx, x, y, r);
           break;
+        }
         case 'texte':
           ecritCentre(ctx, p.texte ?? '', x, y, p.couleur);
           break;
