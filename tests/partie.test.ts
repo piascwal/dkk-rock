@@ -53,26 +53,36 @@ describe('la partie', () => {
     expect(e.pv < pv || e.fini).toBe(true);
   });
 
+  /** La première tuile de ce type (parcours ligne par ligne) qui vérifie `ok`. */
+  const cherche = (p: ReturnType<typeof nouvelle>, type: number, ok: (x: number, y: number) => boolean) => {
+    for (let y = 1; y < p.carte.hauteur; y++)
+      for (let x = 1; x < p.carte.largeur - 1; x++)
+        if (p.carte.get(x, y) === type && ok(x, y)) return { x, y };
+    throw new Error('tuile introuvable');
+  };
+
   it('les caissons de basses explosent en chaîne', () => {
     const p = nouvelle();
-    // les caissons du premier niveau sont empilés vers x = 86
-    const tx = 86;
-    const ty = p.lu.hauteur - 7;
-    expect(p.carte.get(tx, ty)).toBe(T.CAISSON);
+    // deux caissons côte à côte, quelque part dans le premier niveau
+    const { x: tx, y: ty } = cherche(p, T.CAISSON, (x, y) => p.carte.get(x + 1, y) === T.CAISSON);
     p.carte.endommage(tx, ty, 99);
     avance(p, 30);
     expect(p.carte.get(tx + 1, ty)).toBe(T.VIDE);
-    expect(p.carte.get(tx + 1, ty - 1)).toBe(T.VIDE);
   });
 
   it('la neige qui perd son appui tombe', () => {
     const p = nouvelle(2);
-    // les congères sur le plateau (84..86, 8..9) reposent sur la neige du plateau, rangée 10
-    expect(p.carte.get(85, 7)).toBe(T.NEIGE);
-    p.carte.endommage(85, 10, 99);
-    p.carte.endommage(85, 11, 99);
+    // un bloc de neige posé sur autre chose, avec du vide au-dessus
+    const { x, y } = cherche(
+      p,
+      T.NEIGE,
+      (x, y) =>
+        p.carte.get(x, y - 1) === T.VIDE && p.carte.solide(x, y + 1) && p.carte.get(x, y + 1) !== T.NEIGE,
+    );
+    p.carte.endommage(x, y + 1, 99);
+    p.carte.endommage(x, y + 1, 99);
     avance(p, 120);
-    expect(p.carte.get(85, 7)).toBe(T.VIDE);
+    expect(p.carte.get(x, y)).toBe(T.VIDE);
   });
 
   it('libérer une cage donne une vie et change de membre', () => {

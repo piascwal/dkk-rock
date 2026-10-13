@@ -49,7 +49,8 @@ export const GARAGE: Omit<DefNiveau, 'carte'> = {
     3: [
       {
         qui: 'JBG',
-        texte: 'Une échelle. Ou alors on saute contre le mur en tenant HAUT pour grimper, comme des pros.',
+        texte:
+          'Une échelle. Ou alors on saute contre le mur, en poussant vers lui : de petits sauts qui montent, comme des pros.',
       },
     ],
     4: [
