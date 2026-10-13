@@ -85,7 +85,8 @@ export const lobeur: Comportement = (e, ctx, cible) => {
 /** Drone à LED : plane au-dessus de vous et lâche des bombes. */
 export const drone: Comportement = (e, ctx, cible) => {
   const c = centre(cible);
-  const visee = c.y - 80;
+  // la caméra ne montre que 70 px au-dessus du héros (HAUTEUR_VUE × 0,58) : le drone reste dans le champ, sous la barre du haut
+  const visee = c.y - 40;
   e.corps.vy = Math.max(-1, Math.min(1, (visee - e.cy) * 0.05));
   e.marcheVers(ctx, c.x, e.def.vitesse);
   if (e.recharge === 0 && Math.abs(c.x - e.cx) < 24) {

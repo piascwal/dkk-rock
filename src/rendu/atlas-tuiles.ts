@@ -1,7 +1,7 @@
 import { TUILE } from '../config';
 import { bruit } from '../moteur/maths';
 import { NB_TUILES, T } from '../monde/tuiles';
-import { DEBORD, habille } from './bords-tuiles';
+import { DEBORD, habille, habilleParoi } from './bords-tuiles';
 import type { Theme } from './themes';
 
 const VARIANTES = 4;
@@ -201,6 +201,20 @@ export class AtlasTuiles {
   }
 
   private readonly habillees = new Map<number, HTMLCanvasElement>();
+  private readonly parois = new Map<number, HTMLCanvasElement>();
+
+  /** La paroi de fond aux coins extérieurs arrondis selon les côtés qui donnent sur l'air libre. */
+  paroiHabillee(cotes: number): HTMLCanvasElement {
+    let toile = this.parois.get(cotes);
+    if (!toile) {
+      toile = document.createElement('canvas');
+      toile.width = TUILE;
+      toile.height = TUILE;
+      habilleParoi(toile.getContext('2d')!, this.paroi, cotes);
+      this.parois.set(cotes, toile);
+    }
+    return toile;
+  }
 
   /** La tuile habillée selon ses côtés libres (voir bords-tuiles.ts), haute de 16 + DEBORD, faite à la demande. */
   habillee(t: number, tx: number, ty: number, cotes: number): HTMLCanvasElement | null {

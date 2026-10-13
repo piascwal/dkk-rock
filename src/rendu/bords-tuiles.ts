@@ -154,3 +154,59 @@ function dessusHerbeux(
     }
   }
 }
+
+/** Côtés d'une paroi de fond qui donnent sur l'air libre (ni paroi, ni tuile pleine) : ses coins extérieurs s'arrondissent. */
+export function cotesParoi(carte: Carte, tx: number, ty: number): number {
+  const libre = (x: number, y: number) => !carte.aFond(x, y) && !carte.solide(x, y);
+  let c = 0;
+  if (libre(tx, ty - 1)) c |= COTE.HAUT;
+  if (libre(tx + 1, ty)) c |= COTE.DROITE;
+  if (libre(tx, ty + 1)) c |= COTE.BAS;
+  if (libre(tx - 1, ty)) c |= COTE.GAUCHE;
+  return c;
+}
+
+/** La paroi aux coins extérieurs arrondis, comme la matière qu'elle remplace quand on la détruit. */
+export function habilleParoi(c: CanvasRenderingContext2D, source: HTMLCanvasElement, cotes: number): void {
+  c.drawImage(source, 0, 0);
+  const g = (cotes & COTE.GAUCHE) !== 0;
+  const d = (cotes & COTE.DROITE) !== 0;
+  if (cotes & COTE.HAUT) {
+    c.fillStyle = 'rgba(255,255,255,0.08)';
+    c.fillRect(0, 0, TUILE, 1);
+  }
+  c.globalCompositeOperation = 'destination-out';
+  c.fillStyle = '#000';
+  COIN.forEach((n, i) => {
+    if (cotes & COTE.HAUT) {
+      if (g) c.fillRect(0, i, n, 1);
+      if (d) c.fillRect(TUILE - n, i, n, 1);
+    }
+    if (cotes & COTE.BAS) {
+      if (g) c.fillRect(0, 15 - i, n, 1);
+      if (d) c.fillRect(TUILE - n, 15 - i, n, 1);
+    }
+  });
+  c.globalCompositeOperation = 'source-over';
+}
+
+/**
+ * Derrière un coin arrondi d'une tuile pleine : les angles où la paroi continue (d'un côté ou de l'autre) se
+ * remplissent de paroi, ceux qui donnent sur le ciel restent ouverts. Renvoie les coins [x, y] (0 ou TUILE - taille).
+ */
+export function coinsDeParoi(carte: Carte, tx: number, ty: number, cotes: number): [number, number][] {
+  const coins: [number, number][] = [];
+  for (const [h, dx] of [
+    [COTE.GAUCHE, -1],
+    [COTE.DROITE, 1],
+  ] as const)
+    for (const [v, dy] of [
+      [COTE.HAUT, -1],
+      [COTE.BAS, 1],
+    ] as const) {
+      if (!(cotes & h) || !(cotes & v)) continue;
+      if (carte.aFond(tx + dx, ty) || carte.aFond(tx, ty + dy))
+        coins.push([dx < 0 ? 0 : TUILE - COIN[0]!, dy < 0 ? 0 : TUILE - COIN[0]!]);
+    }
+  return coins;
+}

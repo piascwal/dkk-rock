@@ -4,7 +4,7 @@ import type { Tyrolienne } from '../jeu/contexte';
 import type { Carte } from '../monde/carte';
 import { T } from '../monde/tuiles';
 import type { AtlasTuiles } from './atlas-tuiles';
-import { aUnCoin, COTE, cotesLibres, DEBORD } from './bords-tuiles';
+import { aUnCoin, coinsDeParoi, cotesLibres, cotesParoi, DEBORD } from './bords-tuiles';
 
 /** Dessine les tuiles visibles : parois de fond, tuiles, dessus herbeux ou enneigés, fissures. */
 export function dessineTuiles(
@@ -28,10 +28,13 @@ export function dessineTuiles(
       const y = ty * TUILE - Math.round(camY);
       const plein = t !== T.VIDE && t !== T.ECHELLE && t !== T.PLATEFORME;
       const cotes = t === T.VIDE ? 0 : cotesLibres(carte, t, tx, ty);
-      // derrière un coin arrondi, la paroi seulement si elle continue de ce côté (sinon le ciel)
-      const fondDuCoin =
-        aUnCoin(cotes) && (cotes & COTE.HAUT ? carte.aFond(tx, ty - 1) : carte.aFond(tx, ty + 1));
-      if ((!plein || fondDuCoin) && carte.aFond(tx, ty)) ctx.drawImage(atlas.paroi, x, y);
+      // la paroi de fond, aux coins extérieurs arrondis ; derrière un coin arrondi d'une tuile pleine, elle remplit
+      // les angles où elle continue (sinon on verrait le ciel par ces angles)
+      if (carte.aFond(tx, ty) && (!plein || aUnCoin(cotes)))
+        ctx.drawImage(atlas.paroiHabillee(cotesParoi(carte, tx, ty)), x, y);
+      else if (plein && aUnCoin(cotes))
+        for (const [dx, dy] of coinsDeParoi(carte, tx, ty, cotes))
+          ctx.drawImage(atlas.paroi, dx, dy, 3, 3, x + dx, y + dy, 3, 3);
       if (t === T.VIDE) continue;
       // bords à l'air libre : coins arrondis, ombrage, dessus herbeux (voir bords-tuiles.ts)
       const habillee = cotes ? atlas.habillee(t, tx, ty, cotes) : null;
