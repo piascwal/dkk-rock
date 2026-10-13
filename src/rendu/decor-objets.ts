@@ -225,6 +225,8 @@ export const ACCESSOIRES = {
   voiture,
   bouche,
   enceinteDeco,
+  // repli en code de l'enceinte de 3/4 (planche enceinte-34.png, voir decor.ts)
+  enceinte34: enceinteDeco,
   projecteur,
   plante,
   caisseDeco,

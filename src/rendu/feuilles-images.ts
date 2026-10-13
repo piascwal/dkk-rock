@@ -1,9 +1,11 @@
 import { ANIM } from '../jeu/vue';
 import { VERSION } from '../version';
-import { FEUILLES, caseDeLaPlanche, colonneDuCycle } from './feuilles';
+import { FEUILLES, caseDeLaPlanche, colonneDuCycle, type Feuille } from './feuilles';
+import { FEUILLES_DECOR } from './feuilles-objets';
 import type { Genre } from '../jeu/vue';
 
 const images = new Map<Genre, HTMLImageElement>();
+const imagesDecor = new Map<string, HTMLImageElement>();
 
 /** Lance le chargement de toutes les planches déclarées ; celles qui échouent sont ignorées (repli sur le dessin en code). */
 export function chargeFeuilles(base: string): void {
@@ -13,6 +15,20 @@ export function chargeFeuilles(base: string): void {
     // la version dans l'adresse : après une mise à jour, le navigateur ne ressert pas l'ancienne image
     img.src = `${base}sprites/${f.fichier}?v=${VERSION}`;
   }
+  for (const [nom, f] of Object.entries(FEUILLES_DECOR)) {
+    const img = new Image();
+    img.onload = () => imagesDecor.set(nom, img);
+    img.src = `${base}sprites/${f.fichier}?v=${VERSION}`;
+  }
+}
+
+/** Dessine l'apparence `ligne` d'une planche du décor, pieds au point courant. False si elle n'est pas chargée. */
+export function dessineDecorFeuille(ctx: CanvasRenderingContext2D, nom: string, ligne: number): boolean {
+  const f = FEUILLES_DECOR[nom];
+  const img = imagesDecor.get(nom);
+  if (!f || !img) return false;
+  dessineCase(ctx, img, f, 0, ligne % f.images.length);
+  return true;
 }
 
 /** L'image chargée d'une planche (pour la dessiner hors du jeu, sur la carte du monde par exemple). */
@@ -40,6 +56,18 @@ export function dessineFeuille(
     ligne = f.visees + visee - 1;
     col = e === ANIM.COURT ? colonneDuCycle(f, f.images[ligne] ?? 1, compteur) : 0;
   }
+  dessineCase(ctx, img, f, col, ligne);
+  return true;
+}
+
+/** Une case de la planche, pieds au point courant. */
+function dessineCase(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  f: Feuille,
+  col: number,
+  ligne: number,
+): void {
   const d = f.densite ?? 1;
   const k = (f.echelle ?? 1) / d;
   // les planches en pleine définition se posent au tiers de pixel près, les autres au pixel du jeu
@@ -59,5 +87,4 @@ export function dessineFeuille(
     f.h * k,
   );
   ctx.imageSmoothingEnabled = false;
-  return true;
 }

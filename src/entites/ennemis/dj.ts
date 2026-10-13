@@ -9,6 +9,9 @@ import { Ennemi } from './ennemi';
 
 /** Une des enceintes du DJ : tant qu'elles tiennent, il est protégé par les basses. */
 export class Enceinte extends Boss {
+  /** ticks depuis le dernier temps : la membrane gonfle d'un coup puis se dégonfle */
+  private battement = 99;
+
   constructor(
     ctx: Contexte,
     x: number,
@@ -23,7 +26,9 @@ export class Enceinte extends Boss {
     this.anim++;
     if (this.flash > 0) this.flash--;
     if (!this.eveille) return;
-    this.pose = ctx.numeroTemps % 2;
+    // poses de sa planche (outils/fixe-objets.py) : 0 au repos, 3 la plus gonflée
+    this.battement = ctx.surLeTemps ? 0 : this.battement + 1;
+    this.pose = Math.max(0, 3 - Math.floor(this.battement / 4));
     // une onde au sol sur chaque premier temps
     if (ctx.surLeTemps && ctx.numeroTemps % 4 === 0) {
       const pied = this.corps.y + this.corps.h - 6;

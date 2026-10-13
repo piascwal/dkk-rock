@@ -14,4 +14,26 @@ export const FEUILLES_OBJETS: Partial<Record<Genre, Feuille>> = {
     densite: 6,
     pied: 146,
   },
+  [G.ENCEINTE]: {
+    fichier: 'enceinte.png',
+    w: 132,
+    h: 205,
+    images: [1, 1, 1, 1],
+    rythme: 1,
+    densite: 6,
+    pied: 66,
+  },
+};
+
+/** Les planches du décor, sans genre : une ligne par apparence. */
+export const FEUILLES_DECOR: Record<string, Feuille> = {
+  'enceinte-34': {
+    fichier: 'enceinte-34.png',
+    w: 156,
+    h: 216,
+    images: [1, 1],
+    rythme: 1,
+    densite: 6,
+    pied: 78,
+  },
 };

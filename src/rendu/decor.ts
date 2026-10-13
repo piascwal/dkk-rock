@@ -3,6 +3,7 @@ import { Aleatoire } from '../moteur/maths';
 import type { Carte } from '../monde/carte';
 import { T } from '../monde/tuiles';
 import { ACCESSOIRES, type NomAccessoire } from './decor-objets';
+import { dessineDecorFeuille } from './feuilles-images';
 import { pinceau } from './pinceau';
 import type { NomTheme } from './themes';
 
@@ -29,7 +30,7 @@ const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAccessoire[]
       'cloture',
       'cloture',
     ],
-    dedans: ['caisseDeco', 'etagere', 'caisseDeco'],
+    dedans: ['caisseDeco', 'etagere', 'caisseDeco', 'enceinte34'],
     densite: 0.55,
   },
   montagne: {
@@ -53,8 +54,8 @@ const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAccessoire[]
     densite: 0.5,
   },
   club: {
-    dehors: ['enceinteDeco', 'projecteur', 'plante', 'lampadaireNeon'],
-    dedans: ['enceinteDeco', 'projecteur', 'plante', 'plante'],
+    dehors: ['enceinte34', 'enceinte34', 'enceinteDeco', 'projecteur', 'plante', 'lampadaireNeon'],
+    dedans: ['enceinte34', 'enceinte34', 'enceinteDeco', 'projecteur', 'plante'],
     densite: 0.4,
   },
 };
@@ -124,10 +125,18 @@ export function dessineDecor(
       p(-3, -h, 1, h, couleurTouffe);
       p(0, -h - 1, 1, h + 1, couleurTouffe);
       p(3, -h, 1, h, couleurTouffe);
+    } else if (o.quoi === 'enceinte34' && dessineEnceinte(ctx, o.v)) {
+      // dessinée par sa planche
     } else {
       ctx.scale(ECHELLE_ACCESSOIRES, ECHELLE_ACCESSOIRES);
       ACCESSOIRES[o.quoi](p, o.v);
     }
     ctx.restore();
   }
+}
+
+/** Une enceinte de 3/4 (grise ou en bois), tournée d'un côté ou de l'autre selon `v`. */
+function dessineEnceinte(ctx: CanvasRenderingContext2D, v: number): boolean {
+  if (v & 2) ctx.scale(-1, 1);
+  return dessineDecorFeuille(ctx, 'enceinte-34', v & 1);
 }

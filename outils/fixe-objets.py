@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Planches des objets du décor fournis en sprite (le van), sans animation.
+"""Planches des objets fournis en sprite (van, cage, boss, décor), une image par état, sans animation.
 
 Usage : python3 outils/fixe-objets.py      (Pillow et numpy requis)
 
@@ -24,6 +24,10 @@ OBJETS = {
     'cage': (['cage-1-base.png', 'cage-2-base.png'], 'CAGE', 22),  # fermée, puis ouverte
     # le Yéti Alpha : repos, bras levés (deux), touché (trois) ; les poses gardent leur place (cadre commun)
     'yeti-alpha': ([f'boss/yeti-alpha-{k}-base.png' for k in range(1, 7)], 'YETI_ALPHA', 46, True),
+    # les enceintes du DJ, de face : membrane au repos, puis de plus en plus gonflée
+    'enceinte': ([f'boss/enceinte-{k}-base.png' for k in range(1, 5)], 'ENCEINTE', 22, True),
+    # décor sans genre (FEUILLES_DECOR) : enceintes de 3/4, grise puis en bois, posées au fond
+    'enceinte-34': ([f'decor/enceinte-34-{k}-base.png' for k in (1, 2)], None, 26, True),
 }
 
 
@@ -49,7 +53,7 @@ def cadre_commun(chemins):
 
 
 def main():
-    lignes = []
+    lignes, decors = [], []
     for nom, (sources, genre, largeur, *commun) in OBJETS.items():
         if commun:
             etats = cadre_commun([RACINE / 'assets-sources' / s for s in sources])
@@ -73,14 +77,17 @@ def main():
         planche.save(RACINE / 'public' / 'sprites' / f'{nom}.png')
         print(f'{nom}.png : {len(images)} état(s), {cw}x{ch} px de planche, {cw / DENSITE:.0f}x{ch / DENSITE:.0f} en jeu')
         ligne = ', '.join(['1'] * len(images))
-        lignes.append(
-            f"  [G.{genre}]: {{ fichier: '{nom}.png', w: {cw}, h: {ch}, images: [{ligne}], rythme: 1, densite: {DENSITE}, pied: {cw // 2} }},"
+        cle = f'[G.{genre}]' if genre else f"'{nom}'"
+        (lignes if genre else decors).append(
+            f"  {cle}: {{ fichier: '{nom}.png', w: {cw}, h: {ch}, images: [{ligne}], rythme: 1, densite: {DENSITE}, pied: {cw // 2} }},"
         )
     (RACINE / 'src' / 'rendu' / 'feuilles-objets.ts').write_text(
         "// Fichier généré par outils/fixe-objets.py : ne pas modifier à la main.\n"
         "import { G, type Genre } from '../jeu/vue';\n"
         "import type { Feuille } from './feuilles';\n\n"
-        "export const FEUILLES_OBJETS: Partial<Record<Genre, Feuille>> = {\n" + '\n'.join(lignes) + '\n};\n'
+        "export const FEUILLES_OBJETS: Partial<Record<Genre, Feuille>> = {\n" + '\n'.join(lignes) + '\n};\n\n'
+        "/** Les planches du décor, sans genre : une ligne par apparence. */\n"
+        "export const FEUILLES_DECOR: Record<string, Feuille> = {\n" + '\n'.join(decors) + '\n};\n'
     )
 
 

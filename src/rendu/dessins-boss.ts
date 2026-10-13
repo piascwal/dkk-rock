@@ -61,7 +61,7 @@ export const DESSINS_BOSS: Partial<Record<number, Dessin>> = {
   [G.ENCEINTE]: (p, e) => {
     p(-10, -30, 20, 30, '#111');
     p(-9, -29, 18, 28, '#1f1f1f');
-    const r = e === 1 ? 7 : 6;
+    const r = e > 0 ? 7 : 6;
     p(-r, -12 - r, r * 2, r * 2, '#000');
     p(-2, -14, 4, 4, '#444');
     p(-3, -27, 6, 6, '#000');
