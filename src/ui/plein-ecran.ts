@@ -1,3 +1,5 @@
+import { estInstallee } from './installation';
+
 /**
  * Plein écran et paysage : demandés au premier toucher (le navigateur ne les accorde qu'après un geste). Sans effet
  * dans l'application installée (déjà en plein écran) et sur iPhone, où Safari ne le permet pas (installer l'application
@@ -5,6 +7,8 @@
  */
 export function pleinEcran(): void {
   const d = document.documentElement;
+  // l'application installée est déjà en plein écran : le redemander ferait réapparaître le message du navigateur
+  if (estInstallee()) return;
   if (document.fullscreenElement || !document.fullscreenEnabled || !d.requestFullscreen) return;
   d.requestFullscreen({ navigationUI: 'hide' })
     .then(() =>
