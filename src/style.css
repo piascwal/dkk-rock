@@ -62,6 +62,26 @@ body {
   touch-action: none;
 }
 
+/* le bouton pour passer l'intro, en bas, au-dessus de l'animation */
+.passer-intro {
+  position: fixed;
+  z-index: 31;
+  left: 50%;
+  bottom: max(10px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  font-family: var(--titre);
+  font-size: 0.85rem;
+  padding: 0.4em 1em;
+  border: 2px solid #000;
+  background: var(--encre);
+  color: #111;
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 255, 255, 0.6),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3);
+  clip-path: var(--coins);
+  cursor: pointer;
+}
+
 #toile {
   image-rendering: pixelated;
   image-rendering: crisp-edges;

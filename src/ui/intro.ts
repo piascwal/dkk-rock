@@ -2,13 +2,15 @@ import type { Synthe } from '../audio/synthe';
 import { G } from '../jeu/vue';
 import { FEUILLES } from '../rendu/feuilles';
 import { imageDe } from '../rendu/feuilles-images';
-import { ecrit, ecritCentre, largeurTexte } from '../rendu/police';
+import { ecritCentre } from '../rendu/police';
 import { VERSION } from '../version';
-import { ENTREES, FIN, IMPACT, INSTRUMENTS, joueIntro } from './intro-son';
+import { DUREE_CASE, dessineCase } from './intro-comics';
+import { CASES, ENTREES, FIN, IMPACT, INSTRUMENTS, joueIntro } from './intro-son';
 
 /**
  * L'intro, au lancement : les cinq membres du groupe entrent sur scène un à un, sortent leurs instruments, le logo DKK
- * s'écrase et fait tout trembler, « Digital Kaskilt » s'écrit, Fadatchi déboule. Un toucher la passe.
+ * s'écrase et fait tout trembler, « Digital Kaskilt » s'écrit, Fadatchi déboule. Avant, chacun a sa case de BD.
+ * Un bouton en bas permet de la passer.
  * Un premier écran attend un toucher : le navigateur n'autorise le son qu'après un geste.
  */
 const H = 240;
@@ -32,6 +34,7 @@ export class Intro {
   private lancee = false;
   private finie = false;
   private eclats: Eclat[] = [];
+  private readonly passer = document.createElement('button');
 
   constructor(
     private readonly toile: HTMLCanvasElement,
@@ -39,6 +42,12 @@ export class Intro {
     private readonly ensuite: () => void,
   ) {
     this.ctx = toile.getContext('2d')!;
+    this.passer.className = 'passer-intro';
+    this.passer.type = 'button';
+    this.passer.textContent = 'Passer l’intro ›';
+    this.passer.hidden = true;
+    this.passer.addEventListener('click', () => this.termine());
+    toile.after(this.passer);
     this.bases.src = `${import.meta.env.BASE_URL}sprites/intro-heros.png?v=${VERSION}`;
   }
 
@@ -68,13 +77,15 @@ export class Intro {
       this.lancee = true;
       this.debut = performance.now();
       setTimeout(() => joueIntro(this.synthe), 30);
-    } else this.termine();
+      this.passer.hidden = false;
+    } else if (e instanceof KeyboardEvent && (e.code === 'Escape' || e.code === 'Enter')) this.termine();
   };
 
   private termine(): void {
     if (this.finie) return;
     this.finie = true;
     this.toile.hidden = true;
+    this.passer.remove();
     window.removeEventListener('resize', this.dimensionne);
     window.removeEventListener('keydown', this.touche);
     this.toile.removeEventListener('pointerdown', this.touche);
@@ -112,6 +123,13 @@ export class Intro {
       c.restore();
       return;
     }
+    // les cases de BD, l'une après l'autre
+    const k = CASES.findIndex((d) => t >= d && t < d + DUREE_CASE);
+    if (k >= 0) {
+      dessineCase(c, w, k, (t - CASES[k]!) / DUREE_CASE, t);
+      c.restore();
+      return;
+    }
     // la scène : le plancher
     c.fillStyle = '#1a0a14';
     c.fillRect(-10, 214, w + 20, 40);
@@ -125,7 +143,6 @@ export class Intro {
       c.fillRect(-10, -10, w + 20, H + 20);
     }
     if (t > IMPACT + 2.4 && Math.floor(t * 2) % 2) ecritCentre(c, 'ROCK NEVER DIES', w / 2, 6, '#ffd23f', 2);
-    ecrit(c, 'Touchez pour passer', w - largeurTexte('Touchez pour passer') - 4, H - 8, '#6a5a72');
     c.restore();
   }
 
