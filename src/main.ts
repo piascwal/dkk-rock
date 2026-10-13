@@ -8,6 +8,8 @@ import { App } from './app';
 /** Point d'entrée : DKK : Rock Never Dies. */
 const app = new App();
 app.demarre();
+// le jeu a démarré : le filet de secours (public/secours.js) n'a rien à faire
+document.documentElement.dataset.demarre = '1';
 
 // en développement, la console donne accès à l'application (window.dkk.partie...)
 if (import.meta.env.DEV) Object.assign(window, { dkk: app });

@@ -14,14 +14,16 @@ self.addEventListener('install', (e) => {
   );
 });
 
-// activation : on oublie les anciennes versions, on prend la main sur les pages ouvertes
+// activation : on garde la version précédente (une page encore ouverte, ou servie par le cache HTTP, en a besoin),
+// on oublie les plus anciennes, on prend la main sur les pages ouvertes
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches
       .keys()
-      .then((cles) =>
-        Promise.all(cles.filter((c) => c.startsWith('dkk-') && c !== CACHE).map((c) => caches.delete(c))),
-      )
+      .then((cles) => {
+        const anciennes = cles.filter((c) => c.startsWith('dkk-') && c !== CACHE);
+        return Promise.all(anciennes.slice(0, -1).map((c) => caches.delete(c)));
+      })
       .then(() => self.clients.claim()),
   );
 });
@@ -33,8 +35,12 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) return;
   const reseauDabord = req.mode === 'navigate' || req.url.includes('version.json');
   if (reseauDabord) {
+    // « no-cache » : sans ça, le navigateur peut ressortir une page de sa mémoire (GitHub Pages la garde 10 minutes)
+    // qui réclame les fichiers d'une version déjà effacée : écran vide
     e.respondWith(
-      fetch(req).catch(() => caches.match(req, { ignoreSearch: true }).then((r) => r || caches.match('./'))),
+      fetch(req.url, { cache: 'no-cache', credentials: 'same-origin' }).catch(() =>
+        caches.match(req, { ignoreSearch: true }).then((r) => r || caches.match('./')),
+      ),
     );
     return;
   }
