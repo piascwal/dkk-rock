@@ -15,8 +15,8 @@ export interface Sauvegarde {
   version: 1;
   /** la partie en cours, à reprendre avec « Continuer » */
   enCours: Progression | null;
-  /** plus haut niveau débloqué */
-  niveauMax: number;
+  /** les niveaux terminés (indices dans NIVEAUX) : ils ouvrent le suivant de leur arc */
+  faits: number[];
   membre: number;
   pseudo: string;
   son: boolean;
@@ -28,7 +28,7 @@ const CLE = 'dkk-rock.sauvegarde';
 export const SAUVEGARDE_VIDE: Sauvegarde = {
   version: 1,
   enCours: null,
-  niveauMax: 0,
+  faits: [],
   membre: 0,
   pseudo: '',
   son: true,
@@ -37,6 +37,16 @@ export const SAUVEGARDE_VIDE: Sauvegarde = {
 
 const entier = (v: unknown, min: number, max: number, defaut: number): number =>
   typeof v === 'number' && Number.isInteger(v) && v >= min && v <= max ? v : defaut;
+
+/** Les niveaux terminés ; une ancienne sauvegarde (`niveauMax`) disait seulement jusqu'où on était arrivé. */
+function niveauxFaits(o: Record<string, unknown>, nbNiveaux: number): number[] {
+  if (Array.isArray(o.faits))
+    return [
+      ...new Set(o.faits.filter((n): n is number => Number.isInteger(n) && n >= 0 && n < nbNiveaux)),
+    ].sort((a, b) => a - b);
+  const max = entier(o.niveauMax, 0, nbNiveaux - 1, 0);
+  return Array.from({ length: max }, (_, i) => i);
+}
 
 /** Relit une sauvegarde venue du stockage : tout champ abîmé reprend sa valeur par défaut. */
 export function valideSauvegarde(brut: unknown, nbNiveaux: number): Sauvegarde {
@@ -55,7 +65,7 @@ export function valideSauvegarde(brut: unknown, nbNiveaux: number): Sauvegarde {
   return {
     version: 1,
     enCours,
-    niveauMax: entier(o.niveauMax, 0, nbNiveaux - 1, 0),
+    faits: niveauxFaits(o, nbNiveaux),
     membre: entier(o.membre, 0, 4, 0),
     pseudo: typeof o.pseudo === 'string' ? o.pseudo.slice(0, 14) : '',
     son: o.son !== false,

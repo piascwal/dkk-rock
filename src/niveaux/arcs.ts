@@ -1,0 +1,46 @@
+import { FIN_TOURNEE } from '../histoire/fin-tournee';
+import type { Replique } from './format';
+
+/**
+ * Les arcs de l'histoire : chacun est une suite de niveaux (indices dans NIVEAUX) avec son épilogue. L'arc principal est
+ * la tournée contre DJ Boucle ; d'autres peuvent s'y ajouter (un voyage en Jamaïque, par exemple) sans toucher aux
+ * premiers : ajouter les niveaux à la fin de NIVEAUX, puis une entrée ici.
+ */
+export interface DefArc {
+  id: string;
+  titre: string;
+  resume: string;
+  /** les niveaux de l'arc, dans l'ordre (indices dans NIVEAUX) */
+  niveaux: number[];
+  /** niveau (indice dans NIVEAUX) à terminer pour ouvrir l'arc ; absent : ouvert d'emblée */
+  apres?: number;
+  /** les répliques après le dernier niveau de l'arc */
+  fin: Replique[];
+}
+
+export const ARCS: DefArc[] = [
+  {
+    id: 'tournee',
+    titre: 'La tournée',
+    resume: 'Du garage au Club Infini : débrancher DJ Boucle.',
+    niveaux: [0, 1, 2, 3, 4, 5],
+    fin: FIN_TOURNEE,
+  },
+];
+
+/** L'arc d'un niveau (le premier s'il n'est dans aucun : sécurité). */
+export const arcDe = (niveau: number): DefArc => ARCS.find((a) => a.niveaux.includes(niveau)) ?? ARCS[0]!;
+
+/** Le niveau qui suit dans son arc, ou null à la fin de l'arc. */
+export function suivantDansArc(niveau: number): number | null {
+  const a = arcDe(niveau);
+  return a.niveaux[a.niveaux.indexOf(niveau) + 1] ?? null;
+}
+
+/** Un niveau est ouvert si c'est le premier de son arc (arc ouvert) ou si le précédent est terminé. */
+export function niveauOuvert(niveau: number, faits: readonly number[]): boolean {
+  const a = arcDe(niveau);
+  if (a.apres !== undefined && !faits.includes(a.apres)) return false;
+  const pos = a.niveaux.indexOf(niveau);
+  return pos <= 0 || faits.includes(a.niveaux[pos - 1]!);
+}

@@ -2,6 +2,7 @@ import { codeDuLien, nettoiePseudo, type Annonce } from '@piascwal/lan-kit';
 import { HEROS } from '../entites/heros';
 import type { Progression, Sauvegarde } from '../jeu/sauvegarde';
 import { NIVEAUX } from '../niveaux';
+import { ARCS, niveauOuvert } from '../niveaux/arcs';
 import type { AnnonceDkk } from '../reseau/annonce';
 import { Recherche } from '../reseau/client';
 import type { Hote } from '../reseau/hote';
@@ -118,15 +119,24 @@ export class Menus {
   }
 
   niveaux(): void {
-    const liste = el('div', '', 'liste');
-    NIVEAUX.forEach((n, i) => {
-      const b = bouton(`${i + 1}. ${n.titre}`, () => this.rockers(i));
-      b.disabled = i > this.a.sauvegarde.niveauMax;
-      liste.append(b);
+    const faits = this.a.sauvegarde.faits;
+    const arcs = ARCS.map((arc) => {
+      const liste = el('div', '', 'liste');
+      const ouvert = arc.apres === undefined || faits.includes(arc.apres);
+      if (!ouvert)
+        liste.append(
+          el('p', `Terminez « ${NIVEAUX[arc.apres!]?.titre ?? ''} » pour ouvrir cet arc.`, 'aide'),
+        );
+      else
+        arc.niveaux.forEach((i, pos) => {
+          const b = bouton(`${pos + 1}. ${NIVEAUX[i]!.titre}`, () => this.rockers(i));
+          b.disabled = !niveauOuvert(i, faits);
+          liste.append(b);
+        });
+      return [el('h2', arc.titre), liste];
     });
     this.montre(
-      el('h2', 'La tournée'),
-      liste,
+      ...arcs.flat(),
       bouton('Retour', () => this.titre()),
     );
   }
@@ -152,7 +162,7 @@ export class Menus {
     const efface = bouton('Effacer la sauvegarde', () => {
       if (!confirm('Effacer la progression ?')) return;
       s.enCours = null;
-      s.niveauMax = 0;
+      s.faits = [];
       this.a.enregistre();
       this.titre();
     });

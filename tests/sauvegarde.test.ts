@@ -7,7 +7,7 @@ describe('la sauvegarde', () => {
       {
         version: 1,
         enCours: { niveau: 2, drapeau: 1, vies: 4, score: 900 },
-        niveauMax: 3,
+        faits: [0, 1, 1, 9, -2],
         membre: 4,
         pseudo: 'MAT',
         son: false,
@@ -16,7 +16,11 @@ describe('la sauvegarde', () => {
       6,
     );
     expect(s.enCours).toEqual({ niveau: 2, drapeau: 1, vies: 4, score: 900 });
-    expect(s).toMatchObject({ niveauMax: 3, membre: 4, pseudo: 'MAT', son: false, musique: true });
+    expect(s).toMatchObject({ faits: [0, 1], membre: 4, pseudo: 'MAT', son: false, musique: true });
+  });
+
+  it('lit une ancienne sauvegarde (niveauMax) : les niveaux d’avant sont faits', () => {
+    expect(valideSauvegarde({ niveauMax: 3 }, 6).faits).toEqual([0, 1, 2]);
   });
 
   it('répare une sauvegarde abîmée ou d’une ancienne version du jeu', () => {
@@ -27,7 +31,7 @@ describe('la sauvegarde', () => {
       6,
     );
     expect(s.enCours).toEqual({ niveau: 0, drapeau: -1, vies: 5, score: 0 });
-    expect(s.niveauMax).toBe(0);
+    expect(s.faits).toEqual([]); // niveauMax hors limites : rien n'est compté comme fait
     expect(s.membre).toBe(0);
   });
 });

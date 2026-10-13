@@ -117,9 +117,16 @@ validé.
 ### Ajouter du contenu
 
 - **Remplacer un personnage par un vrai sprite :** voir [docs/ASSETS.md](docs/ASSETS.md).
-- **Un niveau :** une carte ASCII dans `src/niveaux/cartes/` (légende dans `format.ts`), ses
-  textes dans `src/niveaux/textes/`, une ligne dans `src/niveaux/index.ts`. Le test
-  d'accessibilité vérifie qu'on atteint la fin sans rien détruire.
+- **Un niveau :** une carte ASCII dans `src/niveaux/cartes/` (légende dans `format.ts`), ses textes dans
+  `src/niveaux/textes/`, une ligne dans `src/niveaux/index.ts` et dans un arc (`niveaux/arcs.ts`). Les cinq premières
+  cartes sont générées par `python3 outils/genere-niveaux.py` (des pièces — collines, fosses à pitons, tours,
+  échafaudages, cheminées à sauts de mur, îles — sur un terrain, doublées de galeries, cavernes, boucles et caches) puis
+  modifiables à la main ; l'aperçu de chaque carte est dans `assets-sources/niveaux/`. Le test d'accessibilité vérifie
+  qu'on atteint la fin sans rien détruire. Sous le terrain il n'y a plus de socle : creuser trop, c'est tomber.
+- **Un arc de l'histoire :** les niveaux d'un arc s'enchaînent, avec leur épilogue ; l'arc principal est « La tournée ».
+  Pour un autre (un voyage en Jamaïque, par exemple) : ajouter ses niveaux à la fin de `NIVEAUX`, puis une entrée dans
+  `ARCS` (`niveaux/arcs.ts`) avec son titre, son résumé, son épilogue et, si on veut, `apres` (le niveau à terminer pour
+  l'ouvrir). Le menu « Choisir un niveau » les liste par arc.
 - **Un ennemi :** une définition dans `entites/ennemis/definitions.ts` (lettre de carte), un
   comportement dans `comportements.ts`, un dessin dans `rendu/dessins-ennemis.ts`.
 - **Une arme :** un tir dans `entites/projectiles-defs.ts`, une entrée dans `entites/armes.ts`,

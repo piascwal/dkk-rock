@@ -110,9 +110,10 @@ export class App implements Actions {
     this.arreteTout();
     const p = new Partie(reprise ?? { niveau, drapeau: -1, vies: VIES_DEPART, score: 0 });
     p.ajouteJoueur(0, membre);
-    p.onProgression = (prog, fini) => {
+    p.onProgression = (prog, fini, niveauFini) => {
       this.sauvegarde.enCours = prog;
-      if (fini) this.sauvegarde.niveauMax = Math.max(this.sauvegarde.niveauMax, prog.niveau);
+      if (fini && niveauFini !== undefined && !this.sauvegarde.faits.includes(niveauFini))
+        this.sauvegarde.faits.push(niveauFini);
       this.enregistre();
     };
     this.partie = p;
@@ -239,7 +240,6 @@ export class App implements Actions {
     this.hote?.diffuse(evts);
     if (p.phase === 'fin' && phaseAvant !== 'fin') {
       this.sauvegarde.enCours = null;
-      this.sauvegarde.niveauMax = NIVEAUX.length - 1;
       this.enregistre();
     }
   }

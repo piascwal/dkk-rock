@@ -13,7 +13,8 @@ import { Carte } from '../monde/carte';
 import { Joueur } from '../entites/joueur';
 import { Boss } from '../entites/ennemis/boss';
 import { DjBoucle } from '../entites/ennemis/dj';
-import { NIVEAUX, niveauLu } from '../niveaux';
+import { niveauLu } from '../niveaux';
+import { suivantDansArc } from '../niveaux/arcs';
 import type { NiveauLu } from '../niveaux/format';
 import { pagesDe } from '../histoire/pages';
 import type { Camp, Cible, Contexte, EntiteSimulee, Tyrolienne } from './contexte';
@@ -56,7 +57,8 @@ export class Partie implements Contexte {
   /** change à chaque chargement de carte : le réseau renvoie alors la carte aux clients */
   generation = 0;
   /** prévenu à chaque drapeau et à chaque niveau fini */
-  onProgression: (p: Progression, niveauFini: boolean) => void = () => {};
+  /** `niveauFini` : le niveau qui vient d'être terminé (sinon, simple mise à jour de la partie en cours) */
+  onProgression: (p: Progression, fini: boolean, niveauFini?: number) => void = () => {};
   private evenements: Evenement[] = [];
   private commandes = new Uint8Array(MAX_JOUEURS);
   private id = 1;
@@ -137,7 +139,7 @@ export class Partie implements Contexte {
     this.page = 0;
     if (this.phase === 'histoire') this.phase = 'jeu';
     else if (this.phase === 'bilan') {
-      if (this.niveau + 1 < NIVEAUX.length) this.chargeNiveauSuivant();
+      if (suivantDansArc(this.niveau) !== null) this.chargeNiveauSuivant();
       else this.phase = 'fin';
     } else if (this.phase === 'perdu') {
       this.vies = VIES_DEPART;
@@ -181,7 +183,7 @@ export class Partie implements Contexte {
   }
 
   private chargeNiveauSuivant(): void {
-    this.charge(this.niveau + 1, -1);
+    this.charge(suivantDansArc(this.niveau) ?? this.niveau, -1);
     this.phase = 'histoire';
     this.page = 0;
   }
@@ -255,8 +257,9 @@ export class Partie implements Contexte {
     this.drapeau = -1;
     this.son('victoire', 0, 0);
     this.onProgression(
-      { ...this.progression(), niveau: Math.min(this.niveau + 1, NIVEAUX.length - 1) },
+      { ...this.progression(), niveau: suivantDansArc(this.niveau) ?? this.niveau },
       true,
+      this.niveau,
     );
   }
 
