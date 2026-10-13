@@ -11,6 +11,7 @@ import { ecranInviter, ecranRejoindre } from './menus-reseau';
 import { QUI_DES_MEMBRES, portrait } from './portraits';
 import { texteVersion } from '../version';
 import { installe, peutInstaller, surIPhone } from './installation';
+import { ecranCarte } from './carte-choix';
 
 /** Ce que les menus demandent à l'application. */
 export interface Actions {
@@ -58,21 +59,9 @@ export class Menus {
   }
 
   titre(): void {
-    const s = this.a.sauvegarde;
     const boutons = el('div', '', 'boutons-menu');
-    if (s.enCours) {
-      const n = NIVEAUX[s.enCours.niveau];
-      boutons.append(
-        bouton(
-          `Continuer — ${n?.titre ?? ''}`,
-          () => this.a.lance(s.enCours!.niveau, s.membre, s.enCours),
-          'principal',
-        ),
-      );
-    }
     boutons.append(
-      bouton('Nouvelle partie', () => this.rockers(0), s.enCours ? '' : 'principal'),
-      bouton('Choisir un niveau', () => this.niveaux()),
+      bouton('Continuer', () => this.carte(), 'principal'),
       bouton('Rejoindre des amis', () => this.rejoindre()),
       bouton('Options', () => this.options()),
     );
@@ -82,11 +71,6 @@ export class Menus {
       el('h1', 'DKK', 'logo'),
       el('p', 'ROCK NEVER DIES', 'slogan'),
       boutons,
-      el(
-        'p',
-        'Clavier : flèches ou ZQSD, Espace saut, J tir, L spécial, Échap pause. Manette acceptée. Jusqu’à 4 joueurs.',
-        'aide',
-      ),
       surIPhone()
         ? el(
             'p',
@@ -95,6 +79,20 @@ export class Menus {
           )
         : el('span'),
       el('p', texteVersion(), 'version'),
+    );
+  }
+
+  /** La carte du monde : on choisit un niveau débloqué (par défaut la partie en cours, sinon le dernier ouvert). */
+  carte(): void {
+    const s = this.a.sauvegarde;
+    const ouverts = NIVEAUX.map((_, i) => i).filter((i) => niveauOuvert(i, s.faits));
+    const depart = s.enCours?.niveau ?? ouverts[ouverts.length - 1] ?? 0;
+    ecranCarte(
+      (...enfants) => this.montre(...enfants),
+      s.faits,
+      depart,
+      (n) => this.rockers(n, s.enCours?.niveau === n ? s.enCours : null),
+      () => this.titre(),
     );
   }
 
@@ -134,26 +132,19 @@ export class Menus {
     );
   }
 
+  /** Pour tester : tous les niveaux de tous les arcs, sans avoir à les débloquer. */
   niveaux(): void {
-    const faits = this.a.sauvegarde.faits;
     const arcs = ARCS.map((arc) => {
       const liste = el('div', '', 'liste');
-      const ouvert = arc.apres === undefined || faits.includes(arc.apres);
-      if (!ouvert)
-        liste.append(
-          el('p', `Terminez « ${NIVEAUX[arc.apres!]?.titre ?? ''} » pour ouvrir cet arc.`, 'aide'),
-        );
-      else
-        arc.niveaux.forEach((i, pos) => {
-          const b = bouton(`${pos + 1}. ${NIVEAUX[i]!.titre}`, () => this.rockers(i));
-          b.disabled = !niveauOuvert(i, faits);
-          liste.append(b);
-        });
+      arc.niveaux.forEach((i, pos) =>
+        liste.append(bouton(`${pos + 1}. ${NIVEAUX[i]!.titre}`, () => this.rockers(i))),
+      );
       return [el('h2', arc.titre), liste];
     });
     this.montre(
+      el('p', 'Tous les niveaux, pour tester.', 'aide'),
       ...arcs.flat(),
-      bouton('Retour', () => this.titre()),
+      bouton('Retour', () => this.options()),
     );
   }
 
@@ -190,6 +181,7 @@ export class Menus {
       this.a.enregistre();
       this.titre();
     });
+    const tests = bouton('Choisir un niveau (test)', () => this.niveaux());
     this.montre(
       el('h2', 'Options'),
       bascule('Bruitages', 'son'),
@@ -198,6 +190,7 @@ export class Menus {
       el('p', `Affichage actuel : ${this.a.diagnostic()}`, 'aide'),
       pseudo,
       efface,
+      tests,
       bouton('Retour', () => this.titre()),
     );
   }

@@ -172,53 +172,80 @@ function plan(arc: DefArc): Plan {
   return pl;
 }
 
-/** Dessine la carte : `niveau` est celui qu'on vient de finir, `page` les ticks du trajet vers le suivant. */
-export function dessineCarteMonde(
-  ctx: CanvasRenderingContext2D,
-  largeur: number,
-  niveau: number,
-  page: number,
-  tick: number,
-): void {
-  const arc = arcDe(niveau);
+/** L'état d'une étape sur la carte : faite (orange), la cible (rose qui clignote), ouverte (bleue), fermée (grise). */
+export type EtatEtape = 'faite' | 'cible' | 'ouverte' | 'fermee';
+
+const COULEURS_ETAPE: Record<EtatEtape, [string, string]> = {
+  faite: ['#e0701f', '#ffd23f'],
+  cible: ['#ff4fd8', '#ffa8ec'],
+  ouverte: ['#2a3a8a', '#4a5ab0'],
+  fermee: ['#3a3440', '#55505c'],
+};
+
+/** Où se trouvent le van et la caméra, le van étant à la position `pos` (en étapes : 2,5 = entre la 3e et la 4e). */
+function cadrage(arc: DefArc, largeur: number, hauteur: number, pos: number) {
   const pl = plan(arc);
-  const i = arc.niveaux.indexOf(niveau);
-  const suivant = suivantDansArc(niveau);
-  const j = suivant === null ? i : arc.niveaux.indexOf(suivant);
-  // le trajet : un temps d'arrêt, la route (accélération puis freinage), l'arrivée
-  const t = borne((page / DUREE_CARTE - 0.12) / 0.7, 0, 1);
-  const d = pl.etapes[i]! + (pl.etapes[j]! - pl.etapes[i]!) * t * t * (3 - 2 * t);
+  const a = Math.floor(borne(pos, 0, pl.etapes.length - 1));
+  const b = Math.min(pl.etapes.length - 1, a + 1);
+  const d = pl.etapes[a]! + (pl.etapes[b]! - pl.etapes[a]!) * (pos - a);
   const [vx, vy] = surRoute(pl.route, d);
   const vanX = vx * C + C / 2;
   const vanY = vy * C + C / 2;
-  // la caméra suit le van, sans sortir de la carte
   const camX = Math.round(borne(vanX - largeur / 2, 0, Math.max(0, LT * C - largeur)));
-  const camY = Math.round(borne(vanY - HAUTEUR_VUE / 2, 0, Math.max(0, HT * C - HAUTEUR_VUE)));
-  ctx.fillStyle = '#2f86d8';
-  ctx.fillRect(0, 0, largeur, HAUTEUR_VUE);
+  const camY = Math.round(borne(vanY - hauteur / 2, 0, Math.max(0, HT * C - hauteur)));
+  return { pl, vanX, vanY, camX, camY };
+}
+
+/** L'étape sous le point (x, y) de l'écran, ou -1 (pour la choisir du doigt). */
+export function etapeTouchee(
+  arc: DefArc,
+  largeur: number,
+  hauteur: number,
+  pos: number,
+  x: number,
+  y: number,
+): number {
+  const { pl, camX, camY } = cadrage(arc, largeur, hauteur, pos);
+  return pl.etapes.findIndex((e) => {
+    const [ex, ey] = surRoute(pl.route, e);
+    return Math.abs(ex * C + C / 2 - camX - x) < 10 && Math.abs(ey * C + C / 2 - camY - y) < 10;
+  });
+}
+
+/** Dessine la carte de l'arc, le van à la position `pos` (en étapes), chaque étape dans son état. */
+export function dessineCarte(
+  ctx: CanvasRenderingContext2D,
+  largeur: number,
+  hauteur: number,
+  arc: DefArc,
+  pos: number,
+  etats: readonly EtatEtape[],
+  titre: string,
+  tick: number,
+  roule: boolean,
+): void {
+  const { pl, vanX, vanY, camX, camY } = cadrage(arc, largeur, hauteur, pos);
   const p: Px = (x, y, w, h, col) => {
     ctx.fillStyle = col;
     ctx.fillRect(Math.round(x), Math.round(y), w, h);
   };
   // la mer qui scintille, puis l'île
-  for (let gy = Math.floor(camY / C); gy <= (camY + HAUTEUR_VUE) / C; gy++)
+  for (let gy = Math.floor(camY / C); gy <= (camY + hauteur) / C; gy++)
     for (let gx = Math.floor(camX / C); gx <= (camX + largeur) / C; gx++)
       mer(p, gx * C - camX, gy * C - camY, tick, gx, gy);
   ctx.drawImage(pl.fond, -camX, -camY);
-  // les étapes : faites (or, coche), la prochaine (clignote), les autres (cartes numérotées)
   pl.etapes.forEach((e, k) => {
     const [ex, ey] = surRoute(pl.route, e);
     const x = ex * C + C / 2 - camX;
     const y = ey * C + C / 2 - camY;
-    const faite = k <= i;
-    const cible = k === j && Math.floor(tick / 15) % 2 === 0;
+    const etat = etats[k] ?? 'fermee';
+    const [fond, haut] = COULEURS_ETAPE[etat === 'cible' && Math.floor(tick / 15) % 2 ? 'ouverte' : etat];
     p(x - 6, y - 6, 12, 12, '#1a0f0a');
-    p(x - 5, y - 5, 10, 10, faite ? '#e0701f' : cible ? '#ff4fd8' : '#2a3a8a');
-    p(x - 5, y - 5, 10, 2, faite ? '#ffd23f' : cible ? '#ffa8ec' : '#4a5ab0');
-    ecrit(ctx, String(k + 1), x - 1, y - 2, '#ffffff');
+    p(x - 5, y - 5, 10, 10, fond);
+    p(x - 5, y - 5, 10, 2, haut);
+    ecrit(ctx, String(k + 1), x - 1, y - 2, etat === 'fermee' ? '#8a8492' : '#ffffff');
   });
   // le van, sa poussière
-  const roule = t > 0 && t < 1;
   if (roule)
     for (let k = 1; k <= 4; k++) {
       ctx.globalAlpha = 0.6 - k * 0.12;
@@ -242,8 +269,40 @@ export function dessineCarteMonde(
     );
     ctx.imageSmoothingEnabled = false;
   }
-  // le bandeau du haut
-  p(0, 0, largeur, 11, 'rgba(10,5,12,0.75)');
+  if (titre) {
+    p(0, 0, largeur, 11, 'rgba(10,5,12,0.75)');
+    ecritCentre(ctx, titre, largeur / 2, 3, '#ffd23f');
+  }
+}
+
+/** Entre deux niveaux : `niveau` est celui qu'on vient de finir, `page` les ticks du trajet vers le suivant. */
+export function dessineCarteMonde(
+  ctx: CanvasRenderingContext2D,
+  largeur: number,
+  niveau: number,
+  page: number,
+  tick: number,
+): void {
+  const arc = arcDe(niveau);
+  const i = arc.niveaux.indexOf(niveau);
+  const suivant = suivantDansArc(niveau);
+  const j = suivant === null ? i : arc.niveaux.indexOf(suivant);
+  // le trajet : un temps d'arrêt, la route (accélération puis freinage), l'arrivée
+  const t = borne((page / DUREE_CARTE - 0.12) / 0.7, 0, 1);
+  const pos = i + (j - i) * t * t * (3 - 2 * t);
+  const etats = arc.niveaux.map((_, k): EtatEtape => (k <= i ? 'faite' : k === j ? 'cible' : 'ouverte'));
   const def = suivant === null ? null : NIVEAUX[suivant];
-  ecritCentre(ctx, def ? `En route : ${def.titre}` : arc.titre, largeur / 2, 3, '#ffd23f');
+  ctx.fillStyle = '#2f86d8';
+  ctx.fillRect(0, 0, largeur, HAUTEUR_VUE);
+  dessineCarte(
+    ctx,
+    largeur,
+    HAUTEUR_VUE,
+    arc,
+    pos,
+    etats,
+    def ? `En route : ${def.titre}` : arc.titre,
+    tick,
+    t > 0 && t < 1,
+  );
 }

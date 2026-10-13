@@ -62,16 +62,16 @@ body {
   touch-action: none;
 }
 
-/* le bouton pour passer l'intro, en bas, au-dessus de l'animation */
+/* le bouton pour passer l'intro : discret, en bas à droite */
 .passer-intro {
   position: fixed;
   z-index: 31;
-  left: 50%;
-  bottom: max(10px, env(safe-area-inset-bottom));
-  transform: translateX(-50%);
+  right: max(10px, env(safe-area-inset-right));
+  bottom: max(8px, env(safe-area-inset-bottom));
+  opacity: 0.65;
   font-family: var(--titre);
-  font-size: 0.85rem;
-  padding: 0.4em 1em;
+  font-size: 0.65rem;
+  padding: 0.3em 0.7em;
   border: 2px solid #000;
   background: var(--encre);
   color: #111;
@@ -664,4 +664,42 @@ h2 {
 #maj button.discret {
   background: var(--encre);
   color: #111;
+}
+
+/* ——— la carte du monde, écran « Continuer » ——— */
+.carte-choix {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+.carte-arc,
+.carte-titre,
+.carte-barre {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  white-space: nowrap;
+}
+
+.carte-arc {
+  top: max(6px, env(safe-area-inset-top));
+  text-shadow: 2px 2px 0 #000;
+}
+
+.carte-titre {
+  top: calc(max(6px, env(safe-area-inset-top)) + 2.2rem);
+  background: rgba(10, 5, 12, 0.75);
+  padding: 0.2rem 0.6rem;
+  font-family: var(--titre);
+  font-size: 0.8rem;
+}
+
+.carte-barre {
+  bottom: max(10px, env(safe-area-inset-bottom));
+  display: flex;
+  gap: 0.5rem;
 }
