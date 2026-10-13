@@ -10,7 +10,8 @@ import { bouton, el } from './elements';
 import { ecranInviter, ecranRejoindre } from './menus-reseau';
 import { QUI_DES_MEMBRES, portrait } from './portraits';
 import { texteVersion } from '../version';
-import { installe, peutInstaller, surIPhone } from './installation';
+import { estInstallee, installe, peutInstaller, surIPhone } from './installation';
+import { pleinEcran } from './plein-ecran';
 import { ecranCarte } from './carte-choix';
 
 /** Ce que les menus demandent à l'application. */
@@ -201,6 +202,9 @@ export class Menus {
     if (!this.a.estClient) boutons.append(bouton('Inviter des amis', () => this.inviter()));
     boutons.append(
       bouton('Options', () => this.options()),
+      ...(document.fullscreenEnabled && !document.fullscreenElement && !estInstallee()
+        ? [bouton('Plein écran', () => (pleinEcran(), this.a.reprend()))]
+        : []),
       bouton('Quitter', () => this.a.quitte()),
     );
     this.montre(

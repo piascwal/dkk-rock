@@ -18,7 +18,6 @@ import { chargeFeuilles } from './rendu/feuilles-images';
 import { Rendu } from './rendu/rendu';
 import { Intro } from './ui/intro';
 import { prepareInstallation } from './ui/installation';
-import { pleinEcran } from './ui/plein-ecran';
 import { Bulles, Histoire } from './ui/dialogues';
 import { Hud } from './ui/hud';
 import { afficheNouvelleVersion } from './ui/maj';
@@ -123,7 +122,6 @@ export class App implements Actions {
   }
 
   lance(niveau: number, membre: number, reprise: Progression | null): void {
-    pleinEcran(); // si on en était sorti
     this.arreteTout();
     const p = new Partie(reprise ?? { niveau, drapeau: -1, vies: VIES_DEPART, score: 0 });
     p.ajouteJoueur(0, membre);
