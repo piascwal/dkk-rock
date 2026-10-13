@@ -154,7 +154,7 @@ export class Bruitages {
     if (t - (this.derniers.get(base) ?? 0) < 45) return;
     this.derniers.set(base, t);
     const note = noteDe(nom);
-    if (note) note.m.joue(this.s, v, note.f);
+    if (note) note.m.joue(this.s, v, note.pas);
     else SONS[base]?.(this.s, v);
   }
 }
