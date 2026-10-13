@@ -64,7 +64,7 @@ const groove = 'K+H H S+H K K+H H S+H H K+H H S+H K K+H K S+H H';
 export const MELODIES: Record<string, Melodie> = {
   // Mat : Come as You Are (Nirvana)
   basse: {
-    pas: notes('mi2 mi2 fa2 fa#2 la2 fa#2 la2 fa#2 fa#2 fa2 mi2 si1 mi2 mi2 si1'),
+    pas: notes('mi2 mi2 fa2 fa#2 la2 fa#2 la2 fa#2 fa#2 fa2 mi2 si2 mi2 mi2 si2'),
     joue: (s, v, p) => basse(s, v, p as number),
   },
   // JBG : Smoke on the Water (Deep Purple)
