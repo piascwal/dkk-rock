@@ -80,6 +80,10 @@ export abstract class JoueurBase implements Cible, EtatSpecial {
     return this.corps.y + this.corps.h / 2;
   }
 
+  get surEchelle(): boolean {
+    return this.echelle;
+  }
+
   vivant(): boolean {
     return !this.mort;
   }

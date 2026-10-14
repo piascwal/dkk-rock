@@ -4,6 +4,11 @@ import type { Camp, Cible, Contexte, EntiteSimulee } from '../../jeu/contexte';
 import { ANIM, type EntiteVue } from '../../jeu/vue';
 import type { DefEnnemi } from './definitions';
 
+/** L'écart de hauteur de sol (en pixels) au-delà duquel un héros est « à un autre étage » : l'ennemi ne le voit pas. */
+const ECART_ETAGE = 22;
+/** Après un coup reçu, l'ennemi cherche son tireur sans égard à l'étage (ticks). */
+const DUREE_PROVOCATION = 150;
+
 /** Combien de temps (en ticks) un ennemi vaincu reste étendu sur la scène avant de s'effacer. */
 const DUREE_A_TERRE = 300;
 
@@ -33,6 +38,8 @@ export class Ennemi implements Cible, EntiteSimulee {
   /** délai avant un nouveau demi-tour : évite de pivoter à chaque pas contre un obstacle */
   virage = 0;
   private flash = 0;
+  /** ticks restants pendant lesquels un coup reçu lui fait repérer son tireur, même à un autre étage */
+  private provoque = 0;
   /** ticks restants à terre une fois vaincu (0 : debout) ; il ne gêne ni ne se bat plus */
   private aTerre = 0;
   /** le côté où le dernier coup l'a projeté */
@@ -82,6 +89,7 @@ export class Ennemi implements Cible, EntiteSimulee {
   blesse(degats: number, ctx: Contexte, dx: number, explosion: boolean): void {
     if (this.fini || this.aTerre > 0) return;
     if (dx) this.projete = dx > 0 ? 1 : -1;
+    this.provoque = DUREE_PROVOCATION;
     this.pv -= degats;
     this.flash = 4;
     if (explosion) this.corps.vy = -3;
@@ -127,6 +135,16 @@ export class Ennemi implements Cible, EntiteSimulee {
       ctx.texte(this.cx, this.corps.y - 14, ctx.rng.choix(this.def.cris), '#ff4fd8');
   }
 
+  /**
+   * Un héros n'est vu que s'il est à peu près à la même hauteur de sol (ou si l'ennemi vole, ou vient d'être touché) et pas
+   * accroché à une échelle : en montant, on ne se fait pas tirer dessus d'un étage plus bas ou plus haut.
+   */
+  private memeEtage(h: Cible): boolean {
+    if (this.def.vole || this.provoque > 0) return true;
+    if (h.surEchelle) return false;
+    return Math.abs(h.y + h.h - (this.corps.y + this.corps.h)) <= ECART_ETAGE;
+  }
+
   /** Cherche un héros visible : devant soi en patrouille, partout une fois en alerte. */
   private percoit(ctx: Contexte): void {
     const def = this.def;
@@ -136,6 +154,7 @@ export class Ennemi implements Cible, EntiteSimulee {
       const dx = h.x + h.w / 2 - this.cx;
       const dy = h.y + h.h / 2 - this.cy;
       if (Math.abs(dx) > def.vision || Math.abs(dy) > def.visionVerticale) continue;
+      if (!this.memeEtage(h)) continue;
       if (this.etat === 'patrouille' && Math.sign(dx) !== this.dir && Math.abs(dx) > 24) continue;
       if (!ligneDeVue(ctx.carte, this.cx, this.corps.y + 4, h.x + h.w / 2, h.y + 4)) continue;
       const d = Math.hypot(dx, dy);
@@ -158,6 +177,7 @@ export class Ennemi implements Cible, EntiteSimulee {
     }
     this.anim++;
     if (this.flash > 0) this.flash--;
+    if (this.provoque > 0) this.provoque--;
     if (this.recharge > 0) this.recharge--;
     if ((ctx.tick + this.id) % 8 === 0) this.percoit(ctx);
     if (this.cible && !this.cible.vivant()) this.cible = null;
@@ -169,7 +189,8 @@ export class Ennemi implements Cible, EntiteSimulee {
         if (--this.minuteur <= 0) this.etat = 'attaque';
         break;
       case 'attaque':
-        if (!this.cible || ctx.tick - this.vuA > 180) {
+        // il lâche sa cible plus vite quand elle n'est plus à son étage (elle monte une échelle, elle s'éloigne par le haut)
+        if (!this.cible || ctx.tick - this.vuA > (this.memeEtage(this.cible) ? 180 : 45)) {
           this.etat = 'perdu';
           this.minuteur = 60;
           this.cible = null;

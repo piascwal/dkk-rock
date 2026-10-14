@@ -99,4 +99,48 @@ describe('les ennemis', () => {
     p.avance();
     expect(p.entites.includes(e)).toBe(false);
   });
+
+  describe('la détection par étage', () => {
+    /** Un fêtard en patrouille face à un héros à 60 px, tous deux au même sol ; `decale` : hauteur du héros en plus. */
+    const scene = (decale: number, surEchelle = false, touche = false) => {
+      const p = nouvelle();
+      const j = p.joueurs[0]!;
+      const e = p.entites.find((x): x is Ennemi => x instanceof Ennemi && x.def.nom === 'Fêtard autotuné')!;
+      j.invulnerable = 99999;
+      if (surEchelle) Object.defineProperty(j, 'surEchelle', { get: () => true });
+      // de l'air autour d'eux : la ligne de vue reste libre
+      const tx = Math.floor(j.corps.x / TUILE);
+      const ty = Math.floor((j.corps.y + j.corps.h - 1) / TUILE);
+      for (let x = tx - 2; x < tx + 8; x++) for (let y = ty - 12; y < ty; y++) p.carte.pose(x, y, T.VIDE);
+      const sol = j.corps.y + j.corps.h;
+      e.dir = -1;
+      e.etat = 'patrouille';
+      if (touche) e.blesse(0, p, 1, false);
+      let vu = false;
+      for (let i = 0; i < 40; i++) {
+        Object.assign(e.corps, { x: j.corps.x + 60, y: sol - e.corps.h, vx: 0, vy: 0 });
+        Object.assign(j.corps, { y: sol - j.corps.h - decale, vx: 0, vy: 0 });
+        p.avance();
+        p.releveEvenements();
+        if (e.etat !== 'patrouille') vu = true;
+      }
+      return vu;
+    };
+
+    it('repère un héros posé sur le même sol', () => {
+      expect(scene(0)).toBe(true);
+    });
+
+    it('ne voit pas un héros deux étages plus haut', () => {
+      expect(scene(80)).toBe(false);
+    });
+
+    it('ne voit pas un héros accroché à une échelle', () => {
+      expect(scene(0, true)).toBe(false);
+    });
+
+    it('cherche son tireur, même à un autre étage, après un coup reçu', () => {
+      expect(scene(80, false, true)).toBe(true);
+    });
+  });
 });

@@ -15,6 +15,8 @@ export interface Cible {
   readonly h: number;
   readonly camp: Camp;
   vivant(): boolean;
+  /** accroché à une échelle : en train de monter ou descendre, on ne le vise pas */
+  readonly surEchelle?: boolean;
   /** `dx` : sens d'où vient le coup (-1, 0 ou 1), pour le recul */
   blesse(degats: number, ctx: Contexte, dx: number, explosion: boolean): void;
   /** effets des tirs ennemis particuliers (hypnose du DJ, flash des influenceurs) */
