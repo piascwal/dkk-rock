@@ -95,7 +95,10 @@ function collisionsTirs(p: Partie): void {
     const b = tir.boite;
     for (const c of visees) {
       if (tir.fini) break;
-      if (c.vivant() && chevauche(b, c)) tir.touche(p, c);
+      if (!c.vivant() || !chevauche(b, c)) continue;
+      // un héros n'atteint pas un ennemi hors de la zone visible
+      if (tir.camp === 'heros' && !p.visible(c.x + c.w / 2, c.y + c.h / 2)) continue;
+      tir.touche(p, c);
     }
   }
 }

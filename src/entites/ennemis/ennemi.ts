@@ -149,7 +149,8 @@ export class Ennemi implements Cible, EntiteSimulee {
    * Un ennemi ne tire que sur un héros de son étage, même s'il l'a vu ou été provoqué : jamais depuis une plate-forme
    * vers celle du dessus ou du dessous (un drone, lui, tire d'en haut).
    */
-  peutTirer(h: Cible): boolean {
+  peutTirer(h: Cible, ctx: Contexte): boolean {
+    if (!ctx.visible(this.cx, this.cy)) return false;
     if (this.def.vole) return true;
     if (h.surEchelle) return false;
     return Math.abs(h.y + h.h - (this.corps.y + this.corps.h)) <= ECART_ETAGE;

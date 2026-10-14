@@ -31,6 +31,12 @@ export const HEROS_LARGEUR = 9;
 export const HEROS_HAUTEUR = 15;
 
 export const MAX_JOUEURS = 4;
+
+/**
+ * La zone de jeu visible, autour d'un héros (la simulation ne connaît pas la caméra) : ce qui est hors de cette zone ne
+ * peut ni tirer ni être touché. Un peu plus large que l'écran des téléphones les plus allongés.
+ */
+export const ZONE_VISIBLE = { demiLargeur: 185, haut: 100, bas: 75 };
 export const VIES_DEPART = 5;
 /** Au-delà, une cage ne donne plus de vie : on change seulement de personnage. */
 export const VIES_MAX = 5;

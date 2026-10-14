@@ -10,9 +10,11 @@ import { dessineCarteMonde } from './carte-monde';
 import { dessineEntite } from './dessin-entites';
 import { dessineDecor, semeDecor } from './decor';
 import { dessineTuiles, dessineTyroliennes } from './dessin-tuiles';
+import { Emojis } from './emojis';
 import { Fond } from './fonds';
 import { Particules } from './particules';
 import { THEMES, type Theme } from './themes';
+import { TraitsPersos } from './traits-persos';
 
 /**
  * Dessine une vue de la partie (EtatVue) : fond, tuiles, entités, particules.
@@ -22,6 +24,8 @@ export class Rendu {
   readonly ctx: CanvasRenderingContext2D;
   readonly camera = new Camera();
   readonly particules = new Particules();
+  private readonly emojis = new Emojis();
+  private readonly traits = new TraitsPersos();
   /** largeur de la vue en pixels du jeu (la hauteur est fixe, la largeur suit la forme de l'écran) */
   largeur = 480;
   theme: Theme = THEMES.garage;
@@ -109,6 +113,7 @@ export class Rendu {
     this.atlas = new AtlasTuiles(this.theme);
     this.fond = new Fond(this.theme);
     this.camera.recadre();
+    this.traits.reinitialise();
   }
 
   /** Les évènements de la partie deviennent des particules. */
@@ -204,5 +209,8 @@ export class Rendu {
       this.theme.lointain,
     );
     this.particules.dessine(ctx, camX, camY);
+    this.traits.maj(vue, this.decor, carte, { emojis: this.emojis });
+    this.emojis.maj();
+    this.emojis.dessine(ctx, camX, camY);
   }
 }

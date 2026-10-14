@@ -37,7 +37,7 @@ export const tireur: Comportement = (e, ctx, cible) => {
   else if (dx > 150) e.marcheVers(ctx, cible.x, e.def.vitesse);
   else e.corps.vx = 0;
   e.dir = vers;
-  if (e.recharge === 0 && e.peutTirer(cible)) {
+  if (e.recharge === 0 && e.peutTirer(cible, ctx)) {
     tireVers(e, ctx, NOTE_AUTOTUNE, cible);
     e.memoire++;
     // rafale de deux notes, puis pause
@@ -64,7 +64,7 @@ export const kamikaze: Comportement = (e, ctx, cible) => {
 export const lobeur: Comportement = (e, ctx, cible) => {
   e.faceA(cible);
   e.corps.vx = 0;
-  if (e.recharge === 0 && e.peutTirer(cible)) {
+  if (e.recharge === 0 && e.peutTirer(cible, ctx)) {
     lobeVers(e, ctx, DROP, cible, 55);
     e.recharge = e.def.cadence;
     ctx.son('drop', e.cx, e.cy);
@@ -93,7 +93,7 @@ export const influenceur: Comportement = (e, ctx, cible) => {
   }
   e.faceA(cible);
   e.corps.vx = 0;
-  if (e.recharge === 0 && e.peutTirer(cible) && Math.abs(cible.x - e.cx) < 110) {
+  if (e.recharge === 0 && e.peutTirer(cible, ctx) && Math.abs(cible.x - e.cx) < 110) {
     tireVers(e, ctx, FLASH_SELFIE, cible);
     ctx.son('flash', e.cx, e.cy);
     ctx.texte(e.cx, e.corps.y - 12, '#NOFILTER', '#ff4fd8');
@@ -106,7 +106,7 @@ export const influenceur: Comportement = (e, ctx, cible) => {
 export const yeti: Comportement = (e, ctx, cible) => {
   e.faceA(cible);
   e.corps.vx = 0;
-  if (ctx.surLeTemps && ctx.numeroTemps % 2 === 0 && e.peutTirer(cible)) {
+  if (ctx.surLeTemps && ctx.numeroTemps % 2 === 0 && e.peutTirer(cible, ctx)) {
     lobeVers(e, ctx, BOULE_NEIGE, cible, 40);
     ctx.son('boum', e.cx, e.cy);
     if (ctx.rng.suivant() < 0.2)
@@ -119,7 +119,7 @@ export const robot: Comportement = (e, ctx, cible) => {
   e.faceA(cible);
   if (Math.abs(cible.x - e.cx) > 60) e.marcheVers(ctx, cible.x, e.def.vitesse);
   else e.corps.vx = 0;
-  if (e.recharge === 0 && e.peutTirer(cible)) {
+  if (e.recharge === 0 && e.peutTirer(cible, ctx)) {
     tireVers(e, ctx, LASER, cible);
     ctx.son('laser', e.cx, e.cy);
     e.memoire = (e.memoire + 1) % 3;

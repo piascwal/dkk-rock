@@ -38,6 +38,7 @@ export function explose(
     const cy = c.y + c.h / 2;
     const d = Math.hypot(cx - x, cy - y) - Math.max(c.w, c.h) / 2;
     if (d > rayon) continue;
+    if (camp === 'heros' && !ctx.visible(cx, cy)) continue;
     const force = degats > 0 ? Math.max(1, degats * (1 - Math.max(0, d) / rayon)) : 0;
     if (force > 0) c.blesse(force, ctx, Math.sign(cx - x) || 1, true);
     pousse(c, cx - x, cy - y);

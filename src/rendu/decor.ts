@@ -8,7 +8,7 @@ import { imageTuile } from './atlas-tuiles';
 import { pinceau } from './pinceau';
 import type { NomTheme } from './themes';
 
-interface Pose {
+export interface Pose {
   tx: number;
   /** rangée de la tuile qui porte l'accessoire */
   ty: number;

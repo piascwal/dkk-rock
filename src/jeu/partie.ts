@@ -7,10 +7,12 @@ import {
   TICKS_PAR_SECONDE,
   TUILE,
   VIES_DEPART,
+  ZONE_VISIBLE,
 } from '../config';
 import { Aleatoire } from '../moteur/maths';
 import { Carte } from '../monde/carte';
 import { Joueur } from '../entites/joueur';
+import { Projectile } from '../entites/projectile';
 import { Boss } from '../entites/ennemis/boss';
 import { DjBoucle } from '../entites/ennemis/dj';
 import { ATTENTE_VAN, Objet } from '../entites/objets';
@@ -87,10 +89,21 @@ export class Partie implements Contexte {
     return this.id;
   }
   ajoute(e: EntiteSimulee): void {
+    // un ennemi hors de la zone visible ne tire pas
+    if (e instanceof Projectile && e.camp === 'ennemis' && !this.visible(e.x, e.y)) return;
     this.entites.push(e);
   }
   heros(): readonly Cible[] {
     return this.cache.heros;
+  }
+  visible(x: number, y: number): boolean {
+    const hs = this.cache.heros;
+    if (!hs.length) return true;
+    return hs.some((h) => {
+      const dx = Math.abs(x - (h.x + h.w / 2));
+      const dy = y - (h.y + h.h / 2);
+      return dx <= ZONE_VISIBLE.demiLargeur && dy >= -ZONE_VISIBLE.haut && dy <= ZONE_VISIBLE.bas;
+    });
   }
   cibles(camp: Camp): readonly Cible[] {
     return this.cache[camp];

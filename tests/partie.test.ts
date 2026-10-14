@@ -50,8 +50,21 @@ describe('la partie', () => {
     avance(p, 1);
     const e = p.entites.find((x): x is Ennemi => x instanceof Ennemi)!;
     const pv = e.pv;
+    // hors de la zone visible, un héros ne l'atteint pas
+    p.explosion(e.cx, e.cy, 30, 3, 'heros');
+    expect(e.pv).toBe(pv);
+    Object.assign(j.corps, { x: e.cx - 40, y: e.corps.y });
     p.explosion(e.cx, e.cy, 30, 3, 'heros');
     expect(e.pv < pv || e.fini).toBe(true);
+  });
+
+  it('la zone visible suit le héros', () => {
+    const p = nouvelle();
+    const j = p.joueurs[0]!;
+    avance(p, 1);
+    expect(p.visible(j.cx + 100, j.cy)).toBe(true);
+    expect(p.visible(j.cx + 400, j.cy)).toBe(false);
+    expect(p.visible(j.cx, j.cy - 300)).toBe(false);
   });
 
   /** La première tuile de ce type (parcours ligne par ligne) qui vérifie `ok`. */

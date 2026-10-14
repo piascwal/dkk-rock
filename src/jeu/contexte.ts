@@ -46,6 +46,8 @@ export interface Contexte {
   ajoute(e: EntiteSimulee): void;
   /** les héros vivants */
   heros(): readonly Cible[];
+  /** vrai si le point est dans la zone de jeu visible d'un héros (hors zone : on ne tire pas, on n'est pas touché) */
+  visible(x: number, y: number): boolean;
   /** toutes les cibles d'un camp donné (pour viser, ou pour blesser) */
   cibles(camp: Camp): readonly Cible[];
   explosion(x: number, y: number, rayon: number, degats: number, camp: Camp): void;
