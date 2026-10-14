@@ -32,6 +32,8 @@ interface Emoji {
 
 const DUREE = 75;
 const FONDU = 22;
+/** Discrets : des easter eggs, pas des alertes. */
+const OPACITE = 0.5;
 
 export class Emojis {
   private readonly liste: Emoji[] = [];
@@ -57,7 +59,7 @@ export class Emojis {
       const h = m.rangees.length;
       const w = m.rangees[0]!.length;
       ctx.save();
-      ctx.globalAlpha = fondu;
+      ctx.globalAlpha = fondu * OPACITE;
       ctx.translate(Math.round(e.x - camX), Math.round(e.y - camY) - monte);
       ctx.scale(echelle, echelle);
       ctx.translate(-Math.floor(w / 2), -h);
