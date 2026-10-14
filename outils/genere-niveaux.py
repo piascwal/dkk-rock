@@ -12,6 +12,7 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent / 'niveaux'))
 
 from peintre import Niveau
+from structures import forteresse, traversee
 from verrous import barrage, bunker, gouffre, patrouilles, trou
 
 RACINE = pathlib.Path(__file__).resolve().parent.parent
@@ -42,7 +43,8 @@ class Recette:
         self.x = 6
         self.digits = declencheurs(fichier_textes)
         self.pieces = []  # (x0, x1, genre)
-        self.gouffres = []  # (x0, largeur) : à recreuser avec leurs échelles après les galeries
+        self.gouffres = []  # (x0, largeur, sol) : à recreuser avec leurs échelles après les galeries
+        self.coupures = []  # (début, fin, sol) : les gouffres sans fond des traversées, qui coupent aussi la galerie
         self.barrages = []  # (x du mur, rangée du sommet) : à reposer après le creusement des galeries
         self.flags = []
 
@@ -133,8 +135,15 @@ class Recette:
         self.n.ennemis(x1 - 9, x1 - 1, lettres, 2)
 
     def p_gouffre(self, x0, x1, lettres='a', nb=4):
-        self.gouffres.append((x0 + 3, x1 - x0 - 6))
+        self.gouffres.append((x0 + 3, x1 - x0 - 6, self.n.base))
         gouffre(self.n, x0 + 3, x1 - x0 - 6, lettres, nb)
+
+    def p_forteresse(self, x0, x1, etages=3, lettres='a', sous_sol=True, cage=False, mat=None):
+        forteresse(self.n, x0 + 2, x1 - x0 - 4, etages, lettres, mat, sous_sol, cage)
+
+    def p_traversee(self, x0, x1, lettres='a'):
+        debut, fin = traversee(self.n, x0, lettres)
+        self.coupures.append((debut, fin, self.n.base))
 
     def p_arene(self, x0, x1, lettres='ab', plus=2):
         n = self.n
@@ -267,14 +276,16 @@ def verrouille_galerie(r, seq_puits):
     """Les murs des barrages coupent la galerie (on ne les contourne pas par en dessous) ; chaque tronçon ainsi isolé
     garde au moins un puits depuis la surface, sinon on n'y entrerait pas."""
     n = r.n
-    murs = sorted(x for x, _ in r.barrages)
     for xw, top in r.barrages:
         n.rect(xw, top, xw + 3, n.h, 'X')
-    for x0, largeur in r.gouffres:  # les salles creusées dans la galerie ont pu entamer les trous et les puits
-        trou(n, x0, largeur)
+    for x0, largeur, sol in r.gouffres:  # les salles creusées dans la galerie ont pu entamer les trous et les puits
+        trou(n, x0, largeur, sol)
+    for debut, fin, sol in r.coupures:  # les gouffres sans fond : plus de terre dessous, sous la passerelle
+        n.rect(debut, sol + 5, fin, n.h, ' ')
     for x in seq_puits:
         n.puits(x)
-    bornes = [10] + [b for xw in murs for b in (xw, xw + 3)] + [n.w - 10]
+    coupes = sorted([(xw, xw + 3) for xw, _ in r.barrages] + [(d, f) for d, f, _ in r.coupures])
+    bornes = [10] + [b for c in coupes for b in c] + [n.w - 10]
     puits = list(seq_puits)
     for a, b in zip(bornes[::2], bornes[1::2]):
         if any(a <= x < b for x in puits):
@@ -287,20 +298,28 @@ def verrouille_galerie(r, seq_puits):
 
 
 def avec_verrous(plan, lettres='a'):
-    """Insère dans le plan, tous les ~14 % du niveau et après une plate-forme, un barrage (il faut monter) puis un
-    gouffre (il faut descendre), en alternance : plus de rue droite, on change d'étage pour avancer."""
+    """Insère dans le plan, après une plate-forme et tous les ~12 % du niveau, des structures qui obligent à changer d'étage
+    ou à franchir le vide : forteresses (étages, pièces, sous-sol), barrages (il faut monter), traversées de gouffres
+    (passerelle, tyrolienne, îlots), gouffres à descendre. Plus de rue droite."""
     total = sum(p[1] for p in plan)
-    cibles = [0.14, 0.28, 0.42, 0.56, 0.70, 0.84]
+    cibles = [0.10, 0.21, 0.32, 0.43, 0.54, 0.65, 0.76, 0.86]
+    modeles = [
+        ('forteresse', 34, dict(etages=3, lettres=lettres)),
+        ('barrage', 28, dict(haut=12, lettres=lettres, butin='*')),
+        ('traversee', 38, dict(lettres=lettres)),
+        ('forteresse', 34, dict(etages=4, lettres=lettres, cage=True)),
+        ('gouffre', 20, dict(lettres=lettres, nb=5)),
+        ('traversee', 38, dict(lettres=lettres)),
+        ('barrage', 28, dict(haut=16, lettres=lettres, tyro=11, butin='+')),
+        ('forteresse', 34, dict(etages=3, lettres=lettres, cage=True)),
+    ]
     sortie, acc, k = [], 0, 0
     for i, (genre, w, kw) in enumerate(plan):
         sortie.append((genre, w, kw))
         acc += w
         if k < len(cibles) and acc >= total * cibles[k] and genre == 'plat' and i < len(plan) - 3:
-            if k % 2 == 0:
-                haut = 16 if k == 2 else 12
-                sortie.append(('barrage', 28, dict(haut=haut, lettres=lettres, tyro=11 if k == 4 else 0, butin='+' if k else '*')))
-            else:
-                sortie.append(('gouffre', 20, dict(lettres=lettres, nb=4 + k // 2)))
+            g, largeur, options = modeles[k]
+            sortie.append((g, largeur, dict(options)))
             k += 1
     return sortie
 

@@ -29,17 +29,18 @@ def barrage(n, x0, haut=12, lettres='a', tyro=0, butin='*'):
     return xw, top
 
 
-def trou(n, x0, largeur):
+def trou(n, x0, largeur, base=None):
     """Le creux du gouffre : du sol à la galerie, une échelle à chaque bord, une petite plate-forme au fond.
-    (Reposé à la fin du creusement des galeries, qui pourraient l'avoir entamé.)"""
+    (Reposé à la fin du creusement des galeries, qui pourraient l'avoir entamé ; `base` : le sol d'alors.)"""
+    base = n.base if base is None else base
     for x in range(x0, x0 + largeur):
-        for y in range(n.base, n.yg + 1):
+        for y in range(base, n.yg + 1):
             n.set(x, y, ' ')
         for y in (n.yg + 1, n.yg + 2):
             if n.get(x, y) == ' ':
                 n.set(x, y, n.t['profond'])
     for x in (x0, x0 + largeur - 1):
-        for y in range(n.base, n.yg + 1):
+        for y in range(base, n.yg + 1):
             n.set(x, y, 'H')
     for x in range(x0 + largeur // 2 - 1, x0 + largeur // 2 + 2):
         n.set(x, n.yg - 2, '=')
