@@ -211,6 +211,16 @@ export class Partie implements Contexte {
     for (const j of this.joueurs) if (j) j.reapparait(x, y, j.membre);
   }
 
+  /**
+   * Recommence le niveau (la carte est refaite, détruite ou non : de quoi se sortir d'une impasse à force d'avoir tout cassé).
+   * Les vies et le score restent ; `depuisLeDebut` repart du départ plutôt que du dernier drapeau.
+   */
+  recommence(depuisLeDebut: boolean): void {
+    if (this.phase !== 'jeu') return;
+    this.charge(this.niveau, depuisLeDebut ? -1 : this.drapeau);
+    this.onProgression(this.progression(), false);
+  }
+
   private chargeNiveauSuivant(): void {
     this.charge(suivantDansArc(this.niveau) ?? this.niveau, -1);
     this.phase = 'histoire';

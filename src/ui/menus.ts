@@ -20,6 +20,9 @@ export interface Actions {
   lance(niveau: number, membre: number, reprise: Progression | null): void;
   rejoins(r: Recherche, a: Annonce<AnnonceDkk>, pseudo: string, membre: number): Promise<void>;
   reprend(): void;
+  /** refait le niveau en cours (hôte seulement) : du départ, ou du dernier drapeau */
+  recommence(depuisLeDebut: boolean): void;
+  readonly aUnDrapeau: boolean;
   quitte(): void;
   ouvreHote(): Hote | null;
   readonly estClient: boolean;
@@ -176,7 +179,14 @@ export class Menus {
   pause(): void {
     const boutons = el('div', '', 'boutons-menu');
     boutons.append(bouton('Reprendre', () => this.a.reprend(), 'principal'));
-    if (!this.a.estClient) boutons.append(bouton('Inviter des amis', () => this.inviter()));
+    if (!this.a.estClient) {
+      if (this.a.aUnDrapeau)
+        boutons.append(this.confirme('Recommencer au drapeau', () => this.a.recommence(false)));
+      boutons.append(
+        this.confirme('Recommencer le niveau', () => this.a.recommence(true)),
+        bouton('Inviter des amis', () => this.inviter()),
+      );
+    }
     boutons.append(
       bouton('Options', () => this.options()),
       ...(document.fullscreenEnabled && !document.fullscreenElement && !estInstallee()
@@ -190,6 +200,24 @@ export class Menus {
       el('p', 'À plusieurs, la partie continue pendant la pause.', 'aide'),
       el('p', `${texteVersion()} · ${this.a.diagnostic()}`, 'version'),
     );
+  }
+
+  /** Un bouton qui demande une seconde pression (3 s pour confirmer) : on ne refait pas son niveau d'un doigt qui glisse. */
+  private confirme(texte: string, action: () => void): HTMLButtonElement {
+    let attente: ReturnType<typeof setTimeout> | null = null;
+    const b = bouton(texte, () => {
+      if (attente) {
+        clearTimeout(attente);
+        action();
+        return;
+      }
+      b.textContent = 'Sûr ? Touchez encore';
+      attente = setTimeout(() => {
+        attente = null;
+        b.textContent = texte;
+      }, 3000);
+    });
+    return b;
   }
 
   inviter(): void {

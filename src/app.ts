@@ -169,6 +169,18 @@ export class App implements Actions {
     $('bouton-pause').hidden = false;
   }
 
+  /** Depuis la pause : refait le niveau (seul l'hôte le peut) et reprend. */
+  recommence(depuisLeDebut: boolean): void {
+    if (!this.partie || this.client) return;
+    this.partie.recommence(depuisLeDebut);
+    this.reprend();
+  }
+
+  /** Vrai si la partie a passé un drapeau : on peut alors recommencer à celui-ci plutôt qu'au départ. */
+  get aUnDrapeau(): boolean {
+    return (this.partie?.drapeau ?? -1) >= 0;
+  }
+
   quitte(): void {
     this.arreteTout();
     this.musique.joue(null);

@@ -124,6 +124,34 @@ describe('la partie', () => {
     expect(j.membre).not.toBe(membre);
   });
 
+  it('recommencer le niveau refait la carte, garde les vies et le score', () => {
+    const p = nouvelle();
+    const j = p.joueurs[0]!;
+    const tx = Math.floor(j.cx / TUILE);
+    const ty = Math.floor((j.corps.y + j.corps.h) / TUILE);
+    const avant = p.carte.get(tx, ty);
+    p.carte.endommage(tx, ty, 99);
+    expect(p.carte.get(tx, ty)).toBe(T.VIDE);
+    p.vies = 2;
+    p.score = 1234;
+    const generation = p.generation;
+    p.recommence(true);
+    expect(p.carte.get(tx, ty)).toBe(avant);
+    expect(p.vies).toBe(2);
+    expect(p.score).toBe(1234);
+    expect(p.phase).toBe('jeu');
+    expect(p.generation).toBe(generation + 1);
+  });
+
+  it('recommencer au drapeau garde le drapeau atteint', () => {
+    const p = nouvelle();
+    p.drapeau = 1;
+    p.recommence(false);
+    expect(p.drapeau).toBe(1);
+    p.recommence(true);
+    expect(p.drapeau).toBe(-1);
+  });
+
   describe('les tonneaux WOG', () => {
     /** Casse un tonneau posé à côté du héros et rend le cœur qu'il libère. */
     const casse = (type: number, sorte: 'coeur' | 'coeurOr') => {
