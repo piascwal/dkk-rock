@@ -126,8 +126,8 @@ def complexe(n, x, largeur, lettres, nb, butin):
     caissons explosifs, un escadron par étage, et le butin (arme, médiator ou cage) dans la salle du haut."""
     mat = n.t['mur']
     yg = n.yg
-    haut = n.base + 3  # le plafond : de la terre au-dessus
-    milieu = n.base + 8  # la dalle entre les deux étages
+    haut = yg - 9  # le plafond : de la terre au-dessus
+    milieu = yg - 4  # la dalle entre les deux étages
     n.rect(x, haut, x + largeur, yg + 1, '.')
     for yy in (yg + 1, yg + 2):
         for xx in range(x, x + largeur):

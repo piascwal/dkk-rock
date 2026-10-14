@@ -133,19 +133,15 @@ validé.
   pendant l'animation ; à plusieurs, elle continue.
 - **Un niveau :** une carte ASCII dans `src/niveaux/cartes/` (légende dans `format.ts`), ses textes dans
   `src/niveaux/textes/`, une ligne dans `src/niveaux/index.ts` et dans un arc (`niveaux/arcs.ts`). Les cinq premières
-  cartes sont générées par `python3 outils/genere-niveaux.py` (des pièces — collines, fosses à pitons, tours,
-  échafaudages, cheminées à sauts de mur, îles — sur un terrain, doublées de galeries, cavernes, boucles et caches) puis
-  modifiables à la main ; l'aperçu de chaque carte est dans `assets-sources/niveaux/`. Le test d'accessibilité vérifie
-  qu'on atteint la fin sans rien détruire. Sous le terrain il n'y a plus de socle : creuser trop, c'est tomber.
-  Tous les ~14 % d'un niveau, un **verrou vertical** (`outils/niveaux/verrous.py`, inséré par `avec_verrous`) oblige à
-  changer d'étage : un _barrage_ (mur incassable de 12 ou 16 tuiles qui coupe aussi la galerie : on monte par un
-  échafaudage, on redescend par une échelle ou une tyrolienne) puis un _gouffre_ (trou trop large pour être sauté : on
-  descend dans la galerie, zone de combat, et on remonte de l'autre côté). Les galeries ont des patrouilles, des
-  complexes souterrains en pierre (deux étages, fenêtres, escadrons, butin) et des caches murées dont une garde une cage
-  (+1 vie). Les **grandes structures** (`outils/niveaux/structures.py`) sont insérées tout au long du niveau : des
-  _forteresses_ de 3 à 4 étages (pièces séparées par des cloisons à portes, échelles qui alternent, fenêtres, toit avec sa
-  cabane, sous-sol creusé dans la terre) et des _traversées_ de gouffres sans fond (on tombe dans le vide) à franchir par une
-  passerelle en arc, une tyrolienne ou trois îlots flottants. Le monde est peu profond : 24 rangées sous la surface, puis le vide.
+  cartes sont générées par `python3 outils/genere-niveaux.py` puis modifiables à la main ; l'aperçu de chaque carte est
+  dans `assets-sources/niveaux/`. Le test d'accessibilité vérifie qu'on atteint la fin sans rien détruire. Sous le
+  terrain il n'y a plus de socle : creuser trop, c'est tomber.
+  **Pas de longues lignes droites :** chaque niveau est un enchaînement de _lieux_ (`outils/niveaux/plans.py`, un plan par
+  niveau) reliés par des raccords de 4 à 6 colonnes : forteresses à étages et sous-sol, traversées de gouffre (passerelle,
+  tyrolienne ou îlots), barrages à escalader, gouffres à descendre, tours, échafaudages, murs. Sous terre, pas de galerie
+  continue (`outils/niveaux/souterrain.py`) : des complexes de pierre, des cavernes et des caches, qu'on atteint par une
+  échelle depuis la surface et qui sont des impasses gardées (butin, arme ou cage +1 vie). Le monde est peu profond :
+  24 rangées sous la surface, puis le vide.
 - **Un arc de l'histoire :** les niveaux d'un arc s'enchaînent, avec leur épilogue ; l'arc principal est « La tournée ».
   Pour un autre (un voyage en Jamaïque, par exemple) : ajouter ses niveaux à la fin de `NIVEAUX`, puis une entrée dans
   `ARCS` (`niveaux/arcs.ts`) avec son titre, son résumé, son épilogue et, si on veut, `apres` (le niveau à terminer pour
