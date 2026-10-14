@@ -1,4 +1,4 @@
-import { HAUTEUR_VUE } from '../config';
+import { HAUTEUR_CARTE } from '../config';
 import { NIVEAUX } from '../niveaux';
 import { ARCS, niveauOuvert, type DefArc } from '../niveaux/arcs';
 import { dessineCarte, etapeTouchee, type EtatEtape } from '../rendu/carte-monde';
@@ -41,10 +41,10 @@ export function ecranCarte(
 
   let largeur = 240;
   const dimensionne = () => {
-    const k = Math.max(1, Math.floor((innerHeight * (devicePixelRatio || 1)) / HAUTEUR_VUE));
-    largeur = Math.round((HAUTEUR_VUE * innerWidth) / innerHeight);
+    const k = Math.max(1, Math.floor((innerHeight * (devicePixelRatio || 1)) / HAUTEUR_CARTE));
+    largeur = Math.round((HAUTEUR_CARTE * innerWidth) / innerHeight);
     toile.width = largeur * k;
-    toile.height = HAUTEUR_VUE * k;
+    toile.height = HAUTEUR_CARTE * k;
     ctx.setTransform(k, 0, 0, k, 0, 0);
     ctx.imageSmoothingEnabled = false;
   };
@@ -52,8 +52,8 @@ export function ecranCarte(
   toile.addEventListener('click', (e) => {
     const r = toile.getBoundingClientRect();
     const x = ((e.clientX - r.left) / r.width) * largeur;
-    const y = ((e.clientY - r.top) / r.height) * HAUTEUR_VUE;
-    const k = etapeTouchee(arc, largeur, HAUTEUR_VUE, pos, x, y);
+    const y = ((e.clientY - r.top) / r.height) * HAUTEUR_CARTE;
+    const k = etapeTouchee(arc, largeur, HAUTEUR_CARTE, pos, x, y);
     if (k === choix) jouer(arc.niveaux[k]!);
     else choisit(k);
   });
@@ -81,11 +81,11 @@ export function ecranCarte(
       k === choix ? 'cible' : faits.includes(n) ? 'faite' : ouverts[k] ? 'ouverte' : 'fermee',
     );
     ctx.fillStyle = '#2f86d8';
-    ctx.fillRect(0, 0, largeur, HAUTEUR_VUE);
+    ctx.fillRect(0, 0, largeur, HAUTEUR_CARTE);
     dessineCarte(
       ctx,
       largeur,
-      HAUTEUR_VUE,
+      HAUTEUR_CARTE,
       arc,
       pos,
       etats,

@@ -1,4 +1,4 @@
-import { DENSITE_MAX, DENSITE_MIN, HAUTEUR_VUE, TUILE } from '../config';
+import { DENSITE_MAX, DENSITE_MIN, HAUTEUR_CARTE, HAUTEUR_VUE, TUILE } from '../config';
 import type { Qualite } from '../jeu/sauvegarde';
 import { ANIM, G, type EntiteVue, type EtatVue, type Evenement } from '../jeu/vue';
 import { Carte } from '../monde/carte';
@@ -143,7 +143,12 @@ export class Rendu {
     ctx.setTransform(this.densite, 0, 0, this.densite, 0, 0);
     ctx.imageSmoothingEnabled = false;
     if (vue.phase === 'carte') {
-      dessineCarteMonde(ctx, this.largeur, vue.niveau, vue.page, this.tick);
+      // la carte garde sa propre hauteur de vue : on l'agrandit pour remplir l'écran (un entier de pixels par pixel de la carte)
+      const k = HAUTEUR_VUE / HAUTEUR_CARTE;
+      ctx.save();
+      ctx.scale(k, k);
+      dessineCarteMonde(ctx, Math.round(this.largeur / k), vue.niveau, vue.page, this.tick);
+      ctx.restore();
       return;
     }
     this.prepareNiveau(vue.niveau);

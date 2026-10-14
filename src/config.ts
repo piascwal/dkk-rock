@@ -6,6 +6,9 @@ export const TUILE = 16;
 /** Hauteur de la vue en pixels du monde (10 tuiles : un héros fait une tuile et on voit trois étages) ; la largeur suit la forme de l'écran. */
 export const HAUTEUR_VUE = 160;
 
+/** La carte du monde est dessinée pour une vue de 7,5 tuiles de haut, quelle que soit la hauteur de la vue en jeu. */
+export const HAUTEUR_CARTE = 120;
+
 /** La simulation avance par pas fixes de 1/60 s. */
 export const TICKS_PAR_SECONDE = 60;
 

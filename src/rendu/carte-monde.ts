@@ -1,4 +1,4 @@
-import { HAUTEUR_VUE } from '../config';
+import { HAUTEUR_CARTE } from '../config';
 import { DUREE_CARTE, G } from '../jeu/vue';
 import { Aleatoire, borne } from '../moteur/maths';
 import { NIVEAUX } from '../niveaux';
@@ -316,11 +316,11 @@ export function dessineCarteMonde(
   const etats = arc.niveaux.map((_, k): EtatEtape => (k <= i ? 'faite' : k === j ? 'cible' : 'ouverte'));
   const def = suivant === null ? null : NIVEAUX[suivant];
   ctx.fillStyle = '#2f86d8';
-  ctx.fillRect(0, 0, largeur, HAUTEUR_VUE);
+  ctx.fillRect(0, 0, largeur, HAUTEUR_CARTE);
   dessineCarte(
     ctx,
     largeur,
-    HAUTEUR_VUE,
+    HAUTEUR_CARTE,
     arc,
     pos,
     etats,
