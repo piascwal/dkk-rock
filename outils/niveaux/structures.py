@@ -24,7 +24,7 @@ def forteresse(n, x0, largeur=30, etages=3, lettres='a', mat=None, sous_sol=True
     for k in range(1, etages + 1):  # la dalle k, au-dessus de l'étage k - 1
         ys = base - k * ETAGE
         for x in range(x0, x1):
-            n.set(x, ys, mat)
+            n.set(x, ys, '=' if (x - x0) % 4 == 2 else mat)  # des pitons : si on casse la dalle, on passe encore
         gx = x0 + 3 if k % 2 else x1 - 4
         for y in range(ys, base - (k - 1) * ETAGE):
             n.set(gx, y, 'H')
@@ -137,7 +137,7 @@ def complexe(n, x, largeur, lettres, nb, butin):
         n.set(x, y, mat)
         n.set(x + largeur - 1, y, mat)
     for xx in range(x, x + largeur):
-        n.set(xx, milieu, mat)
+        n.set(xx, milieu, '=' if (xx - x) % 4 == 2 else mat)  # des pitons : la dalle cassée reste franchissable
     for y in range(milieu, yg + 1):  # l'échelle entre les deux étages
         n.set(x + 4, y, 'H')
     cx = x + largeur // 2

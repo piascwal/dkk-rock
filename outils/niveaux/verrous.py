@@ -25,7 +25,7 @@ def barrage(n, x0, haut=12, lettres='a', tyro=0, butin='*'):
     n.ennemis(xw, xw + 3, lettres, 1, ymin=top - 1)  # un garde sur le mur
     n.repere(xw + 1, butin, ymin=top - 1)
     if tyro:
-        n.tyro(xw + 1, top - 1, xw + 3 + tyro, n.base - 5)
+        n.tyro(xw + 2, top - 1, xw + 3 + tyro, n.base - 5)
     return xw, top
 
 

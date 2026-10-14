@@ -14,9 +14,12 @@ def enchaine(lieux, graine, lettres):
     rng = random.Random(graine)
     plan = []
     for genre, largeur, options in lieux:
-        plan.append((genre, largeur, dict(options)))
+        options = dict(options)
+        apres = options.pop('apres', None)  # largeur imposée du raccord (la tyrolienne d'une tour y atterrit)
+        plan.append((genre, largeur, options))
         if genre not in ('plat', 'vide') + FIN:
-            plan.append(('raccord', rng.randrange(4, 7), dict(lettres=lettres)))
+            largeur_raccord = rng.randrange(4, 7)
+            plan.append(('raccord', apres or largeur_raccord, dict(lettres=lettres)))
     if plan and plan[-1][0] == 'raccord':
         plan.pop()
     return plan
@@ -33,7 +36,7 @@ NIVEAUX = {
             ('mur', 16, dict(haut=5, digit='3')),  # sauter contre le mur
             ('plat', 10, dict(digit='4', cage=True)),  # la cage
             ('plat', 10, dict(digit='5', deco=0, caissons=True)),  # les caissons de basses
-            ('tour', 18, dict(etages=2, tyro=26, digit='6')),  # la tyrolienne
+            ('tour', 18, dict(etages=2, tyro=9, apres=13, digit='6')),  # la tyrolienne
             ('forteresse', 34, dict(etages=3, lettres='ac')),
             ('gouffre', 20, dict(lettres='ac', nb=4)),
             ('echafaudage', 22, dict(niveaux=2, lettres='ac')),
@@ -121,7 +124,7 @@ NIVEAUX = {
         lieux=[
             ('plat', 12, dict(lettres='a', deco=3)),
             ('plat', 10, dict(lettres='ar', digit='1')),  # les robots vocodeurs
-            ('tour', 20, dict(etages=3, lettres='acr', mat='D', vitre=True, tyro=28, digit='2')),  # la tyrolienne entre les toits
+            ('tour', 20, dict(etages=3, lettres='acr', mat='D', vitre=True, tyro=10, apres=14, digit='2')),  # la tyrolienne entre les toits
             ('forteresse', 34, dict(etages=3, lettres='acr', mat='D')),
             ('gouffre', 20, dict(lettres='acr', nb=4)),
             ('traversee', 36, dict(lettres='adr')),

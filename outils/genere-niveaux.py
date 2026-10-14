@@ -125,7 +125,7 @@ class Recette:
             n.ennemis(x0 + 3, x1 - 3, lettres, 1 + (k > 0), ymin=ys - 5)
         n.repere(x0 + (x1 - x0) // 2, '*', ymin=top - 1)  # une arme sur le toit
         if tyro:
-            n.tyro(x0 + 2, top - 1, x1 + tyro, n.base - 5)
+            n.tyro(x1 - 1, top - 1, x1 + tyro, n.base - 5)  # part du bord du toit : le câble ne traverse rien
 
     def p_pont(self, x0, x1, haut=6, lettres='a'):
         n = self.n

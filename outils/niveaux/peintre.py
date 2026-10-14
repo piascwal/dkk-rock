@@ -176,7 +176,7 @@ class Niveau:
         for k in range(1, etages + 1):
             ys = self.base - k * fh
             for x in range(x0, x0 + largeur):
-                self.set(x, ys, mat)
+                self.set(x, ys, '=' if (x - x0) % 4 == 2 else mat)  # des pitons : si on casse la dalle, on passe encore
             gx = x0 + 2 if k % 2 else x0 + largeur - 3  # le trou de l'échelle change de côté à chaque étage
             for y in range(ys, self.base - (k - 1) * fh):
                 self.set(gx, y, 'H')
