@@ -41,6 +41,15 @@ export function dessineDecorFeuille(
   return true;
 }
 
+/** La force du voile du plan de fond (0 : aucun, 1 : tout à la couleur du lointain). Réglable en direct : voir ui/curseur-voile.ts. */
+export const reglageVoile = { force: 0.32 };
+export const FORCE_VOILE_MAX = 0.8;
+
+export function regleVoile(force: number): void {
+  reglageVoile.force = Math.min(FORCE_VOILE_MAX, Math.max(0, force));
+  voilees.clear();
+}
+
 const voilees = new Map<string, HTMLCanvasElement>();
 
 /** Le plan de fond vu de loin : l'image teintée de la couleur du lointain du monde (moins de contraste, comme dans la brume). */
@@ -60,7 +69,7 @@ function voilee(
   const c = toile.getContext('2d')!;
   c.drawImage(img, 0, ligne * f.h, f.w, f.h, 0, 0, f.w, f.h);
   c.globalCompositeOperation = 'source-atop';
-  c.globalAlpha = 0.32;
+  c.globalAlpha = reglageVoile.force;
   c.fillStyle = voile;
   c.fillRect(0, 0, f.w, f.h);
   voilees.set(cle, toile);
