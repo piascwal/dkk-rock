@@ -40,11 +40,17 @@ export class Kiwi implements EntiteSimulee {
     const chef = this.chef();
     const proie = this.proie(ctx);
 
+    // sans proie, il suit son héros à distance : une zone morte autour de lui (viser un point « derrière » le héros
+    // changeait de côté à chaque pas dès qu'on le rejoignait, et le kiwi battait de gauche à droite sans fin)
     let vise = c.x;
+    let zone = 6;
     if (proie) vise = proie.x + proie.w / 2;
-    else if (chef) vise = chef.x + chef.w / 2 - this.dir * 18;
+    else if (chef) {
+      vise = chef.x + chef.w / 2;
+      zone = 22;
+    }
     const dx = vise - (c.x + c.w / 2);
-    if (Math.abs(dx) > 6) {
+    if (Math.abs(dx) > zone) {
       this.dir = dx > 0 ? 1 : -1;
       c.vx = this.dir * (proie ? 1.6 : Math.min(2.4, Math.abs(dx) / 20 + 0.6));
     } else c.vx = 0;
