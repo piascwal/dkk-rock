@@ -33,6 +33,12 @@ OBJETS = {
     'buisson': ([f'decor/buisson-{k}-base.png' for k in range(1, 4)], None, 22),
     'sapin': ([f'decor/sapin-{k}-base.png' for k in range(1, 4)], None, 34),
     'lampadaire': (['decor/lampadaire-base.png'], None, 15),
+    # clôtures (neuve, simple, envahie de lierre), boîtes aux lettres (ronde, carrée), palmiers (penché, droit, courbé) et
+    # arbres (rond vert clair, chêne sombre) : même échelle pour toutes les apparences d'un objet
+    'cloture': ([f'decor/cloture-{k}-base.png' for k in (1, 2, 3)], None, 26),
+    'boite': ([f'decor/boite-{k}-base.png' for k in (1, 2)], None, 11),
+    'palmier': ([f'decor/palmier-{k}-base.png' for k in (1, 2, 3)], None, 34),
+    'arbre': ([f'decor/arbre-{k}-base.png' for k in (1, 2)], None, 34),
     'enceinte-34': ([f'decor/enceinte-34-{k}-base.png' for k in (1, 2)], None, 26, True),
 }
 

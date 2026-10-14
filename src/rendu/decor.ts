@@ -269,7 +269,17 @@ function dessineCaisses(ctx: CanvasRenderingContext2D, v: number): boolean {
   return true;
 }
 
-type Sprite = 'vacheCasque' | 'lampadaire' | 'sapin' | 'sapinNeige' | 'buisson' | 'buissonSable';
+type Sprite =
+  | 'vacheCasque'
+  | 'lampadaire'
+  | 'sapin'
+  | 'sapinNeige'
+  | 'buisson'
+  | 'buissonSable'
+  | 'cloture'
+  | 'boiteAuxLettres'
+  | 'palmier'
+  | 'arbre';
 const SPRITES: ReadonlySet<string> = new Set<Sprite>([
   'vacheCasque',
   'lampadaire',
@@ -277,6 +287,10 @@ const SPRITES: ReadonlySet<string> = new Set<Sprite>([
   'sapinNeige',
   'buisson',
   'buissonSable',
+  'cloture',
+  'boiteAuxLettres',
+  'palmier',
+  'arbre',
 ]);
 
 /** Les accessoires dessinés par une planche fournie (apparence tirée au sort selon `v`, tournée d'un côté ou de l'autre). */
@@ -287,6 +301,10 @@ function dessineSprite(ctx: CanvasRenderingContext2D, quoi: Sprite, v: number, v
   if (v & 8) ctx.scale(-1, 1);
   if (quoi === 'vacheCasque') return dessineDecorFeuille(ctx, 'vache', v % 6, voile);
   if (quoi === 'sapin') return dessineDecorFeuille(ctx, 'sapin', 0, voile);
+  if (quoi === 'cloture') return dessineDecorFeuille(ctx, 'cloture', v % 3, voile);
+  if (quoi === 'boiteAuxLettres') return dessineDecorFeuille(ctx, 'boite', v % 2, voile);
+  if (quoi === 'palmier') return dessineDecorFeuille(ctx, 'palmier', v % 3, voile);
+  if (quoi === 'arbre') return dessineDecorFeuille(ctx, 'arbre', v % 2, voile);
   if (quoi === 'sapinNeige') return dessineDecorFeuille(ctx, 'sapin', 1 + ((v >> 4) & 1), voile);
   return dessineDecorFeuille(ctx, 'buisson', v % 3, voile);
 }
