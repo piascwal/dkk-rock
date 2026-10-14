@@ -12,8 +12,8 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent / 'niveaux'))
 
 from peintre import Niveau
-from structures import forteresse, traversee
-from verrous import barrage, bunker, gouffre, patrouilles, trou
+from structures import complexe, forteresse, traversee
+from verrous import barrage, gouffre, patrouilles, trou
 
 RACINE = pathlib.Path(__file__).resolve().parent.parent
 CARTES = RACINE / 'src' / 'niveaux' / 'cartes'
@@ -227,6 +227,15 @@ def construit(nom, theme, textes, plan, fichier, constante, graine, base=30):  #
     return r
 
 
+def place_libre(x, largeur, pris, w):
+    """Le x le plus proche de `x` où une salle de `largeur` colonnes ne recoupe aucun des intervalles `pris`."""
+    for d in range(0, 120, 4):
+        for cand in (x + d, x - d):
+            if 14 <= cand <= w - largeur - 14 and all(cand + largeur < a or cand > b for a, b in pris):
+                return cand
+    return None
+
+
 def souterrain(r, seq_puits, caveau=None, ennemis='a'):
     """Sous tout le niveau : la galerie principale et ses puits, des cavernes, des boucles, des caches, un second étage."""
     n = r.n
@@ -256,10 +265,14 @@ def souterrain(r, seq_puits, caveau=None, ennemis='a'):
         x = int(w * frac)
         cx, cy = n.cache(x, n.yg - 5, 4, 3)
         n.set(cx, cy, 'K' if frac == 0.7 else '+' if (x // 7) % 2 else '*')
-    # des ennemis tout au long de la galerie, et des bunkers : des salles tenues par un escadron, avec du butin
+    # des ennemis tout au long de la galerie, et des complexes souterrains en pierre (deux étages, fenêtres, butin) : à
+    # l'écart des forteresses et des gouffres, dont les sous-sols et les trous se mêleraient à eux
     patrouilles(n, 14, w - 14, ennemis)
+    pris = [(a - 4, b + 4) for a, b, g in r.pieces if g in ('forteresse', 'traversee', 'barrage', 'gouffre')]
     for frac, butin in ((0.27, '*'), (0.5, 'K'), (0.77, '+'), (0.93, '*')):
-        bunker(n, int(w * frac), 20, ennemis * 2, 5 + int(frac * 3), butin)
+        x = place_libre(int(w * frac), 28, pris, w)
+        if x is not None:
+            complexe(n, x, 28, ennemis * 2, 5 + int(frac * 3), butin)
     if caveau:
         x0, x1 = caveau
         y2 = n.yg + 8

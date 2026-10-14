@@ -141,7 +141,11 @@ validé.
   changer d'étage : un _barrage_ (mur incassable de 12 ou 16 tuiles qui coupe aussi la galerie : on monte par un
   échafaudage, on redescend par une échelle ou une tyrolienne) puis un _gouffre_ (trou trop large pour être sauté : on
   descend dans la galerie, zone de combat, et on remonte de l'autre côté). Les galeries ont des patrouilles, des
-  bunkers (salles tenues par un escadron avec du butin) et des caches murées dont une garde une cage (+1 vie).
+  complexes souterrains en pierre (deux étages, fenêtres, escadrons, butin) et des caches murées dont une garde une cage
+  (+1 vie). Les **grandes structures** (`outils/niveaux/structures.py`) sont insérées tout au long du niveau : des
+  _forteresses_ de 3 à 4 étages (pièces séparées par des cloisons à portes, échelles qui alternent, fenêtres, toit avec sa
+  cabane, sous-sol creusé dans la terre) et des _traversées_ de gouffres sans fond (on tombe dans le vide) à franchir par une
+  passerelle en arc, une tyrolienne ou trois îlots flottants. Le monde est peu profond : 24 rangées sous la surface, puis le vide.
 - **Un arc de l'histoire :** les niveaux d'un arc s'enchaînent, avec leur épilogue ; l'arc principal est « La tournée ».
   Pour un autre (un voyage en Jamaïque, par exemple) : ajouter ses niveaux à la fin de `NIVEAUX`, puis une entrée dans
   `ARCS` (`niveaux/arcs.ts`) avec son titre, son résumé, son épilogue et, si on veut, `apres` (le niveau à terminer pour

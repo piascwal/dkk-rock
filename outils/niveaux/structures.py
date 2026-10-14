@@ -118,3 +118,43 @@ def traversee(n, x0, lettres='a'):
     n.ennemis(gx1 + 1, gx1 + 8, lettres, 2)
     n.ennemis(gx0 - 9, gx0 - 2, lettres, 1, ymin=top - 1)
     return gx0, gx1
+
+
+def complexe(n, x, largeur, lettres, nb, butin):
+    """Un complexe souterrain en pierre, sur deux étages, que la galerie traverse (image : un fortin enterré) : des salles
+    séparées par des cloisons à porte, des fenêtres éclairées dans l'épaisseur des murs, une échelle entre les étages, des
+    caissons explosifs, un escadron par étage, et le butin (arme, médiator ou cage) dans la salle du haut."""
+    mat = n.t['mur']
+    yg = n.yg
+    haut = n.base + 3  # le plafond : de la terre au-dessus
+    milieu = n.base + 8  # la dalle entre les deux étages
+    n.rect(x, haut, x + largeur, yg + 1, '.')
+    for yy in (yg + 1, yg + 2):
+        for xx in range(x, x + largeur):
+            if n.get(xx, yy) == ' ':
+                n.set(xx, yy, n.t['profond'])
+    for y in range(haut, yg + 1):
+        n.set(x, y, mat)
+        n.set(x + largeur - 1, y, mat)
+    for xx in range(x, x + largeur):
+        n.set(xx, milieu, mat)
+    for y in range(milieu, yg + 1):  # l'échelle entre les deux étages
+        n.set(x + 4, y, 'H')
+    cx = x + largeur // 2
+    for y in range(haut, milieu - 2):  # la cloison du haut, avec sa porte
+        n.set(cx, y, mat)
+    for y in range(milieu + 1, yg - 1):  # celle du bas, décalée
+        n.set(cx + 4, y, mat)
+    for y in (yg - 1, yg):  # la galerie entre et sort par le bas
+        n.set(x, y, ' ')
+        n.set(x + largeur - 1, y, ' ')
+    for xx in (x, x + largeur - 1):  # des fenêtres éclairées dans l'épaisseur des murs
+        n.set(xx, milieu - 3, 'V')
+    for xx in (cx - 6, cx + 8):
+        n.set(xx, milieu + 2, 'V')
+    if 'T' in n.t['deco']:
+        for dx in (-2, 2):
+            n.set(cx + dx - 1, yg, 'T')
+    n.set(cx - 5, milieu - 1, 'C')
+    n.ennemis(x + 1, x + largeur - 1, lettres, nb, ymin=haut)
+    n.repere(x + largeur - 5, butin, ymin=haut)
