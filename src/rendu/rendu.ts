@@ -210,6 +210,7 @@ export class Rendu {
     );
     this.particules.dessine(ctx, camX, camY);
     this.traits.maj(vue, this.decor, carte, { emojis: this.emojis });
+    this.emojis.accompagne(vue.entites);
     this.emojis.maj();
     this.emojis.dessine(ctx, camX, camY);
   }

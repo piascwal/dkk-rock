@@ -28,6 +28,15 @@ interface Emoji {
   x: number;
   y: number;
   age: number;
+  /** l'entité qu'il accompagne : il la suit tant qu'elle est à l'écran */
+  suit?: Suivi;
+}
+
+/** Une entité accompagnée, et le décalage de l'emoji par rapport à ses pieds. */
+export interface Suivi {
+  id: number;
+  dx: number;
+  dy: number;
 }
 
 const DUREE = 75;
@@ -38,9 +47,20 @@ const OPACITE = 0.5;
 export class Emojis {
   private readonly liste: Emoji[] = [];
 
-  /** Fait surgir un emoji à (x, y), en pixels du monde (le point du bas). */
-  pop(nom: NomEmoji, x: number, y: number): void {
-    if (this.liste.length < 24) this.liste.push({ nom, x, y, age: 0 });
+  /** Fait surgir un emoji à (x, y), en pixels du monde (le point du bas) ; avec `suit`, il reste collé à l'entité. */
+  pop(nom: NomEmoji, x: number, y: number, suit?: Suivi): void {
+    if (this.liste.length < 24) this.liste.push({ nom, x, y, age: 0, suit });
+  }
+
+  /** Recolle les emojis à leur entité, qui a bougé depuis. */
+  accompagne(entites: readonly { id: number; x: number; y: number }[]): void {
+    for (const e of this.liste) {
+      const v = e.suit && entites.find((o) => o.id === e.suit!.id);
+      if (v && e.suit) {
+        e.x = v.x + e.suit.dx;
+        e.y = v.y + e.suit.dy;
+      }
+    }
   }
 
   /** Un pas d'animation (une image dessinée). */
@@ -54,7 +74,7 @@ export class Emojis {
       const m: Modele = MODELES[e.nom];
       // le pop : tout petit, un peu trop gros, puis à sa taille ; ensuite il monte en ralentissant
       const echelle = e.age < 3 ? 0.6 : e.age < 9 ? 1.4 : 1;
-      const monte = Math.round(10 * (1 - Math.exp(-e.age / 25)));
+      const monte = Math.round(5 * (1 - Math.exp(-e.age / 25)));
       const fondu = e.age > DUREE - FONDU ? (DUREE - e.age) / FONDU : 1;
       const h = m.rangees.length;
       const w = m.rangees[0]!.length;

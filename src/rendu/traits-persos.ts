@@ -23,14 +23,17 @@ export interface TraitPerso {
   croise?: {
     decors: readonly string[];
     /** ...voici ce qui se passe, au pied (x, y) du héros */
-    effet: (x: number, y: number, fx: Effets) => void;
+    effet: (x: number, y: number, fx: Effets, id: number) => void;
   };
 }
 
 export const TRAITS: readonly TraitPerso[] = [
   {
     genre: G.TOM,
-    croise: { decors: ['tronc'], effet: (x, y, fx) => fx.emojis.pop('coeur', x, y - 44) },
+    croise: {
+      decors: ['tronc'],
+      effet: (x, y, fx, id) => fx.emojis.pop('coeur', x, y - 24, { id, dx: 0, dy: -24 }),
+    },
   },
 ];
 
@@ -69,7 +72,7 @@ export class TraitsPersos {
         if (!carte.props(o.tx, o.ty).solide || carte.solide(o.tx, o.ty - 1)) continue;
         if (this.image - (this.dernier.get(o) ?? -REPOS) < REPOS) continue;
         this.dernier.set(o, this.image);
-        trait.croise.effet(v.x, v.y, fx);
+        trait.croise.effet(v.x, v.y, fx, v.id);
       }
     }
   }
