@@ -1,4 +1,5 @@
 import { HAUTEUR_VUE } from '../config';
+import { POSITION_HEROS } from './camera';
 import { Aleatoire } from '../moteur/maths';
 import { Ciel } from './ciel';
 import { arbreRond, brume, palmierPixel, sapinPixel } from './fonds-arbres';
@@ -169,7 +170,7 @@ const PARALLAXE = [0.12, 0.3, 0.55];
 /** Et le défilement vertical des plans, quand la caméra monte ou descend. */
 const PARALLAXE_VERTICALE = [0.2, 0.45, 0.75];
 /** Où se trouve le sol à l'écran quand le héros marche dessus, et où il se pose dans la bande d'un plan de décor. */
-const HORIZON = 84;
+const HORIZON = Math.round(HAUTEUR_VUE * POSITION_HEROS) + 8;
 const PIED_DE_BANDE = 238;
 
 /** Le fond d'un monde : un ciel en dégradé et trois plans de décor qui défilent moins vite que le jeu. */

@@ -1,3 +1,4 @@
+import { HAUTEUR_VUE } from '../config';
 import { Aleatoire } from '../moteur/maths';
 import { disque } from './formes-pixels';
 import type { Decor } from './themes';
@@ -30,6 +31,8 @@ const OISEAUX: Partial<Record<Decor, string>> = {
   palmiers: '#5a2a2a',
 };
 
+/** Le ciel est dessiné pour une vue de 120 px de haut : on étire ses hauteurs à la vue actuelle. */
+const ETIRE = HAUTEUR_VUE / 120;
 const PERIODE = 1700;
 const NB_NUAGES = 11;
 const LARGEUR_MAX = 100;
@@ -80,7 +83,7 @@ export class Ciel {
       this.nuages.push({
         toile: formes[i % formes.length]!,
         x: (i * PERIODE) / NB_NUAGES + r.entier(0, 60),
-        y: loin ? r.entier(6, 30) : r.entier(20, 70),
+        y: Math.round((loin ? r.entier(6, 30) : r.entier(20, 70)) * ETIRE),
         vitesse: loin ? 0.012 : 0.03,
         profondeur: loin ? 0.04 : 0.08,
       });
@@ -106,7 +109,10 @@ export class Ciel {
       if (x < -40 || x > largeur + 40) continue;
       for (let i = 0; i < 4; i++) {
         const bx = Math.round(x + i * 9 + (i % 2) * 3);
-        const by = 28 + v * 17 + (i % 3) * 5 + Math.round(Math.sin((tick + v * 50) / 40 + i) * 2);
+        const by =
+          Math.round((28 + v * 17) * ETIRE) +
+          (i % 3) * 5 +
+          Math.round(Math.sin((tick + v * 50) / 40 + i) * 2);
         const haut = Math.floor((tick + i * 5 + v * 3) / 10) % 2 === 0;
         // des ailes en V (levées) ou en chapeau (baissées), un pixel de corps au milieu
         ctx.fillRect(bx, by, 1, 1);
