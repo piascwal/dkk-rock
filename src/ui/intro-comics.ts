@@ -17,7 +17,8 @@ const PERSOS = [
   { g: G.TOM, nom: 'TOM', role: 'Guitare rythmique', cri: 'TCHAK !', couleur: '#ff4fd8', fond: '#3a0a3a' },
 ];
 
-const H = 240;
+export const HAUTEUR_CASE = 240;
+const H = HAUTEUR_CASE;
 
 /** Une étoile d'onomatopée, en marches d'escalier (pas de courbe lissée). */
 function etoile(c: CanvasRenderingContext2D, cx: number, cy: number, r: number, couleur: string): void {

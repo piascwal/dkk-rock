@@ -8,7 +8,6 @@ import { Recherche } from '../reseau/client';
 import type { Hote } from '../reseau/hote';
 import { bouton, el } from './elements';
 import { ecranInviter, ecranRejoindre } from './menus-reseau';
-import { QUI_DES_MEMBRES, portrait } from './portraits';
 import { texteVersion } from '../version';
 import { estInstallee, installe, peutInstaller, surIPhone } from './installation';
 import { pleinEcran } from './plein-ecran';
@@ -92,7 +91,7 @@ export class Menus {
       (...enfants) => this.montre(...enfants),
       s.faits,
       depart,
-      (n) => this.rockers(n, s.enCours?.niveau === n ? s.enCours : null),
+      (n) => this.lanceNiveau(n, s.enCours?.niveau === n ? s.enCours : null),
       () => this.titre(),
     );
   }
@@ -102,35 +101,13 @@ export class Menus {
     if (this.ecran.querySelector('.logo')) this.titre();
   }
 
-  rockers(niveau: number, reprise: Progression | null = null): void {
-    const liste = el('div', '', 'rockers');
-    HEROS.forEach((h, i) => {
-      const b = bouton(
-        '',
-        () => {
-          this.a.sauvegarde.membre = i;
-          this.a.enregistre();
-          this.a.lance(niveau, i, reprise);
-        },
-        `rocker${i === this.a.sauvegarde.membre ? ' choisi' : ''}`,
-      );
-      b.style.setProperty('--couleur', h.couleur);
-      const img = el('img');
-      img.src = portrait(QUI_DES_MEMBRES[i]!);
-      img.alt = '';
-      b.append(img, el('strong', h.nom), el('span', h.instrument), el('span', h.description));
-      liste.append(b);
-    });
-    this.montre(
-      el('h2', 'Qui ouvre le bal ?'),
-      liste,
-      el(
-        'p',
-        'Les autres attendent en cage. Libérez-les en chemin : une vie de plus, et vous prenez leur place.',
-        'aide',
-      ),
-      bouton('Retour', () => this.titre()),
-    );
+  /**
+   * Lance un niveau : plus de choix de personnage, comme dans Broforce. On reprend avec le dernier membre joué ; une
+   * partie neuve en tire un au hasard. Les autres attendent en cage (voir la cage, interactions.ts).
+   */
+  lanceNiveau(niveau: number, reprise: Progression | null = null): void {
+    const membre = reprise ? this.a.sauvegarde.membre : Math.floor(Math.random() * HEROS.length);
+    this.a.lance(niveau, membre, reprise);
   }
 
   /** Pour tester : tous les niveaux de tous les arcs, sans avoir à les débloquer. */
@@ -138,7 +115,7 @@ export class Menus {
     const arcs = ARCS.map((arc) => {
       const liste = el('div', '', 'liste');
       arc.niveaux.forEach((i, pos) =>
-        liste.append(bouton(`${pos + 1}. ${NIVEAUX[i]!.titre}`, () => this.rockers(i))),
+        liste.append(bouton(`${pos + 1}. ${NIVEAUX[i]!.titre}`, () => this.lanceNiveau(i))),
       );
       return [el('h2', arc.titre), liste];
     });

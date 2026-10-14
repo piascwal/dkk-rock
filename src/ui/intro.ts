@@ -6,6 +6,7 @@ import { ecritCentre } from '../rendu/police';
 import { VERSION } from '../version';
 import { DUREE_CASE, dessineCase } from './intro-comics';
 import { pleinEcran } from './plein-ecran';
+import { calibreToile } from './toile-plein-ecran';
 import { CASES, ENTREES, FIN, IMPACT, INSTRUMENTS, joueIntro } from './intro-son';
 
 /**
@@ -64,12 +65,7 @@ export class Intro {
   }
 
   private dimensionne = (): void => {
-    const k = Math.max(1, Math.floor((innerHeight * (devicePixelRatio || 1)) / H));
-    this.w = Math.round((H * innerWidth) / innerHeight);
-    this.toile.width = this.w * k;
-    this.toile.height = H * k;
-    this.ctx.setTransform(k, 0, 0, k, 0, 0);
-    this.ctx.imageSmoothingEnabled = false;
+    this.w = calibreToile(this.toile, this.ctx, H);
   };
 
   private touche = (e: Event): void => {

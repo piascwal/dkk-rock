@@ -58,3 +58,16 @@ export function joueIntro(s: Synthe): void {
   }
   accord(IMPACT + 4, MI3, 1.2, 0.14);
 }
+
+/** L'arrivée d'un membre : un accord à sa note, un coup de grosse caisse, un éclat de cymbale (voir recrue.ts). */
+export function joueRecrue(s: Synthe, membre: number): void {
+  const ctx = s.ctx;
+  if (!ctx) return;
+  const t0 = ctx.currentTime + 0.03;
+  const f = accords[membre % accords.length]!;
+  for (const mult of [1, 1.5, 2])
+    s.note({ freq: f * mult, duree: 0.7, type: 'sawtooth', volume: 0.1, distordu: true, quand: t0 });
+  s.note({ freq: 140, vers: 40, duree: 0.25, type: 'sine', volume: 0.5, quand: t0 });
+  s.bruit({ duree: 0.5, volume: 0.2, passeHaut: 2500, quand: t0 + 0.05 });
+  s.note({ freq: f * 2, duree: 0.5, type: 'square', volume: 0.06, quand: t0 + 0.55 });
+}

@@ -17,6 +17,7 @@ import type { Carte } from './monde/carte';
 import { chargeFeuilles } from './rendu/feuilles-images';
 import { Rendu } from './rendu/rendu';
 import { Intro } from './ui/intro';
+import { Recrue } from './ui/recrue';
 import { prepareInstallation } from './ui/installation';
 import { Bulles, Histoire } from './ui/dialogues';
 import { Hud } from './ui/hud';
@@ -53,12 +54,17 @@ export class App implements Actions {
   private avant = 0;
   private bitsAvant = 0;
   private derniereVue: EtatVue | null = null;
+  private recrue!: Recrue;
+  /** le membre que l'on jouait à la dernière image, et si on était à terre : pour savoir qu'une recrue arrive */
+  private membreVu: number | null = null;
+  private etaitMort = false;
 
   get estClient(): boolean {
     return !!this.client;
   }
 
   demarre(): void {
+    this.recrue = new Recrue($('intro') as HTMLCanvasElement, this.synthe);
     chargeFeuilles(import.meta.env.BASE_URL);
     // l'application installable : quand le navigateur propose de l'installer, le menu titre affiche le bouton
     prepareInstallation(import.meta.env.BASE_URL, () => {
@@ -123,6 +129,7 @@ export class App implements Actions {
 
   lance(niveau: number, membre: number, reprise: Progression | null): void {
     this.arreteTout();
+    this.membreVu = null;
     const p = new Partie(reprise ?? { niveau, drapeau: -1, vies: VIES_DEPART, score: 0 });
     p.ajouteJoueur(0, membre);
     p.onProgression = (prog, fini, niveauFini) => {
@@ -138,6 +145,7 @@ export class App implements Actions {
   async rejoins(r: Recherche, a: Annonce<AnnonceDkk>, pseudo: string, membre: number): Promise<void> {
     const c = await Client.rejoins(r, a, pseudo, membre);
     this.arreteTout();
+    this.membreVu = null;
     this.client = c;
     c.onEvenements = (l) => this.evenements(l);
     c.onFerme = () => {
@@ -211,7 +219,7 @@ export class App implements Actions {
 
   // ——— la boucle ———
   private commandes(): number {
-    if (this.enPause || this.menus.ouvert) return 0;
+    if (this.enPause || this.menus.ouvert || this.recrue.enCours) return 0;
     return this.clavier.commandes | this.tactile.commandes | commandesManette();
   }
 
@@ -226,7 +234,7 @@ export class App implements Actions {
 
     if (this.partie) {
       const solo = !this.multijoueur;
-      if (!(this.enPause && solo)) {
+      if (!((this.enPause || this.recrue.enCours) && solo)) {
         this.reste += dt;
         while (this.reste >= PAS_MS) {
           this.reste -= PAS_MS;
@@ -272,8 +280,28 @@ export class App implements Actions {
     }
   }
 
+  /**
+   * Une recrue : le membre que l'on joue vient de changer. Au début de la partie (premier tour de jeu) et quand une cage
+   * s'ouvre, on coupe la scène pour le présenter ; le remplaçant d'un héros tombé arrive sans cérémonie.
+   */
+  private annonceRecrue(v: EtatVue, siege: number): void {
+    const moi = v.joueurs[siege];
+    if (v.phase !== 'jeu' || !moi?.present) return;
+    const avant = this.membreVu;
+    const mort = this.etaitMort;
+    this.membreVu = moi.membre;
+    this.etaitMort = moi.mort;
+    if (this.sauvegarde.membre !== moi.membre) {
+      this.sauvegarde.membre = moi.membre;
+      this.enregistre();
+    }
+    if (avant === null) this.recrue.joue(moi.membre, 'depart', () => this.appliqueOptions());
+    else if (avant !== moi.membre && !mort && !moi.mort) this.recrue.joue(moi.membre, 'cage', () => {});
+  }
+
   private affiche(v: EtatVue, carte: Carte, siege: number): void {
     this.derniereVue = v;
+    this.annonceRecrue(v, siege);
     this.rendu.dessine(v, carte, siege);
     const noms: string[] = Array<string>(MAX_JOUEURS).fill('');
     if (this.client) for (const j of this.client.joueurs) noms[j.siege] = j.nom;

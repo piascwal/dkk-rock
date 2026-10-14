@@ -57,7 +57,7 @@ Les héros viennent de leur sprite de base (`assets-sources/heros/`) par
 tibias ; polygones et pivots dans `outils/gabarits.py`), les fait tourner autour des articulations
 (`outils/squelette.py`), puis réduit à 40 px de haut en gardant la palette. Tom et JBT partagent le même
 gabarit de corps (en foulée) ; JBM, Mat (debout, de face) et JBG (long manteau, dont les pans restent fixes) ont chacun le leur. Il produit aussi les portraits de `public/portraits/` (tête et épaules,
-pleine définition) pour les dialogues et le choix du héros.
+pleine définition) pour les dialogues (la case de BD de recrue, elle, utilise la planche du héros).
 
 Lignes de la planche : repos 4 images, course 6, saut, échelle 2, tyrolienne, mur, mort, tir 2.
 L'instrument n'est pas sur la planche : le jeu le dessine par-dessus, à l'épaule (`epaule` dans
