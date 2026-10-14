@@ -154,7 +154,7 @@ export class Rendu {
     const camX = this.camera.x + (s ? (Math.random() - 0.5) * s * 0.6 : 0);
     const camY = this.camera.y + (s ? (Math.random() - 0.5) * s * 0.6 : 0);
 
-    this.fond.dessine(ctx, camX, camY, this.largeur, carte.hauteur * TUILE, this.tick);
+    this.fond.dessine(ctx, camX, camY, this.largeur, (niveauLu(vue.niveau).depart.ty + 1) * TUILE, this.tick);
     // le décor est semé à partir de la carte d'origine (avant destruction) : au chargement de chaque carte
     if (this.carteDecor !== carte) {
       this.carteDecor = carte;
@@ -176,7 +176,7 @@ export class Rendu {
       this.theme.dessus,
       this.theme.lointain,
     );
-    dessineTuiles(ctx, carte, this.atlas, camX, camY, this.largeur);
+    dessineTuiles(ctx, carte, this.atlas, camX, camY, this.largeur, this.tick);
     dessineTyroliennes(ctx, niveauLu(vue.niveau).tyroliennes, carte, camX, camY);
     this.particules.meteo(this.theme.meteo, camX, camY, this.largeur);
     this.particules.maj(carte);

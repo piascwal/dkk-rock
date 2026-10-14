@@ -32,9 +32,15 @@ const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAccessoire[]
       'cloture',
       'vacheCasque',
       'vacheCasque',
+      'tonneau',
+      'pneus',
+      'bidon',
+      'panneauFleche',
+      'pot',
+      'fougere',
     ],
-    dedans: ['caisseDeco', 'etagere', 'caisseDeco', 'enceinte34'],
-    densite: 0.55,
+    dedans: ['caisseDeco', 'etagere', 'caisseDeco', 'enceinte34', 'tonneau', 'bidon', 'pneus', 'torche'],
+    densite: 0.8,
   },
   montagne: {
     dehors: [
@@ -42,42 +48,119 @@ const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAccessoire[]
       'sapin',
       'sapin',
       'buisson',
+      'buisson',
       'rocher',
       'cloture',
       'vacheCasque',
       'vacheCasque',
       'vacheCasque',
       'panneauLounge',
+      'souche',
+      'champignons',
+      'fougere',
+      'fougere',
+      'tronc',
+      'cairn',
+      'feuDeCamp',
+      'torche',
     ],
-    dedans: ['caisseDeco', 'etagere'],
-    densite: 0.6,
+    dedans: ['caisseDeco', 'etagere', 'tonneau', 'torche', 'sacs'],
+    densite: 0.85,
   },
   neige: {
-    dehors: ['sapinNeige', 'sapinNeige', 'rocherNeige', 'buissonNeige', 'bonhommeDeNeige', 'panneauNeige'],
-    dedans: ['caisseDeco'],
-    densite: 0.55,
+    dehors: [
+      'sapinNeige',
+      'sapinNeige',
+      'sapinNeige',
+      'rocherNeige',
+      'buissonNeige',
+      'bonhommeDeNeige',
+      'panneauNeige',
+      'cairn',
+      'feuDeCamp',
+      'sacs',
+      'tronc',
+    ],
+    dedans: ['caisseDeco', 'torche', 'sacs'],
+    densite: 0.75,
   },
   plage: {
-    dehors: ['palmier', 'palmier', 'parasol', 'transat', 'buissonSable', 'rocher'],
-    dedans: ['caisseDeco', 'transat'],
-    densite: 0.5,
+    dehors: [
+      'palmier',
+      'palmier',
+      'parasol',
+      'transat',
+      'buissonSable',
+      'rocher',
+      'tonneau',
+      'sacs',
+      'feuDeCamp',
+      'torche',
+      'fougere',
+      'pot',
+      'panneauFleche',
+    ],
+    dedans: ['caisseDeco', 'transat', 'tonneau', 'torche'],
+    densite: 0.75,
   },
   ville: {
-    dehors: ['lampadaire', 'poubelle', 'afficheRose', 'afficheBleue', 'voiture', 'bouche', 'buissonSable'],
-    dedans: ['plante', 'caisseDeco'],
-    densite: 0.5,
+    dehors: [
+      'lampadaire',
+      'poubelle',
+      'afficheRose',
+      'afficheBleue',
+      'voiture',
+      'bouche',
+      'buissonSable',
+      'bidon',
+      'pneus',
+      'sacs',
+      'tonneau',
+      'pot',
+      'panneauFleche',
+    ],
+    dedans: ['plante', 'caisseDeco', 'bidon', 'tonneau', 'torche'],
+    densite: 0.75,
   },
   club: {
-    dehors: ['enceinte34', 'enceinte34', 'enceinteDeco', 'projecteur', 'plante', 'lampadaireNeon'],
-    dedans: ['enceinte34', 'enceinte34', 'enceinteDeco', 'projecteur', 'plante'],
-    densite: 0.4,
+    dehors: ['enceinte34', 'enceinte34', 'enceinteDeco', 'projecteur', 'plante', 'lampadaireNeon', 'bidon'],
+    dedans: ['enceinte34', 'enceinte34', 'enceinteDeco', 'projecteur', 'plante', 'torche'],
+    densite: 0.55,
   },
 };
+
+/** Les petits accessoires se serrent (une tuile et demie entre deux) ; les autres, trois tuiles ; voitures et vaches, quatre. */
+const PETITS = new Set<string>([
+  'champignons',
+  'cairn',
+  'bidon',
+  'pneus',
+  'pot',
+  'souche',
+  'fougere',
+  'tonneau',
+  'sacs',
+  'torche',
+  'poubelle',
+  'panneauFleche',
+  'boiteAuxLettres',
+]);
 
 /** Les accessoires sont dessinés pour un héros de 28 px : on les agrandit pour celui de 40 px. */
 const ECHELLE_ACCESSOIRES = 1.4;
 
-const SOLS_DECORES: number[] = [T.TERRE, T.NEIGE, T.SABLE, T.BETON, T.ROCHE, T.METAL, T.BOIS, T.GLACE];
+const SOLS_DECORES: number[] = [
+  T.TERRE,
+  T.NEIGE,
+  T.SABLE,
+  T.BETON,
+  T.ROCHE,
+  T.METAL,
+  T.BOIS,
+  T.GLACE,
+  T.PLATEFORME,
+  T.PITON,
+];
 
 /** Une tuile d'herbe : de la terre à l'air libre (rien de plein au-dessus, pas de paroi de fond). */
 const dehors = (carte: Carte, tx: number, ty: number): boolean =>
@@ -92,25 +175,25 @@ export function semeDecor(carte: Carte, theme: NomTheme, graine: number): Pose[]
   const rng = new Aleatoire(graine);
   const semis = SEMIS[theme];
   const poses: Pose[] = [];
-  let libreDepuis = 0;
+  // chaque rangée garde son propre espacement : des accessoires sur le sol, sur les passerelles, sur les toits
+  const libreDepuis = new Map<number, number>();
   for (let tx = 3; tx < carte.largeur - 3; tx++) {
     for (let ty = 1; ty < carte.hauteur - 1; ty++) {
       const sol = carte.get(tx, ty);
       if (!SOLS_DECORES.includes(sol) || carte.solide(tx, ty - 1) || carte.props(tx, ty - 1).echelle)
         continue;
+      if (carte.props(tx, ty - 1).solide || tx < (libreDepuis.get(ty) ?? 0) || rng.suivant() > semis.densite)
+        continue;
       const dedans = carte.aFond(tx, ty - 1);
-      if (tx < libreDepuis || rng.suivant() > semis.densite) continue;
-      const liste = dedans ? semis.dedans : semis.dehors;
-      const quoi = rng.choix(liste);
+      const quoi = rng.choix(dedans ? semis.dedans : semis.dehors);
       // une vache a besoin de pré : de l'herbe sous elle et sous ses voisines, sinon elle finit dans le sous-sol
       if (
         quoi === 'vacheCasque' &&
         !(dehors(carte, tx - 1, ty) && dehors(carte, tx, ty) && dehors(carte, tx + 1, ty))
       )
-        break;
+        continue;
       poses.push({ tx, ty, quoi, v: rng.entier(0, 255), devant: false });
-      libreDepuis = tx + (quoi === 'voiture' || quoi === 'vacheCasque' ? 4 : 3);
-      break;
+      libreDepuis.set(ty, tx + (quoi === 'voiture' || quoi === 'vacheCasque' ? 4 : PETITS.has(quoi) ? 2 : 3));
     }
   }
   // des touffes, devant : de la profondeur dans l'autre sens
@@ -141,7 +224,7 @@ export function dessineDecor(
     if (o.devant !== devant) continue;
     const x = o.tx * TUILE + TUILE / 2 - Math.round(camX);
     if (x < -40 || x > largeur + 40) continue;
-    if (!carte.solide(o.tx, o.ty) || carte.solide(o.tx, o.ty - 1)) continue;
+    if (!carte.props(o.tx, o.ty).solide || carte.solide(o.tx, o.ty - 1)) continue;
     ctx.save();
     ctx.translate(x, o.ty * TUILE - Math.round(camY));
     if (devant) {

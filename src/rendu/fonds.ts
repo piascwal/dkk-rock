@@ -1,5 +1,7 @@
 import { HAUTEUR_VUE } from '../config';
 import { Aleatoire } from '../moteur/maths';
+import { Ciel } from './ciel';
+import { arbreRond, brume, palmierPixel, sapinPixel } from './fonds-arbres';
 import type { Decor, Theme } from './themes';
 
 const LARGEUR_BANDE = 960;
@@ -65,6 +67,12 @@ const DECORS: Record<Decor, Peinture> = {
       c.fill();
       fenetres(c, r, x, 230 - h, w, h, '#ffcf6b');
     }
+    // des arbres sombres entre les maisons, une barrière de piquets
+    for (let x = 30; x < LARGEUR_BANDE; x += r.entier(50, 90))
+      arbreRond(c, x, 236, r.entier(22, 34), r.choix(['#27403a', '#2d4a3a', '#22362f']));
+    c.fillStyle = '#1d1630';
+    for (let x = 0; x < LARGEUR_BANDE; x += 4) c.fillRect(x, 226, 1, 8);
+    c.fillRect(0, 229, LARGEUR_BANDE, 1);
   },
   montagnes: (c, r, th, plan) => {
     if (!plan) {
@@ -79,14 +87,23 @@ const DECORS: Record<Decor, Peinture> = {
     }
     c.fillStyle = th.proche;
     cretes(c, r, 230, 40, 40, false);
-    for (let x = 0; x < LARGEUR_BANDE; x += r.entier(10, 22))
-      sapin(c, x, 236 - r.entier(0, 30), r.entier(14, 26), '#2f5a33');
+    // une vraie forêt : des sapins et des arbres ronds de toutes tailles, plus de brume au pied
+    for (let x = 0; x < LARGEUR_BANDE; x += r.entier(9, 20)) {
+      const h = r.entier(16, 36);
+      const y = 238 - r.entier(0, 26);
+      if (r.suivant() < 0.65) sapinPixel(c, x, y, h, '#2f5a33');
+      else arbreRond(c, x, y, h, r.choix(['#3f7a3a', '#4f9a3a', '#356a35']));
+    }
+    brume(c, LARGEUR_BANDE, 190, 262, 'rgba(255,255,255,0.2)');
   },
   pics: (c, r, th, plan) => {
     c.fillStyle = plan ? th.proche : th.lointain;
     cretes(c, r, plan ? 235 : 200, plan ? 60 : 130, plan ? 50 : 70, true);
-    if (plan)
-      for (let x = 0; x < LARGEUR_BANDE; x += r.entier(14, 30)) sapin(c, x, 245, r.entier(12, 20), '#e8f2ff');
+    if (plan) {
+      for (let x = 0; x < LARGEUR_BANDE; x += r.entier(12, 24))
+        sapinPixel(c, x, 250 - r.entier(0, 8), r.entier(16, 32), '#5f7fa3', '#e8f2ff');
+      brume(c, LARGEUR_BANDE, 200, 270, 'rgba(220,235,255,0.25)');
+    }
   },
   palmiers: (c, r, th, plan) => {
     if (!plan) {
@@ -95,10 +112,18 @@ const DECORS: Record<Decor, Peinture> = {
       c.fillStyle = 'rgba(255,255,255,0.4)';
       for (let i = 0; i < 40; i++)
         c.fillRect(r.entier(0, LARGEUR_BANDE), r.entier(195, 260), r.entier(6, 20), 1);
+      // des voiliers à l'horizon : une coque sombre, une voile claire en escalier
+      for (let i = 0; i < 4; i++) {
+        const bx = r.entier(40, LARGEUR_BANDE - 40);
+        c.fillStyle = '#3a2a2a';
+        c.fillRect(bx, 197, 12, 2);
+        c.fillStyle = '#fff6dc';
+        for (let k = 0; k < 9; k++) c.fillRect(bx + 4, 188 + k, 1 + Math.floor(k / 2), 1);
+      }
       return;
     }
-    for (let x = 20; x < LARGEUR_BANDE; x += r.entier(70, 130))
-      palmier(c, x, 250, r.entier(50, 80), th.proche);
+    for (let x = 20; x < LARGEUR_BANDE; x += r.entier(46, 90))
+      palmierPixel(c, x, 252 - r.entier(0, 8), r.entier(36, 70), th.proche);
   },
   immeubles: (c, r, th, plan) => {
     for (let x = 0; x < LARGEUR_BANDE; x += r.entier(30, 55)) {
@@ -107,6 +132,16 @@ const DECORS: Record<Decor, Peinture> = {
       c.fillStyle = plan ? th.proche : th.lointain;
       c.fillRect(x, HAUTEUR_BANDE - h, w, h);
       fenetres(c, r, x, HAUTEUR_BANDE - h, w, h, plan ? '#ffd56b' : '#5b4a8a');
+      const haut = HAUTEUR_BANDE - h;
+      if (r.suivant() < 0.3) {
+        c.fillRect(x + Math.round(w / 2), haut - 12, 1, 12);
+        c.fillStyle = '#ff4f4f';
+        c.fillRect(x + Math.round(w / 2), haut - 13, 1, 1);
+      } else if (r.suivant() < 0.4) {
+        c.fillStyle = plan ? '#0f0c20' : '#1b1538';
+        c.fillRect(x + 4, haut - 7, 9, 7);
+        c.fillRect(x + 6, haut - 9, 5, 2);
+      }
       if (plan && r.suivant() < 0.25) {
         c.fillStyle = r.choix(['#ff4fd8', '#3fe0ff', '#7cfc7c']);
         c.fillRect(x + 4, HAUTEUR_BANDE - h + 6, w - 8, 3);
@@ -129,39 +164,21 @@ const DECORS: Record<Decor, Peinture> = {
   },
 };
 
-function sapin(c: CanvasRenderingContext2D, x: number, y: number, h: number, coul: string): void {
-  c.fillStyle = coul;
-  c.beginPath();
-  c.moveTo(x, y - h);
-  c.lineTo(x - h / 3, y);
-  c.lineTo(x + h / 3, y);
-  c.fill();
-  c.fillRect(x - 1, y, 2, 30);
-}
-
-function palmier(c: CanvasRenderingContext2D, x: number, y: number, h: number, coul: string): void {
-  c.strokeStyle = coul;
-  c.lineWidth = 4;
-  c.beginPath();
-  c.moveTo(x, y);
-  c.quadraticCurveTo(x + 10, y - h / 2, x + 4, y - h);
-  c.stroke();
-  c.fillStyle = coul;
-  for (const a of [-2.6, -2, -1.2, -0.5, 0.1]) {
-    c.beginPath();
-    c.ellipse(x + 4 + Math.cos(a) * 12, y - h + Math.sin(a) * 6 + 4, 14, 3, a, 0, Math.PI * 2);
-    c.fill();
-  }
-}
-
 /** Vitesse de défilement des trois plans (1 = la même que le jeu) : lointain, moyen, proche. */
 const PARALLAXE = [0.12, 0.3, 0.55];
+/** Et le défilement vertical des plans, quand la caméra monte ou descend. */
+const PARALLAXE_VERTICALE = [0.2, 0.45, 0.75];
+/** Où se trouve le sol à l'écran quand le héros marche dessus, et où il se pose dans la bande d'un plan de décor. */
+const HORIZON = 84;
+const PIED_DE_BANDE = 238;
 
 /** Le fond d'un monde : un ciel en dégradé et trois plans de décor qui défilent moins vite que le jeu. */
 export class Fond {
   private readonly plans: HTMLCanvasElement[];
+  private readonly ciel: Ciel;
 
   constructor(private readonly theme: Theme) {
+    this.ciel = new Ciel(theme.decor);
     // le plan proche reprend le dessin du plan moyen, autre graine, assombri : plus près, plus sombre
     this.plans = ([0, 1, 1] as const).map((plan, i) => {
       const toile = document.createElement('canvas');
@@ -183,7 +200,7 @@ export class Fond {
     camX: number,
     camY: number,
     largeur: number,
-    basMonde: number,
+    surface: number,
     tick: number,
   ): void {
     const th = this.theme;
@@ -193,14 +210,32 @@ export class Fond {
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, largeur, HAUTEUR_VUE);
     this.astres(ctx, largeur, tick);
-    // en haut d'un niveau, le décor descend : on voit plus de ciel
-    const hauteurAuDessus = Math.max(0, basMonde - HAUTEUR_VUE - camY);
+    this.ciel.dessine(ctx, camX, largeur, tick);
+    // chaque plan est posé sur l'horizon : le pied de ses arbres suit le sol quand on marche, et glisse moins vite que lui
+    // quand on monte ou descend (plus le plan est loin, moins il bouge) : de la profondeur, et des forêts visibles
+    const solEcran = surface - camY;
     PARALLAXE.forEach((f, i) => {
       const x = -((camX * f) % LARGEUR_BANDE);
-      const y = HAUTEUR_VUE - HAUTEUR_BANDE + Math.round(hauteurAuDessus * f * 0.6) + i * 6;
-      for (let k = 0; x + k * LARGEUR_BANDE < largeur; k++)
-        ctx.drawImage(this.plans[i]!, Math.round(x + k * LARGEUR_BANDE), y);
+      const pied = HORIZON + (solEcran - HORIZON) * PARALLAXE_VERTICALE[i]!;
+      const y = Math.round(pied) - PIED_DE_BANDE;
+      // sous la bande : de la couleur du plan, seulement là où l'écran existe
+      const dessous = Math.max(0, y + HAUTEUR_BANDE - 1);
+      if (dessous < HAUTEUR_VUE) {
+        ctx.fillStyle = i === 0 ? th.lointain : th.proche;
+        ctx.fillRect(0, dessous, largeur, HAUTEUR_VUE - dessous);
+      }
+      // et de la bande, seulement la part visible (trois images de 960 × 270 en entier, à chaque image, coûtaient cher)
+      const h0 = Math.max(0, -y);
+      const h1 = Math.min(HAUTEUR_BANDE, HAUTEUR_VUE - y);
+      if (h1 <= h0) return;
+      for (let k = 0; x + k * LARGEUR_BANDE < largeur; k++) {
+        const dx = Math.round(x + k * LARGEUR_BANDE);
+        const sx = Math.max(0, -dx);
+        const sw = Math.min(LARGEUR_BANDE, largeur - dx) - sx;
+        if (sw > 0) ctx.drawImage(this.plans[i]!, sx, h0, sw, h1 - h0, dx + sx, y + h0, sw, h1 - h0);
+      }
     });
+    this.ciel.oiseaux(ctx, camX, largeur, tick);
     if (th.decor === 'club') this.lasers(ctx, largeur, tick);
   }
 

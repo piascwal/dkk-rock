@@ -4,6 +4,7 @@ import type { Tyrolienne } from '../jeu/contexte';
 import type { Carte } from '../monde/carte';
 import { T } from '../monde/tuiles';
 import type { AtlasTuiles } from './atlas-tuiles';
+import { dessineVegetation } from './vegetation';
 import { aUnCoin, coinsDeParoi, cotesLibres, cotesParoi, DEBORD } from './bords-tuiles';
 
 /** Dessine les tuiles visibles : parois de fond, tuiles, dessus herbeux ou enneigés, fissures. */
@@ -14,6 +15,7 @@ export function dessineTuiles(
   camX: number,
   camY: number,
   largeur: number,
+  tick: number,
 ): void {
   const tx0 = Math.max(0, Math.floor(camX / TUILE));
   const ty0 = Math.max(0, Math.floor(camY / TUILE));
@@ -50,6 +52,7 @@ export function dessineTuiles(
       if (usure < 0.7) fissures(ctx, x, y, usure, tx, ty);
     }
   }
+  dessineVegetation(ctx, carte, camX, camY, largeur, atlas.theme.decor, tick);
 }
 
 function fissures(
