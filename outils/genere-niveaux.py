@@ -169,8 +169,10 @@ class Recette:
         self.n.repere(x, c)
 
     def drapeau(self, x):
-        self.n.repere(x, '!', surface=True)
-        self.flags.append(x)
+        for dx in (0, 1, -1, 2, -2, 3, -3):  # le plus près possible d'un sol libre
+            if self.n.repere(x + dx, '!', ymin=self.n.base - 3, surface=True):  # au sol, jamais sur une plate-forme en hauteur
+                self.flags.append(x + dx)
+                return
 
     def ecrit(self, indice, nom_fichier, constante):
         n = self.n
@@ -228,13 +230,15 @@ def construit(nom, theme, textes, plan, fichier, constante, graine, base=30):  #
             n.repere(x0 + 1, c, surface=True)
         if kw.get('flag'):
             pass
-    # drapeaux : au début de la 1re plate-forme de chaque quart du niveau
-    for q in (1, 2, 3):
-        cible = total * q // 4
-        for x0, x1, g in r.pieces:
-            if g in ('plat', 'raccord', 'arene') and x0 >= cible - 10:
-                r.drapeau(x0 + (x1 - x0) // 2)
-                break
+    # drapeaux : après chaque lieu important (un par 50 colonnes au moins), et juste avant chaque boss
+    dernier = 0
+    for x0, x1, g in r.pieces:
+        if g == 'raccord' and x0 - dernier >= 50 and x0 > 30:
+            r.drapeau(x0 + (x1 - x0) // 2)
+            dernier = x0
+    for x0, x1, g in r.pieces:
+        if g in ('arene', 'vide') and x1 - x0 >= 40:
+            r.drapeau(x0 + 3)
     # le van, au bout
     n.repere(total - 5, 'F', surface=True)
     return r

@@ -131,6 +131,7 @@ export function litNiveau(def: DefNiveau): NiveauLu {
     }
   }
 
+  lu.drapeaux.sort((a, b) => a.x - b.x); // l'ordre des drapeaux est celui du niveau, pas celui des rangées
   scelleLesEchelles(tuiles, largeur, hauteur);
   if (!lu.depart) throw new ErreurNiveau(`${def.id} : pas de départ (@)`);
   if (!lu.fin && !lu.boss.some((b) => b.lettre === 'Z'))
