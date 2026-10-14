@@ -63,7 +63,7 @@ export class Projectile implements EntiteSimulee {
     this.y += dy;
     const tx = Math.floor(this.x / TUILE);
     const ty = Math.floor(this.y / TUILE);
-    if (!ctx.carte.solide(tx, ty)) return;
+    if (!ctx.carte.solide(tx, ty) && !(this.camp === 'ennemis' && this.bloqueParPlanche(ctx, tx, ty))) return;
     const d = this.def;
     const detruite = ctx.carte.endommage(tx, ty, d.degatsTuile) !== null;
     // une onde qui creuse passe à travers ce qu'elle détruit
@@ -88,6 +88,12 @@ export class Projectile implements EntiteSimulee {
     } else {
       this.termine(ctx);
     }
+  }
+
+  /** Un tir ennemi ne traverse ni planche ni piton (mais passe devant une échelle) : il reste sur son étage. */
+  private bloqueParPlanche(ctx: Contexte, tx: number, ty: number): boolean {
+    const p = ctx.carte.props(tx, ty);
+    return p.solide && !p.echelle && p.traversable;
   }
 
   /** La partie signale un contact avec une cible du camp adverse. */

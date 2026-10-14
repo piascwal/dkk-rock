@@ -13,20 +13,9 @@ const centre = (c: Cible) => ({ x: c.x + c.w / 2, y: c.y + c.h / 2 });
 /** Tire droit vers la cible (un peu de visée verticale). */
 function tireVers(e: Ennemi, ctx: Contexte, def: DefProjectile, cible: Cible): void {
   const c = centre(cible);
-  const dx = c.x - e.cx;
-  const dy = c.y - e.cy;
-  const n = Math.hypot(dx, dy) || 1;
-  ctx.ajoute(
-    new Projectile(
-      ctx,
-      def,
-      'ennemis',
-      e.cx + e.dir * 6,
-      e.cy - 2,
-      (dx / n) * def.vitesse,
-      (dy / n) * def.vitesse,
-    ),
-  );
+  // toujours droit devant, à l'horizontale : le héros est sur le même étage, pas en haut ni en bas
+  const sens = Math.sign(c.x - e.cx) || e.dir;
+  ctx.ajoute(new Projectile(ctx, def, 'ennemis', e.cx + sens * 6, e.cy - 2, sens * def.vitesse, 0));
 }
 
 /** Lance en cloche pour retomber sur la cible en `duree` ticks. */
@@ -48,7 +37,7 @@ export const tireur: Comportement = (e, ctx, cible) => {
   else if (dx > 150) e.marcheVers(ctx, cible.x, e.def.vitesse);
   else e.corps.vx = 0;
   e.dir = vers;
-  if (e.recharge === 0) {
+  if (e.recharge === 0 && e.peutTirer(cible)) {
     tireVers(e, ctx, NOTE_AUTOTUNE, cible);
     e.memoire++;
     // rafale de deux notes, puis pause
@@ -75,7 +64,7 @@ export const kamikaze: Comportement = (e, ctx, cible) => {
 export const lobeur: Comportement = (e, ctx, cible) => {
   e.faceA(cible);
   e.corps.vx = 0;
-  if (e.recharge === 0) {
+  if (e.recharge === 0 && e.peutTirer(cible)) {
     lobeVers(e, ctx, DROP, cible, 55);
     e.recharge = e.def.cadence;
     ctx.son('drop', e.cx, e.cy);
@@ -104,7 +93,7 @@ export const influenceur: Comportement = (e, ctx, cible) => {
   }
   e.faceA(cible);
   e.corps.vx = 0;
-  if (e.recharge === 0 && Math.abs(cible.x - e.cx) < 110) {
+  if (e.recharge === 0 && e.peutTirer(cible) && Math.abs(cible.x - e.cx) < 110) {
     tireVers(e, ctx, FLASH_SELFIE, cible);
     ctx.son('flash', e.cx, e.cy);
     ctx.texte(e.cx, e.corps.y - 12, '#NOFILTER', '#ff4fd8');
@@ -117,7 +106,7 @@ export const influenceur: Comportement = (e, ctx, cible) => {
 export const yeti: Comportement = (e, ctx, cible) => {
   e.faceA(cible);
   e.corps.vx = 0;
-  if (ctx.surLeTemps && ctx.numeroTemps % 2 === 0) {
+  if (ctx.surLeTemps && ctx.numeroTemps % 2 === 0 && e.peutTirer(cible)) {
     lobeVers(e, ctx, BOULE_NEIGE, cible, 40);
     ctx.son('boum', e.cx, e.cy);
     if (ctx.rng.suivant() < 0.2)
@@ -130,7 +119,7 @@ export const robot: Comportement = (e, ctx, cible) => {
   e.faceA(cible);
   if (Math.abs(cible.x - e.cx) > 60) e.marcheVers(ctx, cible.x, e.def.vitesse);
   else e.corps.vx = 0;
-  if (e.recharge === 0) {
+  if (e.recharge === 0 && e.peutTirer(cible)) {
     tireVers(e, ctx, LASER, cible);
     ctx.son('laser', e.cx, e.cy);
     e.memoire = (e.memoire + 1) % 3;

@@ -37,7 +37,7 @@ NIVEAUX = {
             ('plat', 10, dict(digit='4', cage=True)),  # la cage
             ('plat', 10, dict(digit='5', deco=0, caissons=True)),  # les caissons de basses
             ('tour', 18, dict(etages=2, tyro=9, apres=13, digit='6')),  # la tyrolienne
-            ('forteresse', 34, dict(etages=3, lettres='ac')),
+            ('forteresse', 34, dict(etages=3, lettres='ac', cage=True)),
             ('gouffre', 20, dict(lettres='ac', nb=4)),
             ('echafaudage', 22, dict(niveaux=2, lettres='ac')),
             ('traversee', 36, dict(lettres='ac')),
@@ -57,7 +57,7 @@ NIVEAUX = {
             ('plat', 12, dict(lettres='a', deco=3)),  # la radio : « Radio Sommet »
             ('colline', 18, dict(haut=3, lettres='ac')),
             ('plat', 10, dict(lettres='a', digit='3', drones=1)),  # les vaches
-            ('forteresse', 34, dict(etages=3, lettres='ad')),
+            ('forteresse', 34, dict(etages=3, lettres='ad', cage=True)),
             ('barrage', 20, dict(haut=12, lettres='ad', butin='*')),
             ('gouffre', 20, dict(lettres='ad', nb=4)),
             ('maison', 14, dict(lettres='ac')),
@@ -80,7 +80,7 @@ NIVEAUX = {
             ('plat', 12, dict(lettres='y', deco=2)),
             ('colline', 18, dict(haut=3, lettres='y')),
             ('plat', 10, dict(lettres='y', digit='2')),  # la glace et la neige qui tombe
-            ('forteresse', 34, dict(etages=3, lettres='y', mat='R')),
+            ('forteresse', 34, dict(etages=3, lettres='y', mat='R', cage=True)),
             ('gouffre', 20, dict(lettres='y', nb=4)),
             ('barrage', 20, dict(haut=12, lettres='y', butin='*')),
             ('traversee', 36, dict(lettres='ya')),
@@ -103,7 +103,7 @@ NIVEAUX = {
             ('colline', 18, dict(haut=3, lettres='cc')),
             ('plat', 10, dict(lettres='ac', digit='2')),  # le sable qui s'effondre
             ('maison', 14, dict(lettres='ac')),
-            ('forteresse', 34, dict(etages=3, lettres='acd', mat='W')),
+            ('forteresse', 34, dict(etages=3, lettres='acd', mat='W', cage=True)),
             ('traversee', 36, dict(lettres='cd')),
             ('echafaudage', 22, dict(niveaux=2, lettres='cd')),
             ('gouffre', 20, dict(lettres='cd', nb=4)),
@@ -125,7 +125,7 @@ NIVEAUX = {
             ('plat', 12, dict(lettres='a', deco=3)),
             ('plat', 10, dict(lettres='ar', digit='1')),  # les robots vocodeurs
             ('tour', 20, dict(etages=3, lettres='acr', mat='D', vitre=True, tyro=10, apres=14, digit='2')),  # la tyrolienne entre les toits
-            ('forteresse', 34, dict(etages=3, lettres='acr', mat='D')),
+            ('forteresse', 34, dict(etages=3, lettres='acr', mat='D', cage=True)),
             ('gouffre', 20, dict(lettres='acr', nb=4)),
             ('traversee', 36, dict(lettres='adr')),
             ('plat', 10, dict(lettres='acdr', digit='3')),  # le vocodeur

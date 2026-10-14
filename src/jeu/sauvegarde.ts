@@ -2,6 +2,7 @@
  * La sauvegarde, dans le stockage du navigateur : le niveau atteint, le
  * dernier drapeau levé, les vies et le score, plus les réglages.
  */
+import { VIES_MAX } from '../config';
 
 export interface Progression {
   niveau: number;
@@ -63,7 +64,7 @@ export function valideSauvegarde(brut: unknown, nbNiveaux: number): Sauvegarde {
       ? {
           niveau: entier(p.niveau, 0, nbNiveaux - 1, 0),
           drapeau: entier(p.drapeau, -1, 99, -1),
-          vies: entier(p.vies, 1, 99, 5),
+          vies: entier(p.vies, 1, VIES_MAX, 5),
           score: entier(p.score, 0, 1e9, 0),
         }
       : null;

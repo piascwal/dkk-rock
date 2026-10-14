@@ -35,7 +35,7 @@ minimale, et le Yéti Alpha) → la Plage du Tube de l'Été → la Ville Autotu
 - Tout est destructible sauf le socle ; les caisses, le sable et la neige tombent quand on leur
   retire le sol ; les caissons de basses explosent en chaîne.
 - Échelles, tyroliennes, saut et escalade contre les murs.
-- **Cages** : un membre du groupe y est enfermé. Le libérer donne une vie, et on prend sa place.
+- **Cages** : un membre du groupe y est enfermé. Le libérer donne une vie (cinq au plus : au maximum, on change seulement de personnage), et on prend sa place. Chaque niveau en cache quatre ou cinq.
 - **Armes à ramasser** (ampli à lampes, vinyle de jazz, accordéon-flamme, cornemuse, triangle
   laser, gong sacré) ; **médiators d'or** : soin et spécial.
 - **Drapeaux** : point de reprise et sauvegarde. « Continuer » reprend au dernier drapeau.

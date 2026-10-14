@@ -24,8 +24,8 @@ def souterrain(r, ennemis='a'):
     n, w, yg = r.n, r.n.w, r.n.yg
     pris = [(a - 4, b + 4) for a, b, g in r.pieces if g in ('forteresse', 'traversee', 'barrage', 'gouffre')]
     lieux = ['complexe', 'caverne', 'complexe', 'cache', 'complexe', 'caverne']
-    butins = ['*', 'K', '+', '*', 'K', '+']
-    nb = max(4, w // 95)
+    butins = ['K', '*', 'K', '+', 'K', '*']  # des cages : on en veut plusieurs par niveau
+    nb = max(5, w // 85)
     for i in range(nb):
         genre, butin = lieux[i % len(lieux)], butins[i % len(butins)]
         largeur = {'complexe': 28, 'caverne': 18, 'cache': 8}[genre]

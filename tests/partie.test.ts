@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { TUILE, VIES_DEPART } from '../src/config';
+import { TUILE, VIES_DEPART, VIES_MAX } from '../src/config';
 import { C } from '../src/jeu/commandes';
 import { Partie } from '../src/jeu/partie';
 import { DUREE_CARTE } from '../src/jeu/vue';
@@ -91,12 +91,24 @@ describe('la partie', () => {
     const j = p.joueurs[0]!;
     const cage = p.entites.find((e): e is Objet => e instanceof Objet && e.sorte === 'cage')!;
     const membre = j.membre;
-    const vies = p.vies;
+    p.vies = 3;
     Object.assign(j.corps, { x: cage.corps.x, y: cage.corps.y });
     avance(p, 2);
-    expect(p.vies).toBe(vies + 1);
+    expect(p.vies).toBe(4);
     expect(j.membre).not.toBe(membre);
     expect(cage.active).toBe(true);
+  });
+
+  it('au maximum de vies, une cage change seulement de membre', () => {
+    const p = nouvelle();
+    const j = p.joueurs[0]!;
+    const cage = p.entites.find((e): e is Objet => e instanceof Objet && e.sorte === 'cage')!;
+    const membre = j.membre;
+    p.vies = VIES_MAX;
+    Object.assign(j.corps, { x: cage.corps.x, y: cage.corps.y });
+    avance(p, 2);
+    expect(p.vies).toBe(VIES_MAX);
+    expect(j.membre).not.toBe(membre);
   });
 
   it('le van termine le niveau, qui sauvegarde et enchaîne sur le suivant', () => {

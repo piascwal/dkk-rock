@@ -32,6 +32,8 @@ export const HEROS_HAUTEUR = 15;
 
 export const MAX_JOUEURS = 4;
 export const VIES_DEPART = 5;
+/** Au-delà, une cage ne donne plus de vie : on change seulement de personnage. */
+export const VIES_MAX = 5;
 export const PV_HEROS = 3;
 export const SPECIAUX_DEPART = 3;
 

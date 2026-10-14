@@ -1,4 +1,4 @@
-import { PV_HEROS } from '../config';
+import { PV_HEROS, VIES_MAX } from '../config';
 import { armeRamassee } from '../entites/armes';
 import { HEROS } from '../entites/heros';
 import { Objet } from '../entites/objets';
@@ -26,12 +26,13 @@ export function interactions(p: Partie): void {
         case 'cage':
           if (e.active) break;
           e.active = true;
-          p.vies++;
+          const gagne = p.vies < VIES_MAX;
+          if (gagne) p.vies++;
           p.score += 500;
           j.membre = membreLibre(p, (j.membre + 1 + p.rng.entier(0, 3)) % HEROS.length, j.siege);
           j.invulnerable = 60;
           p.son('liberation', e.corps.x, e.corps.y);
-          p.texte(e.corps.x, e.corps.y - 12, '+1 VIE', '#7cfc7c');
+          p.texte(e.corps.x, e.corps.y - 12, gagne ? '+1 VIE' : 'VIES AU MAX', gagne ? '#7cfc7c' : '#ffd23f');
           p.evenement({ k: 'bulle', qui: j.def.qui, texte: p.rng.choix(j.def.rejoint) });
           break;
         case 'drapeau':
