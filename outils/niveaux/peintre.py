@@ -18,7 +18,7 @@ class Niveau:
         self.rng = random.Random(graine)
         self.t = theme
         self.g = [[' '] * largeur for _ in range(hauteur)]
-        self.yg = base + 14  # la galerie souterraine principale (sous tous les paliers)
+        self.yg = base + 12  # la galerie souterraine principale (sous tous les paliers)
         self.haut = [base] * largeur  # la rangée du terrain de chaque colonne
         self.bas = hauteur - 6  # sous cette rangée : le vide
         self.vus = []  # (x, nature) pour les statistiques

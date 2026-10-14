@@ -36,8 +36,9 @@ def declencheurs(fichier):
 class Recette:
     """Pose les pièces les unes après les autres, de gauche à droite, et le butin."""
 
-    def __init__(self, nom, theme, fichier_textes, largeur=430, hauteur=70, base=30, graine=1):
-        self.nom, self.n = nom, Niveau(largeur, hauteur, base, graine, THEMES[theme])
+    def __init__(self, nom, theme, fichier_textes, largeur=430, base=30, graine=1):
+        # peu de profondeur : 30 rangées sous la surface, dont 6 de vide ; le monde finit vite, on tombe vite
+        self.nom, self.n = nom, Niveau(largeur, base + 30, base, graine, THEMES[theme])
         self.x = 6
         self.digits = declencheurs(fichier_textes)
         self.pieces = []  # (x0, x1, genre)
@@ -233,7 +234,7 @@ def souterrain(r, seq_puits, caveau=None, ennemis='a'):
     # des cavernes : une salle haute avec ses pitons, le butin tout en haut
     for frac, c in ((0.15, '*'), (0.45, '+'), (0.8, '*')):
         x0 = int(w * frac)
-        px, py = n.caverne(x0, 16, 9)
+        px, py = n.caverne(x0, 16, 7)
         n.repere(px, c, ymin=py - 2)
         n.ennemis(x0 + 2, x0 + 14, ennemis, 2, ymin=n.yg - 8)
     objets = ['+', '*', 'a', '+', 'a', '*']
