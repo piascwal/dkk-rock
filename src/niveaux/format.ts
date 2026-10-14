@@ -10,6 +10,7 @@ import type { NomTheme } from '../rendu/themes';
  *   N neige    G glace   W bois    - plateforme   H échelle   C caisse
  *   T caisson de basses (explose)   S sable   V vitre   D béton
  *   E échelon scellé (échelle incassable)   = piton (plateforme incassable)
+ *   O tonneau WOG (un cœur : +1 vie)   Q tonneau d'or WOG (cœur d'or : tout revient, 10 s d'invincibilité)
  *   . mur de fond (décor d'intérieur, on passe devant)
  *
  * Repères (la case est vide une fois lue) :

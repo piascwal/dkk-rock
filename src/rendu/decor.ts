@@ -279,7 +279,8 @@ type Sprite =
   | 'cloture'
   | 'boiteAuxLettres'
   | 'palmier'
-  | 'arbre';
+  | 'arbre'
+  | 'tonneau';
 const SPRITES: ReadonlySet<string> = new Set<Sprite>([
   'vacheCasque',
   'lampadaire',
@@ -291,6 +292,7 @@ const SPRITES: ReadonlySet<string> = new Set<Sprite>([
   'boiteAuxLettres',
   'palmier',
   'arbre',
+  'tonneau',
 ]);
 
 /** Les accessoires dessinés par une planche fournie (apparence tirée au sort selon `v`, tournée d'un côté ou de l'autre). */
@@ -305,6 +307,7 @@ function dessineSprite(ctx: CanvasRenderingContext2D, quoi: Sprite, v: number, v
   if (quoi === 'boiteAuxLettres') return dessineDecorFeuille(ctx, 'boite', v % 2, voile);
   if (quoi === 'palmier') return dessineDecorFeuille(ctx, 'palmier', v % 3, voile);
   if (quoi === 'arbre') return dessineDecorFeuille(ctx, 'arbre', v % 2, voile);
+  if (quoi === 'tonneau') return dessineDecorFeuille(ctx, 'tonneau', 0, voile);
   if (quoi === 'sapinNeige') return dessineDecorFeuille(ctx, 'sapin', 1 + ((v >> 4) & 1), voile);
   return dessineDecorFeuille(ctx, 'buisson', v % 3, voile);
 }

@@ -35,6 +35,11 @@ minimale, et le Yéti Alpha) → la Plage du Tube de l'Été → la Ville Autotu
 - Tout est destructible sauf le socle ; les caisses, le sable et la neige tombent quand on leur
   retire le sol ; les caissons de basses explosent en chaîne.
 - Échelles, tyroliennes, saut et escalade contre les murs.
+- **Tonneaux WOG** (le WOG, une passion magique pour les membres des DKK ; l'histoire sera retravaillée) : ce sont des tuiles
+  (`O` bois, `Q` or ; `outils/fixe-tuiles.py`), semées par le générateur (4 à 6 par niveau, un seul tonneau d'or, dans une cache).
+  Cassé, un tonneau en bois libère un **cœur** (+1 vie, 5 au plus) ; un tonneau d'or, un **cœur d'or** : tous les points de vie
+  et `DUREE_INVINCIBLE` (10 s) d'invincibilité, avec une forte aura (`rendu/aura.ts`, portée par `EntiteVue.aura`, protocole v4).
+  Le tonneau sans pancarte est le décor ordinaire de l'arrière-plan.
 - **Zone visible et traits de personnages :** la simulation ne connaît pas la caméra ; `ZONE_VISIBLE` (config) approxime
   l'écran autour des héros (`Contexte.visible`) : un ennemi hors zone ne tire pas, un héros n'atteint pas un ennemi hors zone.
   Les petits traits propres à un personnage (Tom : un cœur pixel art quand il croise un rondin) sont des entrées de `TRAITS`

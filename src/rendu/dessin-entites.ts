@@ -2,6 +2,7 @@ import { TUILE } from '../config';
 import { herosDuGenre } from '../entites/heros';
 import { ANIM, G, type EntiteVue } from '../jeu/vue';
 import type { AtlasTuiles } from './atlas-tuiles';
+import { dessineAura } from './aura';
 import { DESSINS_BOSS } from './dessins-boss';
 import { DESSINS_ENNEMIS } from './dessins-ennemis';
 import { dessineFeuille } from './feuilles-images';
@@ -12,7 +13,16 @@ import { DEMI_TAILLE, DESSINS_TIRS } from './dessins-tirs';
 import { pinceau } from './pinceau';
 import { ecritCentre } from './police';
 
-const DRAPEAUX_SANS_MIROIR = new Set<number>([G.CAGE, G.DRAPEAU, G.VAN, G.ARME, G.SOIN, G.BLOC]);
+const DRAPEAUX_SANS_MIROIR = new Set<number>([
+  G.CAGE,
+  G.DRAPEAU,
+  G.VAN,
+  G.ARME,
+  G.SOIN,
+  G.BLOC,
+  G.COEUR,
+  G.COEUR_OR,
+]);
 
 /** Dessine une entité de la vue, en coordonnées d'écran. */
 export function dessineEntite(
@@ -50,6 +60,7 @@ export function dessineEntite(
     ctx.translate(0, -5);
     ctx.rotate(v.g === G.DRONE ? -0.4 : -Math.PI / 2);
   }
+  if (v.aura && heros) dessineAura(ctx, performance.now());
   const p = pinceau(ctx);
   const blanc = v.clignote && !heros && !estTir;
   const pb = blanc ? (x0: number, y0: number, w: number, h: number) => p(x0, y0, w, h, '#ffffff') : p;

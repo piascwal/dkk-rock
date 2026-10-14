@@ -32,3 +32,6 @@ remplace un par un (voir `docs/ASSETS.md`, et `outils/fixe-objets.py` pour les p
 - **Nouvel arc ou nouveau thème → la carte du monde** (`src/rendu/carte-monde.ts`) : elle se construit d'après les
   niveaux de l'arc et leur thème, mais un thème nouveau (la Jamaïque, par exemple) doit y avoir sa région (`REGIONS`,
   une entrée par décor) ; vérifier ensuite l'allure de la carte de l'arc.
+
+- **WOG** : le tonneau WOG (cœur, cœur d'or, invincibilité de 10 s) est en place côté jeu ; son rôle dans l'histoire (une passion
+  magique des DKK) reste à écrire : dialogues au premier tonneau, au premier cœur d'or.

@@ -1,4 +1,4 @@
-import { PV_HEROS, VIES_MAX } from '../config';
+import { DUREE_INVINCIBLE, PV_HEROS, VIES_MAX } from '../config';
 import { armeRamassee } from '../entites/armes';
 import { HEROS } from '../entites/heros';
 import { Objet } from '../entites/objets';
@@ -57,6 +57,23 @@ export function interactions(p: Partie): void {
           p.evenement({ k: 'bulle', qui: j.def.qui, texte: p.rng.choix(a.repliques) });
           break;
         }
+        case 'coeur': {
+          const gagne = p.vies < VIES_MAX;
+          if (gagne) p.vies++;
+          e.fini = true;
+          p.son('liberation', e.corps.x, e.corps.y);
+          p.texte(e.corps.x, e.corps.y - 10, gagne ? '+1 VIE' : 'VIES AU MAX', gagne ? '#ff6b8a' : '#ffd23f');
+          break;
+        }
+        case 'coeurOr':
+          j.pv = PV_HEROS;
+          j.invincible = DUREE_INVINCIBLE;
+          j.invulnerable = 0;
+          e.fini = true;
+          p.son('liberation', e.corps.x, e.corps.y);
+          p.texte(e.corps.x, e.corps.y - 10, 'WOG ! INVINCIBLE', '#ffd23f');
+          p.evenement({ k: 'confettis', x: e.corps.x, y: e.corps.y });
+          break;
         case 'soin':
           j.pv = PV_HEROS;
           j.speciaux++;

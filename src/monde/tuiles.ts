@@ -23,6 +23,8 @@ export const T = {
   BETON: 15,
   ECHELON: 16,
   PITON: 17,
+  TONNEAU_WOG: 18,
+  TONNEAU_OR: 19,
 } as const;
 
 export type Tuile = (typeof T)[keyof typeof T];
@@ -86,6 +88,10 @@ export const PROPRIETES: Record<Tuile, ProprietesTuile> = {
   }),
   // une plateforme scellée au mur, incassable : le pas d'un chemin qu'on ne doit pas pouvoir couper
   [T.PITON]: base({ nom: 'piton', car: '=', pv: Infinity, traversable: true, debris: '#8a96a3' }),
+  // les tonneaux WOG, la passion magique des DKK : en les cassant, on libère un cœur (une vie) ou un cœur d'or (tout
+  // revient, et dix secondes d'invincibilité)
+  [T.TONNEAU_WOG]: base({ nom: 'tonneau WOG', car: 'O', pv: 3, tombe: true, debris: '#7a4a22' }),
+  [T.TONNEAU_OR]: base({ nom: 'tonneau d’or WOG', car: 'Q', pv: 6, tombe: true, debris: '#ffd23f' }),
 };
 
 const PAR_CARACTERE = new Map<string, Tuile>(

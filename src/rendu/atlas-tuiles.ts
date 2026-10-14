@@ -22,6 +22,14 @@ function moucheture(c: CanvasRenderingContext2D, v: number, coul: string, n: num
   }
 }
 
+function tonneau(c: CanvasRenderingContext2D, bois: string, cercle: string, pancarte: string): void {
+  px(c, 3, 1, 10, 14, bois);
+  px(c, 2, 4, 12, 8, bois);
+  px(c, 2, 4, 12, 1, cercle);
+  px(c, 2, 11, 12, 1, cercle);
+  px(c, 4, 6, 8, 4, pancarte);
+}
+
 const PEINTRES: Partial<Record<number, Peintre>> = {
   [T.TERRE]: (c, v, th) => {
     px(c, 0, 0, 16, 16, th.terre);
@@ -125,6 +133,9 @@ const PEINTRES: Partial<Record<number, Peintre>> = {
     c.fill();
     px(c, 3, 2, 10, 1, '#ff4fd8');
   },
+  // les tonneaux WOG (repli en code si l'image ne charge pas) : un fût, deux cerclages, la pancarte
+  [T.TONNEAU_WOG]: (c) => tonneau(c, '#8a5a2b', '#3a3a40', '#c49a5a'),
+  [T.TONNEAU_OR]: (c) => tonneau(c, '#e8b92a', '#a8741a', '#fff0a0'),
   [T.SABLE]: (c, v) => {
     px(c, 0, 0, 16, 16, '#e3c47e');
     moucheture(c, v, '#c9a862', 10, 7);
@@ -148,6 +159,8 @@ const PEINTRES: Partial<Record<number, Peintre>> = {
 const IMAGES_TUILES: Partial<Record<number, string>> = {
   [T.CAISSE]: 'tuile-caisse.png',
   [T.CAISSON]: 'tuile-caisson.png',
+  [T.TONNEAU_WOG]: 'tuile-tonneau-wog.png',
+  [T.TONNEAU_OR]: 'tuile-tonneau-or.png',
 };
 const imagesTuiles = new Map<number, HTMLImageElement>();
 

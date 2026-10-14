@@ -7,6 +7,45 @@ type Dessin = (p: Pinceau, e: number, f: number) => void;
 /** Le dessin qui sert d'icône à chaque arme ramassable (dans l'ordre d'ARMES_RAMASSABLES). */
 const ICONES_ARMES = [G.P_AMPLI, G.P_VINYLE, G.P_FLAMME, G.P_CORNEMUSE, G.P_TRIANGLE, G.P_GONG];
 
+/** Un cœur en pixels (X plein, o reflet), cerné ; (0, 0) : le milieu de sa base. */
+function coeur(
+  p: Pinceau,
+  rangees: readonly string[],
+  plein: string,
+  reflet: string,
+  contour: string,
+  haut: number,
+): void {
+  const w = rangees[0]!.length;
+  const x0 = -Math.floor(w / 2);
+  const y0 = -haut - rangees.length;
+  for (const [dx, dy] of [
+    [-1, 0],
+    [1, 0],
+    [0, -1],
+    [0, 1],
+  ] as const)
+    rangees.forEach((l, y) => {
+      for (let x = 0; x < l.length; x++) if (l[x] !== '.') p(x0 + x + dx, y0 + y + dy, 1, 1, contour);
+    });
+  rangees.forEach((l, y) => {
+    for (let x = 0; x < l.length; x++)
+      if (l[x] !== '.') p(x0 + x, y0 + y, 1, 1, l[x] === 'o' ? reflet : plein);
+  });
+}
+
+const COEUR = ['.XX.XX.', 'XoXXXXX', 'XXXXXXX', '.XXXXX.', '..XXX..', '...X...'];
+const COEUR_DORE = [
+  '.XXX.XXX.',
+  'XoXXXXXXX',
+  'XoXXXXXXX',
+  'XXXXXXXXX',
+  '.XXXXXXX.',
+  '..XXXXX..',
+  '...XXX...',
+  '....X....',
+];
+
 export const DESSINS_OBJETS: Partial<Record<number, Dessin>> = {
   [G.CAGE]: (p, e) => {
     p(-8, -18, 16, 2, '#555');
@@ -58,6 +97,24 @@ export const DESSINS_OBJETS: Partial<Record<number, Dessin>> = {
     p(-6, -12 + b, 12, 1, '#ffd23f');
     p(-6, -1 + b, 12, 1, '#ffd23f');
     p(-1, -13 + b, 2, 1, '#888');
+  },
+  // les cœurs libérés par les tonneaux WOG : ils flottent doucement
+  [G.COEUR]: (p, _e, f) => {
+    coeur(p, COEUR, '#ff3b6b', '#ffb3c6', '#7a0f30', 2 + Math.round(Math.sin(f / 12)));
+  },
+  [G.COEUR_OR]: (p, _e, f) => {
+    const haut = 2 + Math.round(1.5 * Math.sin(f / 10));
+    // le cœur d'or, et des étincelles qui scintillent autour
+    coeur(p, COEUR_DORE, '#ffc61a', '#fff6b0', '#8a5a00', haut);
+    for (const [dx, dy, d] of [
+      [-7, -12, 0],
+      [7, -9, 13],
+      [5, -16, 26],
+    ] as const)
+      if ((f + d) % 40 < 14) {
+        p(dx, -haut + dy, 1, 3, '#fff6b0');
+        p(dx - 1, -haut + dy + 1, 3, 1, '#fff6b0');
+      }
   },
   [G.SOIN]: (p, _e, f) => {
     const l = [5, 3, 1, 3][Math.floor(f / 6) % 4]!;

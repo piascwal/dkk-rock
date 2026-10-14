@@ -54,6 +54,9 @@ export function releveCarte(p: Partie): void {
     const cx = (m.x + 0.5) * TUILE;
     const cy = (m.y + 0.5) * TUILE;
     if (m.avant === T.CAISSON) p.enAttente.push([p.tick + 5, cx, cy]);
+    // un tonneau WOG cassé libère un cœur, un tonneau d'or WOG un cœur d'or
+    if (m.avant === T.TONNEAU_WOG) p.ajoute(new Objet(p, 'coeur', m.x * TUILE, m.y * TUILE));
+    if (m.avant === T.TONNEAU_OR) p.ajoute(new Objet(p, 'coeurOr', m.x * TUILE, m.y * TUILE));
     if (m.avant === T.CAISSE) {
       const r = p.rng.suivant();
       if (r < 0.2)

@@ -14,7 +14,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent / 'niveaux'))
 
 from peintre import Niveau
 from plans import NIVEAUX, enchaine
-from souterrain import souterrain
+from souterrain import souterrain, tonneaux_de_surface
 from structures import forteresse, traversee
 from verrous import barrage, gouffre
 
@@ -250,6 +250,7 @@ def fabrique(cle):
     plan = enchaine(cfg['lieux'], cfg['graine'], cfg['raccord'])
     r = construit(cfg['nom'], cfg['theme'], cfg['textes'], plan, '', '', cfg['graine'], base=cfg['base'])
     souterrain(r, cfg['caves'])
+    tonneaux_de_surface(r)
     if cle == 'cimes':
         arene_du_yeti(r)
     r.ecrit(0, cfg['fichier'], cfg['constante'])

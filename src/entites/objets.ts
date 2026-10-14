@@ -4,7 +4,7 @@ import { G, type EntiteVue, type Genre } from '../jeu/vue';
 import { appliqueGravite, deplace, nouveauCorps, type Corps } from '../monde/physique';
 import type { Tuile } from '../monde/tuiles';
 
-export type SorteObjet = 'cage' | 'drapeau' | 'van' | 'arme' | 'soin';
+export type SorteObjet = 'cage' | 'drapeau' | 'van' | 'arme' | 'soin' | 'coeur' | 'coeurOr';
 
 const GENRES: Record<SorteObjet, Genre> = {
   cage: G.CAGE,
@@ -12,6 +12,8 @@ const GENRES: Record<SorteObjet, Genre> = {
   van: G.VAN,
   arme: G.ARME,
   soin: G.SOIN,
+  coeur: G.COEUR,
+  coeurOr: G.COEUR_OR,
 };
 
 /** Le départ du van : ticks d'attente moteur lancé, puis accélération (px/tick²) jusqu'à la vitesse maximale (px/tick). */
@@ -25,6 +27,8 @@ const TAILLES: Record<SorteObjet, [number, number]> = {
   van: [48, 28],
   arme: [12, 12],
   soin: [10, 10],
+  coeur: [10, 9],
+  coeurOr: [12, 11],
 };
 
 /**

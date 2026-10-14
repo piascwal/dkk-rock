@@ -36,7 +36,15 @@ export class Joueur extends JoueurBase {
       this.invulnerable = 2;
       return;
     }
-    for (const k of ['invulnerable', 'ebloui', 'hypnose', 'recharge', 'lacheTyro', 'traverse'] as const)
+    for (const k of [
+      'invulnerable',
+      'invincible',
+      'ebloui',
+      'hypnose',
+      'recharge',
+      'lacheTyro',
+      'traverse',
+    ] as const)
       if (this[k] > 0) this[k]--;
     this.anim++;
     if (this.tyro) this.majTyrolienne(ctx);
@@ -261,6 +269,7 @@ export class Joueur extends JoueurBase {
       y: c.y + c.h,
       gauche: this.dir < 0,
       clignote: this.invulnerable > 0 && this.invulnerable % 8 < 4,
+      aura: this.invincible > 0,
       e,
       // 4 bits de phase d'animation (cycle de 12 pas de 3 ticks : 6 images de course de 6 ticks chacune, sans à-coup),
       // 3 bits de visée, 1 bit « tire »

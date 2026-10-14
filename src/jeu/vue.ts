@@ -54,6 +54,8 @@ export const G = {
   ARME: 63,
   SOIN: 64,
   BLOC: 65,
+  COEUR: 66,
+  COEUR_OR: 67,
 } as const;
 
 export type Genre = (typeof G)[keyof typeof G];
@@ -85,6 +87,8 @@ export interface EntiteVue {
   gauche: boolean;
   /** clignote (invulnérable, sur le point d'exploser) */
   clignote: boolean;
+  /** une forte aura autour du héros : il est invincible (le cœur d'or) */
+  aura?: boolean;
   /** état d'animation, 0 à 15 */
   e: number;
   /** image ou variante, 0 à 255 (type d'arme, tuile d'un bloc, sens d'une tyrolienne...) */

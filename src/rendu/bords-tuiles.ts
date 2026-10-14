@@ -13,7 +13,17 @@ import { T } from '../monde/tuiles';
 export const COTE = { HAUT: 1, DROITE: 2, BAS: 4, GAUCHE: 8, SOUS_OBJET: 16 } as const;
 
 /** Les tuiles « posées » ou construites (caisses, caissons, murs) : la terre en dessous garde son herbe. */
-const POSEES = new Set<number>([T.CAISSE, T.CAISSON, T.BOIS, T.BRIQUE, T.METAL, T.BETON, T.VITRE]);
+const POSEES = new Set<number>([
+  T.CAISSE,
+  T.CAISSON,
+  T.TONNEAU_WOG,
+  T.TONNEAU_OR,
+  T.BOIS,
+  T.BRIQUE,
+  T.METAL,
+  T.BETON,
+  T.VITRE,
+]);
 
 /** Pixels de touffes au-dessus de la tuile : la toile habillée est plus haute d'autant. */
 export const DEBORD = 3;

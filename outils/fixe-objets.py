@@ -33,6 +33,8 @@ OBJETS = {
     'buisson': ([f'decor/buisson-{k}-base.png' for k in range(1, 4)], None, 22),
     'sapin': ([f'decor/sapin-{k}-base.png' for k in range(1, 4)], None, 34),
     'lampadaire': (['decor/lampadaire-base.png'], None, 15),
+    # le tonneau de décor, sans pancarte (les tonneaux WOG sont des tuiles : outils/fixe-tuiles.py)
+    'tonneau': (['decor/tonneau-base.png'], None, 13),
     # clôtures (neuve, simple, envahie de lierre), boîtes aux lettres (ronde, carrée), palmiers (penché, droit, courbé) et
     # arbres (rond vert clair, chêne sombre) : même échelle pour toutes les apparences d'un objet
     'cloture': ([f'decor/cloture-{k}-base.png' for k in (1, 2, 3)], None, 26),

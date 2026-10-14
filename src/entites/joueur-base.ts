@@ -19,6 +19,8 @@ export abstract class JoueurBase implements Cible, EtatSpecial {
   mort = false;
   delaiReapparition = 0;
   invulnerable = INVULNERABLE;
+  /** ticks d'invincibilité restants (le cœur d'or WOG) : aucun dégât, et l'aura se voit */
+  invincible = 0;
   /** monté dans le van qui part : ni vu, ni touché, ni commandé */
   embarque = false;
   solo = 0;
@@ -89,7 +91,7 @@ export abstract class JoueurBase implements Cible, EtatSpecial {
   }
 
   blesse(degats: number, ctx: Contexte, dx: number): void {
-    if (this.mort || this.invulnerable > 0 || this.dejaBlesse === ctx.tick) return;
+    if (this.mort || this.invulnerable > 0 || this.invincible > 0 || this.dejaBlesse === ctx.tick) return;
     this.dejaBlesse = ctx.tick;
     this.pv -= Math.max(1, Math.round(degats));
     this.invulnerable = INVULNERABLE;

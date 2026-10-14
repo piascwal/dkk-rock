@@ -37,6 +37,16 @@ describe('le protocole réseau', () => {
     expect(d.entites[0]).toMatchObject({ id: e.id, g: e.g, x: Math.round(e.x), gauche: e.gauche });
   });
 
+  it("l'aura d'invincibilité traverse le réseau", () => {
+    const p = new Partie({ niveau: 0, drapeau: -1, vies: 5, score: 0 });
+    p.ajouteJoueur(0, 0);
+    p.joueurs[0]!.invincible = 100;
+    const d = decodeEtat(encodeEtat(p.vue()))!;
+    const heros = d.entites.find((e) => e.id === p.joueurs[0]!.id)!;
+    expect(heros.aura).toBe(true);
+    expect(d.entites.filter((e) => e.aura).length).toBe(1);
+  });
+
   it('refuse un instantané tronqué ou d’un autre type', () => {
     const p = new Partie({ niveau: 0, drapeau: -1, vies: 5, score: 0 });
     p.ajouteJoueur(0, 0);

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { TUILE, VIES_DEPART, VIES_MAX } from '../src/config';
+import { DUREE_INVINCIBLE, PV_HEROS, TUILE, VIES_DEPART, VIES_MAX } from '../src/config';
 import { C } from '../src/jeu/commandes';
 import { Partie } from '../src/jeu/partie';
 import { DUREE_CARTE } from '../src/jeu/vue';
@@ -122,6 +122,55 @@ describe('la partie', () => {
     avance(p, 2);
     expect(p.vies).toBe(VIES_MAX);
     expect(j.membre).not.toBe(membre);
+  });
+
+  describe('les tonneaux WOG', () => {
+    /** Casse un tonneau posé à côté du héros et rend le cœur qu'il libère. */
+    const casse = (type: number, sorte: 'coeur' | 'coeurOr') => {
+      const p = nouvelle();
+      const j = p.joueurs[0]!;
+      const tx = Math.floor(j.cx / TUILE) + 3;
+      const ty = Math.floor((j.corps.y + j.corps.h) / TUILE) - 1;
+      p.carte.pose(tx, ty, type as never);
+      p.carte.endommage(tx, ty, 99);
+      avance(p, 1);
+      const coeur = p.entites.find((e): e is Objet => e instanceof Objet && e.sorte === sorte);
+      expect(coeur).toBeDefined();
+      return { p, j, coeur: coeur! };
+    };
+    const ramasse = (p: Partie, j: Partie['joueurs'][number] & object, coeur: Objet) => {
+      Object.assign(j.corps, { x: coeur.corps.x, y: coeur.corps.y });
+      avance(p, 2);
+    };
+
+    it('un tonneau WOG libère un cœur qui redonne une vie', () => {
+      const { p, j, coeur } = casse(T.TONNEAU_WOG, 'coeur');
+      p.vies = 3;
+      ramasse(p, j, coeur);
+      expect(p.vies).toBe(4);
+      expect(coeur.fini).toBe(true);
+    });
+
+    it('jamais plus de vies que le maximum', () => {
+      const { p, j, coeur } = casse(T.TONNEAU_WOG, 'coeur');
+      p.vies = VIES_MAX;
+      ramasse(p, j, coeur);
+      expect(p.vies).toBe(VIES_MAX);
+    });
+
+    it("un tonneau d'or libère un cœur d'or : toute la vie, et dix secondes d'invincibilité", () => {
+      const { p, j, coeur } = casse(T.TONNEAU_OR, 'coeurOr');
+      j.pv = 1;
+      ramasse(p, j, coeur);
+      expect(j.pv).toBe(PV_HEROS);
+      expect(j.invincible).toBeGreaterThan(DUREE_INVINCIBLE - 5);
+      expect(p.vue().entites.find((e) => e.id === j.id)?.aura).toBe(true);
+      j.blesse(1, p, 1);
+      expect(j.pv).toBe(PV_HEROS);
+      avance(p, DUREE_INVINCIBLE + 5);
+      expect(j.invincible).toBe(0);
+      expect(p.vue().entites.find((e) => e.id === j.id)?.aura).toBeFalsy();
+    });
   });
 
   it('le van termine le niveau, qui sauvegarde et enchaîne sur le suivant', () => {

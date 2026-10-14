@@ -26,6 +26,7 @@ def souterrain(r, ennemis='a'):
     lieux = ['complexe', 'caverne', 'complexe', 'cache', 'complexe', 'caverne']
     butins = ['K', '*', 'K', '+', 'K', '*']  # des cages : on en veut plusieurs par niveau
     nb = max(5, w // 85)
+    dore = False  # le tonneau d'or WOG : un seul par niveau, dans la première cache
     for i in range(nb):
         genre, butin = lieux[i % len(lieux)], butins[i % len(butins)]
         largeur = {'complexe': 28, 'caverne': 18, 'cache': 8}[genre]
@@ -42,11 +43,30 @@ def souterrain(r, ennemis='a'):
                 n.galerie(x0, x0 + 9, alcoves=0)
                 n.ennemis(x0, x0 + 9, ennemis, 1, ymin=yg - 1)
             n.repere(x - 7, '+', ymin=yg - 1)
+            n.repere(x + largeur - 8, 'O', ymin=yg - 9)  # un tonneau WOG sur le plancher du haut
         elif genre == 'caverne':
             px, py = n.caverne(x, largeur, 7)
             n.puits(x + 2)
             n.repere(px, butin, ymin=py - 2)
+            if i < 3:
+                n.repere(px + 2, 'O', ymin=py - 2)
             n.ennemis(x + 4, x + largeur - 2, ennemis, 3, ymin=yg - 8)
         else:
             cx, cy = n.cache(x + 2, yg - 5, 4, 3)
-            n.set(cx, cy, butin)
+            if dore:
+                n.set(cx, cy, butin)
+            else:
+                n.set(cx, cy, 'Q')
+                dore = True
+
+
+def tonneaux_de_surface(r):
+    """Des tonneaux WOG sur le terrain : un raccord sur trois (le reste du temps, le chemin est libre). Le tonneau d'or de
+    secours (si aucune cache n'en a reçu) se pose au premier raccord."""
+    n = r.n
+    raccords = [(a, b) for a, b, g in r.pieces if g == 'raccord' and b - a >= 4]
+    for k, (a, b) in enumerate(raccords):
+        if k % 3 == 1:
+            n.repere(a + 1, 'O', ymin=n.base - 3, surface=True)
+    if not any('Q' in ligne for ligne in n.g):
+        n.repere(raccords[0][0] + 1, 'Q', ymin=n.base - 3, surface=True)
