@@ -21,10 +21,18 @@ export function freq(nom: string): number {
 }
 const notes = (s: string) => s.split(' ').map(freq);
 
-/** Mat : une basse, une octave au-dessus pour les haut-parleurs de téléphone, plus le vrai grave dessous. */
+/**
+ * Mat : une basse. Les haut-parleurs de téléphone ne rendent presque rien sous 150 Hz : le grave (mi2 = 82 Hz) reste dessous
+ * pour les vrais haut-parleurs, mais le son s'appuie sur ses harmoniques (octave, double octave) et sur un claquement de
+ * corde, bien plus forts, pour qu'on l'entende partout.
+ */
 const basse = (s: Synthe, v: number, f: number) => {
-  s.note({ freq: f * 2, duree: 0.32, type: 'sawtooth', volume: 0.22 * v, filtre: 900 });
-  s.note({ freq: f, duree: 0.32, type: 'sine', volume: 0.25 * v });
+  // saturée comme les guitares des autres : c'est ce qui la fait ressortir dans le mélange
+  s.note({ freq: f * 2, duree: 0.34, type: 'sawtooth', volume: 0.2 * v, distordu: true });
+  s.note({ freq: f * 2, duree: 0.34, type: 'sawtooth', volume: 0.3 * v, filtre: 2200 });
+  s.note({ freq: f * 4, duree: 0.2, type: 'triangle', volume: 0.22 * v });
+  s.note({ freq: f, duree: 0.34, type: 'sine', volume: 0.3 * v });
+  s.bruit({ duree: 0.04, volume: 0.12 * v, passeHaut: 1500 });
 };
 
 /** JBG : un power chord saturé (fondamentale et quinte). */
