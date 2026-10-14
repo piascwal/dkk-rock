@@ -1,6 +1,6 @@
 import { DENSITE_MAX, DENSITE_MIN, HAUTEUR_VUE, TUILE } from '../config';
 import type { Qualite } from '../jeu/sauvegarde';
-import { G, type EtatVue, type Evenement } from '../jeu/vue';
+import { ANIM, G, type EntiteVue, type EtatVue, type Evenement } from '../jeu/vue';
 import { Carte } from '../monde/carte';
 import { proprietes } from '../monde/tuiles';
 import { NIVEAUX, niveauLu } from '../niveaux';
@@ -182,9 +182,10 @@ export class Rendu {
     this.particules.maj(carte);
 
     // les objets derrière, puis les personnages, puis les tirs
-    const tri = (g: number) => (g >= G.CAGE ? 0 : g >= G.P_BAGUETTE ? 2 : 1);
+    const tri = (v: EntiteVue) =>
+      v.g >= G.CAGE || (v.g < G.P_BAGUETTE && v.e === ANIM.TERRASSE) ? 0 : v.g >= G.P_BAGUETTE ? 2 : 1;
     for (const passe of [0, 1, 2])
-      for (const v of vue.entites) if (tri(v.g) === passe) dessineEntite(ctx, v, camX, camY, this.atlas);
+      for (const v of vue.entites) if (tri(v) === passe) dessineEntite(ctx, v, camX, camY, this.atlas);
     for (const v of vue.entites) if (v.g === G.VAN && v.e === 2) this.particules.van(v.x, v.y, v.f / 20);
     dessineDecor(
       ctx,

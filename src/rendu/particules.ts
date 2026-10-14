@@ -1,9 +1,10 @@
 import { HAUTEUR_VUE } from '../config';
 import type { Carte } from '../monde/carte';
-import { anneau, disque } from './formes-pixels';
+import { anneau, disque, note } from './formes-pixels';
+import { dessineNuages } from './nuages';
 import { ecritCentre } from './police';
 
-type Sorte = 'carre' | 'fumee' | 'poussiere' | 'eclat' | 'texte' | 'flocon' | 'luciole' | 'onde';
+type Sorte = 'carre' | 'note' | 'fumee' | 'poussiere' | 'eclat' | 'texte' | 'flocon' | 'luciole' | 'onde';
 
 interface Particule {
   sorte: Sorte;
@@ -20,10 +21,6 @@ interface Particule {
 }
 
 const MAX = 700;
-/** Les paliers de couleur d'un nuage d'explosion, [cœur, liseré] : feu vif, braise, cendre. */
-const FEU_VIF = ['#fff3b0', '#ffb347'];
-const BRAISE = ['#c0502a', '#7a2a14'];
-const CENDRE = ['#4a4a4a', '#2a2a2a'];
 const CONFETTIS = ['#ff4fd8', '#ffd23f', '#3fa7f2', '#7cfc7c', '#ff6b35', '#ffffff'];
 
 /**
@@ -143,18 +140,46 @@ export class Particules {
       });
   }
 
+  /**
+   * La mort d'un ennemi (pas de sang : on le met au tapis) : le son s'échappe, quelques notes qui montent en
+   * ondulant et retombent, des étincelles d'ampli qui grésille, quelques confettis.
+   */
   confettis(x: number, y: number): void {
-    for (let i = 0; i < 18; i++)
+    for (let i = 0; i < 4; i++)
+      this.ajoute({
+        sorte: 'note',
+        x: x + (Math.random() - 0.5) * 8,
+        y: y - 4,
+        vx: (Math.random() - 0.5) * 1.6,
+        vy: -1.8 - Math.random() * 1.4,
+        vie: 45 + Math.random() * 30,
+        taille: 1,
+        couleur: CONFETTIS[i % 4]!,
+        gravite: 0.07,
+      });
+    for (let i = 0; i < 6; i++)
+      this.ajoute({
+        sorte: 'eclat',
+        x,
+        y,
+        vx: (Math.random() - 0.5) * 5,
+        vy: -Math.random() * 3.5,
+        vie: 14 + Math.random() * 14,
+        taille: 1,
+        couleur: i % 2 ? '#ffffff' : '#ffd23f',
+        gravite: 0.12,
+      });
+    for (let i = 0; i < 4; i++)
       this.ajoute({
         sorte: 'carre',
         x,
         y,
         vx: (Math.random() - 0.5) * 4,
-        vy: -1 - Math.random() * 3,
-        vie: 50 + Math.random() * 30,
+        vy: -1 - Math.random() * 2.5,
+        vie: 40 + Math.random() * 25,
         taille: 2,
-        couleur: CONFETTIS[i % CONFETTIS.length]!,
-        gravite: 0.08,
+        couleur: CONFETTIS[(i + 2) % CONFETTIS.length]!,
+        gravite: 0.1,
       });
   }
 
@@ -209,6 +234,7 @@ export class Particules {
       p.vie--;
       p.vy += p.gravite;
       if (p.sorte === 'flocon') p.vx = Math.sin(p.vie / 30) * 0.4;
+      if (p.sorte === 'note') p.vx = Math.sin(p.vie / 5) * 0.55;
       if (p.sorte === 'luciole') p.vx = Math.sin(p.vie / 20) * 0.3;
       const nx = p.x + p.vx;
       const ny = p.y + p.vy;
@@ -224,39 +250,8 @@ export class Particules {
     this.liste = this.liste.filter((p) => p.vie > 0);
   }
 
-  /**
-   * Les nuages d'explosion : tous les liserés d'abord, puis tous les cœurs, pour que les boules qui se chevauchent
-   * forment une seule masse (et non des bulles qui montrent chacune leur contour), puis les reflets.
-   */
-  private nuages(ctx: CanvasRenderingContext2D, camX: number, camY: number): void {
-    const nuages = this.liste
-      .filter((p) => p.sorte === 'fumee')
-      .map((p) => {
-        const t = p.vie / p.vieMax;
-        const r = p.taille * (1.4 - t * 0.6) * (t < 0.25 ? t * 4 : 1);
-        const [coeur, bord] =
-          t > 0.8 ? FEU_VIF : t > 0.6 ? [p.couleur, '#c0502a'] : t > 0.35 ? BRAISE : CENDRE;
-        return { x: Math.round(p.x - camX), y: Math.round(p.y - camY), r, t, coeur, bord };
-      })
-      .filter((n) => n.r >= 1);
-    for (const n of nuages) {
-      ctx.fillStyle = n.bord;
-      disque(ctx, n.x, n.y, n.r + 1);
-    }
-    for (const n of nuages) {
-      ctx.fillStyle = n.coeur;
-      disque(ctx, n.x, n.y, n.r);
-    }
-    for (const n of nuages) {
-      if (n.t <= 0.35) continue;
-      // un reflet plus clair en haut à gauche
-      ctx.fillStyle = n.t > 0.6 ? '#fff3b0' : '#ff9b2f';
-      disque(ctx, n.x - Math.round(n.r * 0.3), n.y - Math.round(n.r * 0.3), n.r * 0.4);
-    }
-  }
-
   dessine(ctx: CanvasRenderingContext2D, camX: number, camY: number): void {
-    this.nuages(ctx, camX, camY);
+    dessineNuages(ctx, this.liste, camX, camY);
     for (const p of this.liste) {
       const x = Math.round(p.x - camX);
       const y = Math.round(p.y - camY);
@@ -287,6 +282,10 @@ export class Particules {
           if (t > 0.15) anneau(ctx, x, y, r);
           break;
         }
+        case 'note':
+          // elle clignote avant de disparaître (pas de transparence)
+          if (t > 0.3 || p.vie % 4 < 2) note(ctx, x - 2, y - 3, p.couleur);
+          break;
         case 'texte':
           ecritCentre(ctx, p.texte ?? '', x, y, p.couleur);
           break;

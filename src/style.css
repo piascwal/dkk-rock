@@ -62,12 +62,12 @@ body {
   touch-action: none;
 }
 
-/* le bouton pour passer l'intro : discret, en bas à droite */
+/* le bouton pour passer l'intro : discret, en haut à droite (le bas porte les noms des personnages) */
 .passer-intro {
   position: fixed;
   z-index: 31;
   right: max(10px, env(safe-area-inset-right));
-  bottom: max(8px, env(safe-area-inset-bottom));
+  top: max(8px, env(safe-area-inset-top));
   opacity: 0.65;
   font-family: var(--titre);
   font-size: 0.65rem;

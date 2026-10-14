@@ -26,3 +26,21 @@ export function anneau(ctx: CanvasRenderingContext2D, x: number, y: number, r: n
     ctx.fillRect(x + l - reste + 1, y + dy, reste, 1);
   }
 }
+
+/** Une note de musique de 4 × 6 pixels (queue, tête, crochet), cernée de noir, dont le coin haut gauche est en (x, y). */
+export function note(ctx: CanvasRenderingContext2D, x: number, y: number, couleur: string): void {
+  const forme = (dx: number, dy: number, coul: string) => {
+    ctx.fillStyle = coul;
+    ctx.fillRect(x + 2 + dx, y + dy, 1, 5);
+    ctx.fillRect(x + dx, y + 4 + dy, 3, 2);
+    ctx.fillRect(x + 3 + dx, y + dy, 1, 2);
+  };
+  for (const [dx, dy] of [
+    [-1, 0],
+    [1, 0],
+    [0, -1],
+    [0, 1],
+  ] as const)
+    forme(dx, dy, '#000000');
+  forme(0, 0, couleur);
+}

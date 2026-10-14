@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { TUILE, VIES_DEPART } from '../src/config';
 import { Ennemi } from '../src/entites/ennemis/ennemi';
 import { Partie } from '../src/jeu/partie';
+import { ANIM } from '../src/jeu/vue';
 import { T } from '../src/monde/tuiles';
 
 const nouvelle = () => {
@@ -73,5 +74,29 @@ describe('les ennemis', () => {
       avant = e.dir;
     }
     expect(tours).toBeLessThanOrEqual(2);
+  });
+
+  it('un ennemi vaincu reste étendu un moment, sans plus se battre ni encaisser, puis s’efface', () => {
+    const p = nouvelle();
+    const e = p.entites.find((x): x is Ennemi => x instanceof Ennemi && !x.def.explose)!;
+    const points = p.score;
+    e.blesse(99, p, 1, false);
+    expect(p.score).toBeGreaterThan(points);
+    expect(e.vivant()).toBe(false);
+    expect(e.fini).toBe(false);
+    expect(e.vue().e).toBe(ANIM.TERRASSE);
+    // un deuxième coup ne rapporte rien de plus
+    const score = p.score;
+    e.blesse(99, p, 1, false);
+    expect(p.score).toBe(score);
+    // le héros reste à portée de simulation sans être touché
+    Object.assign(p.joueurs[0]!.corps, { x: e.corps.x - 200, y: e.corps.y });
+    p.joueurs[0]!.invulnerable = 9999;
+    for (let i = 0; i < 100; i++) p.avance();
+    expect(e.fini).toBe(false);
+    for (let i = 0; i < 260; i++) p.avance();
+    expect(e.fini).toBe(true);
+    p.avance();
+    expect(p.entites.includes(e)).toBe(false);
   });
 });

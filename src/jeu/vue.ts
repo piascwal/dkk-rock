@@ -71,6 +71,8 @@ export const ANIM = {
   PERDU: 8,
   ETOURDI: 9,
   ATTAQUE: 10,
+  /** un ennemi à terre : il reste sur la scène un moment, estompé (`f` : le temps qu'il lui reste, par demi-ticks) */
+  TERRASSE: 11,
 } as const;
 
 export interface EntiteVue {

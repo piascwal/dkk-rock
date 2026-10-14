@@ -82,7 +82,7 @@ export function dessineCase(c: CanvasRenderingContext2D, w: number, i: number, u
       f.h * zoom,
     );
   }
-  // le cadre de la case : bord noir épais, liseré blanc
+  // le cadre de la case : un bord noir épais
   c.fillStyle = '#000000';
   for (const [x, y, ww, hh] of [
     [0, 0, w, 6],
@@ -91,8 +91,6 @@ export function dessineCase(c: CanvasRenderingContext2D, w: number, i: number, u
     [w - 6, 0, 6, H],
   ] as const)
     c.fillRect(x, y, ww, hh);
-  c.fillStyle = '#ffffff';
-  c.fillRect(6, 6, w - 12, 2);
   // l'encadré du nom, comme une légende de BD
   const bx = gauche ? Math.round(w * 0.6) : 16;
   const bw = Math.round(w * 0.36);

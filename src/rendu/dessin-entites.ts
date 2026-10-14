@@ -38,17 +38,24 @@ export function dessineEntite(
   }
   // un héros invulnérable clignote ; un ennemi touché passe au blanc
   const heros = herosDuGenre(v.g);
+  const aTerre = v.e === ANIM.TERRASSE && heros === undefined && v.g < G.P_BAGUETTE;
   if (v.clignote && heros) ctx.globalAlpha = 0.35;
 
   ctx.save();
   ctx.translate(x, y);
   if (v.gauche && !DRAPEAUX_SANS_MIROIR.has(v.g)) ctx.scale(-1, 1);
+  if (aTerre) {
+    // mis au tapis : couché sur le dos, estompé, et qui s'efface à la fin (`f` : ce qu'il lui reste à rester là)
+    ctx.globalAlpha = 0.55 * Math.min(1, v.f / 40);
+    ctx.translate(0, -5);
+    ctx.rotate(v.g === G.DRONE ? -0.4 : -Math.PI / 2);
+  }
   const p = pinceau(ctx);
   const blanc = v.clignote && !heros && !estTir;
   const pb = blanc ? (x0: number, y0: number, w: number, h: number) => p(x0, y0, w, h, '#ffffff') : p;
 
   // sprites à apparences : l'identifiant choisit l'apparence ; héros : phase d'animation ; autres : compteur
-  const compteur = FEUILLES[v.g]?.variantes ? v.id : heros ? v.f & 15 : v.f;
+  const compteur = aTerre ? 0 : FEUILLES[v.g]?.variantes ? v.id : heros ? v.f & 15 : v.f;
   if (
     dessineFeuille(
       ctx,

@@ -4,6 +4,9 @@ import type { Camp, Cible, Contexte, EntiteSimulee } from '../../jeu/contexte';
 import { ANIM, type EntiteVue } from '../../jeu/vue';
 import type { DefEnnemi } from './definitions';
 
+/** Combien de temps (en ticks) un ennemi vaincu reste étendu sur la scène avant de s'effacer. */
+const DUREE_A_TERRE = 300;
+
 export type EtatEnnemi = 'patrouille' | 'alerte' | 'attaque' | 'perdu';
 
 /**
@@ -30,6 +33,10 @@ export class Ennemi implements Cible, EntiteSimulee {
   /** délai avant un nouveau demi-tour : évite de pivoter à chaque pas contre un obstacle */
   virage = 0;
   private flash = 0;
+  /** ticks restants à terre une fois vaincu (0 : debout) ; il ne gêne ni ne se bat plus */
+  private aTerre = 0;
+  /** le côté où le dernier coup l'a projeté */
+  private projete: 1 | -1 = 1;
 
   constructor(
     ctx: Contexte,
@@ -69,11 +76,12 @@ export class Ennemi implements Cible, EntiteSimulee {
   }
 
   vivant(): boolean {
-    return !this.fini;
+    return !this.fini && this.aTerre === 0;
   }
 
   blesse(degats: number, ctx: Contexte, dx: number, explosion: boolean): void {
-    if (this.fini) return;
+    if (this.fini || this.aTerre > 0) return;
+    if (dx) this.projete = dx > 0 ? 1 : -1;
     this.pv -= degats;
     this.flash = 4;
     if (explosion) this.corps.vy = -3;
@@ -85,11 +93,29 @@ export class Ennemi implements Cible, EntiteSimulee {
   }
 
   meurt(ctx: Contexte): void {
-    if (this.fini) return;
-    this.fini = true;
+    if (this.fini || this.aTerre > 0) return;
     ctx.ennemiVaincu(this.cx, this.cy, this.def.points);
-    if (this.def.explose)
+    if (this.def.explose) {
+      this.fini = true;
       ctx.explosion(this.cx, this.cy, this.def.explose.rayon, this.def.explose.degats, 'tous');
+      return;
+    }
+    // pas de sang : il est mis au tapis, un petit saut en arrière, puis il reste là, estompé
+    this.aTerre = DUREE_A_TERRE;
+    this.etat = 'perdu';
+    this.cible = null;
+    this.corps.vx = this.projete * 1.4;
+    this.corps.vy = -2.2;
+  }
+
+  /** Étendu : il retombe et glisse un peu, puis s'efface. */
+  private estALaTerre(ctx: Contexte): void {
+    this.anim++;
+    const c = this.corps;
+    if (c.auSol) c.vx *= 0.8;
+    appliqueGravite(c);
+    deplace(c, ctx.carte);
+    if (--this.aTerre <= 0 || c.y > ctx.carte.hauteur * TUILE + 32) this.fini = true;
   }
 
   passeEnAlerte(ctx: Contexte): void {
@@ -126,6 +152,10 @@ export class Ennemi implements Cible, EntiteSimulee {
   }
 
   maj(ctx: Contexte): void {
+    if (this.aTerre > 0) {
+      this.estALaTerre(ctx);
+      return;
+    }
     this.anim++;
     if (this.flash > 0) this.flash--;
     if (this.recharge > 0) this.recharge--;
@@ -229,6 +259,17 @@ export class Ennemi implements Cible, EntiteSimulee {
   }
 
   vue(): EntiteVue {
+    if (this.aTerre > 0)
+      return {
+        id: this.id,
+        g: this.def.genre,
+        x: this.cx,
+        y: this.corps.y + this.corps.h,
+        gauche: this.dir < 0,
+        clignote: false,
+        e: ANIM.TERRASSE,
+        f: Math.min(255, Math.ceil(this.aTerre / 2)),
+      };
     const e =
       this.etat === 'alerte'
         ? ANIM.ALERTE
