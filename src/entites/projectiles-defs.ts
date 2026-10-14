@@ -28,6 +28,8 @@ export interface DefProjectile {
   proximite?: number;
   recul?: number;
   effet?: 'hypnose' | 'eblouit';
+  /** un tir lourd (grosse bombe, onde de sol) : les tirs des héros ne l'arrêtent pas */
+  lourd?: boolean;
   /** se transforme en un autre tir en fin de course (la cornemuse laisse un nuage) */
   laisse?: DefProjectile;
 }

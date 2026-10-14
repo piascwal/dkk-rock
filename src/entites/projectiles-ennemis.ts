@@ -20,6 +20,7 @@ export const DROP = P({
   duree: 150,
   taille: 6,
   explosion: { rayon: 28, degats: 2 },
+  lourd: true,
 });
 export const BOMBE_DRONE = P({
   genre: G.P_BOMBE,
@@ -30,6 +31,7 @@ export const BOMBE_DRONE = P({
   duree: 150,
   taille: 5,
   explosion: { rayon: 24, degats: 2 },
+  lourd: true,
 });
 export const BOULE_NEIGE = P({
   genre: G.P_BOULE_NEIGE,
@@ -80,6 +82,7 @@ export const GROSSE_BOULE = P({
   roule: true,
   creuse: true,
   explosion: { rayon: 30, degats: 1 },
+  lourd: true,
 });
 export const ONDE_SOL = P({
   genre: G.P_ONDE_SOL,
@@ -90,4 +93,5 @@ export const ONDE_SOL = P({
   duree: 140,
   taille: 10,
   perce: true,
+  lourd: true,
 });

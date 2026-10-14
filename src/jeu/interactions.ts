@@ -77,9 +77,19 @@ export function interactions(p: Partie): void {
 
 /** Les tirs contre les cibles du camp d'en face. */
 function collisionsTirs(p: Partie): void {
+  const tirsEnnemis = p.entites.filter(
+    (e): e is Projectile => e instanceof Projectile && e.camp === 'ennemis' && !e.def.lourd,
+  );
   for (const e of p.entites) {
     if (e.fini || !(e instanceof Projectile)) continue;
     const tir = e;
+    // un tir de héros arrête les petits tirs ennemis qu'il croise (pas les grosses bombes) ; il y reste, sauf s'il perce
+    if (tir.camp === 'heros' && !tir.def.proximite)
+      for (const autre of tirsEnnemis) {
+        if (autre.fini || tir.fini || !chevauche(tir.boite, autre.boite)) continue;
+        autre.termine(p);
+        if (!tir.def.perce) tir.termine(p);
+      }
     const visees = tir.camp === 'heros' ? p.cibles('ennemis') : p.cibles('heros');
     const b = tir.boite;
     for (const c of visees) {
