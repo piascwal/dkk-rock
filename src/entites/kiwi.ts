@@ -20,6 +20,7 @@ export class Kiwi implements EntiteSimulee {
   private bec = 0;
   private ponte = 400;
   private anim = 0;
+  private parti = false;
 
   constructor(
     ctx: Contexte,
@@ -27,12 +28,22 @@ export class Kiwi implements EntiteSimulee {
     y: number,
     /** le héros suivi */
     private chef: () => Cible | null,
+    /** un chauffage soufflant le remplace : il s'efface le temps qu'il reste */
+    private absent: () => boolean = () => false,
   ) {
     this.id = ctx.prochainId();
     this.corps = nouveauCorps(x, y, 8, 8);
   }
 
   maj(ctx: Contexte): void {
+    if (this.absent()) {
+      this.parti = true;
+      return;
+    }
+    // de retour : il retrouve son héros comme par magie
+    const chef0 = this.chef();
+    if (this.parti && chef0) Object.assign(this.corps, { x: chef0.x, y: chef0.y - 4, vx: 0, vy: 0 });
+    this.parti = false;
     this.anim++;
     if (this.bec > 0) this.bec--;
     if (this.ponte > 0) this.ponte--;
@@ -91,7 +102,8 @@ export class Kiwi implements EntiteSimulee {
     return meilleure;
   }
 
-  vue(): EntiteVue {
+  vue(): EntiteVue | null {
+    if (this.absent()) return null;
     const c = this.corps;
     const pique = this.bec > 12;
     let e: number = ANIM.DEBOUT;

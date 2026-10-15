@@ -2,7 +2,7 @@ import { HEROS_HAUTEUR, HEROS_LARGEUR, INVULNERABLE, PV_HEROS, SPECIAUX_DEPART }
 import { EtatCommandes } from '../jeu/commandes';
 import type { Camp, Cible, Contexte, Tyrolienne } from '../jeu/contexte';
 import { nouveauCorps, type Corps } from '../monde/physique';
-import { armeRamassee, type DefArme } from './armes';
+import { armeRamassee, type Compagnon, type DefArme } from './armes';
 import { HEROS, type DefHeros, type EtatSpecial } from './heros';
 
 /** Un héros contrôlé par un joueur (local ou distant : la simulation ne fait pas la différence). */
@@ -16,6 +16,8 @@ export abstract class JoueurBase implements Cible, EtatSpecial {
   /** 0 = l'instrument, sinon index dans ARMES_RAMASSABLES + 1 */
   arme = 0;
   munitions = 0;
+  /** le chauffage soufflant qui l'accompagne, tant que l'arme a des munitions */
+  compagnon: Compagnon | null = null;
   mort = false;
   delaiReapparition = 0;
   invulnerable = INVULNERABLE;
@@ -129,6 +131,7 @@ export abstract class JoueurBase implements Cible, EtatSpecial {
     this.pv = PV_HEROS;
     this.speciaux = Math.max(this.speciaux, SPECIAUX_DEPART);
     this.arme = 0;
+    this.compagnon = null;
     this.invulnerable = INVULNERABLE;
     this.hypnose = 0;
     this.ebloui = 0;

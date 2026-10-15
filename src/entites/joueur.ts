@@ -246,7 +246,14 @@ export class Joueur extends JoueurBase {
     }
     if (!k.tenu(C.TIR) || this.recharge > 0 || this.ebloui > 0) return;
     const a = this.armeActuelle;
-    a.tir(ctx, bouche);
+    // l'arme-compagnon tire depuis le compagnon ; s'il n'est pas (encore) là, rien ne part et rien ne se dépense
+    const origine = a.compagnon
+      ? this.compagnon && !this.compagnon.fini
+        ? this.compagnon.bouche(bouche)
+        : null
+      : bouche;
+    if (!origine) return;
+    a.tir(ctx, origine);
     this.recharge = a.cadence;
     // l'instrument du héros joue la note suivante de son riff (voir audio/melodies.ts) ; une arme ramassée, son bruit
     ctx.son(this.arme ? a.son : `${a.son}:${this.notes++ % 256}`, this.cx, this.cy);

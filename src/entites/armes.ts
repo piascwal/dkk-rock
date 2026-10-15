@@ -4,6 +4,7 @@ import {
   BOULET_AMPLI,
   CORNEMUSE,
   FLAMME,
+  JET_FLAMME,
   ONDE_GONG,
   TRIANGLE,
   VINYLE,
@@ -18,6 +19,13 @@ export interface Tireur {
   angle?: number;
 }
 
+/** Un compagnon qui tient lieu de bouche à l'arme du héros (le chauffage soufflant). */
+export interface Compagnon {
+  readonly fini: boolean;
+  /** Se tourne vers la visée du héros et rend où part le tir : le centre du cercle de sa grille. */
+  bouche(visee: Tireur): Tireur;
+}
+
 export interface DefArme {
   nom: string;
   /** ticks entre deux tirs */
@@ -26,6 +34,8 @@ export interface DefArme {
   munitions: number;
   son: string;
   tir: (ctx: Contexte, t: Tireur) => void;
+  /** l'arme est un compagnon (voir `Compagnon`) : le tir part de lui, et il reste tant qu'il y a des munitions */
+  compagnon?: boolean;
   /** ce que dit le héros en la ramassant : on découvre la richesse d'une musique... sans l'admettre */
   repliques: string[];
 }
@@ -103,7 +113,22 @@ export const ARMES_RAMASSABLES: DefArme[] = [
       "Un gong de 80 centimètres. Les percussions d'Asie ont mille ans d'avance. On s'en fiche, ça fait BOUM.",
     ],
   },
+  {
+    nom: 'Chauffage soufflant',
+    cadence: 3,
+    munitions: 110,
+    son: 'flamme',
+    compagnon: true,
+    tir: (ctx, t) => tire(ctx, t, JET_FLAMME, ctx.rng.entre(-0.5, 0.5)),
+    repliques: [
+      'Un chauffage soufflant. Il ronronne comme un vieil ampli. Il me suit partout : mignon ou inquiétant ?',
+      "Il sent la poussière brûlée, c'est la base du rock. Et il crache du feu. Je l'adopte.",
+    ],
+  },
 ];
+
+/** L'index de l'arme-compagnon dans ARMES_RAMASSABLES, plus un (comme `JoueurVue.arme`). */
+export const ARME_CHAUFFAGE = ARMES_RAMASSABLES.findIndex((a) => a.compagnon) + 1;
 
 /** L'arme d'index `i` (1 et plus : ramassées), ou null pour l'instrument. */
 export const armeRamassee = (i: number): DefArme | null => ARMES_RAMASSABLES[i - 1] ?? null;

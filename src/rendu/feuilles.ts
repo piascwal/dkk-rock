@@ -73,6 +73,16 @@ export const FEUILLES: Partial<Record<Genre, Feuille>> = {
     rythme: 5,
     echelle: 0.5,
   },
+  // le chauffage soufflant, fabriqué par outils/fixe-chauffage.py : debout 1 image, court 4 (écrasé), saut 1 (étiré), souffle 2 (secoué)
+  [G.CHAUFFAGE]: {
+    fichier: 'chauffage.png',
+    w: 227,
+    h: 308,
+    images: [1, 4, 1, 0, 0, 0, 0, 0, 0, 0, 2],
+    rythme: 5,
+    densite: 6,
+    echelle: 0.5,
+  },
 };
 
 /** Pour les tests et la lisibilité : tous les genres de héros. */

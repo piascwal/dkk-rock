@@ -49,7 +49,11 @@ minimale, et le Yéti Alpha) → la Plage du Tube de l'Été → la Ville Autotu
   emojis sont dans `src/rendu/emojis.ts`.
 - **Cages** : un membre du groupe y est enfermé. Le libérer donne une vie (cinq au plus : au maximum, on change seulement de personnage), et on prend sa place. Chaque niveau en cache quatre ou cinq.
 - **Armes à ramasser** (ampli à lampes, vinyle de jazz, accordéon-flamme, cornemuse, triangle
-  laser, gong sacré) ; **médiators d'or** : soin et spécial.
+  laser, gong sacré, **chauffage soufflant**) ; **médiators d'or** : soin et spécial.
+  Le **chauffage soufflant** est une arme-compagnon (`entites/chauffage.ts`, `DefArme.compagnon`) : il suit le héros à la place
+  de Fadatchi en avançant par petits bonds, passe devant lui quand il tire et crache un gros jet de flammes par le centre du
+  cercle de sa grille ; quand les munitions s'épuisent (ou que le héros change d'arme ou tombe), il s'en va et le kiwi revient.
+  Sa planche (`public/sprites/chauffage.png`) vient de `outils/fixe-chauffage.py`.
 - **Drapeaux** : point de reprise et sauvegarde. « Continuer » reprend au dernier drapeau.
 - Ennemis : fêtards autotunés, videurs costauds, danseurs du tube de l'été (kamikazes),
   lanceurs de drops, drones à LED, influenceurs (le flash éblouit), yétis (n'attaquent que sur
