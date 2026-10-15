@@ -80,6 +80,7 @@ export class App implements Actions {
     };
     window.addEventListener('pointerdown', geste);
     window.addEventListener('keydown', geste);
+    window.addEventListener('pagehide', () => this.synthe.endort()); // iOS, appli installée : pagehide avant le gel
     const recalibre = () => this.rendu.redimensionne();
     window.addEventListener('resize', recalibre);
     window.addEventListener('orientationchange', recalibre);
@@ -88,6 +89,9 @@ export class App implements Actions {
       if (e.code === 'Enter' && this.derniereVue && this.derniereVue.phase !== 'jeu') this.suivant();
     });
     document.addEventListener('visibilitychange', () => {
+      // en arrière-plan : plus de son (téléphone : écran verrouillé, autre appli) ; au retour, il reprend
+      if (document.hidden) this.synthe.endort();
+      else this.synthe.demarre();
       if (document.hidden && this.partie && !this.multijoueur) this.mettreEnPause();
       if (!document.hidden) void this.controleVersion();
     });

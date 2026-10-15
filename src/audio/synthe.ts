@@ -15,7 +15,8 @@ export class Synthe {
   /** À appeler depuis un geste (toucher, touche). */
   demarre(): void {
     if (this.ctx) {
-      if (this.ctx.state === 'suspended') void this.ctx.resume();
+      // « suspended » (mis en veille par nous) ou « interrupted » (appel, Siri... sur iOS) : on relance
+      if (this.ctx.state !== 'running') void this.ctx.resume();
       return;
     }
     const Ctx =
@@ -59,6 +60,14 @@ export class Synthe {
     g.setValueAtTime(g.value, t);
     g.setTargetAtTime(1 - 0.55 * force, t, 0.03);
     g.setTargetAtTime(1, t + 0.25, 0.35);
+  }
+
+  /**
+   * L'appli passe en arrière-plan : tout le son s'arrête (musique et bruitages), sans rien perdre : l'horloge audio est gelée,
+   * la musique repart où elle en était au retour (voir `demarre`).
+   */
+  endort(): void {
+    if (this.ctx && this.ctx.state === 'running') void this.ctx.suspend();
   }
 
   get pret(): boolean {
