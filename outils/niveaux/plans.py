@@ -37,15 +37,17 @@ NIVEAUX = {
             ('plat', 10, dict(digit='4', cage=True)),  # la cage
             ('plat', 10, dict(digit='5', deco=0, caissons=True)),  # les caissons de basses
             ('tour', 18, dict(etages=2, tyro=9, apres=13, digit='6')),  # la tyrolienne
-            ('forteresse', 34, dict(etages=3, lettres='ac', cage=True)),
-            ('gouffre', 20, dict(lettres='ac', nb=4)),
-            ('echafaudage', 22, dict(niveaux=2, lettres='ac')),
-            ('traversee', 36, dict(lettres='ac')),
+            ('forteresse', 32, dict(etages=3, lettres='ac', cage=True)),
+            ('gouffre', 18, dict(lettres='ac', nb=4)),
+            ('parking', 42, dict(lettres='ac')),  # le parking à étages, propre au garage
+            ('echafaudage', 22, dict(niveaux=3, lettres='ac')),
+            ('traversee', 36, dict(lettres='ac', mode='pont')),
             ('barrage', 20, dict(haut=12, lettres='ac', butin='*')),
-            ('forteresse', 34, dict(etages=4, lettres='ac', cage=True)),
+            ('forteresse', 40, dict(etages=4, lettres='ac', cage=True)),
             ('mur', 16, dict(haut=6, lettres='ac')),
-            ('traversee', 36, dict(lettres='ac')),
-            ('gouffre', 20, dict(lettres='ac', nb=5)),
+            ('traversee', 36, dict(lettres='ac', mode='iles')),
+            ('parking', 46, dict(lettres='ac')),
+            ('gouffre', 22, dict(lettres='ac', nb=5)),
             ('barrage', 20, dict(haut=16, lettres='ac', tyro=11, butin='+')),
             ('arene', 40, dict(lettres='ac')),
         ],
@@ -57,18 +59,18 @@ NIVEAUX = {
             ('plat', 12, dict(lettres='a', deco=3)),  # la radio : « Radio Sommet »
             ('colline', 18, dict(haut=3, lettres='ac')),
             ('plat', 10, dict(lettres='a', digit='3', drones=1)),  # les vaches
-            ('forteresse', 34, dict(etages=3, lettres='ad', cage=True)),
-            ('barrage', 20, dict(haut=12, lettres='ad', butin='*')),
-            ('gouffre', 20, dict(lettres='ad', nb=4)),
+            ('forteresse', 36, dict(etages=3, lettres='ad', cage=True)),
+            ('falaise', 26, dict(lettres='ad')),  # la falaise à corniches, propre aux alpages
+            ('gouffre', 22, dict(lettres='ad', nb=4)),
             ('maison', 14, dict(lettres='ac')),
-            ('traversee', 36, dict(lettres='ad')),
+            ('traversee', 36, dict(lettres='ad', mode='pont')),
             ('tour', 22, dict(etages=3, lettres='adf', digit='2')),  # le chalet du DJ, là-haut
             ('mur', 18, dict(haut=6, lettres='ad')),
-            ('forteresse', 34, dict(etages=4, lettres='adf', cage=True)),
+            ('forteresse', 30, dict(etages=4, lettres='adf', cage=True)),
             ('cheminee', 24, dict(haut=11, lettres='ad')),
-            ('traversee', 36, dict(lettres='adf')),
+            ('falaise', 30, dict(lettres='adf')),
             ('plat', 10, dict(lettres='adf', digit='4', drones=2)),  # le yodel
-            ('gouffre', 20, dict(lettres='adf', nb=5)),
+            ('traversee', 36, dict(lettres='adf', mode='iles')),
             ('barrage', 20, dict(haut=16, lettres='adf', tyro=11, butin='+')),
             ('arene', 44, dict(lettres='adf')),
         ],
@@ -81,13 +83,15 @@ NIVEAUX = {
             ('colline', 18, dict(haut=3, lettres='y')),
             ('plat', 10, dict(lettres='y', digit='2')),  # la glace et la neige qui tombe
             ('forteresse', 34, dict(etages=3, lettres='y', mat='R', cage=True)),
+            ('glacier', 52, dict(lettres='y', nb=3)),  # le glacier, propre aux cimes
             ('gouffre', 20, dict(lettres='y', nb=4)),
             ('barrage', 20, dict(haut=12, lettres='y', butin='*')),
             ('traversee', 36, dict(lettres='ya')),
             ('mur', 18, dict(haut=6, lettres='y')),
             ('echafaudage', 22, dict(niveaux=2, lettres='y')),
-            ('forteresse', 34, dict(etages=4, lettres='ya', mat='R', cage=True)),
-            ('traversee', 36, dict(lettres='ya')),
+            ('forteresse', 30, dict(etages=4, lettres='ya', mat='R', cage=True)),
+            ('traversee', 36, dict(lettres='ya', mode='iles')),
+            ('glacier', 40, dict(lettres='ya', nb=2)),
             ('barrage', 20, dict(haut=16, lettres='ya', tyro=11, butin='+')),
             ('plat', 10, dict(lettres='yy', digit='3')),  # flash spécial : Detroit
             ('gouffre', 20, dict(lettres='ya', nb=5)),
@@ -103,16 +107,17 @@ NIVEAUX = {
             ('colline', 18, dict(haut=3, lettres='cc')),
             ('plat', 10, dict(lettres='ac', digit='2')),  # le sable qui s'effondre
             ('maison', 14, dict(lettres='ac')),
-            ('forteresse', 34, dict(etages=3, lettres='acd', mat='W', cage=True)),
-            ('traversee', 36, dict(lettres='cd')),
+            ('forteresse', 32, dict(etages=3, lettres='acd', mat='W', cage=True)),
+            ('ponton', 42, dict(lettres='cd')),  # le ponton et son phare, propres à la plage
             ('echafaudage', 22, dict(niveaux=2, lettres='cd')),
             ('gouffre', 20, dict(lettres='cd', nb=4)),
             ('barrage', 20, dict(haut=12, lettres='cd', butin='*')),
-            ('forteresse', 34, dict(etages=4, lettres='acdf', mat='W', cage=True)),
+            ('forteresse', 38, dict(etages=4, lettres='acdf', mat='W', cage=True)),
             ('mur', 18, dict(haut=6, lettres='cdf')),
-            ('traversee', 36, dict(lettres='cdf')),
+            ('traversee', 36, dict(lettres='cdf', mode='pont')),
             ('plat', 10, dict(lettres='acdf', digit='3')),  # reggae, cumbia, raï...
             ('tour', 20, dict(etages=3, lettres='acdf')),
+            ('ponton', 42, dict(lettres='cdf')),
             ('barrage', 20, dict(haut=16, lettres='cdf', tyro=11, butin='+')),
             ('gouffre', 20, dict(lettres='cdb', nb=5)),
             ('arene', 44, dict(lettres='acdbf')),
@@ -126,13 +131,15 @@ NIVEAUX = {
             ('plat', 10, dict(lettres='ar', digit='1')),  # les robots vocodeurs
             ('tour', 20, dict(etages=3, lettres='acr', mat='D', vitre=True, tyro=10, apres=14, digit='2')),  # la tyrolienne entre les toits
             ('forteresse', 34, dict(etages=3, lettres='acr', mat='D', cage=True)),
+            ('toits', 42, dict(lettres='acr')),  # les toits sur pilotis, propres à la ville
             ('gouffre', 20, dict(lettres='acr', nb=4)),
-            ('traversee', 36, dict(lettres='adr')),
+            ('traversee', 36, dict(lettres='adr', mode='pont')),
             ('plat', 10, dict(lettres='acdr', digit='3')),  # le vocodeur
             ('barrage', 20, dict(haut=12, lettres='adr', butin='*')),
-            ('forteresse', 34, dict(etages=4, lettres='acdr', mat='D', cage=True)),
+            ('forteresse', 38, dict(etages=4, lettres='acdr', mat='D', cage=True)),
             ('echafaudage', 22, dict(niveaux=3, lettres='adr')),
             ('mur', 18, dict(haut=7, lettres='adr')),
+            ('toits', 42, dict(lettres='adrf')),
             ('traversee', 36, dict(lettres='adrf')),
             ('plat', 10, dict(lettres='arrb', digit='4', drones=2)),  # la tour du Club Infini
             ('tour', 24, dict(etages=4, lettres='acdr', mat='D', vitre=True)),

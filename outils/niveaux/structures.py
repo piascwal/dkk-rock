@@ -90,10 +90,11 @@ def _ilot(n, x, y, largeur):
             n.set(x + i, y + k, n.t['sol'] if k == 0 else n.t['sous'])
 
 
-def traversee(n, x0, lettres='a'):
-    """Un gouffre sans fond de 17 tuiles, trop large pour être sauté, et trois façons de le franchir : une passerelle en
-    arc (qui plonge au milieu), une tyrolienne depuis un échafaudage, ou trois îlots flottants en escalier (le butin y est).
-    Tomber, c'est le vide. Renvoie (début, fin) du gouffre : la galerie y est coupée."""
+def traversee(n, x0, lettres='a', mode='mixte'):
+    """Un gouffre sans fond de 17 tuiles, trop large pour être sauté. Trois façons de le franchir, selon `mode` : « mixte »
+    (une passerelle en arc, une tyrolienne depuis un échafaudage et trois îlots flottants en escalier, où est le butin),
+    « pont » (la passerelle seule, que l'on peut couper à force de tirer : mais des pitons la soutiennent) ou « iles » (quatre
+    îlots à sauter de l'un à l'autre, sans passerelle ni câble). Tomber, c'est le vide. Renvoie (début, fin) du gouffre."""
     base = n.base
     gx0 = x0 + 12
     g = 17
@@ -101,22 +102,33 @@ def traversee(n, x0, lettres='a'):
     for x in range(gx0, gx1):  # le gouffre : plus de terre, plus de galerie
         for y in range(base, n.h):
             n.set(x, y, ' ')
-    for i in range(g):  # la passerelle : des planches qui plongent de trois rangées au milieu
-        x = gx0 + i
-        y = base + round(3 * math.sin(math.pi * (i + 0.5) / g))
-        n.set(x, y, '=' if i % 6 == 3 else '-')
-    # l'échafaudage collé au bord : d'où part la tyrolienne et d'où l'on saute sur le premier îlot
-    haut = n.echafaudage(gx0 - 10, 9, 2)
-    top = haut[-1]
-    n.tyro(gx0 - 5, top - 1, gx1 + 3, base - 5)
-    # trois îlots en escalier descendant (un saut de trois tuiles de l'un à l'autre) ; le butin est sur le premier
-    for k, ytop in enumerate((base - 5, base - 4, base - 2)):
-        _ilot(n, gx0 + 1 + 6 * k, ytop, 4)
-    n.repere(gx0 + 2, '*', ymin=base - 6)
-    n.ennemis(gx0 + 7, gx0 + 11, lettres, 1, ymin=base - 5)
-    n.ennemis(gx0 + 13, gx0 + 17, lettres, 1, ymin=base - 3)
+    if mode in ('mixte', 'pont'):
+        for i in range(g):  # la passerelle : des planches qui plongent de trois rangées au milieu
+            x = gx0 + i
+            y = base + round(3 * math.sin(math.pi * (i + 0.5) / g))
+            n.set(x, y, '=' if i % 6 == 3 or mode == 'pont' else '-')
+    if mode == 'mixte':
+        # l'échafaudage collé au bord : d'où part la tyrolienne et d'où l'on saute sur le premier îlot
+        haut = n.echafaudage(gx0 - 10, 9, 2)
+        top = haut[-1]
+        n.tyro(gx0 - 5, top - 1, gx1 + 3, base - 5)
+        # trois îlots en escalier descendant (un saut de trois tuiles de l'un à l'autre) ; le butin est sur le premier
+        for k, ytop in enumerate((base - 5, base - 4, base - 2)):
+            _ilot(n, gx0 + 1 + 6 * k, ytop, 4)
+        n.repere(gx0 + 2, '*', ymin=base - 6)
+        n.ennemis(gx0 + 7, gx0 + 11, lettres, 1, ymin=base - 5)
+        n.ennemis(gx0 + 13, gx0 + 17, lettres, 1, ymin=base - 3)
+        n.ennemis(gx0 - 9, gx0 - 2, lettres, 1, ymin=top - 1)
+    elif mode == 'iles':
+        # quatre îlots de trois tuiles, deux tuiles de vide entre eux, à peine plus hauts ou plus bas l'un que l'autre
+        for k, ytop in enumerate((base - 1, base - 2, base - 1, base - 2)):
+            _ilot(n, gx0 + 1 + 4 * k, ytop, 3)
+        n.repere(gx0 + 6, '*', ymin=base - 5)
+        n.ennemis(gx0 + 5, gx0 + 9, lettres, 1, ymin=base - 5)
+        n.ennemis(gx0 + 9, gx0 + 14, lettres, 1, ymin=base - 5)
+    else:
+        n.ennemis(gx0 + 4, gx0 + 12, lettres, 1, ymin=base - 6)
     n.ennemis(gx1 + 1, gx1 + 8, lettres, 2)
-    n.ennemis(gx0 - 9, gx0 - 2, lettres, 1, ymin=top - 1)
     return gx0, gx1
 
 

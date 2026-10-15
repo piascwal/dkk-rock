@@ -15,6 +15,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent / 'niveaux'))
 from peintre import Niveau
 from plans import NIVEAUX, enchaine
 from souterrain import souterrain, tonneaux_de_surface
+from signatures import falaise, glacier, parking, ponton, toits
 from structures import forteresse, traversee
 from verrous import barrage, gouffre
 
@@ -155,8 +156,24 @@ class Recette:
     def p_forteresse(self, x0, x1, etages=3, lettres='a', sous_sol=True, cage=False, mat=None):
         forteresse(self.n, x0 + 2, x1 - x0 - 4, etages, lettres, mat, sous_sol, cage)
 
-    def p_traversee(self, x0, x1, lettres='a'):
-        traversee(self.n, x0, lettres)
+    def p_traversee(self, x0, x1, lettres='a', mode='mixte'):
+        traversee(self.n, x0, lettres, mode)
+
+    # ---- les structures propres à chaque monde (voir niveaux/signatures.py)
+    def p_parking(self, x0, x1, lettres='a'):
+        parking(self.n, x0, x1 - x0, lettres)
+
+    def p_falaise(self, x0, x1, lettres='a'):
+        falaise(self.n, x0, x1 - x0, lettres, 'R')
+
+    def p_glacier(self, x0, x1, lettres='y', nb=3):
+        glacier(self.n, x0, x1 - x0, lettres, nb)
+
+    def p_ponton(self, x0, x1, lettres='a'):
+        ponton(self.n, x0, x1 - x0, lettres, self.n.t['mur'])
+
+    def p_toits(self, x0, x1, lettres='a'):
+        toits(self.n, x0, x1 - x0, lettres, self.n.t['mur'])
 
     def p_arene(self, x0, x1, lettres='ab', plus=2):
         n = self.n

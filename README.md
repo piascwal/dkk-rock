@@ -148,6 +148,11 @@ validé.
   cartes sont générées par `python3 outils/genere-niveaux.py` puis modifiables à la main ; l'aperçu de chaque carte est
   dans `assets-sources/niveaux/`. Le test d'accessibilité vérifie qu'on atteint la fin sans rien détruire. Sous le
   terrain il n'y a plus de socle : creuser trop, c'est tomber.
+  **Chaque monde a sa géométrie** (`outils/niveaux/signatures.py`) : le garage son _parking à étages_ (rampes en escalier, local
+  dessous, niveau de pitons dessus), les alpages leur _falaise à corniches_ (échelles en zigzag, grotte à mi-hauteur), les cimes
+  leur _glacier_ (bosses de glace qui glisse, crevasses, igloo à traverser), la plage son _ponton_ de planches sur pilotis et son
+  phare, la ville ses _toits sur pilotis_ (on saute de toit en toit). Les pièces communes varient aussi : la traversée de gouffre
+  existe en trois modes (`mixte`, `pont`, `iles`), et forteresses, barrages et gouffres changent de taille d'un niveau à l'autre.
   **Pas de longues lignes droites :** chaque niveau est un enchaînement de _lieux_ (`outils/niveaux/plans.py`, un plan par
   niveau) reliés par des raccords de 4 à 6 colonnes : forteresses à étages et sous-sol, traversées de gouffre (passerelle,
   tyrolienne ou îlots), barrages à escalader, gouffres à descendre, tours, échafaudages, murs. Sous terre, pas de galerie
