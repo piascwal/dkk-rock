@@ -147,5 +147,6 @@ export const ACCESSOIRES_SUPPLEMENTAIRES = {
   pot,
   panneauFleche,
   torche,
+  flambeau: torche,
   feuDeCamp,
 } satisfies Record<string, Accessoire>;

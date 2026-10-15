@@ -42,7 +42,7 @@ const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAccessoire[]
       'pot',
       'fougere',
     ],
-    dedans: ['caisseDeco', 'etagere', 'caisseDeco', 'enceinte34', 'tonneau', 'bidon', 'pneus', 'torche'],
+    dedans: ['caisseDeco', 'etagere', 'caisseDeco', 'enceinte34', 'tonneau', 'bidon', 'pneus', 'flambeau'],
     densite: 0.8,
   },
   montagne: {
@@ -67,7 +67,7 @@ const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAccessoire[]
       'feuDeCamp',
       'torche',
     ],
-    dedans: ['caisseDeco', 'etagere', 'tonneau', 'torche', 'sacs'],
+    dedans: ['caisseDeco', 'etagere', 'tonneau', 'flambeau', 'sacs'],
     densite: 0.85,
   },
   neige: {
@@ -84,7 +84,7 @@ const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAccessoire[]
       'sacs',
       'tronc',
     ],
-    dedans: ['caisseDeco', 'torche', 'sacs'],
+    dedans: ['caisseDeco', 'flambeau', 'sacs'],
     densite: 0.75,
   },
   plage: {
@@ -103,7 +103,7 @@ const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAccessoire[]
       'pot',
       'panneauFleche',
     ],
-    dedans: ['caisseDeco', 'transat', 'tonneau', 'torche'],
+    dedans: ['caisseDeco', 'transat', 'tonneau', 'flambeau'],
     densite: 0.75,
   },
   ville: {
@@ -122,18 +122,19 @@ const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAccessoire[]
       'pot',
       'panneauFleche',
     ],
-    dedans: ['plante', 'caisseDeco', 'bidon', 'tonneau', 'torche'],
+    dedans: ['plante', 'caisseDeco', 'bidon', 'tonneau', 'flambeau'],
     densite: 0.75,
   },
   club: {
     dehors: ['enceinte34', 'enceinte34', 'enceinteDeco', 'projecteur', 'plante', 'lampadaireNeon', 'bidon'],
-    dedans: ['enceinte34', 'enceinte34', 'enceinteDeco', 'projecteur', 'plante', 'torche'],
+    dedans: ['enceinte34', 'enceinte34', 'enceinteDeco', 'projecteur', 'plante', 'flambeau'],
     densite: 0.55,
   },
 };
 
 /** Les petits accessoires se serrent (une tuile et demie entre deux) ; les autres, trois tuiles ; voitures et vaches, quatre. */
 const PETITS = new Set<string>([
+  'flambeau',
   'champignons',
   'cairn',
   'bidon',

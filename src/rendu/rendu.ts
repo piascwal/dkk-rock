@@ -12,6 +12,7 @@ import { dessineDecor, semeDecor, type CoucheDecor } from './decor';
 import { dessineTuiles, dessineTyroliennes } from './dessin-tuiles';
 import { Emojis } from './emojis';
 import { Fond } from './fonds';
+import { Braises } from './flammes';
 import { dessineIndicateurs } from './indicateurs';
 import { Particules } from './particules';
 import { THEMES, type Theme } from './themes';
@@ -26,6 +27,7 @@ export class Rendu {
   readonly camera = new Camera();
   readonly particules = new Particules();
   private readonly emojis = new Emojis();
+  private readonly braises = new Braises();
   private readonly traits = new TraitsPersos();
   /** largeur de la vue en pixels du jeu (la hauteur est fixe, la largeur suit la forme de l'écran) */
   largeur = 480;
@@ -58,6 +60,11 @@ export class Rendu {
     this.echauffement = 240;
     this.densite = DENSITE_MAX;
     this.redimensionne();
+  }
+
+  /** Les braises des flammes ne valent pas une image perdue : coupées en mode éco et sous 45 images par seconde. */
+  private braisesPermises(): boolean {
+    return this.qualite !== 'eco' && this.fps >= 45;
   }
 
   /** Ce qu'on affiche : « 6× · 60 i/s ». */
@@ -178,6 +185,7 @@ export class Rendu {
         NIVEAUX[vue.niveau]!.theme,
         11 + vue.niveau,
       );
+      this.braises.regle(this.decor);
     }
     const decore = (couche: CoucheDecor) =>
       dessineDecor(
@@ -206,6 +214,12 @@ export class Rendu {
     for (const v of vue.entites) if (v.g === G.VAN && v.e === 2) this.particules.van(v.x, v.y, v.f / 20);
     decore('devant');
     this.particules.dessine(ctx, camX, camY);
+    // les braises sont un petit plus : on les coupe dès que l'appareil peine (mode éco, ou trop peu d'images par seconde)
+    if (this.braisesPermises()) {
+      this.braises.emetDepuis(carte, camX, this.largeur);
+      this.braises.maj();
+      this.braises.dessine(ctx, camX, camY);
+    }
     this.traits.maj(vue, this.decor, carte, { emojis: this.emojis });
     this.emojis.accompagne(vue.entites);
     this.emojis.maj();

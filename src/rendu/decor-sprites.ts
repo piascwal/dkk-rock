@@ -28,6 +28,7 @@ export type Sprite =
   | 'tronc'
   | 'feuDeCamp'
   | 'torche'
+  | 'flambeau'
   | 'parasol';
 export const SPRITES: ReadonlySet<string> = new Set<Sprite>([
   'vacheCasque',
@@ -51,6 +52,7 @@ export const SPRITES: ReadonlySet<string> = new Set<Sprite>([
   'tronc',
   'feuDeCamp',
   'torche',
+  'flambeau',
   'parasol',
 ]);
 
@@ -83,6 +85,7 @@ export function dessineSprite(
   if (quoi === 'tronc') return dessineDecorFeuille(ctx, 'tronc', v % 2, voile);
   if (quoi === 'feuDeCamp') return dessineDecorFeuille(ctx, 'feu', 0, voile);
   if (quoi === 'torche') return dessineDecorFeuille(ctx, 'torche', v % 3, voile);
+  if (quoi === 'flambeau') return dessineDecorFeuille(ctx, 'flambeau', 0, voile);
   if (quoi === 'parasol') return dessineDecorFeuille(ctx, 'parasol', v % 3, voile);
   if (quoi === 'sapinNeige') return dessineDecorFeuille(ctx, 'sapin', 1 + ((v >> 4) & 1), voile);
   return dessineDecorFeuille(ctx, 'buisson', v % 3, voile);
