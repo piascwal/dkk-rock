@@ -83,6 +83,11 @@ body {
 }
 
 #toile {
+  /* le cadre est fixé par le CSS (tout l'écran, image centrée et jamais déformée) : plus de petit rectangle en haut à gauche
+     quand un navigateur renvoie une taille de fenêtre éphémère */
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   display: block;

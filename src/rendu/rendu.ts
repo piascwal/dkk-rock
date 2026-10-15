@@ -12,6 +12,7 @@ import { dessineDecor, semeDecor } from './decor';
 import { dessineTuiles, dessineTyroliennes } from './dessin-tuiles';
 import { Emojis } from './emojis';
 import { Fond } from './fonds';
+import { dessineIndicateurs } from './indicateurs';
 import { Particules } from './particules';
 import { THEMES, type Theme } from './themes';
 import { TraitsPersos } from './traits-persos';
@@ -43,6 +44,8 @@ export class Rendu {
   private images = 0;
   private fps = 60;
   private echauffement = 240;
+  /** la taille d'écran lue au dernier calibrage : si elle change sans évènement (iPad), on recalibre */
+  private tailleVue = '';
 
   constructor(private readonly toile: HTMLCanvasElement) {
     this.ctx = toile.getContext('2d', { alpha: false })!;
@@ -73,6 +76,7 @@ export class Rendu {
   redimensionne(): void {
     const w = window.innerWidth;
     const h = window.innerHeight;
+    this.tailleVue = `${w}x${h}@${window.devicePixelRatio || 1}`;
     this.largeur = Math.round(Math.min(520, Math.max(220, (HAUTEUR_VUE * w) / h)));
     const k = Math.min(w / this.largeur, h / HAUTEUR_VUE);
     // inutile de dessiner plus fin que les pixels de l'écran (ceux d'un téléphone sont 2 à 3 fois plus petits qu'un pixel CSS)
@@ -80,8 +84,6 @@ export class Rendu {
     this.densite = this.densiteVoulue(ecran);
     this.toile.width = this.largeur * this.densite;
     this.toile.height = HAUTEUR_VUE * this.densite;
-    this.toile.style.width = `${Math.floor(this.largeur * k)}px`;
-    this.toile.style.height = `${Math.floor(HAUTEUR_VUE * k)}px`;
     this.ctx.imageSmoothingEnabled = false;
   }
 
@@ -144,6 +146,8 @@ export class Rendu {
     this.tick++;
     const ctx = this.ctx;
     // tout se dessine en pixels du jeu ; la densité est appliquée ici, une fois
+    if (this.tailleVue !== `${window.innerWidth}x${window.innerHeight}@${window.devicePixelRatio || 1}`)
+      this.redimensionne();
     this.adapteDensite();
     ctx.setTransform(this.densite, 0, 0, this.densite, 0, 0);
     ctx.imageSmoothingEnabled = false;
@@ -213,5 +217,6 @@ export class Rendu {
     this.emojis.accompagne(vue.entites);
     this.emojis.maj();
     this.emojis.dessine(ctx, camX, camY);
+    dessineIndicateurs(ctx, vue, siegeLocal, camX, camY, this.largeur, this.tick);
   }
 }

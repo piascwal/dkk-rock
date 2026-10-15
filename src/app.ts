@@ -76,7 +76,10 @@ export class App implements Actions {
     };
     window.addEventListener('pointerdown', geste);
     window.addEventListener('keydown', geste);
-    window.addEventListener('resize', () => this.rendu.redimensionne());
+    const recalibre = () => this.rendu.redimensionne();
+    window.addEventListener('resize', recalibre);
+    window.addEventListener('orientationchange', recalibre);
+    window.visualViewport?.addEventListener('resize', recalibre);
     window.addEventListener('keydown', (e) => {
       if (e.code === 'Enter' && this.derniereVue && this.derniereVue.phase !== 'jeu') this.suivant();
     });
