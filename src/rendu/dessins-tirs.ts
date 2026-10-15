@@ -19,6 +19,7 @@ export const DEMI_TAILLE: Partial<Record<number, number>> = {
   [G.P_HYPNOSE]: 5,
   [G.P_GROSSE_BOULE]: 8,
   [G.P_ONDE_SOL]: 5,
+  [G.P_JET_FLAMME]: 7,
   ...DEMI_TAILLE_ARMES,
 };
 
@@ -78,6 +79,22 @@ export const DESSINS_TIRS: Partial<Record<number, Dessin>> = {
     const k = f % 6;
     p(-3, -3, 6, 6, k < 3 ? '#ff9b2f' : '#ff6b35');
     p(-1, -1, 3, 3, '#ffe066');
+  },
+  // le jet du chauffage : une grosse flamme qui grossit en s'éloignant, du jaune au rouge, puis s'éteint en fumée
+  [G.P_JET_FLAMME]: (p, f) => {
+    const t = Math.min(1, f / 30);
+    const r = 3 + Math.round(4 * t);
+    const tremble = (f * 5) % 3 === 0 ? 1 : 0;
+    const [ext, milieu, coeur] =
+      t < 0.35
+        ? ['#ff9b2f', '#ffd23f', '#fff6c0']
+        : t < 0.75
+          ? ['#e8501c', '#ff8a1f', '#ffc83d']
+          : ['rgba(90,50,40,0.5)', 'rgba(150,80,50,0.45)', ''];
+    p(-r, -r + 1 + tremble, 2 * r, 2 * r - 2, ext);
+    p(-r + 1, -r + tremble, 2 * r - 2, 2 * r, ext);
+    p(-r + 2, -r + 2 + tremble, 2 * r - 4, 2 * r - 4, milieu);
+    if (coeur && t < 0.55) p(-2, -2 + tremble, 4, 4, coeur);
   },
   [G.P_CORNEMUSE]: (p) => {
     p(-3, -3, 6, 5, '#2d6a4f');

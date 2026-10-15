@@ -1,5 +1,5 @@
 import { TUILE } from '../config';
-import { armeRamassee } from '../entites/armes';
+import { ARME_CHAUFFAGE, armeRamassee } from '../entites/armes';
 import { herosDuGenre } from '../entites/heros';
 import { ANIM, G, type EntiteVue } from '../jeu/vue';
 import type { AtlasTuiles } from './atlas-tuiles';
@@ -90,6 +90,12 @@ export function dessineEntite(
     const epaule = FEUILLES[v.g]?.epaule;
     if (heros && epaule && v.e !== ANIM.ECHELLE && v.e !== ANIM.TYROLIENNE && v.e !== ANIM.MORT)
       dessineInstrument(p, ctx, v.g, v.f, epaule);
+  } else if (
+    v.g === G.ARME &&
+    v.f === ARME_CHAUFFAGE &&
+    dessineFeuille(ctx, G.CHAUFFAGE, ANIM.DEBOUT, 0, false)
+  ) {
+    // l'arme à ramasser : le chauffage lui-même, posé là
   } else if (heros) dessineHeros(p, v.g, v.e, v.f, ctx);
   else if (v.g === G.KIWI) dessineKiwi(p, v.e, v.f);
   else if (estTir) DESSINS_TIRS[v.g]?.(pb, v.f, v.e);
@@ -98,8 +104,12 @@ export function dessineEntite(
   else if (v.g === G.ARME && dessineBonus(ctx, v.f)) {
     // une arme à icône fournie : l'icône flotte à la place de la mallette
   } else if (DESSINS_OBJETS[v.g]) {
-    DESSINS_OBJETS[v.g]!(p, v.e, v.f);
-    if (v.g === G.ARME) iconeArme(p, v.f, 0);
+    // l'arme à ramasser qui est le chauffage, planche pas encore chargée : son dessin de repli, sans boîte ni icône
+    if (v.g === G.ARME && v.f === ARME_CHAUFFAGE) DESSINS_OBJETS[G.CHAUFFAGE]!(p, v.e, v.f);
+    else {
+      DESSINS_OBJETS[v.g]!(p, v.e, v.f);
+      if (v.g === G.ARME) iconeArme(p, v.f, 0);
+    }
   }
   ctx.restore();
   ctx.globalAlpha = 1;

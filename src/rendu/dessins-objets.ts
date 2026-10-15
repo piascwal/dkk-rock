@@ -5,7 +5,7 @@ import { DESSINS_TIRS } from './dessins-tirs';
 type Dessin = (p: Pinceau, e: number, f: number) => void;
 
 /** Le dessin qui sert d'icône à chaque arme ramassable (dans l'ordre d'ARMES_RAMASSABLES). */
-const ICONES_ARMES = [G.P_AMPLI, G.P_VINYLE, G.P_FLAMME, G.P_CORNEMUSE, G.P_TRIANGLE, G.P_GONG];
+const ICONES_ARMES = [G.P_JET_FLAMME];
 
 /** Un cœur en pixels (X plein, o reflet), cerné ; (0, 0) : le milieu de sa base. */
 function coeur(
@@ -115,6 +115,14 @@ export const DESSINS_OBJETS: Partial<Record<number, Dessin>> = {
         p(dx, -haut + dy, 1, 3, '#fff6b0');
         p(dx - 1, -haut + dy + 1, 3, 1, '#fff6b0');
       }
+  },
+  // repli du chauffage soufflant (tant que sa planche n'est pas chargée) : un boîtier crème, des boutons, une grille noire
+  [G.CHAUFFAGE]: (p) => {
+    p(-8, -22, 16, 22, '#2b2b2b');
+    p(-7, -21, 14, 20, '#e6d2a6');
+    p(-5, -19, 3, 3, '#1c1c1c');
+    p(0, -19, 3, 3, '#1c1c1c');
+    p(-7, -13, 14, 11, '#1c1c1c');
   },
   [G.SOIN]: (p, _e, f) => {
     const l = [5, 3, 1, 3][Math.floor(f / 6) % 4]!;

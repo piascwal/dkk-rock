@@ -1,5 +1,6 @@
 import { TUILE } from '../config';
 import { ARMES_RAMASSABLES } from '../entites/armes';
+import { Chauffage } from '../entites/chauffage';
 import { DjBoucle } from '../entites/ennemis/dj';
 import { ENNEMIS_PAR_LETTRE } from '../entites/ennemis/definitions';
 import { Ennemi } from '../entites/ennemis/ennemi';
@@ -32,10 +33,16 @@ export function peuple(p: Partie): void {
     p.ajoute(b.lettre === 'Y' ? new YetiAlpha(p, b.x, b.y) : new DjBoucle(p, b.x, b.y));
   const r = p.drapeau >= 0 ? lu.drapeaux[p.drapeau]! : lu.depart;
   p.ajoute(
-    new Kiwi(p, r.x - 12, r.y + 4, () => {
-      for (const j of p.joueurs) if (j && !j.mort) return j;
-      return null;
-    }),
+    new Kiwi(
+      p,
+      r.x - 12,
+      r.y + 4,
+      () => {
+        for (const j of p.joueurs) if (j && !j.mort) return j;
+        return null;
+      },
+      () => p.entites.some((e) => e instanceof Chauffage && !e.fini),
+    ),
   );
 }
 

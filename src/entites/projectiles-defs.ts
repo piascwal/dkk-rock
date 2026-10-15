@@ -158,6 +158,18 @@ export const FLAMME = P({
   perce: true,
   retouche: 6,
 });
+/** Le gros jet du chauffage soufflant : épais, long, il traverse tout et brûle ce qu'il touche. */
+export const JET_FLAMME = P({
+  genre: G.P_JET_FLAMME,
+  vitesse: 4,
+  gravite: -0.04,
+  degats: 0.8,
+  degatsTuile: 1,
+  duree: 30,
+  taille: 14,
+  perce: true,
+  retouche: 8,
+});
 export const NUAGE_GAZ = P({
   genre: G.P_GAZ,
   vitesse: 0,

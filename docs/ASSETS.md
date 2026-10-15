@@ -66,6 +66,13 @@ L'instrument n'est pas sur la planche : le jeu le dessine par-dessus, à l'épau
 **Pour un nouveau personnage** : son sprite de base (de profil ou 3/4, pieds visibles), puis un gabarit dans
 `outils/gabarits.py` (réutiliser celui d'un corps de même pose, sinon de nouveaux polygones).
 
+## Le chauffage soufflant (arme-compagnon)
+
+Son sprite de base est `assets-sources/chauffage/chauffage-base.png` ; `python3 outils/fixe-chauffage.py` le remet sur sa
+grille de pixels et en tire la planche `public/sprites/chauffage.png` (debout, court = écrasé à l'atterrissage, saut = étiré,
+souffle = secoué). Le script affiche aussi la position de la bouche (le centre du cercle de la grille) : à reporter dans
+`BOUCHE` de `src/entites/chauffage.ts` si l'on change de sprite. La planche est déclarée à la main dans `feuilles.ts`.
+
 ## Sprites fixes et apparences multiples (ennemis)
 
 Un ennemi peut n'avoir qu'une image : il se déplace alors sans cycle de marche. Il peut aussi avoir **plusieurs

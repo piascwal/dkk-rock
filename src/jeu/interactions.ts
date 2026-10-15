@@ -1,5 +1,6 @@
 import { DUREE_INVINCIBLE, PV_HEROS, VIES_MAX } from '../config';
 import { armeRamassee } from '../entites/armes';
+import { Chauffage } from '../entites/chauffage';
 import { HEROS } from '../entites/heros';
 import { Objet } from '../entites/objets';
 import { Projectile } from '../entites/projectile';
@@ -51,6 +52,9 @@ export function interactions(p: Partie): void {
           const a = armeRamassee(e.variante);
           if (!a) break;
           j.ramasseArme(e.variante);
+          // l'arme-compagnon : le chauffage apparaît à côté du héros (s'il est déjà là, on lui refait le plein)
+          if (a.compagnon && !(j.compagnon && !j.compagnon.fini))
+            p.ajoute(new Chauffage(p, j.corps.x, j.corps.y, j));
           e.fini = true;
           p.son('ramasse', e.corps.x, e.corps.y);
           p.texte(e.corps.x, e.corps.y - 10, a.nom.toUpperCase(), '#ffd23f');

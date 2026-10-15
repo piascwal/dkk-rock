@@ -13,6 +13,8 @@ export const G = {
   MAT: 3,
   TOM: 4,
   KIWI: 5,
+  /** le chauffage soufflant : l'arme qui accompagne le héros à la place de Fadatchi */
+  CHAUFFAGE: 6,
   FETARD: 10,
   VIDEUR: 11,
   DANSEUR: 12,
@@ -40,7 +42,8 @@ export const G = {
   P_TRIANGLE: 43,
   P_GONG: 44,
   P_OEUF: 45,
-  P_MINIDISC: 46,
+  P_JET_FLAMME: 46,
+  P_MINIDISC: 59,
   P_PILE: 47,
   P_FLIPPER: 48,
   P_FRISBEE: 49,
