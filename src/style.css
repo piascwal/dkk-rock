@@ -342,6 +342,13 @@ h2 {
   border-radius: 0;
 }
 
+/* les icônes du HUD sont du pixel art (ui/icones-hud.ts) : agrandies sans lissage, alignées sur le texte */
+.px {
+  image-rendering: pixelated;
+  vertical-align: -2px;
+  margin-right: 1px;
+}
+
 .coeurs {
   color: var(--rouge);
 }

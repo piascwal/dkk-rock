@@ -20,8 +20,6 @@ export interface Tireur {
 
 export interface DefArme {
   nom: string;
-  /** pictogramme du HUD */
-  icone: string;
   /** ticks entre deux tirs */
   cadence: number;
   /** munitions d'une arme ramassée (les instruments sont illimités) */
@@ -45,7 +43,6 @@ export function tire(ctx: Contexte, t: Tireur, def: DefProjectile, vy = 0, vites
 export const ARMES_RAMASSABLES: DefArme[] = [
   {
     nom: 'Ampli à lampes',
-    icone: '📻',
     cadence: 30,
     munitions: 8,
     son: 'ampli',
@@ -57,7 +54,6 @@ export const ARMES_RAMASSABLES: DefArme[] = [
   },
   {
     nom: 'Vinyle de jazz',
-    icone: '💿',
     cadence: 14,
     munitions: 20,
     son: 'vinyle',
@@ -69,7 +65,6 @@ export const ARMES_RAMASSABLES: DefArme[] = [
   },
   {
     nom: 'Accordéon-flamme',
-    icone: '🪗',
     cadence: 3,
     munitions: 90,
     son: 'flamme',
@@ -81,7 +76,6 @@ export const ARMES_RAMASSABLES: DefArme[] = [
   },
   {
     nom: 'Cornemuse',
-    icone: '🐑',
     cadence: 36,
     munitions: 6,
     son: 'cornemuse',
@@ -93,7 +87,6 @@ export const ARMES_RAMASSABLES: DefArme[] = [
   },
   {
     nom: 'Triangle laser',
-    icone: '🔺',
     cadence: 8,
     munitions: 30,
     son: 'triangle',
@@ -102,7 +95,6 @@ export const ARMES_RAMASSABLES: DefArme[] = [
   },
   {
     nom: 'Gong sacré',
-    icone: '🔔',
     cadence: 40,
     munitions: 4,
     son: 'gong',

@@ -15,9 +15,9 @@ interface Modele {
 export const MODELES = {
   coeur: {
     rangees: ['.XX.XX.', 'XoXXXXX', 'XXXXXXX', '.XXXXX.', '..XXX..', '...X...'],
-    plein: '#ff3b6b',
-    reflet: '#ffb3c6',
-    contour: '#7a0f30',
+    plein: '#ff9ccf',
+    reflet: '#ffe3f1',
+    contour: '#b0508c',
   },
 } satisfies Record<string, Modele>;
 
@@ -42,7 +42,7 @@ export interface Suivi {
 const DUREE = 75;
 const FONDU = 22;
 /** Discrets : des easter eggs, pas des alertes. */
-const OPACITE = 0.5;
+const OPACITE = 0.38;
 
 export class Emojis {
   private readonly liste: Emoji[] = [];

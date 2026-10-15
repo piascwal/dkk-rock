@@ -32,7 +32,6 @@ export interface DefHeros {
 
 const instrument = (nom: string, cadence: number, son: string, tir: DefArme['tir']): DefArme => ({
   nom,
-  icone: '🎸',
   cadence,
   munitions: Infinity,
   son,

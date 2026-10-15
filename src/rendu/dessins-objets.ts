@@ -100,7 +100,7 @@ export const DESSINS_OBJETS: Partial<Record<number, Dessin>> = {
   },
   // les cœurs libérés par les tonneaux WOG : ils flottent doucement
   [G.COEUR]: (p, _e, f) => {
-    coeur(p, COEUR, '#ff3b6b', '#ffb3c6', '#7a0f30', 2 + Math.round(Math.sin(f / 12)));
+    coeur(p, COEUR, '#e5243b', '#ff9a9a', '#3a0a10', 2 + Math.round(Math.sin(f / 12)));
   },
   [G.COEUR_OR]: (p, _e, f) => {
     const haut = 2 + Math.round(1.5 * Math.sin(f / 10));
