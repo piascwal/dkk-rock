@@ -148,6 +148,12 @@ validé.
   cartes sont générées par `python3 outils/genere-niveaux.py` puis modifiables à la main ; l'aperçu de chaque carte est
   dans `assets-sources/niveaux/`. Le test d'accessibilité vérifie qu'on atteint la fin sans rien détruire. Sous le
   terrain il n'y a plus de socle : creuser trop, c'est tomber.
+  **Les forteresses ne se grimpent pas par la façade** : à chaque étage, un balcon de quatre tuiles à gauche (un ennemi dessus : on
+  se cogne dessous en sautant de mur en mur) et une annexe fermée à droite ; chacun a sa porte sur l'étage, il faut passer par
+  l'intérieur (`_avancees` dans `outils/niveaux/structures.py`).
+  **Fin de niveau :** quand le camping-car a disparu, l'écran des _convertis au rock_ (`ui/convertis.ts`) liste les ennemis vaincus
+  par type, avec leurs compteurs (« selon les DKK ») ; il vient de la vue (`EtatVue.convertis`, protocole v5), donc chez tous les
+  joueurs ; un premier toucher termine le comptage, le suivant passe au récit.
   **Chaque monde a sa géométrie** (`outils/niveaux/signatures.py`) : le garage son _parking à étages_ (rampes en escalier, local
   dessous, niveau de pitons dessus), les alpages leur _falaise à corniches_ (échelles en zigzag, grotte à mi-hauteur), les cimes
   leur _glacier_ (bosses de glace qui glisse, crevasses, igloo à traverser), la plage son _ponton_ de planches sur pilotis et son

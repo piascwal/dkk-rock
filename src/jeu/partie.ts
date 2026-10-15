@@ -7,7 +7,6 @@ import {
   TICKS_PAR_SECONDE,
   TUILE,
   VIES_DEPART,
-  ZONE_VISIBLE,
 } from '../config';
 import { Aleatoire } from '../moteur/maths';
 import { Carte } from '../monde/carte';
@@ -22,11 +21,12 @@ import type { NiveauLu } from '../niveaux/format';
 import { pagesDe } from '../histoire/pages';
 import type { Camp, Cible, Contexte, EntiteSimulee, Tyrolienne } from './contexte';
 import { explose } from './explosions';
+import { zoneVisible } from './zone-visible';
 import { peuple, releveCarte } from './chargement';
 import { interactions, membreLibre } from './interactions';
 import type { Progression } from './sauvegarde';
 import { construitVue } from './vue-partie';
-import { DUREE_CARTE, type EtatVue, type Evenement, type Phase } from './vue';
+import { DUREE_CARTE, GENRES_CONVERTIS, type EtatVue, type Evenement, type Phase } from './vue';
 
 const estCible = (e: EntiteSimulee): e is EntiteSimulee & Cible => 'blesse' in e && 'camp' in e;
 
@@ -63,6 +63,8 @@ export class Partie implements Contexte {
   /** le van qui part, et le nombre de ticks avant le bilan (-1 : il n'est pas parti) */
   private van: Objet | null = null;
   departDans = -1;
+  /** les ennemis convertis au rock depuis le début du niveau (voir GENRES_CONVERTIS) */
+  convertis: number[] = GENRES_CONVERTIS.map(() => 0);
   /** change à chaque chargement de carte : le réseau renvoie alors la carte aux clients */
   generation = 0;
   /** prévenu à chaque drapeau et à chaque niveau fini */
@@ -97,13 +99,7 @@ export class Partie implements Contexte {
     return this.cache.heros;
   }
   visible(x: number, y: number): boolean {
-    const hs = this.cache.heros;
-    if (!hs.length) return true;
-    return hs.some((h) => {
-      const dx = Math.abs(x - (h.x + h.w / 2));
-      const dy = y - (h.y + h.h / 2);
-      return dx <= ZONE_VISIBLE.demiLargeur && dy >= -ZONE_VISIBLE.haut && dy <= ZONE_VISIBLE.bas;
-    });
+    return zoneVisible(this.cache.heros, x, y);
   }
   cibles(camp: Camp): readonly Cible[] {
     return this.cache[camp];
@@ -123,8 +119,10 @@ export class Partie implements Contexte {
   secoue(force: number): void {
     this.secousse = Math.max(this.secousse, force);
   }
-  ennemiVaincu(x: number, y: number, points: number): void {
+  ennemiVaincu(x: number, y: number, points: number, genre: number): void {
     this.score += points;
+    const i = GENRES_CONVERTIS.indexOf(genre);
+    if (i >= 0) this.convertis[i] = Math.min(255, this.convertis[i]! + 1);
     this.evenements.push({ k: 'confettis', x, y });
     this.texte(x, y - 10, `+${points}`, '#ffd23f');
   }
@@ -162,6 +160,8 @@ export class Partie implements Contexte {
     }
     this.page = 0;
     if (this.phase === 'histoire') this.phase = 'jeu';
+    else if (this.phase === 'convertis')
+      this.phase = 'bilan'; // l'écran des convertis passé, place au récit
     else if (this.phase === 'bilan') {
       if (suivantDansArc(this.niveau) !== null) {
         // le van roule vers le niveau suivant sur la carte du monde
@@ -194,6 +194,7 @@ export class Partie implements Contexte {
     this.niveau = niveau;
     this.drapeau = drapeau;
     this.generation++;
+    this.convertis = GENRES_CONVERTIS.map(() => 0);
     this.lu = niveauLu(niveau);
     this.carte = new Carte(this.lu.largeur, this.lu.hauteur, this.lu.tuiles, this.lu.fond);
     // les tuiles de l'ancienne carte n'ont plus de sens
@@ -318,7 +319,7 @@ export class Partie implements Contexte {
   termineNiveau(): void {
     if (this.phase !== 'jeu') return;
     this.score += 1000 + this.vies * 200;
-    this.phase = 'bilan';
+    this.phase = 'convertis';
     this.page = 0;
     this.drapeau = -1;
     this.son('victoire', 0, 0);

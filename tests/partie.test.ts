@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { DUREE_INVINCIBLE, PV_HEROS, TUILE, VIES_DEPART, VIES_MAX } from '../src/config';
 import { C } from '../src/jeu/commandes';
 import { Partie } from '../src/jeu/partie';
-import { DUREE_CARTE } from '../src/jeu/vue';
+import { DUREE_CARTE, G, GENRES_CONVERTIS } from '../src/jeu/vue';
 import { Objet } from '../src/entites/objets';
 import { NIVEAUX } from '../src/niveaux';
 import { T } from '../src/monde/tuiles';
@@ -34,7 +34,8 @@ describe('la partie', () => {
       p.commande(1, t % 2 ? C.TIR | C.GAUCHE : C.SAUT);
       p.avance();
       p.releveEvenements();
-      if (p.phase === 'perdu' || p.phase === 'bilan' || p.phase === 'carte') p.suivant();
+      if (p.phase === 'perdu' || p.phase === 'convertis' || p.phase === 'bilan' || p.phase === 'carte')
+        p.suivant();
     }
     expect(p.vue().entites.length).toBeGreaterThan(0);
   });
@@ -124,6 +125,20 @@ describe('la partie', () => {
     expect(j.membre).not.toBe(membre);
   });
 
+  it('les ennemis vaincus sont comptés par type, remis à zéro à chaque niveau', () => {
+    const p = nouvelle();
+    p.ennemiVaincu(0, 0, 100, G.FETARD);
+    p.ennemiVaincu(0, 0, 100, G.FETARD);
+    p.ennemiVaincu(0, 0, 250, G.VIDEUR);
+    p.ennemiVaincu(0, 0, 0, G.CAGE); // ce qui n'est pas un ennemi ne compte pas
+    const v = p.vue();
+    expect(v.convertis[GENRES_CONVERTIS.indexOf(G.FETARD)]).toBe(2);
+    expect(v.convertis[GENRES_CONVERTIS.indexOf(G.VIDEUR)]).toBe(1);
+    expect(v.convertis.reduce((a, b) => a + b, 0)).toBe(3);
+    p.recommence(true);
+    expect(p.vue().convertis.every((n) => n === 0)).toBe(true);
+  });
+
   it('recommencer le niveau refait la carte, garde les vies et le score', () => {
     const p = nouvelle();
     const j = p.joueurs[0]!;
@@ -210,9 +225,9 @@ describe('la partie', () => {
     avance(p, 2);
     expect(p.phase).toBe('jeu'); // le van doit d'abord partir
     avance(p, 200);
-    expect(p.phase).toBe('bilan');
+    expect(p.phase).toBe('convertis'); // l'écran des ennemis convertis, avant le récit
     expect(sauvegardes).toEqual([1]);
-    while (p.phase === 'bilan' || p.phase === 'carte') p.suivant();
+    while (p.phase === 'convertis' || p.phase === 'bilan' || p.phase === 'carte') p.suivant();
     expect(p.phase).toBe('histoire');
     expect(p.niveau).toBe(1);
   });
@@ -225,7 +240,7 @@ describe('la partie', () => {
       // les héros se trouvent loin, comme à la fin d'un niveau long
       for (const j of p.joueurs) if (j) Object.assign(j.corps, { x: 190 * TUILE, y: 5 * TUILE });
       p.termineNiveau();
-      while (p.phase === 'bilan' || p.phase === 'carte') p.suivant();
+      while (p.phase === 'convertis' || p.phase === 'bilan' || p.phase === 'carte') p.suivant();
       expect(p.niveau).toBe(n);
       for (const j of p.joueurs) {
         if (!j) continue;
@@ -284,13 +299,15 @@ describe('la partie', () => {
     expect(van.vue().e).toBe(2);
     expect(Math.abs(j.cx - van.corps.x - van.corps.w / 2)).toBeLessThan(2); // la caméra suit le van
     avance(p, 120);
+    expect(p.phase).toBe('convertis');
+    p.suivant();
     expect(p.phase).toBe('bilan');
   });
 
   it('entre deux niveaux, le van roule sur la carte du monde, puis le niveau suivant commence', () => {
     const p = nouvelle();
     p.termineNiveau();
-    while (p.phase === 'bilan') p.suivant();
+    while (p.phase === 'convertis' || p.phase === 'bilan') p.suivant();
     expect(p.phase).toBe('carte');
     expect(p.niveau).toBe(0);
     avance(p, DUREE_CARTE + 1);

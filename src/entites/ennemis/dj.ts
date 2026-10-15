@@ -42,7 +42,7 @@ export class Enceinte extends Boss {
 
   protected meurt(ctx: Contexte): void {
     ctx.explosion(this.cx, this.cy, 40, 4, 'tous');
-    ctx.ennemiVaincu(this.cx, this.cy, this.points);
+    ctx.ennemiVaincu(this.cx, this.cy, this.points, G.DJ);
     ctx.texte(this.cx, this.cy - 20, 'LARSEN FATAL', '#ff4fd8');
   }
 }
@@ -140,7 +140,7 @@ export class DjBoucle extends Boss {
   protected meurt(ctx: Contexte): void {
     for (const e of this.enceintes) if (!e.fini) e.blesse(999, ctx);
     ctx.explosion(this.cx, this.cy, 70, 0, 'heros');
-    ctx.ennemiVaincu(this.cx, this.cy, this.points);
+    ctx.ennemiVaincu(this.cx, this.cy, this.points, G.DJ);
     ctx.secoue(30);
     ctx.evenement({ k: 'bulle', qui: 'DJ', texte: 'Attendez... ce riff... c’est en ré ? J’adore le ré...' });
   }

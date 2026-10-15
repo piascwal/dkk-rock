@@ -42,7 +42,11 @@ export class App implements Actions {
   private readonly rendu = new Rendu($('toile') as HTMLCanvasElement);
   private readonly hud = new Hud($('hud'));
   private readonly bulles = new Bulles($('bulle'));
-  private readonly histoire = new Histoire($('histoire'), () => this.suivant());
+  private readonly histoire = new Histoire(
+    $('histoire'),
+    () => this.suivant(),
+    (nom) => this.bruitages.joue(nom),
+  );
   private readonly clavier = new Clavier();
   private readonly tactile = new Tactile($('jeu'));
   private readonly menus = new Menus($('ecran'), this);

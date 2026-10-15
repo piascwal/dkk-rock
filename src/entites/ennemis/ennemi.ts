@@ -102,7 +102,7 @@ export class Ennemi implements Cible, EntiteSimulee {
 
   meurt(ctx: Contexte): void {
     if (this.fini || this.aTerre > 0) return;
-    ctx.ennemiVaincu(this.cx, this.cy, this.def.points);
+    ctx.ennemiVaincu(this.cx, this.cy, this.def.points, this.def.genre);
     if (this.def.explose) {
       this.fini = true;
       ctx.explosion(this.cx, this.cy, this.def.explose.rayon, this.def.explose.degats, 'tous');

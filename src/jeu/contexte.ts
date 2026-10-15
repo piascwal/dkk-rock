@@ -56,7 +56,7 @@ export interface Contexte {
   texte(x: number, y: number, s: string, couleur?: string): void;
   secoue(force: number): void;
   /** un ennemi vaincu : score et confettis */
-  ennemiVaincu(x: number, y: number, points: number): void;
+  ennemiVaincu(x: number, y: number, points: number, genre: number): void;
 }
 
 /** Une entité de la simulation : elle se met à jour puis se décrit pour la vue. */

@@ -1,5 +1,13 @@
 import { MAX_JOUEURS } from '../config';
-import { PHASES, type EntiteVue, type EtatVue, type Evenement, type Genre, type JoueurVue } from '../jeu/vue';
+import {
+  GENRES_CONVERTIS,
+  PHASES,
+  type EntiteVue,
+  type EtatVue,
+  type Evenement,
+  type Genre,
+  type JoueurVue,
+} from '../jeu/vue';
 
 /**
  * Le protocole de DKK entre l'hôte et les autres joueurs.
@@ -12,12 +20,12 @@ import { PHASES, type EntiteVue, type EtatVue, type Evenement, type Genre, type 
  *
  * Changer ce fichier de façon incompatible : augmenter VERSION_PROTOCOLE.
  */
-export const VERSION_PROTOCOLE = 4;
+export const VERSION_PROTOCOLE = 5;
 export const APP_DKK = { id: 'dkk-rock', version: VERSION_PROTOCOLE };
 
 const TYPE_ETAT = 1;
 const TYPE_COMMANDES = 2;
-const OCTETS_ENTETE = 15;
+const OCTETS_ENTETE = 15 + GENRES_CONVERTIS.length;
 const OCTETS_JOUEUR = 10;
 const OCTETS_ENTITE = 9;
 
@@ -42,6 +50,7 @@ export function encodeEtat(v: EtatVue): ArrayBuffer {
   o += 4;
   u8(v.boss < 0 ? 255 : v.boss * 254);
   u8(v.secousse);
+  for (let i = 0; i < GENRES_CONVERTIS.length; i++) u8(v.convertis[i] ?? 0);
   for (let s = 0; s < MAX_JOUEURS; s++) {
     const j = v.joueurs[s]!;
     u8((j.present ? 1 : 0) | (j.mort ? 2 : 0));
@@ -90,6 +99,7 @@ export function decodeEtat(buf: ArrayBuffer): EtatVue | null {
   o += 4;
   const b = u8();
   const secousse = u8();
+  const convertis = GENRES_CONVERTIS.map(() => u8());
   const joueurs: JoueurVue[] = [];
   for (let s = 0; s < MAX_JOUEURS; s++) {
     const fl = u8();
@@ -137,6 +147,7 @@ export function decodeEtat(buf: ArrayBuffer): EtatVue | null {
     score,
     boss: b === 255 ? -1 : b / 254,
     secousse,
+    convertis,
     joueurs,
     entites,
   };

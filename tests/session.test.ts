@@ -105,7 +105,8 @@ describe('une session à plusieurs', () => {
     await pas(partie, hote, 2);
     expect(client.carte.get(20, 18)).toBe(T.VIDE);
     partie.termineNiveau();
-    while (partie.phase === 'bilan' || partie.phase === 'carte') partie.suivant();
+    while (partie.phase === 'convertis' || partie.phase === 'bilan' || partie.phase === 'carte')
+      partie.suivant();
     await pas(partie, hote, 2);
     expect(client.niveau).toBe(1);
     expect(client.carte.largeur).toBe(partie.carte.largeur);

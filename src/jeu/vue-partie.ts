@@ -58,6 +58,7 @@ export function construitVue(p: Partie): EtatVue {
   return {
     tick: p.tick,
     phase: p.phase,
+    convertis: p.convertis.map((n) => Math.min(255, n)),
     page: p.page,
     niveau: p.niveau,
     vies: p.vies,

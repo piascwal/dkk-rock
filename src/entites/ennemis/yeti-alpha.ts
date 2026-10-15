@@ -87,7 +87,7 @@ export class YetiAlpha extends Boss {
 
   protected meurt(ctx: Contexte): void {
     ctx.explosion(this.cx, this.cy, 50, 0, 'heros');
-    ctx.ennemiVaincu(this.cx, this.cy, this.points);
+    ctx.ennemiVaincu(this.cx, this.cy, this.points, G.YETI_ALPHA);
     ctx.evenement({ k: 'bulle', qui: 'YETI', texte: 'Le minimal... c’était... l’espace... entre les...' });
     ctx.secoue(20);
   }

@@ -2,6 +2,7 @@ import { pagesDe } from '../histoire/pages';
 import type { EtatVue } from '../jeu/vue';
 import { NIVEAUX } from '../niveaux';
 import type { Qui } from '../niveaux/format';
+import { Convertis } from './convertis';
 import { COULEURS, NOMS, portrait } from './portraits';
 
 const QUIS = new Set(Object.keys(NOMS));
@@ -59,13 +60,19 @@ export class Bulles {
 export class Histoire {
   private cle = '';
 
+  private readonly convertis: Convertis;
+
   constructor(
     private readonly element: HTMLElement,
     private readonly suivant: () => void,
+    son: (nom: string) => void = () => {},
   ) {
+    this.convertis = new Convertis(son);
     element.addEventListener('pointerdown', (e) => {
       e.preventDefault();
-      this.suivant();
+      // l'écran des convertis : un premier toucher finit le comptage, le suivant passe à la suite
+      if (this.convertis.enCours) this.convertis.termine();
+      else this.suivant();
     });
   }
 
@@ -73,8 +80,18 @@ export class Histoire {
     if (v.phase === 'jeu') {
       this.element.hidden = true;
       this.cle = '';
+      this.convertis.arrete();
       return;
     }
+    if (v.phase === 'convertis') {
+      if (this.cle === `convertis-${v.niveau}`) return;
+      this.cle = `convertis-${v.niveau}`;
+      this.element.classList.remove('carte');
+      this.convertis.affiche(this.element, v.convertis);
+      this.element.hidden = false;
+      return;
+    }
+    this.convertis.arrete();
     if (v.phase === 'carte') {
       // la carte du monde se dessine dans le canvas : juste de quoi passer le trajet
       if (this.cle === `carte-${v.niveau}`) return;

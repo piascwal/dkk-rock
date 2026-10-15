@@ -472,6 +472,63 @@ h2 {
   font-size: 0.9rem;
 }
 
+/* l'écran des ennemis « convertis au rock » */
+#histoire .convertis {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem 1.6rem;
+  max-width: 46rem;
+}
+
+#histoire .converti {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 15rem;
+  font-size: clamp(0.8rem, 3.8vh, 1.15rem);
+  animation: apparait 0.25s ease-out;
+}
+
+#histoire .icone-converti {
+  width: 70px;
+  height: 77px;
+  image-rendering: pixelated;
+}
+
+#histoire .converti .nom {
+  flex: 1;
+  text-align: left;
+}
+
+#histoire .converti .compteur {
+  font-family: var(--titre);
+  color: var(--jaune);
+  font-size: clamp(1rem, 5vh, 1.5rem);
+  min-width: 3.4rem;
+  text-align: right;
+}
+
+#histoire .total-convertis {
+  margin: 0;
+  font-size: clamp(0.85rem, 4vh, 1.2rem);
+  line-height: 1.5;
+  animation: apparait 0.4s ease-out;
+}
+
+#histoire .total-convertis strong {
+  font-family: var(--titre);
+  color: var(--jaune);
+  font-size: clamp(1.1rem, 5.5vh, 1.7rem);
+}
+
+@keyframes apparait {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
 @keyframes clignote {
   50% {
     opacity: 0.3;

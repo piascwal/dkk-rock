@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { VIES_DEPART } from '../src/config';
 import { C } from '../src/jeu/commandes';
+import { G } from '../src/jeu/vue';
 import { Partie } from '../src/jeu/partie';
 import {
   decodeCommandes,
@@ -35,6 +36,17 @@ describe('le protocole réseau', () => {
     expect(d.joueurs.map((j) => j.membre)).toEqual(v.joueurs.map((j) => j.membre));
     const e = v.entites[0]!;
     expect(d.entites[0]).toMatchObject({ id: e.id, g: e.g, x: Math.round(e.x), gauche: e.gauche });
+  });
+
+  it('les compteurs de convertis traversent le réseau', () => {
+    const p = new Partie({ niveau: 0, drapeau: -1, vies: 5, score: 0 });
+    p.ajouteJoueur(0, 0);
+    p.ennemiVaincu(0, 0, 100, G.FETARD);
+    p.ennemiVaincu(0, 0, 100, G.ROBOT);
+    p.ennemiVaincu(0, 0, 100, G.ROBOT);
+    const d = decodeEtat(encodeEtat(p.vue()))!;
+    expect(d.convertis).toEqual(p.vue().convertis);
+    expect(d.convertis.reduce((a, b) => a + b, 0)).toBe(3);
   });
 
   it("l'aura d'invincibilité traverse le réseau", () => {

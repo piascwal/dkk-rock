@@ -41,10 +41,37 @@ def forteresse(n, x0, largeur=30, etages=3, lettres='a', mat=None, sous_sol=True
     for x in (x0, x1 - 1):  # les portes du rez-de-chaussée
         n.rect(x, base - 2, x + 1, base, ' ')
     n.repere(x0 + largeur // 2 + 5, '+', ymin=base - 2 * ETAGE + 1)
+    _avancees(n, x0, x1, etages, mat, lettres)
     _toit(n, x0, x1, top, mat, lettres)
     if sous_sol:
         _sous_sol(n, x0, x1, mat, lettres, cage)
     return top
+
+
+def _avancees(n, x0, x1, etages, mat, lettres):
+    """Des avancées sur les façades, pour qu'on ne grimpe pas le bâtiment en sautant de mur en mur : à gauche, un balcon de quatre
+    tuiles à chaque étage, gardé par un ennemi (on se cogne dessous) ; à droite, une annexe fermée (un bow-window) où l'on ne
+    peut qu'entrer par la pièce. Chaque avancée a sa porte sur l'étage : il faut passer par le bâtiment."""
+    base = n.base
+    droite = x1 - 1  # le mur de droite
+    for k in range(1, etages):
+        ys = base - k * ETAGE
+        for x in range(x0 - 4, x0):  # le balcon, à la hauteur de la dalle
+            n.set(x, ys, mat)
+        n.set(x0, ys - 2, ' ')
+        n.set(x0, ys - 1, ' ')
+        n.ennemis(x0 - 4, x0, lettres, 1, ymin=ys - 1)
+        for x in range(droite + 1, droite + 6):  # l'annexe : un plancher, un toit, un mur au bout
+            n.set(x, ys, mat)
+            n.set(x, ys - 5, mat)
+        for y in range(ys - 4, ys):
+            n.set(droite + 5, y, mat)
+            for x in range(droite + 1, droite + 5):
+                n.set(x, y, '.')
+        n.set(droite, ys - 2, ' ')
+        n.set(droite, ys - 1, ' ')
+        n.set(droite + 3, ys - 1, 'C' if k % 2 else 'T')
+        n.ennemis(droite + 1, droite + 5, lettres, 1, ymin=ys - 4)
 
 
 def _toit(n, x0, x1, top, mat, lettres):
