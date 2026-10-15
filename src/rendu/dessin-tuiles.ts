@@ -45,7 +45,11 @@ export function dessineTuiles(
         const toile = atlas.toile(t, tx, ty);
         // un sprite fourni (96 px) sur un affichage moins fin : lissé, sinon des pixels sautent au hasard
         if (toile instanceof HTMLImageElement) ctx.imageSmoothingEnabled = finesse < 6;
-        if (toile) ctx.drawImage(toile, x, y, TUILE, TUILE);
+        if (toile && (t === T.TONNEAU_WOG || t === T.TONNEAU_OR)) {
+          // les tonneaux WOG débordent de leur case, vers le haut : l'inscription doit se lire (la collision reste d'une tuile)
+          const cote = Math.round(TUILE * GROSSEUR_TONNEAU);
+          ctx.drawImage(toile, x - Math.round((cote - TUILE) / 2), y - (cote - TUILE), cote, cote);
+        } else if (toile) ctx.drawImage(toile, x, y, TUILE, TUILE);
         ctx.imageSmoothingEnabled = false;
       }
       const usure = carte.usure(tx, ty);
@@ -54,6 +58,9 @@ export function dessineTuiles(
   }
   dessineVegetation(ctx, carte, camX, camY, largeur, atlas.theme.decor, tick);
 }
+
+/** Le tonneau WOG est dessiné un peu plus grand que sa case (voir plus haut). */
+export const GROSSEUR_TONNEAU = 1.4;
 
 function fissures(
   ctx: CanvasRenderingContext2D,
