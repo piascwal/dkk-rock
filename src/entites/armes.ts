@@ -3,7 +3,12 @@ import { Projectile } from './projectile';
 import {
   BOULET_AMPLI,
   CORNEMUSE,
+  DONUT,
   FLAMME,
+  FLIPPER,
+  FRISBEE,
+  MINIDISC,
+  PILE,
   ONDE_GONG,
   TRIANGLE,
   VINYLE,
@@ -25,6 +30,8 @@ export interface DefArme {
   /** munitions d'une arme ramassée (les instruments sont illimités) */
   munitions: number;
   son: string;
+  /** la planche de l'icône du bonus (en jeu, dans le HUD, sur le bouton de tir) ; sans elle, le dessin de son tir */
+  sprite?: string;
   tir: (ctx: Contexte, t: Tireur) => void;
   /** ce que dit le héros en la ramassant : on découvre la richesse d'une musique... sans l'admettre */
   repliques: string[];
@@ -101,6 +108,63 @@ export const ARMES_RAMASSABLES: DefArme[] = [
     tir: (ctx, t) => tire(ctx, t, ONDE_GONG),
     repliques: [
       "Un gong de 80 centimètres. Les percussions d'Asie ont mille ans d'avance. On s'en fiche, ça fait BOUM.",
+    ],
+  },
+  {
+    nom: 'Lecteur minidisc',
+    cadence: 18,
+    munitions: 16,
+    son: 'minidisc',
+    sprite: 'arme-minidisc',
+    tir: (ctx, t) => tire(ctx, t, MINIDISC),
+    repliques: [
+      'Un minidisc. Le futur, version 1999. Le son est compressé, mais pas le propos.',
+      'Il lance des disques avec des ondes. Le lecteur CD a toujours su.',
+    ],
+  },
+  {
+    nom: 'Pile alcaline',
+    cadence: 4,
+    munitions: 70,
+    son: 'pile',
+    sprite: 'arme-pile',
+    tir: (ctx, t) => tire(ctx, t, PILE, ctx.rng.entre(-0.35, 0.35)),
+    repliques: [
+      "Une pile alcaline. L'énergie, ça se lance.",
+      'Tout le groupe tourne sur piles. Là, en rafale.',
+    ],
+  },
+  {
+    nom: 'Flipper',
+    cadence: 30,
+    munitions: 8,
+    son: 'flipper',
+    sprite: 'arme-flipper',
+    tir: (ctx, t) => tire(ctx, t, FLIPPER, -2.2),
+    repliques: [
+      'Flipper ? Le dauphin ? ... Il a l’air content de rebondir. Moi aussi.',
+      'Un dauphin. Pourquoi pas.',
+    ],
+  },
+  {
+    nom: 'Frisbee',
+    cadence: 16,
+    munitions: 14,
+    son: 'frisbee',
+    sprite: 'arme-frisbee',
+    tir: (ctx, t) => tire(ctx, t, FRISBEE),
+    repliques: ['Un frisbee téléguidé. Il revient toujours. Enfin, vers les autres.'],
+  },
+  {
+    nom: 'Machine à donuts',
+    cadence: 22,
+    munitions: 14,
+    son: 'donut',
+    sprite: 'arme-donuts',
+    tir: (ctx, t) => tire(ctx, t, DONUT, -1.4),
+    repliques: [
+      'Une machine à donuts. Explosifs, évidemment. Je vote pour.',
+      'Sucré, rond, et ça fait boum.',
     ],
   },
 ];

@@ -88,6 +88,28 @@ export class Tactile {
     this.manche.style.transform = '';
   }
 
+  /**
+   * Le bouton de tir montre l'arme ramassée (son icône, et ce qu'il lui reste de munitions) à la place de « TIR » ; l'instrument
+   * du héros, lui, garde le libellé. `icone` : l'image de l'arme (null : pas d'arme).
+   */
+  arme(icone: { url: string; w: number; h: number } | null, munitions: number): void {
+    const bouton = this.element.querySelector<HTMLElement>('.bouton.tir');
+    if (!bouton) return;
+    const cle = icone ? `${icone.url}|${munitions}` : '';
+    if (bouton.dataset.arme === cle) return;
+    bouton.dataset.arme = cle;
+    bouton.classList.toggle('avec-arme', !!icone);
+    if (!icone) return void bouton.replaceChildren(document.createTextNode('TIR'));
+    const img = document.createElement('img');
+    img.className = 'icone-arme';
+    img.src = icone.url;
+    img.alt = '';
+    const reste = document.createElement('span');
+    reste.className = 'munitions';
+    reste.textContent = `×${munitions}`;
+    bouton.replaceChildren(img, reste);
+  }
+
   /** Lâche tout : joystick et boutons. */
   relache(): void {
     this.relacheJoystick();

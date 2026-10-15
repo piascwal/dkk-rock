@@ -5,6 +5,7 @@ import { Synthe } from './audio/synthe';
 import { MAX_JOUEURS, VIES_DEPART } from './config';
 import { Clavier, commandesManette } from './entrees/clavier';
 import { Tactile } from './entrees/tactile';
+import { iconeDeLArme } from './ui/icones-hud';
 import { C } from './jeu/commandes';
 import { Partie } from './jeu/partie';
 import { charge, enregistre, type Progression, type Sauvegarde } from './jeu/sauvegarde';
@@ -333,6 +334,8 @@ export class App implements Actions {
       for (const d of this.hote.distants.values()) noms[d.siege] = d.nom;
     }
     this.hud.maj(v, siege, noms);
+    const moi = v.joueurs[siege];
+    this.tactile.arme(moi?.present && moi.arme ? iconeDeLArme(moi.arme, 34) : null, moi?.munitions ?? 0);
     this.histoire.maj(v);
     const theme = this.rendu.theme.musique;
     this.musique.joue(v.boss >= 0 ? 'boss' : theme);

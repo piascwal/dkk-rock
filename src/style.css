@@ -684,6 +684,33 @@ h2 {
   background: var(--rouge);
 }
 
+/* le bouton de tir montre l'arme ramassée à la place de « TIR » : son icône, et ce qu'il lui reste de munitions */
+.bouton.tir.avec-arme {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 0;
+  line-height: 1;
+  opacity: 0.9;
+}
+
+.bouton .icone-arme {
+  max-width: 62%;
+  max-height: 58%;
+  image-rendering: pixelated;
+  pointer-events: none;
+  filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.6));
+}
+
+.bouton .munitions {
+  font-size: 0.62rem;
+  margin-top: 1px;
+  text-shadow: 1px 1px 0 #000;
+  pointer-events: none;
+}
+
 .bouton.special {
   right: 46px;
   bottom: 86px;

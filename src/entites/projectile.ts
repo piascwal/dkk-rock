@@ -33,6 +33,7 @@ export class Projectile implements EntiteSimulee {
 
   maj(ctx: Contexte): void {
     if (++this.age >= this.def.duree) return this.termine(ctx);
+    if (this.def.guide) this.guide(ctx);
     if (!this.colle) {
       this.vy = Math.min(CHUTE_MAX, this.vy + GRAVITE * this.def.gravite);
       const pas = Math.max(1, Math.ceil(Math.max(Math.abs(this.vx), Math.abs(this.vy)) / 5));
@@ -53,6 +54,29 @@ export class Projectile implements EntiteSimulee {
         );
       if (proche) this.termine(ctx);
     }
+  }
+
+  /** Téléguidage : le tir tourne, sans changer de vitesse, vers l'ennemi visible le plus proche (à moins de 150 px). */
+  private guide(ctx: Contexte): void {
+    let cible: Cible | null = null;
+    let dMin = 150 * 150;
+    for (const c of ctx.cibles(this.camp === 'heros' ? 'ennemis' : 'heros')) {
+      if (!c.vivant() || !ctx.visible(c.x + c.w / 2, c.y + c.h / 2)) continue;
+      const d = (c.x + c.w / 2 - this.x) ** 2 + (c.y + c.h / 2 - this.y) ** 2;
+      if (d < dMin) {
+        dMin = d;
+        cible = c;
+      }
+    }
+    if (!cible) return;
+    const vitesse = Math.hypot(this.vx, this.vy) || this.def.vitesse;
+    const voulu = Math.atan2(cible.y + cible.h / 2 - this.y, cible.x + cible.w / 2 - this.x);
+    const actuel = Math.atan2(this.vy, this.vx);
+    // le plus court chemin entre deux angles, borné par le virage maximal
+    let ecart = ((voulu - actuel + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
+    ecart = Math.max(-this.def.guide!, Math.min(this.def.guide!, ecart));
+    this.vx = Math.cos(actuel + ecart) * vitesse;
+    this.vy = Math.sin(actuel + ecart) * vitesse;
   }
 
   /** Avance d'un petit pas sur un seul axe et règle le choc contre une tuile. */

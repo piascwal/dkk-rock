@@ -45,6 +45,15 @@ OBJETS = {
     'torche': ([f'decor/torche-{k}-base.png' for k in (1, 2, 3)], None, 6),
     # le flambeau sur pied des forteresses et des caves
     'flambeau': (['decor/flambeau-base.png'], None, 8),
+    # lot 9 : les cinq armes à ramasser (icône du bonus, en jeu et sur le bouton de tir) et le tir qui en sort (genre P_...)
+    'arme-minidisc': (['armes/minidisc-base.png'], None, 15),
+    'arme-pile': (['armes/pile-base.png'], None, 14),
+    'arme-flipper': (['armes/flipper-base.png'], None, 16),
+    'arme-frisbee': (['armes/frisbee-base.png'], None, 16),
+    'arme-donuts': (['armes/donuts-base.png'], None, 15),
+    'tir-pile': (['armes/pile-base.png'], 'P_PILE', 9),
+    'tir-flipper': (['armes/flipper-base.png'], 'P_FLIPPER', 14),
+    'tir-frisbee': (['armes/frisbee-base.png'], 'P_FRISBEE', 12),
     'parasol': ([f'decor/parasol-{k}-base.png' for k in (1, 2, 3)], None, 28),
     'poubelle': ([f'decor/poubelle-{k}-base.png' for k in (1, 2)], None, 11),
     # le tonneau de décor, sans pancarte (les tonneaux WOG sont des tuiles : outils/fixe-tuiles.py)

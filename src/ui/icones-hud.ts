@@ -1,4 +1,7 @@
+import { armeRamassee } from '../entites/armes';
 import { iconeArme } from '../rendu/dessins-objets';
+import { FEUILLES_DECOR } from '../rendu/feuilles-objets';
+import { VERSION } from '../version';
 import { pinceau } from '../rendu/pinceau';
 
 /**
@@ -76,7 +79,16 @@ export function icone(nom: NomIcone): Icone {
 }
 
 /** L'icône d'une arme ramassée (`variante` : son numéro) : le dessin de son tir, sur une toile de 20 × 14. */
-export function iconeDeLArme(variante: number): Icone {
+export function iconeDeLArme(variante: number, hauteur = 14 * ZOOM): Icone {
+  const sprite = armeRamassee(variante)?.sprite;
+  const f = sprite ? FEUILLES_DECOR[sprite] : undefined;
+  // une arme à icône fournie : sa planche (même image que le bonus en jeu), à la hauteur demandée
+  if (sprite && f)
+    return {
+      url: `${import.meta.env.BASE_URL}sprites/${f.fichier}?v=${VERSION}`,
+      w: Math.round((f.w / f.h) * hauteur),
+      h: hauteur,
+    };
   const cle = `arme-${variante}`;
   let i = cache.get(cle);
   if (!i) {

@@ -30,6 +30,8 @@ export interface DefProjectile {
   effet?: 'hypnose' | 'eblouit';
   /** un tir lourd (grosse bombe, onde de sol) : les tirs des héros ne l'arrêtent pas */
   lourd?: boolean;
+  /** téléguidé : tourne vers l'ennemi le plus proche, de ce nombre de radians par tick au plus */
+  guide?: number;
   /** se transforme en un autre tir en fin de course (la cornemuse laisse un nuage) */
   laisse?: DefProjectile;
 }
@@ -211,4 +213,62 @@ export const OEUF_KIWI = P({
   roule: true,
   explosion: { rayon: 36, degats: 6 },
   proximite: 12,
+});
+
+// ——— les armes de lot 9 ———
+/** Le disque du lecteur minidisc : il traverse les ennemis en laissant des ondes derrière lui. */
+export const MINIDISC = P({
+  genre: G.P_MINIDISC,
+  vitesse: 3.6,
+  gravite: 0,
+  degats: 1.5,
+  degatsTuile: 1,
+  duree: 70,
+  taille: 9,
+  perce: true,
+  retouche: 12,
+});
+/** La pile alcaline : une rafale de petites piles, un peu en éventail. */
+export const PILE = P({
+  genre: G.P_PILE,
+  vitesse: 7,
+  gravite: 0,
+  degats: 1,
+  degatsTuile: 1,
+  duree: 40,
+  taille: 4,
+});
+/** Flipper le dauphin : lancé en cloche, il rebondit trois fois avant d'exploser. */
+export const FLIPPER = P({
+  genre: G.P_FLIPPER,
+  vitesse: 3.2,
+  gravite: 0.55,
+  degats: 1,
+  degatsTuile: 1,
+  duree: 110,
+  taille: 9,
+  rebonds: 3,
+  explosion: { rayon: 28, degats: 3 },
+});
+/** Le frisbee : téléguidé, il vire vers l'ennemi le plus proche. */
+export const FRISBEE = P({
+  genre: G.P_FRISBEE,
+  vitesse: 3.6,
+  gravite: 0,
+  degats: 2,
+  degatsTuile: 0.5,
+  duree: 150,
+  taille: 7,
+  guide: 0.09,
+});
+/** Le donut explosif de la machine à donuts : lancé en cloche, il explose au premier contact. */
+export const DONUT = P({
+  genre: G.P_DONUT,
+  vitesse: 3.4,
+  gravite: 0.4,
+  degats: 1,
+  degatsTuile: 1,
+  duree: 80,
+  taille: 8,
+  explosion: { rayon: 24, degats: 2 },
 });

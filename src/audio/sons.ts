@@ -40,6 +40,34 @@ const SONS: Record<string, Son> = {
     s.bruit({ duree: 0.3, volume: 0.2 * v, passeBas: 800 });
   },
   vinyle: (s, v) => s.note({ freq: 900, vers: 300, duree: 0.15, type: 'triangle', volume: 0.1 * v }),
+  // les armes du lot 9 : un disque qui siffle, un clic de pile, le cri d'un dauphin, un coup de vent, un « pop » sucré
+  minidisc: (s, v) => {
+    s.note({ freq: 520, vers: 940, duree: 0.2, type: 'triangle', volume: 0.12 * v });
+    s.bruit({ duree: 0.08, volume: 0.04 * v, passeHaut: 3000 });
+  },
+  pile: (s, v) => {
+    s.note({ freq: 1500, vers: 900, duree: 0.04, type: 'square', volume: 0.06 * v });
+    s.bruit({ duree: 0.03, volume: 0.05 * v, passeHaut: 2500 });
+  },
+  flipper: (s, v) => {
+    s.note({ freq: 1500, vers: 2400, duree: 0.12, type: 'sine', volume: 0.12 * v });
+    s.note({
+      freq: 2400,
+      vers: 1700,
+      duree: 0.1,
+      type: 'sine',
+      volume: 0.1 * v,
+      quand: s.ctx ? s.ctx.currentTime + 0.1 : 0,
+    });
+  },
+  frisbee: (s, v) => {
+    s.bruit({ duree: 0.18, volume: 0.06 * v, passeHaut: 1500 });
+    s.note({ freq: 380, vers: 720, duree: 0.2, type: 'triangle', volume: 0.07 * v });
+  },
+  donut: (s, v) => {
+    s.note({ freq: 320, vers: 140, duree: 0.12, type: 'sine', volume: 0.16 * v });
+    s.bruit({ duree: 0.06, volume: 0.05 * v, passeBas: 1500 });
+  },
   flamme: (s, v) => s.bruit({ duree: 0.08, volume: 0.06 * v, passeBas: 1200 }),
   cornemuse: (s, v) => {
     s.note({ freq: 233, duree: 0.5, type: 'sawtooth', volume: 0.07 * v, filtre: 1500 });

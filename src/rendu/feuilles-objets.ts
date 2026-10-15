@@ -23,6 +23,9 @@ export const FEUILLES_OBJETS: Partial<Record<Genre, Feuille>> = {
     densite: 6,
     pied: 66,
   },
+  [G.P_PILE]: { fichier: 'tir-pile.png', w: 54, h: 56, images: [1], rythme: 1, densite: 6, pied: 27 },
+  [G.P_FLIPPER]: { fichier: 'tir-flipper.png', w: 84, h: 80, images: [1], rythme: 1, densite: 6, pied: 42 },
+  [G.P_FRISBEE]: { fichier: 'tir-frisbee.png', w: 72, h: 51, images: [1], rythme: 1, densite: 6, pied: 36 },
 };
 
 /** Les planches du décor, sans genre : une ligne par apparence. */
@@ -46,6 +49,19 @@ export const FEUILLES_DECOR: Record<string, Feuille> = {
   feu: { fichier: 'feu.png', w: 84, h: 92, images: [1], rythme: 1, densite: 6, pied: 42 },
   torche: { fichier: 'torche.png', w: 36, h: 147, images: [1, 1, 1], rythme: 1, densite: 6, pied: 18 },
   flambeau: { fichier: 'flambeau.png', w: 48, h: 174, images: [1], rythme: 1, densite: 6, pied: 24 },
+  'arme-minidisc': {
+    fichier: 'arme-minidisc.png',
+    w: 90,
+    h: 88,
+    images: [1],
+    rythme: 1,
+    densite: 6,
+    pied: 45,
+  },
+  'arme-pile': { fichier: 'arme-pile.png', w: 84, h: 88, images: [1], rythme: 1, densite: 6, pied: 42 },
+  'arme-flipper': { fichier: 'arme-flipper.png', w: 96, h: 92, images: [1], rythme: 1, densite: 6, pied: 48 },
+  'arme-frisbee': { fichier: 'arme-frisbee.png', w: 96, h: 69, images: [1], rythme: 1, densite: 6, pied: 48 },
+  'arme-donuts': { fichier: 'arme-donuts.png', w: 90, h: 98, images: [1], rythme: 1, densite: 6, pied: 45 },
   parasol: { fichier: 'parasol.png', w: 168, h: 168, images: [1, 1, 1], rythme: 1, densite: 6, pied: 84 },
   poubelle: { fichier: 'poubelle.png', w: 66, h: 96, images: [1, 1], rythme: 1, densite: 6, pied: 33 },
   tonneau: { fichier: 'tonneau.png', w: 78, h: 95, images: [1], rythme: 1, densite: 6, pied: 39 },

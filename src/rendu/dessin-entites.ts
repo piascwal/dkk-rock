@@ -1,11 +1,12 @@
 import { TUILE } from '../config';
+import { armeRamassee } from '../entites/armes';
 import { herosDuGenre } from '../entites/heros';
 import { ANIM, G, type EntiteVue } from '../jeu/vue';
 import type { AtlasTuiles } from './atlas-tuiles';
 import { dessineAura } from './aura';
 import { DESSINS_BOSS } from './dessins-boss';
 import { DESSINS_ENNEMIS } from './dessins-ennemis';
-import { dessineFeuille } from './feuilles-images';
+import { dessineDecorFeuille, dessineFeuille } from './feuilles-images';
 import { FEUILLES } from './feuilles';
 import { dessineHeros, dessineInstrument, dessineKiwi } from './dessins-heros';
 import { DESSINS_OBJETS, iconeArme } from './dessins-objets';
@@ -23,6 +24,14 @@ const DRAPEAUX_SANS_MIROIR = new Set<number>([
   G.COEUR,
   G.COEUR_OR,
 ]);
+
+/** L'icône fournie d'une arme à ramasser, qui flotte doucement ; false si l'arme n'en a pas (ou si elle n'est pas chargée). */
+function dessineBonus(ctx: CanvasRenderingContext2D, variante: number): boolean {
+  const sprite = armeRamassee(variante)?.sprite;
+  if (!sprite) return false;
+  ctx.translate(0, Math.round(Math.sin(performance.now() / 260) * 1.5) - 1);
+  return dessineDecorFeuille(ctx, sprite, 0);
+}
 
 /** Dessine une entité de la vue, en coordonnées d'écran. */
 export function dessineEntite(
@@ -86,7 +95,9 @@ export function dessineEntite(
   else if (estTir) DESSINS_TIRS[v.g]?.(pb, v.f, v.e);
   else if (DESSINS_ENNEMIS[v.g]) DESSINS_ENNEMIS[v.g]!(pb, v.e, v.f);
   else if (DESSINS_BOSS[v.g]) DESSINS_BOSS[v.g]!(pb, v.e, v.f);
-  else if (DESSINS_OBJETS[v.g]) {
+  else if (v.g === G.ARME && dessineBonus(ctx, v.f)) {
+    // une arme à icône fournie : l'icône flotte à la place de la mallette
+  } else if (DESSINS_OBJETS[v.g]) {
     DESSINS_OBJETS[v.g]!(p, v.e, v.f);
     if (v.g === G.ARME) iconeArme(p, v.f, 0);
   }

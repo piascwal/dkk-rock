@@ -1,4 +1,5 @@
 import { G } from '../jeu/vue';
+import { DEMI_TAILLE_ARMES, DESSINS_TIRS_ARMES } from './dessins-tirs-armes';
 import type { Pinceau } from './pinceau';
 
 type Dessin = (p: Pinceau, f: number, e: number) => void;
@@ -18,11 +19,13 @@ export const DEMI_TAILLE: Partial<Record<number, number>> = {
   [G.P_HYPNOSE]: 5,
   [G.P_GROSSE_BOULE]: 8,
   [G.P_ONDE_SOL]: 5,
+  ...DEMI_TAILLE_ARMES,
 };
 
 const tourne = (f: number, n: number) => Math.floor(f / 3) % n;
 
 export const DESSINS_TIRS: Partial<Record<number, Dessin>> = {
+  ...DESSINS_TIRS_ARMES,
   [G.P_BAGUETTE]: (p, f) => {
     const r = tourne(f, 4);
     if (r % 2) p(-1, -3, 1, 6, '#d9a066');
