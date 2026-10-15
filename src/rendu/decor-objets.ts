@@ -54,6 +54,13 @@ const poubelle: Accessoire = (p) => {
   p(-2, -6, 1, 5, '#46525a');
 };
 
+/** Le boîtier de CD « L5 » (repli : la planche fournie le remplace). */
+const boitierCd: Accessoire = (p) => {
+  p(-4, -9, 8, 9, '#cfd8dc');
+  p(-3, -8, 6, 7, '#3a4a6a');
+  p(-1, -6, 2, 3, '#ffd23f');
+};
+
 const palmier: Accessoire = (p, v) => {
   const h = 26 + (v % 12);
   p(0, -h, 3, h, '#8b6a3a');
@@ -211,6 +218,7 @@ export const ACCESSOIRES = {
   lampadaire: lampadaire('#ffd56b'),
   lampadaireNeon: lampadaire('#ff4fd8'),
   poubelle,
+  boitierCd,
   palmier,
   parasol,
   transat,

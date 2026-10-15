@@ -29,6 +29,7 @@ export type Sprite =
   | 'feuDeCamp'
   | 'torche'
   | 'flambeau'
+  | 'boitierCd'
   | 'parasol';
 export const SPRITES: ReadonlySet<string> = new Set<Sprite>([
   'vacheCasque',
@@ -53,6 +54,7 @@ export const SPRITES: ReadonlySet<string> = new Set<Sprite>([
   'feuDeCamp',
   'torche',
   'flambeau',
+  'boitierCd',
   'parasol',
 ]);
 
@@ -67,6 +69,8 @@ export function dessineSprite(
   // les panneaux ne sont jamais retournés : on doit pouvoir lire ce qui est écrit dessus
   if (quoi === 'panneauFleche' || quoi === 'panneauNeige' || quoi === 'panneauLounge')
     return dessineDecorFeuille(ctx, 'panneau', v % 4, voile);
+  // le boîtier de CD n'est jamais retourné : on doit y lire « L5 »
+  if (quoi === 'boitierCd') return dessineDecorFeuille(ctx, 'boitier-cd', 0, voile);
   // un peu enfoncé : l'herbe des tuiles, dessinée ensuite, cache le pied
   ctx.translate(0, quoi === 'vacheCasque' ? 2 : 1);
   if (v & 8) ctx.scale(-1, 1);

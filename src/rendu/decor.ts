@@ -127,7 +127,7 @@ const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAccessoire[]
   },
   club: {
     dehors: ['enceinte34', 'enceinte34', 'enceinteDeco', 'projecteur', 'plante', 'lampadaireNeon', 'bidon'],
-    dedans: ['enceinte34', 'enceinte34', 'enceinteDeco', 'projecteur', 'plante', 'flambeau'],
+    dedans: ['enceinte34', 'enceinte34', 'enceinteDeco', 'projecteur', 'plante', 'boitierCd', 'flambeau'],
     densite: 0.55,
   },
 };
@@ -135,6 +135,7 @@ const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAccessoire[]
 /** Les petits accessoires se serrent (une tuile et demie entre deux) ; les autres, trois tuiles ; voitures et vaches, quatre. */
 const PETITS = new Set<string>([
   'flambeau',
+  'boitierCd',
   'champignons',
   'cairn',
   'bidon',

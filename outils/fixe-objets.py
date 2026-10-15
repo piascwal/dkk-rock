@@ -54,6 +54,8 @@ OBJETS = {
     'tir-pile': (['armes/pile-base.png'], 'P_PILE', 9),
     'tir-flipper': (['armes/flipper-base.png'], 'P_FLIPPER', 14),
     'tir-frisbee': (['armes/frisbee-base.png'], 'P_FRISBEE', 12),
+    # le boîtier de CD « L5 » : clin d'œil à un plaisir coupable d'un membre du groupe, qui traîne dans les coulisses
+    'boitier-cd': (['armes/boitier-cd-base.png'], None, 10),
     'parasol': ([f'decor/parasol-{k}-base.png' for k in (1, 2, 3)], None, 28),
     'poubelle': ([f'decor/poubelle-{k}-base.png' for k in (1, 2)], None, 11),
     # le tonneau de décor, sans pancarte (les tonneaux WOG sont des tuiles : outils/fixe-tuiles.py)
