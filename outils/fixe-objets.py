@@ -8,6 +8,7 @@ Le sprite est remis sur sa grille de pixels (prepare_instrument.py), recadré su
 largeur voulue en jeu (6 pixels de planche par pixel du jeu).
 """
 import pathlib
+import subprocess
 import sys
 
 import numpy as np
@@ -116,5 +117,14 @@ def main():
     )
 
 
+def formate(chemin):
+    """Le fichier généré passe par Prettier, comme tout le code : sinon la CI (format:check) refuse le commit."""
+    try:
+        subprocess.run(['npx', 'prettier', '--write', str(chemin)], cwd=RACINE, check=False, capture_output=True)
+    except OSError:
+        print('Prettier introuvable : lancez `npx prettier --write src/rendu/feuilles-objets.ts` à la main.')
+
+
 if __name__ == '__main__':
     main()
+    formate(RACINE / 'src' / 'rendu' / 'feuilles-objets.ts')
