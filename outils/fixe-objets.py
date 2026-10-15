@@ -40,6 +40,9 @@ OBJETS = {
     'tronc': ([f'decor/tronc-{k}-base.png' for k in (1, 2)], None, 19),
     'plante': ([f'decor/plante-{k}-base.png' for k in (1, 2, 3, 4)], None, 9),
     'feu': (['decor/feu-1-base.png'], None, 14),
+    # lot 8 : flambeaux de bambou (grande flamme, petite flamme, perche longue) et parasols (rouge et bleu, jaune et vert, rayé)
+    'torche': ([f'decor/torche-{k}-base.png' for k in (1, 2, 3)], None, 6),
+    'parasol': ([f'decor/parasol-{k}-base.png' for k in (1, 2, 3)], None, 28),
     'poubelle': ([f'decor/poubelle-{k}-base.png' for k in (1, 2)], None, 11),
     # le tonneau de décor, sans pancarte (les tonneaux WOG sont des tuiles : outils/fixe-tuiles.py)
     'tonneau': (['decor/tonneau-base.png'], None, 13),
