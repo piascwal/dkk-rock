@@ -1,5 +1,13 @@
 import { TUILE } from '../config';
-import { NB_TUILES, PROPRIETES, T, proprietes, type ProprietesTuile, type Tuile } from './tuiles';
+import {
+  NB_TUILES,
+  PROPRIETES,
+  T,
+  TUILES_LEGERES,
+  proprietes,
+  type ProprietesTuile,
+  type Tuile,
+} from './tuiles';
 
 export interface Modification {
   x: number;
@@ -11,12 +19,7 @@ export interface Modification {
 
 /** La matière du terrain laisse une paroi quand on la détruit ; pas les objets (caisses, caissons, plateformes). */
 const estMatiere = (t: number) =>
-  proprietes(t).solide &&
-  t !== T.PLATEFORME &&
-  t !== T.CAISSE &&
-  t !== T.CAISSON &&
-  t !== T.TONNEAU_WOG &&
-  t !== T.TONNEAU_OR;
+  proprietes(t).solide && !TUILES_LEGERES.has(t) && t !== T.CAISSE && t !== T.CAISSON;
 
 /**
  * La grille de tuiles d'un niveau. Hors de la carte : murs de socle à gauche

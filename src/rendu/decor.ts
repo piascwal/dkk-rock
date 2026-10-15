@@ -17,6 +17,8 @@ export interface Pose {
   v: number;
   /** proche : dessiné devant les héros (touffes) */
   devant: boolean;
+  /** dans une pièce (mur de fond derrière) : dessiné par-dessus le mur de fond, pas derrière lui */
+  dedans: boolean;
 }
 
 /** Ce que l'on sème, par monde : dehors (sur le sol à l'air libre) et dedans (derrière un mur d'intérieur). */
@@ -152,6 +154,7 @@ const ECHELLE_ACCESSOIRES = 1.4;
 
 const SOLS_DECORES: number[] = [
   T.TERRE,
+  T.BRIQUE,
   T.NEIGE,
   T.SABLE,
   T.BETON,
@@ -193,7 +196,7 @@ export function semeDecor(carte: Carte, theme: NomTheme, graine: number): Pose[]
         !(dehors(carte, tx - 1, ty) && dehors(carte, tx, ty) && dehors(carte, tx + 1, ty))
       )
         continue;
-      poses.push({ tx, ty, quoi, v: rng.entier(0, 255), devant: false });
+      poses.push({ tx, ty, quoi, v: rng.entier(0, 255), devant: false, dedans });
       libreDepuis.set(ty, tx + (quoi === 'voiture' || quoi === 'vacheCasque' ? 4 : PETITS.has(quoi) ? 2 : 3));
     }
   }
@@ -202,13 +205,20 @@ export function semeDecor(carte: Carte, theme: NomTheme, graine: number): Pose[]
     for (let ty = 1; ty < carte.hauteur - 1; ty++) {
       if (!SOLS_DECORES.includes(carte.get(tx, ty)) || carte.solide(tx, ty - 1) || carte.aFond(tx, ty - 1))
         continue;
-      if (rng.suivant() < 0.5) poses.push({ tx, ty, quoi: 'buisson', v: rng.entier(0, 255), devant: true });
+      if (rng.suivant() < 0.5)
+        poses.push({ tx, ty, quoi: 'buisson', v: rng.entier(0, 255), devant: true, dedans: false });
       break;
     }
   return poses;
 }
 
-/** Dessine les accessoires visibles dont le sol tient encore. `devant` choisit la couche. */
+/**
+ * Les trois couches du décor : derrière les tuiles (`fond`), par-dessus le mur de fond des pièces mais derrière les héros
+ * (`interieur`, sans quoi le mur de fond les cacherait), et devant les héros (`devant`, les touffes).
+ */
+export type CoucheDecor = 'fond' | 'interieur' | 'devant';
+
+/** Dessine les accessoires visibles dont le sol tient encore, d'une couche. */
 export function dessineDecor(
   ctx: CanvasRenderingContext2D,
   poses: readonly Pose[],
@@ -216,19 +226,19 @@ export function dessineDecor(
   camX: number,
   camY: number,
   largeur: number,
-  devant: boolean,
+  couche: CoucheDecor,
   couleurTouffe: string,
   voile: string,
 ): void {
   const p = pinceau(ctx);
   for (const o of poses) {
-    if (o.devant !== devant) continue;
+    if (o.devant !== (couche === 'devant') || (!o.devant && o.dedans !== (couche === 'interieur'))) continue;
     const x = o.tx * TUILE + TUILE / 2 - Math.round(camX);
     if (x < -40 || x > largeur + 40) continue;
     if (!carte.props(o.tx, o.ty).solide || carte.solide(o.tx, o.ty - 1)) continue;
     ctx.save();
     ctx.translate(x, o.ty * TUILE - Math.round(camY));
-    if (devant) {
+    if (couche === 'devant') {
       // une petite touffe d'herbe, de neige ou de sable, devant les pieds
       const h = 2 + (o.v % 3);
       p(-3, -h, 1, h, couleurTouffe);

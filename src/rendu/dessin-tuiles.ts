@@ -2,7 +2,7 @@ import { HAUTEUR_VUE, TUILE } from '../config';
 import { bruit } from '../moteur/maths';
 import type { Tyrolienne } from '../jeu/contexte';
 import type { Carte } from '../monde/carte';
-import { T } from '../monde/tuiles';
+import { T, TUILES_LEGERES } from '../monde/tuiles';
 import type { AtlasTuiles } from './atlas-tuiles';
 import { dessineVegetation } from './vegetation';
 import { aUnCoin, coinsDeParoi, cotesLibres, cotesParoi, DEBORD } from './bords-tuiles';
@@ -28,7 +28,7 @@ export function dessineTuiles(
       const t = carte.get(tx, ty);
       const x = tx * TUILE - Math.round(camX);
       const y = ty * TUILE - Math.round(camY);
-      const plein = t !== T.VIDE && t !== T.ECHELLE && t !== T.PLATEFORME;
+      const plein = t !== T.VIDE && !TUILES_LEGERES.has(t);
       const cotes = t === T.VIDE ? 0 : cotesLibres(carte, t, tx, ty);
       // la paroi de fond, aux coins extérieurs arrondis ; derrière un coin arrondi d'une tuile pleine, elle remplit
       // les angles où elle continue (sinon on verrait le ciel par ces angles)

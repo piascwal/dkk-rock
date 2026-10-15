@@ -104,3 +104,13 @@ export const tuileDuCaractere = (c: string): Tuile | null => PAR_CARACTERE.get(c
 export const proprietes = (t: number): ProprietesTuile => PROPRIETES[t as Tuile] ?? PROPRIETES[T.VIDE];
 
 export const NB_TUILES = Object.keys(PROPRIETES).length;
+
+/** Les tuiles qui ne remplissent pas leur case : on voit le mur de fond (ou le décor) derrière elles. */
+export const TUILES_LEGERES: ReadonlySet<number> = new Set<number>([
+  T.ECHELLE,
+  T.ECHELON,
+  T.PLATEFORME,
+  T.PITON,
+  T.TONNEAU_WOG,
+  T.TONNEAU_OR,
+]);

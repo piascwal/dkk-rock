@@ -8,7 +8,7 @@ import { AtlasTuiles } from './atlas-tuiles';
 import { Camera } from './camera';
 import { dessineCarteMonde } from './carte-monde';
 import { dessineEntite } from './dessin-entites';
-import { dessineDecor, semeDecor } from './decor';
+import { dessineDecor, semeDecor, type CoucheDecor } from './decor';
 import { dessineTuiles, dessineTyroliennes } from './dessin-tuiles';
 import { Emojis } from './emojis';
 import { Fond } from './fonds';
@@ -179,18 +179,21 @@ export class Rendu {
         11 + vue.niveau,
       );
     }
-    dessineDecor(
-      ctx,
-      this.decor,
-      carte,
-      camX,
-      camY,
-      this.largeur,
-      false,
-      this.theme.dessus,
-      this.theme.lointain,
-    );
+    const decore = (couche: CoucheDecor) =>
+      dessineDecor(
+        ctx,
+        this.decor,
+        carte,
+        camX,
+        camY,
+        this.largeur,
+        couche,
+        this.theme.dessus,
+        this.theme.lointain,
+      );
+    decore('fond');
     dessineTuiles(ctx, carte, this.atlas, camX, camY, this.largeur, this.tick);
+    decore('interieur');
     dessineTyroliennes(ctx, niveauLu(vue.niveau).tyroliennes, carte, camX, camY);
     this.particules.meteo(this.theme.meteo, camX, camY, this.largeur);
     this.particules.maj(carte);
@@ -201,17 +204,7 @@ export class Rendu {
     for (const passe of [0, 1, 2])
       for (const v of vue.entites) if (tri(v) === passe) dessineEntite(ctx, v, camX, camY, this.atlas);
     for (const v of vue.entites) if (v.g === G.VAN && v.e === 2) this.particules.van(v.x, v.y, v.f / 20);
-    dessineDecor(
-      ctx,
-      this.decor,
-      carte,
-      camX,
-      camY,
-      this.largeur,
-      true,
-      this.theme.dessus,
-      this.theme.lointain,
-    );
+    decore('devant');
     this.particules.dessine(ctx, camX, camY);
     this.traits.maj(vue, this.decor, carte, { emojis: this.emojis });
     this.emojis.accompagne(vue.entites);

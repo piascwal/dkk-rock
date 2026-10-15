@@ -7,7 +7,7 @@ import type { Emojis } from '../src/rendu/emojis';
 import { TraitsPersos } from '../src/rendu/traits-persos';
 
 const carte = { props: () => ({ solide: true }), solide: () => false } as unknown as Carte;
-const tronc: Pose = { tx: 10, ty: 5, quoi: 'tronc', v: 0, devant: false };
+const tronc: Pose = { tx: 10, ty: 5, quoi: 'tronc', v: 0, devant: false, dedans: false };
 const sol = 5 * TUILE;
 
 const vue = (g: number, x: number, y = sol, e: number = ANIM.COURT) =>

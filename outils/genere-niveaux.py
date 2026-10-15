@@ -176,6 +176,7 @@ class Recette:
 
     def ecrit(self, indice, nom_fichier, constante):
         n = self.n
+        n.fond_souterrain()
         lignes = n.lignes()
         ts = (
             f'// {self.nom} : la carte du niveau, générée par outils/genere-niveaux.py puis modifiable à la main.\n'

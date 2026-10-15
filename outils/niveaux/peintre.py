@@ -45,6 +45,20 @@ class Niveau:
                 return y
         return None
 
+    def fond_souterrain(self):
+        """Donne un mur de fond ('.') à tous les creux sous le terrain : puits, cavernes, gouffres, galeries. Sans lui, on voit
+        le ciel à travers la terre. Un creux est « sous le terrain » s'il y a de la matière à sa gauche et à sa droite sur
+        sa rangée, et encore de la matière en dessous : le vide sans fond (le gouffre qu'on traverse) n'en reçoit pas."""
+        mat = set('#RBMNGWSDVX')
+        premier = [next((x for x in range(self.w) if self.g[y][x] in mat), None) for y in range(self.h)]
+        dernier = [next((x for x in range(self.w - 1, -1, -1) if self.g[y][x] in mat), None) for y in range(self.h)]
+        for x in range(self.w):
+            dessous = False
+            for y in range(self.h - 1, self.base, -1):
+                dessous = dessous or self.g[y][x] in mat
+                if self.g[y][x] == ' ' and dessous and premier[y] is not None and premier[y] < x < dernier[y]:
+                    self.g[y][x] = '.'
+
     def libre(self, x, y, hauteur=2):
         return all(self.get(x, y - k) in ' .' for k in range(hauteur))
 

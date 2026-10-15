@@ -1,5 +1,5 @@
 import { TUILE } from '../config';
-import { T, tuileDuCaractere } from '../monde/tuiles';
+import { T, TUILES_LEGERES, tuileDuCaractere } from '../monde/tuiles';
 import type { NomTheme } from '../rendu/themes';
 
 /**
@@ -132,6 +132,7 @@ export function litNiveau(def: DefNiveau): NiveauLu {
     }
   }
 
+  donneFondAuxTuilesLegeres(lignes, tuiles, fond, largeur, hauteur);
   lu.drapeaux.sort((a, b) => a.x - b.x); // l'ordre des drapeaux est celui du niveau, pas celui des rangées
   scelleLesEchelles(tuiles, largeur, hauteur);
   if (!lu.depart) throw new ErreurNiveau(`${def.id} : pas de départ (@)`);
@@ -166,4 +167,47 @@ function scelleLesEchelles(tuiles: Uint8Array, largeur: number, hauteur: number)
       else rang++;
     }
   }
+}
+
+/**
+ * Les tuiles qui ne remplissent pas leur case (échelles, planches, pitons, tonneaux, caisses) gardent le mur de fond de
+ * la pièce où elles sont : une case voisine de mur de fond ('.'), ou serrée entre deux murs pleins (un puits). Sans cela, on
+ * voit le ciel à travers un plancher à pitons ou derrière une échelle.
+ */
+/** Celles qui laissent voir le fond, et les caisses : une fois cassées, elles laissent le mur de la pièce. */
+const LEGERES = new Set<number>([...TUILES_LEGERES, T.CAISSE, T.CAISSON]);
+const PLEINES = new Set<number>([
+  T.TERRE,
+  T.ROCHE,
+  T.BRIQUE,
+  T.METAL,
+  T.SOCLE,
+  T.NEIGE,
+  T.GLACE,
+  T.BOIS,
+  T.BETON,
+]);
+
+function donneFondAuxTuilesLegeres(
+  lignes: string[],
+  tuiles: Uint8Array,
+  fond: Uint8Array,
+  largeur: number,
+  hauteur: number,
+): void {
+  const mur = (x: number, y: number) => lignes[y]?.[x] === '.';
+  const pleine = (x: number, y: number) =>
+    x >= 0 && x < largeur && y >= 0 && y < hauteur && PLEINES.has(tuiles[y * largeur + x]!);
+  for (let y = 0; y < hauteur; y++)
+    for (let x = 0; x < largeur; x++) {
+      if (!LEGERES.has(tuiles[y * largeur + x]!)) continue;
+      if (
+        mur(x - 1, y) ||
+        mur(x + 1, y) ||
+        mur(x, y - 1) ||
+        mur(x, y + 1) ||
+        (pleine(x - 1, y) && pleine(x + 1, y))
+      )
+        fond[y * largeur + x] = 1;
+    }
 }
