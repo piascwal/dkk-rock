@@ -6,7 +6,7 @@ import { ACCESSOIRES, type NomAccessoire } from './decor-objets';
 import { imageTuile } from './atlas-tuiles';
 import { pinceau } from './pinceau';
 import { dessineDecorFeuille } from './feuilles-images';
-import { ECART_VOITURES, SOLS_DECORES, dehors, echelleProche, solLibre } from './decor-sol';
+import { ECART_VOITURES, SOLS_DECORES, dehors, echelleProche, emprise, solLibre } from './decor-sol';
 import { dessineSprite, SPRITES, type Sprite } from './decor-sprites';
 import type { NomTheme } from './themes';
 
@@ -209,6 +209,21 @@ export function semeDecor(carte: Carte, theme: NomTheme, graine: number): Pose[]
   // chaque rangée garde son propre espacement : des accessoires sur le sol, sur les passerelles, sur les toits
   const libreDepuis = new Map<number, number>();
   let derniereVoiture = -ECART_VOITURES;
+  // les cases déjà prises par un accessoire : deux accessoires ne se cachent jamais l'un l'autre
+  const prises = new Set<number>();
+  const cle = (x: number, y: number) => y * 4096 + x;
+  // un accessoire d'intérieur est dessiné par-dessus les tuiles (caisses cassables, échelles) : son emprise doit être libre
+  const place = (tx: number, ty: number, dedans: boolean): boolean => {
+    const cases = emprise(tx, ty);
+    const libre = cases.every(
+      ([x, y]) =>
+        !prises.has(cle(x, y)) &&
+        (!dedans ||
+          (x >= 0 && y >= 0 && x < carte.largeur && y < carte.hauteur && carte.get(x, y) === T.VIDE)),
+    );
+    if (libre) for (const [x, y] of cases) prises.add(cle(x, y));
+    return libre;
+  };
   for (let tx = 3; tx < carte.largeur - 3; tx++) {
     for (let ty = 1; ty < carte.hauteur - 1; ty++) {
       const sol = carte.get(tx, ty);
@@ -226,12 +241,13 @@ export function semeDecor(carte: Carte, theme: NomTheme, graine: number): Pose[]
           ![-2, -1, 0, 1, 2].every((d) => solLibre(carte, tx + d, ty)))
       )
         continue;
-      if (quoi === 'voiture') derniereVoiture = tx;
       if (
         quoi === 'vacheCasque' &&
         !(dehors(carte, tx - 1, ty) && dehors(carte, tx, ty) && dehors(carte, tx + 1, ty))
       )
         continue;
+      if (!place(tx, ty, dedans)) continue;
+      if (quoi === 'voiture') derniereVoiture = tx;
       poses.push({ tx, ty, quoi, v: rng.entier(0, 255), devant: false, dedans });
       libreDepuis.set(
         ty,
@@ -243,7 +259,7 @@ export function semeDecor(carte: Carte, theme: NomTheme, graine: number): Pose[]
   for (let tx = 1; tx < carte.largeur - 1; tx++)
     for (let ty = 1; ty < carte.hauteur - 1; ty++) {
       if (!solLibre(carte, tx, ty) || echelleProche(carte, tx, ty)) continue;
-      if (rng.suivant() < 0.5)
+      if (rng.suivant() < 0.5 && place(tx, ty, false))
         poses.push({ tx, ty, quoi: 'buisson', v: rng.entier(0, 255), devant: true, dedans: false });
       break;
     }

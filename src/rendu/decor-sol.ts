@@ -35,3 +35,10 @@ export const echelleProche = (carte: Carte, tx: number, ty: number): boolean => 
     for (let dy = 1; dy <= 5; dy++) if (carte.props(tx + dx, ty - dy).echelle) return true;
   return false;
 };
+
+/** Les cases qu'un accessoire posé en (tx, ty) occupe : une tuile de part et d'autre, et jusqu'à trois tuiles au-dessus. */
+export const emprise = (tx: number, ty: number): [number, number][] => {
+  const cases: [number, number][] = [];
+  for (let dx = -1; dx <= 1; dx++) for (let dy = 1; dy <= 3; dy++) cases.push([tx + dx, ty - dy]);
+  return cases;
+};
