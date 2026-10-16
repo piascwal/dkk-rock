@@ -63,6 +63,7 @@ export const FEUILLES_DECOR: Record<string, Feuille> = {
   'arme-frisbee': { fichier: 'arme-frisbee.png', w: 96, h: 69, images: [1], rythme: 1, densite: 6, pied: 48 },
   'arme-donuts': { fichier: 'arme-donuts.png', w: 90, h: 98, images: [1], rythme: 1, densite: 6, pied: 45 },
   'boitier-cd': { fichier: 'boitier-cd.png', w: 60, h: 44, images: [1], rythme: 1, densite: 6, pied: 30 },
+  etagere: { fichier: 'etagere.png', w: 286, h: 289, images: [1, 1, 1], rythme: 1, densite: 6, pied: 143 },
   parasol: { fichier: 'parasol.png', w: 168, h: 168, images: [1, 1, 1], rythme: 1, densite: 6, pied: 84 },
   poubelle: { fichier: 'poubelle.png', w: 66, h: 96, images: [1, 1], rythme: 1, densite: 6, pied: 33 },
   tonneau: { fichier: 'tonneau.png', w: 78, h: 95, images: [1], rythme: 1, densite: 6, pied: 39 },

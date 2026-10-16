@@ -6,6 +6,7 @@ import { ACCESSOIRES, type NomAccessoire } from './decor-objets';
 import { imageTuile } from './atlas-tuiles';
 import { pinceau } from './pinceau';
 import { dessineDecorFeuille } from './feuilles-images';
+import { ECART_VOITURES, SOLS_DECORES, dehors, solLibre } from './decor-sol';
 import { dessineSprite, SPRITES, type Sprite } from './decor-sprites';
 import type { NomTheme } from './themes';
 
@@ -101,7 +102,7 @@ const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAccessoire[]
       'tronc',
       'enceinte34',
     ],
-    dedans: ['caisseDeco', 'enceinte34', 'flambeau', 'sacs'],
+    dedans: ['caisseDeco', 'etagere', 'enceinte34', 'flambeau', 'sacs'],
     densite: 0.75,
   },
   plage: {
@@ -123,7 +124,7 @@ const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAccessoire[]
       'enceinte34',
       'enceinte34',
     ],
-    dedans: ['caisseDeco', 'transat', 'enceinte34', 'tonneau', 'flambeau'],
+    dedans: ['caisseDeco', 'etagere', 'transat', 'enceinte34', 'tonneau', 'flambeau'],
     densite: 0.75,
   },
   ville: {
@@ -146,7 +147,7 @@ const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAccessoire[]
       'enceinte34',
       'enceinteDeco',
     ],
-    dedans: ['plante', 'caisseDeco', 'enceinte34', 'bidon', 'enceinte34', 'flambeau'],
+    dedans: ['plante', 'caisseDeco', 'etagere', 'enceinte34', 'bidon', 'enceinte34', 'flambeau'],
     densite: 0.75,
   },
   club: {
@@ -167,6 +168,7 @@ const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAccessoire[]
       'enceinte34',
       'projecteur',
       'boitierCd',
+      'etagere',
       'flambeau',
     ],
     densite: 0.7,
@@ -192,33 +194,8 @@ const PETITS = new Set<string>([
   'boiteAuxLettres',
 ]);
 
-/** Deux voitures ne se suivent jamais de plus près (en tuiles) : un fil rouge du décor, pas un parking. */
-const ECART_VOITURES = 24;
-
 /** Les accessoires sont dessinés pour un héros de 28 px : on les agrandit pour celui de 40 px. */
 const ECHELLE_ACCESSOIRES = 1.4;
-
-const SOLS_DECORES: number[] = [
-  T.TERRE,
-  T.BRIQUE,
-  T.NEIGE,
-  T.SABLE,
-  T.BETON,
-  T.ROCHE,
-  T.METAL,
-  T.BOIS,
-  T.GLACE,
-  T.PLATEFORME,
-  T.PITON,
-];
-
-/** Une tuile d'herbe : de la terre à l'air libre (rien de plein au-dessus, pas de paroi de fond). */
-const dehors = (carte: Carte, tx: number, ty: number): boolean =>
-  carte.get(tx, ty) === T.TERRE && !carte.solide(tx, ty - 1) && !carte.aFond(tx, ty - 1);
-
-/** Un sol décoré à l'air libre, de n'importe quelle matière (béton des villes compris) : rien de plein au-dessus. */
-const solLibre = (carte: Carte, tx: number, ty: number): boolean =>
-  SOLS_DECORES.includes(carte.get(tx, ty)) && !carte.solide(tx, ty - 1) && !carte.aFond(tx, ty - 1);
 
 /**
  * Le décor « bien chargé » du plan proche, derrière les héros : arbres, mobilier, panneaux, vaches
