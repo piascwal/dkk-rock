@@ -25,6 +25,7 @@ export interface Pose {
 const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAccessoire[]; densite: number }> = {
   garage: {
     dehors: [
+      'voiture',
       'enceinte34',
       'arbre',
       'buisson',
@@ -59,6 +60,7 @@ const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAccessoire[]
   },
   montagne: {
     dehors: [
+      'voiture',
       'sapin',
       'sapin',
       'sapin',
@@ -85,6 +87,7 @@ const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAccessoire[]
   },
   neige: {
     dehors: [
+      'voiture',
       'sapinNeige',
       'sapinNeige',
       'sapinNeige',
@@ -103,6 +106,7 @@ const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAccessoire[]
   },
   plage: {
     dehors: [
+      'voiture',
       'palmier',
       'palmier',
       'parasol',
@@ -124,6 +128,7 @@ const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAccessoire[]
   },
   ville: {
     dehors: [
+      'voiture',
       'lampadaire',
       'poubelle',
       'afficheRose',
@@ -235,7 +240,10 @@ export function semeDecor(carte: Carte, theme: NomTheme, graine: number): Pose[]
       )
         continue;
       poses.push({ tx, ty, quoi, v: rng.entier(0, 255), devant: false, dedans });
-      libreDepuis.set(ty, tx + (quoi === 'voiture' || quoi === 'vacheCasque' ? 4 : PETITS.has(quoi) ? 2 : 3));
+      libreDepuis.set(
+        ty,
+        tx + (quoi === 'voiture' ? 6 : quoi === 'vacheCasque' ? 4 : PETITS.has(quoi) ? 2 : 3),
+      );
     }
   }
   // des touffes, devant : de la profondeur dans l'autre sens

@@ -43,7 +43,7 @@ export const FEUILLES_DECOR: Record<string, Feuille> = {
   sapin: { fichier: 'sapin.png', w: 204, h: 266, images: [1, 1, 1], rythme: 1, densite: 6, pied: 102 },
   lampadaire: { fichier: 'lampadaire.png', w: 90, h: 240, images: [1], rythme: 1, densite: 6, pied: 45 },
   panneau: { fichier: 'panneau.png', w: 123, h: 139, images: [1, 1, 1, 1], rythme: 1, densite: 6, pied: 61 },
-  voiture: { fichier: 'voiture.png', w: 184, h: 127, images: [1, 1, 1], rythme: 1, densite: 6, pied: 92 },
+  voiture: { fichier: 'voiture.png', w: 270, h: 186, images: [1, 1, 1], rythme: 1, densite: 6, pied: 135 },
   tronc: { fichier: 'tronc.png', w: 114, h: 84, images: [1, 1], rythme: 1, densite: 6, pied: 57 },
   plante: { fichier: 'plante.png', w: 120, h: 126, images: [1, 1, 1, 1], rythme: 1, densite: 6, pied: 60 },
   feu: { fichier: 'feu.png', w: 84, h: 92, images: [1], rythme: 1, densite: 6, pied: 42 },

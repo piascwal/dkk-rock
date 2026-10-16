@@ -37,7 +37,7 @@ OBJETS = {
     # lot 7 : panneaux de bois (jamais retournés : on doit pouvoir lire l'inscription), voitures, bûches, plantes en pot
     # (cactus, pousse, retombante, grosse jardinière), feu de camp et poubelles (verte, kaki)
     'panneau': ([f'decor/panneau-{k}-base.png' for k in (1, 2, 3, 4)], None, 20),
-    'voiture': ([f'decor/voiture-{k}-base.png' for k in (1, 2, 3)], None, 30),
+    'voiture': ([f'decor/voiture-{k}-base.png' for k in (1, 2, 3)], None, 44),
     'tronc': ([f'decor/tronc-{k}-base.png' for k in (1, 2)], None, 19),
     'plante': ([f'decor/plante-{k}-base.png' for k in (1, 2, 3, 4)], None, 9),
     'feu': (['decor/feu-1-base.png'], None, 14),
