@@ -38,7 +38,7 @@ OBJETS = {
     # (cactus, pousse, retombante, grosse jardinière), feu de camp et poubelles (verte, kaki)
     'panneau': ([f'decor/panneau-{k}-base.png' for k in (1, 2, 3, 4)], None, 20),
     # la voiture 2 (la Mégane) est vue de trois quarts : le générateur la redresse (voir `redresse`) pour que ses roues touchent le sol
-    'voiture': ([f'decor/voiture-{k}-base.png' for k in (1, 2, 3)], None, 59),
+    'voiture': ([f'decor/voiture-{k}-base.png' for k in (1, 2, 3, 4, 5)], None, 59),
     'tronc': ([f'decor/tronc-{k}-base.png' for k in (1, 2)], None, 19),
     'plante': ([f'decor/plante-{k}-base.png' for k in (1, 2, 3, 4)], None, 9),
     'feu': (['decor/feu-1-base.png'], None, 14),
@@ -99,10 +99,26 @@ def redresse(a):
 
 
 def natif_brut(chemin):
+    """L'image à sa vraie grille : la plus grande case (de 1 à 8 px) dont tous les blocs opaques sont unis (1 si le dessin n'est pas
+    posé sur une grille plus large : on ne touche à rien). Les deux voitures de trois quarts sont ensuite redressées."""
     a = np.array(Image.open(chemin).convert('RGBA'))
-    if chemin.name == 'voiture-2-base.png':
+    case, depart = 1, (0, 0)
+    for c in range(2, 9):
+        for oy in range(c):
+            for ox in range(c):
+                h, w = (a.shape[0] - oy) // c * c, (a.shape[1] - ox) // c * c
+                b = a[oy : oy + h, ox : ox + w].astype(int).reshape(h // c, c, w // c, c, 4)
+                unis = np.abs(b - b[:, :1, :, :1]).sum((1, 3, 4)) == 0
+                opaques = b[:, 0, :, 0, 3] > 0
+                if unis[opaques].mean() >= 0.99:
+                    case, depart = c, (ox, oy)
+    ox, oy = depart
+    if case > 1:
+        h, w = (a.shape[0] - oy) // case * case, (a.shape[1] - ox) // case * case
+        a = a[oy : oy + h, ox : ox + w].reshape(h // case, case, w // case, case, 4)[:, 0, :, 0]
+    if chemin.name in ('voiture-2-base.png', 'voiture-5-base.png'):
         a = redresse(a)
-    return a, 1
+    return a, case
 
 
 def agrandit(chemin, largeur):
@@ -148,6 +164,9 @@ def main():
         images = []
         for nat, _ in etats:
             h, w = nat.shape[:2]
+            if nom in NATIF_BRUT:  # chaque image a sa grille : son propre facteur entier, pour une largeur en jeu voisine
+                largeur_etat = np.ptp(np.nonzero(nat[..., 3].any(0))[0]) + 1
+                echelle = max(1, round(largeur * DENSITE / largeur_etat))
             nw, nh = round(w * echelle), round(h * echelle)
             yy = np.minimum((np.arange(nh) / echelle).astype(int), h - 1)
             xx = np.minimum((np.arange(nw) / echelle).astype(int), w - 1)
