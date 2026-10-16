@@ -85,7 +85,7 @@ export function dessineSprite(
   if (quoi === 'arbre') return dessineDecorFeuille(ctx, 'arbre', v % 2, voile);
   if (quoi === 'tonneau') return dessineDecorFeuille(ctx, 'tonneau', 0, voile);
   // une voiture est un élément clé : jamais voilée, pour qu'on reconnaisse son modèle
-  if (quoi === 'voiture') return dessineDecorFeuille(ctx, 'voiture', v % 3);
+  if (quoi === 'voiture') return dessineDecorFeuille(ctx, 'voiture', v % 2);
   // les petits pots : cactus, pousse, plante retombante ; la grosse jardinière se réserve aux plantes d'intérieur
   if (quoi === 'pot') return dessineDecorFeuille(ctx, 'plante', v % 3, voile);
   if (quoi === 'plante') return dessineDecorFeuille(ctx, 'plante', v % 2 ? 3 : 2, voile);

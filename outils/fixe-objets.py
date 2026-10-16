@@ -37,7 +37,9 @@ OBJETS = {
     # lot 7 : panneaux de bois (jamais retournés : on doit pouvoir lire l'inscription), voitures, bûches, plantes en pot
     # (cactus, pousse, retombante, grosse jardinière), feu de camp et poubelles (verte, kaki)
     'panneau': ([f'decor/panneau-{k}-base.png' for k in (1, 2, 3, 4)], None, 20),
-    'voiture': ([f'decor/voiture-{k}-base.png' for k in (1, 2, 3)], None, 59),
+    # la voiture 2 est vue de trois quarts : ses roues ne sont pas à la même hauteur, elle flotterait toujours d'un côté ; on ne garde
+    # que les deux vues de profil, dont les quatre roues touchent le sol
+    'voiture': ([f'decor/voiture-{k}-base.png' for k in (1, 3)], None, 59),
     'tronc': ([f'decor/tronc-{k}-base.png' for k in (1, 2)], None, 19),
     'plante': ([f'decor/plante-{k}-base.png' for k in (1, 2, 3, 4)], None, 9),
     'feu': (['decor/feu-1-base.png'], None, 14),
