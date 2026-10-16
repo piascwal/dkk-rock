@@ -59,6 +59,9 @@ OBJETS = {
     'boitier-cd': (['armes/boitier-cd-base.png'], None, 10),
     # lot 10 : trois étagères de livres (une garnie de bibelots et d'un casque audio), pour les pièces intérieures
     'etagere': ([f'decor/etagere-{k}-base.png' for k in (1, 2, 3)], None, 34),
+    # lot 11-12 : des tas de rochers (gris, et sous la neige), en sprites fournis
+    'rocher': ([f'decor/rocher-{k}-base.png' for k in (1, 2, 3, 4)], None, 30),
+    'rocherNeige': ([f'decor/rocher-neige-{k}-base.png' for k in (1, 2, 3, 4)], None, 30),
     'parasol': ([f'decor/parasol-{k}-base.png' for k in (1, 2, 3)], None, 28),
     'poubelle': ([f'decor/poubelle-{k}-base.png' for k in (1, 2)], None, 11),
     # le tonneau de décor, sans pancarte (les tonneaux WOG sont des tuiles : outils/fixe-tuiles.py)
