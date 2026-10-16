@@ -18,7 +18,7 @@ from prepare_instrument import natif_et_case
 
 RACINE = pathlib.Path(__file__).resolve().parent.parent
 COTE = 96
-TUILES = ['caisse', 'caisson', 'tonneau-wog', 'tonneau-or']
+TUILES = ['caisse', 'caisson', 'tonneau-wog', 'tonneau-or', 'bois']
 # les tuiles qui gardent leurs proportions (un tonneau n'est pas carré) : centrées en bas de la case
 PROPORTIONS = {'tonneau-wog', 'tonneau-or'}
 

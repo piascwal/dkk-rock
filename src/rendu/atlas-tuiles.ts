@@ -161,6 +161,7 @@ const IMAGES_TUILES: Partial<Record<number, string>> = {
   [T.CAISSON]: 'tuile-caisson.png',
   [T.TONNEAU_WOG]: 'tuile-tonneau-wog.png',
   [T.TONNEAU_OR]: 'tuile-tonneau-or.png',
+  [T.BOIS]: 'tuile-bois.png',
 };
 const imagesTuiles = new Map<number, HTMLImageElement>();
 
