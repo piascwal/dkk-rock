@@ -37,9 +37,8 @@ OBJETS = {
     # lot 7 : panneaux de bois (jamais retournés : on doit pouvoir lire l'inscription), voitures, bûches, plantes en pot
     # (cactus, pousse, retombante, grosse jardinière), feu de camp et poubelles (verte, kaki)
     'panneau': ([f'decor/panneau-{k}-base.png' for k in (1, 2, 3, 4)], None, 20),
-    # la voiture 2 est vue de trois quarts : ses roues ne sont pas à la même hauteur, elle flotterait toujours d'un côté ; on ne garde
-    # que les deux vues de profil, dont les quatre roues touchent le sol
-    'voiture': ([f'decor/voiture-{k}-base.png' for k in (1, 3)], None, 59),
+    # la voiture 2 (la Mégane) est vue de trois quarts : le générateur la redresse (voir `redresse`) pour que ses roues touchent le sol
+    'voiture': ([f'decor/voiture-{k}-base.png' for k in (1, 2, 3)], None, 59),
     'tronc': ([f'decor/tronc-{k}-base.png' for k in (1, 2)], None, 19),
     'plante': ([f'decor/plante-{k}-base.png' for k in (1, 2, 3, 4)], None, 9),
     'feu': (['decor/feu-1-base.png'], None, 14),
@@ -80,8 +79,29 @@ OBJETS = {
 NATIF_BRUT = {'voiture'}
 
 
+def redresse(a):
+    """Une voiture vue de trois quarts a sa roue arrière plus haute que l'avant : on fait glisser chaque colonne d'un nombre entier
+    de pixels (un cisaillement, sans rééchantillonnage : le pixel art reste net) pour que les deux roues reposent sur la même ligne."""
+    al = a[..., 3] > 0
+    xs = np.nonzero(al.any(0))[0]
+    bas = {x: np.nonzero(al[:, x])[0].max() for x in xs}
+    milieu = (xs.min() + xs.max()) // 2
+    xr = max((x for x in xs if x < milieu), key=lambda x: bas[x])  # le bas de la roue arrière
+    xf = max((x for x in xs if x >= milieu), key=lambda x: bas[x])  # celui de la roue avant
+    pente = (bas[xf] - bas[xr]) / (xf - xr)
+    decal = {x: round(pente * (xf - x)) for x in xs}
+    mini = min(decal.values())
+    sortie = np.zeros((a.shape[0] + max(decal.values()) - mini, a.shape[1], 4), np.uint8)
+    for x in xs:
+        d = decal[x] - mini
+        sortie[d : d + a.shape[0], x] = a[:, x]
+    return sortie
+
+
 def natif_brut(chemin):
     a = np.array(Image.open(chemin).convert('RGBA'))
+    if chemin.name == 'voiture-2-base.png':
+        a = redresse(a)
     return a, 1
 
 
