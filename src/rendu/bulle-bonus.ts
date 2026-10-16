@@ -1,11 +1,43 @@
 import { G } from '../jeu/vue';
+import { disque } from './formes-pixels';
+
+/** Les cœurs (tonneaux de vie) n'ont pas de boîte : une aura qui bat, rose ou dorée. */
+const AURAS: Partial<Record<number, { halo: string; coeur: string }>> = {
+  [G.COEUR]: { halo: '255,90,120', coeur: '255,200,210' },
+  [G.COEUR_OR]: { halo: '255,210,60', coeur: '255,250,200' },
+};
+
+function dessineAuraCoeur(
+  ctx: CanvasRenderingContext2D,
+  a: { halo: string; coeur: string },
+  ms: number,
+): void {
+  const t = ms / 1000;
+  const bat = 1 + 0.12 * Math.sin(t * 6);
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  for (const [r, al, c] of [
+    [15, 0.12, a.halo],
+    [11, 0.18, a.halo],
+    [7, 0.24, a.coeur],
+  ] as const) {
+    ctx.fillStyle = `rgba(${c},${al})`;
+    disque(ctx, 0, -8, r * bat);
+  }
+  // quelques étincelles qui montent en tournant autour
+  ctx.fillStyle = `rgba(${a.coeur},0.9)`;
+  for (let i = 0; i < 4; i++) {
+    const ang = t * 2.2 + i * 1.57;
+    if (Math.sin(t * 9 + i * 2) > -0.3)
+      ctx.fillRect(Math.round(Math.cos(ang) * 11), Math.round(-8 + Math.sin(ang) * 10), 1, 1);
+  }
+  ctx.restore();
+}
 
 /** Les bonus à ramasser, enfermés dans une boîte de verre : taille (demi-largeur, hauteur) et teinte du verre. */
 const BULLES: Partial<Record<number, { demi: number; haut: number; verre: string; bord: string }>> = {
   [G.ARME]: { demi: 13, haut: 26, verre: '160,230,255', bord: '210,245,255' },
   [G.SOIN]: { demi: 11, haut: 22, verre: '255,225,120', bord: '255,240,170' },
-  [G.COEUR]: { demi: 11, haut: 22, verre: '255,150,170', bord: '255,205,215' },
-  [G.COEUR_OR]: { demi: 11, haut: 22, verre: '255,225,120', bord: '255,240,170' },
 };
 
 /**
@@ -14,6 +46,8 @@ const BULLES: Partial<Record<number, { demi: number; haut: number; verre: string
  * c'est quelque chose à prendre (pas du décor). Dessinée au pied du bonus (0, 0), par-dessus lui.
  */
 export function dessineBulle(ctx: CanvasRenderingContext2D, genre: number, ms: number): void {
+  const aura = AURAS[genre];
+  if (aura) return dessineAuraCoeur(ctx, aura, ms);
   const b = BULLES[genre];
   if (!b) return;
   const t = ms / 1000;
