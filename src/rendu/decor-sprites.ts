@@ -65,8 +65,11 @@ export const SPRITES: ReadonlySet<string> = new Set<Sprite>([
 ]);
 
 /** Les accessoires dessinés par une planche fournie (apparence tirée au sort selon `v`, tournée d'un côté ou de l'autre). */
-/** De combien les tas de rochers (au sol, jamais dedans) s'enfoncent, en pixels du jeu. */
-const ENFONCE_ROCHERS = 3;
+/**
+ * De combien les tas de rochers (au sol, jamais dedans) s'enfoncent, en pixels du jeu : assez pour que le pied le plus
+ * haut de leur contour rond (l'écart mesuré dans la planche, outils/fixe-objets.py) soit sous le sol.
+ */
+const ENFONCE_ROCHERS: Record<string, number> = { rocher: 7, rocherNeige: 5 };
 
 export function dessineSprite(
   ctx: CanvasRenderingContext2D,
@@ -83,7 +86,7 @@ export function dessineSprite(
   if (quoi === 'etagere') return dessineDecorFeuille(ctx, 'etagere', v % 3, voile);
   // les tas de rochers ont un pied rond : on les enfonce de quelques pixels, le sol (dessiné devant) cache le bas irrégulier
   if (quoi === 'rocher' || quoi === 'rocherNeige') {
-    ctx.translate(0, ENFONCE_ROCHERS);
+    ctx.translate(0, ENFONCE_ROCHERS[quoi] ?? 0);
     return dessineDecorFeuille(ctx, quoi === 'rocher' ? 'rocher' : 'rocherNeige', v % 4, voile);
   }
   // un peu enfoncé : l'herbe des tuiles, dessinée ensuite, cache le pied
