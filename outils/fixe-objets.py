@@ -19,6 +19,10 @@ from prepare_instrument import natif_et_case
 
 RACINE = pathlib.Path(__file__).resolve().parent.parent
 DENSITE = 6
+# des planches plus fines que 6 pixels par pixel du jeu, et réduites avec lissage (au lieu d'un agrandissement entier, qui donne des
+# pixels inégaux quand l'écran n'est pas un multiple de la planche) : le DJ, très détaillé, plus grand que le reste
+DENSITES = {'dj': 8}
+LISSES = {'dj'}
 # objet : (fichiers sources, un par état (une ligne de la planche chacun), genre dans jeu/vue.ts, largeur en jeu en pixels)
 OBJETS = {
     'van': (['van-base.png'], 'VAN', 56),
@@ -164,16 +168,21 @@ def main():
         # tous les états ont la même échelle (celle du premier) pour que l'objet ne change pas de taille en s'ouvrant
         premier = etats[0][0]
         w0 = np.ptp(np.nonzero(premier[..., 3].any(0))[0]) + 1  # la largeur du personnage, pas celle du cadre commun
-        echelle = largeur * DENSITE / w0
-        if nom in NATIF_BRUT or nom == 'dj':
+        dens = DENSITES.get(nom, DENSITE)
+        echelle = largeur * dens / w0
+        if nom in NATIF_BRUT:
             echelle = max(1, round(echelle))  # entier : pas de pixel plus large que son voisin
         images = []
         for nat, _ in etats:
             h, w = nat.shape[:2]
             if nom in NATIF_BRUT:  # chaque image a sa grille : son propre facteur entier, pour une largeur en jeu voisine
                 largeur_etat = np.ptp(np.nonzero(nat[..., 3].any(0))[0]) + 1
-                echelle = max(1, round(largeur * DENSITE / largeur_etat))
+                echelle = max(1, round(largeur * dens / largeur_etat))
             nw, nh = round(w * echelle), round(h * echelle)
+            if nom in LISSES:  # chaque pixel d'origine agrandi nettement (×4), puis réduit à la taille voulue avec un filtre de qualité
+                gros = Image.fromarray(np.repeat(np.repeat(nat, 4, axis=0), 4, axis=1))
+                images.append(gros.resize((nw, nh), Image.LANCZOS))
+                continue
             yy = np.minimum((np.arange(nh) / echelle).astype(int), h - 1)
             xx = np.minimum((np.arange(nw) / echelle).astype(int), w - 1)
             images.append(Image.fromarray(nat[np.ix_(yy, xx)]))
@@ -181,12 +190,24 @@ def main():
         planche = Image.new('RGBA', (cw, ch * len(images)), (0, 0, 0, 0))
         for k, im in enumerate(images):  # centré, posé en bas de sa case
             planche.alpha_composite(im, ((cw - im.width) // 2, k * ch + ch - im.height))
-        planche.save(RACINE / 'public' / 'sprites' / f'{nom}.png')
-        print(f'{nom}.png : {len(images)} état(s), {cw}x{ch} px de planche, {cw / DENSITE:.0f}x{ch / DENSITE:.0f} en jeu')
+        # 256 couleurs suffisent aux planches lissées (visuellement identique) : 2 Mo de moins à charger et à garder hors ligne
+        sortie = (
+            planche.quantize(256, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.NONE) if nom in LISSES else planche
+        )
+        sortie.save(RACINE / 'public' / 'sprites' / f'{nom}.png', optimize=nom in LISSES)
+        print(f'{nom}.png : {len(images)} état(s), {cw}x{ch} px de planche, {cw / dens:.0f}x{ch / dens:.0f} en jeu')
         ligne = ', '.join(['1'] * len(images))
+        extra = ''
+        if nom == 'dj':
+            # les pieds des montants de l'éclairage (les colonnes du bord) doivent toucher le sol : le socle des platines, plus bas,
+            # s'enfonce dans le sol (la planche est coupée à la ligne du sol à l'affichage)
+            a = np.array(planche)[..., 3] > 0
+            bord = max(1, cw // 12)
+            bas_montants = max(np.nonzero(a[:ch][:, c])[0].max() for c in list(range(bord)) + list(range(cw - bord, cw)) if a[:ch][:, c].any())
+            extra = f', enfonce: {round((ch - 1 - bas_montants) / dens, 1)}'
         cle = f'[G.{genre}]' if genre else f"'{nom}'"
         (lignes if genre else decors).append(
-            f"  {cle}: {{ fichier: '{nom}.png', w: {cw}, h: {ch}, images: [{ligne}], rythme: 1, densite: {DENSITE}, pied: {cw // 2} }},"
+            f"  {cle}: {{ fichier: '{nom}.png', w: {cw}, h: {ch}, images: [{ligne}], rythme: 1, densite: {dens}, pied: {cw // 2}{extra} }},"
         )
     (RACINE / 'src' / 'rendu' / 'feuilles-objets.ts').write_text(
         "// Fichier généré par outils/fixe-objets.py : ne pas modifier à la main.\n"

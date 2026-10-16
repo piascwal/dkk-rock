@@ -298,19 +298,28 @@ def arene_du_yeti(r):
 
 
 def arene_du_dj(r):
-    """L'arène de DJ Boucle : plate, close par un mur de métal ; deux estrades de pitons de part et d'autre pour esquiver les ondes
-    de ses enceintes (qui se dressent à sept tuiles de lui), un médiator sur chacune. Pas de van : le niveau finit avec le DJ."""
+    """L'arène de DJ Boucle : plate, close par un mur de métal. Sous la scène (le DJ et ses deux enceintes, à sept tuiles de lui),
+    du socle incassable : on ne peut pas faire tomber le boss en creusant. Quatre estrades de pitons pour esquiver les ondes au sol
+    et les bombes du Drop : deux au fond, deux plus près de la scène ; un médiator sur chacune des estrades du fond. Pas de van :
+    le niveau finit avec le DJ."""
     n = r.n
     x0 = n.w - 70
     n.niveler(x0, n.w)
     n.rect(n.w - 4, 3, n.w, n.base, 'M')
+    n.rect(x0 + 28, n.base, x0 + 45, n.base + 4, 'X')  # le sol de la scène, incassable
     n.repere(x0 + 36, 'Z', surface=True)
-    for a, b in ((x0 + 8, x0 + 20), (n.w - 24, n.w - 12)):
+    for a, b, y, butin in (
+        (x0 + 6, x0 + 16, n.base - 5, True),
+        (x0 + 20, x0 + 27, n.base - 4, False),
+        (x0 + 47, x0 + 54, n.base - 4, False),
+        (x0 + 58, x0 + 64, n.base - 5, True),
+    ):
         for x in range(a, b):
-            n.set(x, n.base - 5, '=')
-        n.repere((a + b) // 2, '+', ymin=n.base - 6)
+            n.set(x, y, '=')
+        if butin:
+            n.repere((a + b) // 2, '+', ymin=y - 1)
     n.ennemis(x0 + 4, x0 + 28, 'bcd', 3)
-    n.ennemis(x0 + 44, n.w - 6, 'bcd', 3)
+    n.ennemis(x0 + 46, n.w - 6, 'bcd', 3)
 
 
 def interieur(n):

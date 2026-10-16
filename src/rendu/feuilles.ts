@@ -53,6 +53,11 @@ export interface Feuille {
   cycle?: number;
   /** agrandissement du sprite (1 par défaut) : la planche peut être plus fine que le jeu */
   echelle?: number;
+  /**
+   * Pixels du jeu dont le sprite s'enfonce sous la ligne des pieds (le DJ : les montants de son éclairage touchent le sol, son
+   * socle est plus bas) : tout ce qui dépasse sous cette ligne est coupé à l'affichage.
+   */
+  enfonce?: number;
 }
 
 /**
