@@ -37,7 +37,7 @@ OBJETS = {
     # lot 7 : panneaux de bois (jamais retournés : on doit pouvoir lire l'inscription), voitures, bûches, plantes en pot
     # (cactus, pousse, retombante, grosse jardinière), feu de camp et poubelles (verte, kaki)
     'panneau': ([f'decor/panneau-{k}-base.png' for k in (1, 2, 3, 4)], None, 20),
-    'voiture': ([f'decor/voiture-{k}-base.png' for k in (1, 2, 3)], None, 44),
+    'voiture': ([f'decor/voiture-{k}-base.png' for k in (1, 2, 3)], None, 59),
     'tronc': ([f'decor/tronc-{k}-base.png' for k in (1, 2)], None, 19),
     'plante': ([f'decor/plante-{k}-base.png' for k in (1, 2, 3, 4)], None, 9),
     'feu': (['decor/feu-1-base.png'], None, 14),
@@ -70,6 +70,17 @@ OBJETS = {
 }
 
 
+# Ces images ne sont pas du pixel art sur une grille de 2 : leurs pixels sont déjà ceux du jeu. Les ramener à la grille
+# détecterait une case fausse et abîmerait le dessin (bruit, détails perdus) ; on les prend telles quelles, et on les agrandit
+# d'un facteur entier pour que chaque pixel reste carré.
+NATIF_BRUT = {'voiture'}
+
+
+def natif_brut(chemin):
+    a = np.array(Image.open(chemin).convert('RGBA'))
+    return a, 1
+
+
 def agrandit(chemin, largeur):
     """Le sprite remis sur sa grille, recadré, agrandi sans lissage à `largeur` px de planche."""
     nat, case = natif_et_case(chemin)
@@ -96,12 +107,20 @@ def main():
     for nom, (sources, genre, largeur, *commun) in OBJETS.items():
         if commun:
             etats = cadre_commun([RACINE / 'assets-sources' / s for s in sources])
+        elif nom in NATIF_BRUT:
+            etats = []
+            for s in sources:
+                nat, case = natif_brut(RACINE / 'assets-sources' / s)
+                ys, xs = np.nonzero(nat[..., 3])
+                etats.append((nat[ys.min() : ys.max() + 1, xs.min() : xs.max() + 1], case))
         else:
             etats = [agrandit(RACINE / 'assets-sources' / s, largeur) for s in sources]
         # tous les états ont la même échelle (celle du premier) pour que l'objet ne change pas de taille en s'ouvrant
         premier = etats[0][0]
         w0 = np.ptp(np.nonzero(premier[..., 3].any(0))[0]) + 1  # la largeur du personnage, pas celle du cadre commun
         echelle = largeur * DENSITE / w0
+        if nom in NATIF_BRUT:
+            echelle = max(1, round(echelle))  # entier : pas de pixel plus large que son voisin
         images = []
         for nat, _ in etats:
             h, w = nat.shape[:2]

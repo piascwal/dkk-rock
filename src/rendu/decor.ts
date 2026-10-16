@@ -192,6 +192,9 @@ const PETITS = new Set<string>([
   'boiteAuxLettres',
 ]);
 
+/** Deux voitures ne se suivent jamais de plus près (en tuiles) : un fil rouge du décor, pas un parking. */
+const ECART_VOITURES = 24;
+
 /** Les accessoires sont dessinés pour un héros de 28 px : on les agrandit pour celui de 40 px. */
 const ECHELLE_ACCESSOIRES = 1.4;
 
@@ -213,6 +216,10 @@ const SOLS_DECORES: number[] = [
 const dehors = (carte: Carte, tx: number, ty: number): boolean =>
   carte.get(tx, ty) === T.TERRE && !carte.solide(tx, ty - 1) && !carte.aFond(tx, ty - 1);
 
+/** Un sol décoré à l'air libre, de n'importe quelle matière (béton des villes compris) : rien de plein au-dessus. */
+const solLibre = (carte: Carte, tx: number, ty: number): boolean =>
+  SOLS_DECORES.includes(carte.get(tx, ty)) && !carte.solide(tx, ty - 1) && !carte.aFond(tx, ty - 1);
+
 /**
  * Le décor « bien chargé » du plan proche, derrière les héros : arbres, mobilier, panneaux, vaches
  * à casque... semés au chargement du niveau, toujours au même endroit pour une même carte.
@@ -224,6 +231,7 @@ export function semeDecor(carte: Carte, theme: NomTheme, graine: number): Pose[]
   const poses: Pose[] = [];
   // chaque rangée garde son propre espacement : des accessoires sur le sol, sur les passerelles, sur les toits
   const libreDepuis = new Map<number, number>();
+  let derniereVoiture = -ECART_VOITURES;
   for (let tx = 3; tx < carte.largeur - 3; tx++) {
     for (let ty = 1; ty < carte.hauteur - 1; ty++) {
       const sol = carte.get(tx, ty);
@@ -234,6 +242,15 @@ export function semeDecor(carte: Carte, theme: NomTheme, graine: number): Pose[]
       const dedans = carte.aFond(tx, ty - 1);
       const quoi = rng.choix(dedans ? semis.dedans : semis.dehors);
       // une vache a besoin de pré : de l'herbe sous elle et sous ses voisines, sinon elle finit dans le sous-sol
+      // une voiture a besoin de cinq tuiles de sol d'affilée (sinon elle déborde d'une corniche) et ne côtoie pas une autre
+      // voiture : une tous les vingt-quatre tuiles au plus, tous niveaux de sol confondus
+      if (
+        quoi === 'voiture' &&
+        (tx - derniereVoiture < ECART_VOITURES ||
+          ![-2, -1, 0, 1, 2].every((d) => solLibre(carte, tx + d, ty)))
+      )
+        continue;
+      if (quoi === 'voiture') derniereVoiture = tx;
       if (
         quoi === 'vacheCasque' &&
         !(dehors(carte, tx - 1, ty) && dehors(carte, tx, ty) && dehors(carte, tx + 1, ty))
@@ -249,8 +266,7 @@ export function semeDecor(carte: Carte, theme: NomTheme, graine: number): Pose[]
   // des touffes, devant : de la profondeur dans l'autre sens
   for (let tx = 1; tx < carte.largeur - 1; tx++)
     for (let ty = 1; ty < carte.hauteur - 1; ty++) {
-      if (!SOLS_DECORES.includes(carte.get(tx, ty)) || carte.solide(tx, ty - 1) || carte.aFond(tx, ty - 1))
-        continue;
+      if (!solLibre(carte, tx, ty)) continue;
       if (rng.suivant() < 0.5)
         poses.push({ tx, ty, quoi: 'buisson', v: rng.entier(0, 255), devant: true, dedans: false });
       break;
