@@ -9,7 +9,7 @@ self.addEventListener('install', (e) => {
   e.waitUntil(
     caches
       .open(CACHE)
-      .then((c) => c.addAll(FICHIERS))
+      .then((c) => c.addAll(FICHIERS.map((f) => new Request(f, { cache: 'reload' })))) // « reload » : jamais la copie du cache HTTP
       .then(() => self.skipWaiting()),
   );
 });
@@ -30,6 +30,14 @@ self.addEventListener('activate', (e) => {
 
 // la page et version.json : le réseau d'abord (pour voir les mises à jour), le cache si on est hors ligne ;
 // tout le reste (fichiers à empreinte, sprites) : le cache d'abord
+// la version courante d'abord : `caches.match` seul fouille les caches dans l'ordre de leur création, et ressortirait
+// l'ancien sprite (même nom de fichier) de la version précédente, que l'on garde
+const trouve = (req) =>
+  caches
+    .open(CACHE)
+    .then((c) => c.match(req, { ignoreSearch: true }))
+    .then((r) => r || caches.match(req, { ignoreSearch: true }));
+
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) return;
@@ -39,13 +47,13 @@ self.addEventListener('fetch', (e) => {
     // qui réclame les fichiers d'une version déjà effacée : écran vide
     e.respondWith(
       fetch(req.url, { cache: 'no-cache', credentials: 'same-origin' }).catch(() =>
-        caches.match(req, { ignoreSearch: true }).then((r) => r || caches.match('./')),
+        trouve(req).then((r) => r || caches.match('./')),
       ),
     );
     return;
   }
   e.respondWith(
-    caches.match(req, { ignoreSearch: true }).then(
+    trouve(req).then(
       (r) =>
         r ||
         fetch(req).then((rep) => {
