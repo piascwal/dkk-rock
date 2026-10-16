@@ -6,7 +6,7 @@ import { ACCESSOIRES, type NomAccessoire } from './decor-objets';
 import { imageTuile } from './atlas-tuiles';
 import { pinceau } from './pinceau';
 import { dessineDecorFeuille } from './feuilles-images';
-import { ECART_VOITURES, SOLS_DECORES, dehors, solLibre } from './decor-sol';
+import { ECART_VOITURES, SOLS_DECORES, dehors, echelleProche, solLibre } from './decor-sol';
 import { dessineSprite, SPRITES, type Sprite } from './decor-sprites';
 import type { NomTheme } from './themes';
 
@@ -212,8 +212,7 @@ export function semeDecor(carte: Carte, theme: NomTheme, graine: number): Pose[]
   for (let tx = 3; tx < carte.largeur - 3; tx++) {
     for (let ty = 1; ty < carte.hauteur - 1; ty++) {
       const sol = carte.get(tx, ty);
-      if (!SOLS_DECORES.includes(sol) || carte.solide(tx, ty - 1) || carte.props(tx, ty - 1).echelle)
-        continue;
+      if (!SOLS_DECORES.includes(sol) || carte.solide(tx, ty - 1) || echelleProche(carte, tx, ty)) continue;
       if (carte.props(tx, ty - 1).solide || tx < (libreDepuis.get(ty) ?? 0) || rng.suivant() > semis.densite)
         continue;
       const dedans = carte.aFond(tx, ty - 1);
@@ -243,7 +242,7 @@ export function semeDecor(carte: Carte, theme: NomTheme, graine: number): Pose[]
   // des touffes, devant : de la profondeur dans l'autre sens
   for (let tx = 1; tx < carte.largeur - 1; tx++)
     for (let ty = 1; ty < carte.hauteur - 1; ty++) {
-      if (!solLibre(carte, tx, ty)) continue;
+      if (!solLibre(carte, tx, ty) || echelleProche(carte, tx, ty)) continue;
       if (rng.suivant() < 0.5)
         poses.push({ tx, ty, quoi: 'buisson', v: rng.entier(0, 255), devant: true, dedans: false });
       break;

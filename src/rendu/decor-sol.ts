@@ -25,3 +25,13 @@ export const dehors = (carte: Carte, tx: number, ty: number): boolean =>
 /** Un sol décoré à l'air libre, de n'importe quelle matière (béton des villes compris) : rien de plein au-dessus. */
 export const solLibre = (carte: Carte, tx: number, ty: number): boolean =>
   SOLS_DECORES.includes(carte.get(tx, ty)) && !carte.solide(tx, ty - 1) && !carte.aFond(tx, ty - 1);
+
+/**
+ * Une échelle à moins de deux tuiles de part et d'autre, et jusqu'à cinq tuiles au-dessus : un accessoire posé là serait
+ * dessiné devant elle (ou derrière elle, en la cachant). Les accessoires les plus hauts tiennent dans cette zone.
+ */
+export const echelleProche = (carte: Carte, tx: number, ty: number): boolean => {
+  for (let dx = -2; dx <= 2; dx++)
+    for (let dy = 1; dy <= 5; dy++) if (carte.props(tx + dx, ty - dy).echelle) return true;
+  return false;
+};
