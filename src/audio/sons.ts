@@ -10,7 +10,11 @@ const accord = (s: Synthe, v: number, f: number, d = 0.18) => {
 
 /** Le catalogue des bruitages, par nom (les noms sont ceux que la partie émet). */
 const SONS: Record<string, Son> = {
-  baguette: (s, v) => s.bruit({ duree: 0.05, volume: 0.25 * v, passeHaut: 3000 }),
+  // le tir de base de JBT : un claquement de baguette, assez fort pour se détacher de la musique
+  baguette: (s, v) => {
+    s.bruit({ duree: 0.05, volume: 0.5 * v, passeHaut: 3000 });
+    s.note({ freq: 1400, vers: 900, duree: 0.03, type: 'triangle', volume: 0.12 * v });
+  },
   cri: (s, v) => {
     s.note({
       freq: 520 + Math.random() * 80,
