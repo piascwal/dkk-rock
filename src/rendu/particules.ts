@@ -30,7 +30,8 @@ const CONFETTIS = ['#ff4fd8', '#ffd23f', '#3fa7f2', '#7cfc7c', '#ff6b35', '#ffff
 export class Particules {
   private liste: Particule[] = [];
 
-  private ajoute(p: Omit<Particule, 'vieMax'>): void {
+  /** Une particule de plus (public : les effets propres au décor, debris-decor.ts, s'en servent). */
+  ajoute(p: Omit<Particule, 'vieMax'>): void {
     if (this.liste.length >= MAX) this.liste.shift();
     this.liste.push({ ...p, vieMax: p.vie });
   }

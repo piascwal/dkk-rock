@@ -4,6 +4,7 @@ import { herosDuGenre } from '../entites/heros';
 import { ANIM, G, type EntiteVue } from '../jeu/vue';
 import type { AtlasTuiles } from './atlas-tuiles';
 import { dessineAura } from './aura';
+import { dessineBulle } from './bulle-bonus';
 import { DESSINS_BOSS } from './dessins-boss';
 import { DESSINS_ENNEMIS } from './dessins-ennemis';
 import { dessineDecorFeuille, dessineFeuille } from './feuilles-images';
@@ -13,6 +14,7 @@ import { DESSINS_OBJETS, iconeArme } from './dessins-objets';
 import { DEMI_TAILLE, DESSINS_TIRS } from './dessins-tirs';
 import { pinceau } from './pinceau';
 import { ecritCentre } from './police';
+import type { Theme } from './themes';
 
 const DRAPEAUX_SANS_MIROIR = new Set<number>([
   G.CAGE,
@@ -40,6 +42,7 @@ export function dessineEntite(
   camX: number,
   camY: number,
   atlas: AtlasTuiles,
+  lueur?: Theme['lueur'],
 ): void {
   // la position se cale sur la grille de la planche : le pixel du jeu, ou son tiers pour une planche en pleine définition
   const d = FEUILLES[v.g]?.densite ?? 1;
@@ -61,6 +64,11 @@ export function dessineEntite(
   if (v.clignote && heros) ctx.globalAlpha = 0.35;
 
   ctx.save();
+  // monde sombre : un liseré lumineux détache les personnages du fond (cyan pour les héros, rose pour ceux d'en face)
+  if (lueur && v.g < G.P_BAGUETTE && !aTerre) {
+    ctx.shadowColor = heros ? lueur.heros : lueur.ennemis;
+    ctx.shadowBlur = heros ? 10 : 6;
+  }
   ctx.translate(x, y);
   if (v.gauche && !DRAPEAUX_SANS_MIROIR.has(v.g)) ctx.scale(-1, 1);
   if (aTerre) {
@@ -111,6 +119,7 @@ export function dessineEntite(
       if (v.g === G.ARME) iconeArme(p, v.f, 0);
     }
   }
+  dessineBulle(ctx, v.g, performance.now());
   ctx.restore();
   ctx.globalAlpha = 1;
 

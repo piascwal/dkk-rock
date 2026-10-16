@@ -48,10 +48,14 @@ minimale, et le Yéti Alpha) → la Plage du Tube de l'Été → la Ville Autotu
   dans `src/rendu/traits-persos.ts`, côté rendu et d'après la vue (rien à changer dans la simulation ni le protocole) ; les
   emojis sont dans `src/rendu/emojis.ts`.
 - **Cages** : un membre du groupe y est enfermé. Le libérer donne une vie (cinq au plus : au maximum, on change seulement de personnage), et on prend sa place. Chaque niveau en cache quatre ou cinq.
+- **Chaos visuel** (sans dégât en plus) : quand la tuile qui porte un accessoire de décor est détruite, des morceaux colorés
+  s'envolent (`rendu/debris-decor.ts`, notes en plus pour les enceintes) ; les bonus (armes, médiators, cœurs) sont enfermés dans
+  une boîte de verre qui ondule et brille (`rendu/bulle-bonus.ts`) ; dans les mondes sombres (ville, club), un liseré lumineux
+  détache les personnages du fond (`Theme.lueur`, cyan pour les héros, rose pour les autres) ; des enceintes dans chaque monde.
 - **Armes à ramasser** : lecteur minidisc (disque à ondes), pile alcaline (rafale), flipper (le
   dauphin rebondit puis explose), frisbee (guidé vers les ennemis), machine à donuts (explosifs),
   **chauffage soufflant** (compagnon) ; l'icône de l'arme remplace « TIR » sur le bouton ; un boîtier de CD « L5 »
-  traîne dans les coulisses des clubs (clin d'œil à un plaisir coupable) ; médiators d'or** : soin et spécial.
+  traîne dans les coulisses des clubs (clin d'œil à un plaisir coupable) ; **médiators d'or** : soin et spécial.
   Le **chauffage soufflant** est une arme-compagnon (`entites/chauffage.ts`, `DefArme.compagnon`) : il suit le héros à la place
   de Fadatchi en avançant par petits bonds, passe devant lui quand il tire et crache un gros jet de flammes par le centre du
   cercle de sa grille ; quand les munitions s'épuisent (ou que le héros change d'arme ou tombe), il s'en va et le kiwi revient.

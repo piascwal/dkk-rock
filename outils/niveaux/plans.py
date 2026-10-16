@@ -148,4 +148,24 @@ NIVEAUX = {
             ('arene', 48, dict(lettres='acdrf')),
         ],
     ),
+    'club': dict(
+        nom='Le Club Infini', theme='club', textes='06-club.ts', fichier='06-club.ts',
+        constante='CARTE_CLUB', graine=66, base=30, raccord='abc', caves='abc', van=False, interieur=True,
+        lieux=[
+            ('plat', 14, dict(lettres='ab', deco=3, digit='1')),  # les videurs de l'entrée
+            ('forteresse', 34, dict(etages=3, lettres='abc', mat='M', cage=True)),  # le hall et ses mezzanines
+            ('scene', 36, dict(lettres='acf')),  # la première scène, ses basses et ses projecteurs
+            ('barrage', 20, dict(haut=12, lettres='bcf', butin='*')),
+            ('plat', 10, dict(lettres='bc', digit='2')),  # la ligne de basse
+            ('tour', 22, dict(etages=4, lettres='abdf', mat='M', vitre=True)),  # les loges
+            ('traversee', 36, dict(lettres='cdf')),
+            ('gouffre', 20, dict(lettres='cdf', nb=4)),  # la fosse
+            ('echafaudage', 22, dict(niveaux=3, lettres='cdf')),  # les structures de la régie
+            ('forteresse', 38, dict(etages=4, lettres='abcd', mat='M', cage=True)),  # l'espace VIP
+            ('scene', 36, dict(lettres='bcdf')),  # la grande scène
+            ('mur', 18, dict(haut=7, lettres='bcd')),
+            ('plat', 12, dict(lettres='bcdr', digit='3', drones=1)),  # le DJ, juste derrière
+            ('vide', 70, dict()),  # l'arène de DJ Boucle (outils/genere-niveaux.py : arene_du_dj)
+        ],
+    ),
 }

@@ -16,6 +16,8 @@ export interface Theme {
   dessus: string;
   terre: string;
   decor: Decor;
+  /** monde sombre : la lueur qui détache héros et ennemis du fond (liseré lumineux) */
+  lueur?: { heros: string; ennemis: string };
   meteo: 'neige' | 'lucioles' | 'confettis' | null;
   /** motif musical (voir audio/musique.ts) */
   musique: 'garage' | 'montagne' | 'neige' | 'plage' | 'ville' | 'boss';
@@ -74,6 +76,7 @@ export const THEMES: Record<NomTheme, Theme> = {
     dessus: '#7b7b85',
     terre: '#55555e',
     decor: 'immeubles',
+    lueur: { heros: '#8fe8ff', ennemis: '#ff7ad9' },
     meteo: null,
     musique: 'ville',
   },
@@ -85,6 +88,7 @@ export const THEMES: Record<NomTheme, Theme> = {
     dessus: '#3d3550',
     terre: '#2a2438',
     decor: 'club',
+    lueur: { heros: '#8fe8ff', ennemis: '#ff7ad9' },
     meteo: 'confettis',
     musique: 'boss',
   },

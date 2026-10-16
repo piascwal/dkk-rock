@@ -15,7 +15,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent / 'niveaux'))
 from peintre import Niveau
 from plans import NIVEAUX, enchaine
 from souterrain import souterrain, tonneaux_de_surface
-from signatures import falaise, glacier, parking, ponton, toits
+from signatures import falaise, glacier, parking, ponton, scene, toits
 from structures import forteresse, traversee
 from verrous import barrage, gouffre
 
@@ -29,6 +29,7 @@ THEMES = {
     'cimes': dict(sol='N', sous='R', profond='R', mur='R', deco=['G']),
     'plage': dict(sol='S', sous='S', profond='#', mur='W', deco=['C', 'W']),
     'ville': dict(sol='D', sous='D', profond='D', mur='D', deco=['C', 'T', 'M']),
+    'club': dict(sol='D', sous='D', profond='D', mur='M', deco=['C', 'T', 'T']),
 }
 
 
@@ -172,6 +173,9 @@ class Recette:
     def p_ponton(self, x0, x1, lettres='a'):
         ponton(self.n, x0, x1 - x0, lettres, self.n.t['mur'])
 
+    def p_scene(self, x0, x1, lettres='a'):
+        scene(self.n, x0, x1 - x0, lettres, 'D')
+
     def p_toits(self, x0, x1, lettres='a'):
         toits(self.n, x0, x1 - x0, lettres, self.n.t['mur'])
 
@@ -233,7 +237,7 @@ def apercu(lignes, nom, z=3):
 # Les recettes. Chaque recette : une liste de pièces (genre, largeur, options), puis les galeries et le butin.
 
 
-def construit(nom, theme, textes, plan, fichier, constante, graine, base=30):  # fichier et constante : inutilisés ici
+def construit(nom, theme, textes, plan, fichier, constante, graine, base=30, van=True):  # fichier et constante : inutilisés ici
     total = 12 + sum(p[1] for p in plan)
     r = Recette(nom, theme, textes, largeur=total, graine=graine, base=base)
     n = r.n
@@ -257,8 +261,9 @@ def construit(nom, theme, textes, plan, fichier, constante, graine, base=30):  #
     for x0, x1, g in r.pieces:
         if g in ('arene', 'vide') and x1 - x0 >= 40:
             r.drapeau(x0 + 3)
-    # le van, au bout
-    n.repere(total - 5, 'F', surface=True)
+    # le van, au bout (le club n'en a pas : le niveau finit avec le DJ)
+    if van:
+        n.repere(total - 5, 'F', surface=True)
     return r
 
 
@@ -266,11 +271,15 @@ def fabrique(cle):
     """Construit un niveau d'après son plan (outils/niveaux/plans.py), puis ses caves, et l'écrit."""
     cfg = NIVEAUX[cle]
     plan = enchaine(cfg['lieux'], cfg['graine'], cfg['raccord'])
-    r = construit(cfg['nom'], cfg['theme'], cfg['textes'], plan, '', '', cfg['graine'], base=cfg['base'])
+    r = construit(cfg['nom'], cfg['theme'], cfg['textes'], plan, '', '', cfg['graine'], base=cfg['base'], van=cfg.get('van', True))
     souterrain(r, cfg['caves'])
     tonneaux_de_surface(r)
     if cle == 'cimes':
         arene_du_yeti(r)
+    if cle == 'club':
+        arene_du_dj(r)
+    if cfg.get('interieur'):
+        interieur(r.n)
     r.ecrit(0, cfg['fichier'], cfg['constante'])
     return r
 
@@ -286,6 +295,32 @@ def arene_du_yeti(r):
     n.rect(x0 + 8, n.base - 9, x0 + 22, n.base - 8, 'G')
     n.rect(x0 + 38, n.base - 9, x0 + 52, n.base - 8, 'G')
     n.repere(n.w - 5, 'F', surface=True)
+
+
+def arene_du_dj(r):
+    """L'arène de DJ Boucle : plate, close par un mur de métal ; deux estrades de pitons de part et d'autre pour esquiver les ondes
+    de ses enceintes (qui se dressent à sept tuiles de lui), un médiator sur chacune. Pas de van : le niveau finit avec le DJ."""
+    n = r.n
+    x0 = n.w - 70
+    n.niveler(x0, n.w)
+    n.rect(n.w - 4, 3, n.w, n.base, 'M')
+    n.repere(x0 + 36, 'Z', surface=True)
+    for a, b in ((x0 + 8, x0 + 20), (n.w - 24, n.w - 12)):
+        for x in range(a, b):
+            n.set(x, n.base - 5, '=')
+        n.repere((a + b) // 2, '+', ymin=n.base - 6)
+    n.ennemis(x0 + 4, x0 + 28, 'bcd', 3)
+    n.ennemis(x0 + 44, n.w - 6, 'bcd', 3)
+
+
+def interieur(n):
+    """Un club est une salle : un plafond de métal, un mur au bout, et un mur de fond derrière tout ce qui est creux au-dessus du sol."""
+    plafond = 2
+    for y in range(0, n.base):
+        for x in range(n.w):
+            if n.g[y][x] != ' ':
+                continue
+            n.g[y][x] = 'M' if y <= plafond or x == 0 else '.'
 
 
 if __name__ == '__main__':

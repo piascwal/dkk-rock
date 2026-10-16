@@ -148,3 +148,26 @@ def toits(n, x0, largeur, lettres='a', mat='D'):
     for y in range(tops[2], base):  # l'échelle de descente, derrière le dernier
         n.set(x - 2 + 0, y, 'H')
     n.ennemis(x0, x, lettres, 2)
+
+
+def scene(n, x0, largeur, lettres='a', mat='D'):
+    """La scène d'un club : une estrade de deux tuiles (une marche de chaque côté) avec deux caissons de basses à ses extrémités,
+    et au-dessus un portique de pitons (les projecteurs), gagné par une échelle depuis l'estrade : une arme y attend. Des
+    danseurs sur l'estrade, des gardes devant."""
+    base = n.base
+    xs = x0 + 7
+    w = min(18, largeur - 16)
+    n.rect(xs - 2, base - 1, xs, base, mat)  # les marches
+    n.rect(xs + w, base - 1, xs + w + 2, base, mat)
+    n.rect(xs, base - 2, xs + w, base, mat)  # l'estrade
+    n.set(xs + 1, base - 3, 'T')
+    n.set(xs + w - 2, base - 3, 'T')
+    for x in range(xs + 1, xs + w - 1):  # le portique des projecteurs
+        n.set(x, base - 9, '=')
+    for y in range(base - 9, base - 2):
+        n.set(xs + 3, y, 'H')
+    n.repere(xs + w // 2 + 2, '*', ymin=base - 10)
+    n.ennemis(xs + 3, xs + w - 3, lettres, 2, ymin=base - 4)
+    n.ennemis(xs + 3, xs + w - 3, lettres, 1, ymin=base - 10)
+    n.ennemis(x0 + 1, xs - 3, lettres, 1)
+    n.ennemis(xs + w + 3, x0 + largeur - 1, lettres, 1)

@@ -8,6 +8,7 @@ import { AtlasTuiles } from './atlas-tuiles';
 import { Camera } from './camera';
 import { dessineCarteMonde } from './carte-monde';
 import { dessineEntite } from './dessin-entites';
+import { debrisDeDecor } from './debris-decor';
 import { dessineDecor, semeDecor, type CoucheDecor } from './decor';
 import { dessineTuiles, dessineTyroliennes } from './dessin-tuiles';
 import { Emojis } from './emojis';
@@ -36,6 +37,8 @@ export class Rendu {
   private fond = new Fond(THEMES.garage);
   private niveau = -1;
   private decor: ReturnType<typeof semeDecor> = [];
+  /** les accessoires posés sur chaque tuile (clé : rangée × 100000 + colonne), pour les briser avec elle */
+  private decorParTuile = new Map<number, ReturnType<typeof semeDecor>>();
   private carteDecor: Carte | null = null;
   private tick = 0;
   /** pixels du canvas par pixel du jeu : 6 (pleine définition) ou 3 (appareil lent) */
@@ -131,7 +134,10 @@ export class Rendu {
     for (const e of evts) {
       switch (e.k) {
         case 'tuile':
-          if (e.t === 0) p.debris((e.x + 0.5) * TUILE, (e.y + 0.5) * TUILE, proprietes(e.avant).debris, 7);
+          if (e.t !== 0) break;
+          p.debris((e.x + 0.5) * TUILE, (e.y + 0.5) * TUILE, proprietes(e.avant).debris, 7);
+          // ce qui était posé sur cette tuile (décor) se brise aussi : des morceaux s'envolent
+          for (const o of this.decorParTuile.get(e.y * 100000 + e.x) ?? []) debrisDeDecor(p, o);
           break;
         case 'explo':
           p.explosion(e.x, e.y, e.r);
@@ -186,6 +192,11 @@ export class Rendu {
         11 + vue.niveau,
       );
       this.braises.regle(this.decor);
+      this.decorParTuile = new Map();
+      for (const o of this.decor) {
+        const cle = o.ty * 100000 + o.tx;
+        this.decorParTuile.set(cle, [...(this.decorParTuile.get(cle) ?? []), o]);
+      }
     }
     const decore = (couche: CoucheDecor) =>
       dessineDecor(
@@ -210,7 +221,8 @@ export class Rendu {
     const tri = (v: EntiteVue) =>
       v.g >= G.CAGE || (v.g < G.P_BAGUETTE && v.e === ANIM.TERRASSE) ? 0 : v.g >= G.P_BAGUETTE ? 2 : 1;
     for (const passe of [0, 1, 2])
-      for (const v of vue.entites) if (tri(v) === passe) dessineEntite(ctx, v, camX, camY, this.atlas);
+      for (const v of vue.entites)
+        if (tri(v) === passe) dessineEntite(ctx, v, camX, camY, this.atlas, this.theme.lueur);
     for (const v of vue.entites) if (v.g === G.VAN && v.e === 2) this.particules.van(v.x, v.y, v.f / 20);
     decore('devant');
     this.particules.dessine(ctx, camX, camY);

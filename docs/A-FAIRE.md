@@ -22,7 +22,7 @@ remplace un par un (voir `docs/ASSETS.md`, et `outils/fixe-objets.py` pour les p
 
 ## Niveaux
 
-- **Niveau 6 (le Club Infini) :** sans relief ni galeries ; lui ajouter une approche extérieure avant la tour.
+- **Niveau 6 (le Club Infini) :** généré comme les autres (salle close, deux scènes, arène du DJ) ; lui ajouter une approche extérieure avant l'entrée.
 - **Arc de l'histoire en Jamaïque** (les reggae-men deviennent des amis) : le mécanisme d'arcs est prêt (`niveaux/arcs.ts`),
   il manque les niveaux, les textes et les ennemis.
 - **Décors de premier plan non jouables :** prévoir une couche devant les héros quand les sprites seront fournis.
