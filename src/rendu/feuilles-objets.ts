@@ -14,6 +14,15 @@ export const FEUILLES_OBJETS: Partial<Record<Genre, Feuille>> = {
     densite: 6,
     pied: 146,
   },
+  [G.DJ]: {
+    fichier: 'dj.png',
+    w: 388,
+    h: 404,
+    images: [1, 1, 1, 1, 1, 1, 1],
+    rythme: 1,
+    densite: 6,
+    pied: 194,
+  },
   [G.ENCEINTE]: {
     fichier: 'enceinte.png',
     w: 132,

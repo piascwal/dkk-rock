@@ -25,6 +25,9 @@ OBJETS = {
     'cage': (['cage-1-base.png', 'cage-2-base.png'], 'CAGE', 22),  # fermée, puis ouverte
     # le Yéti Alpha : repos, bras levés (deux), touché (trois) ; les poses gardent leur place (cadre commun)
     'yeti-alpha': ([f'boss/yeti-alpha-{k}-base.png' for k in range(1, 7)], 'YETI_ALPHA', 46, True),
+    # DJ Boucle derrière ses platines (les images d'origine : 1 à 4, au repos, les deux mains sur les platines ; 5 bras écartés
+    # (les lasers) ; 6 penché en avant (l'anneau d'hypnose) ; 7 le poing levé (le Drop) ; cadre commun : le décor derrière lui ne bouge pas)
+    'dj': ([f'boss/dj-{k}-base.png' for k in range(1, 8)], 'DJ', 65, True),
     # les enceintes du DJ, de face : membrane au repos, puis de plus en plus gonflée
     'enceinte': ([f'boss/enceinte-{k}-base.png' for k in range(1, 5)], 'ENCEINTE', 22, True),
     # décor sans genre (FEUILLES_DECOR) : enceintes de 3/4, grise puis en bois, posées au fond
@@ -162,7 +165,7 @@ def main():
         premier = etats[0][0]
         w0 = np.ptp(np.nonzero(premier[..., 3].any(0))[0]) + 1  # la largeur du personnage, pas celle du cadre commun
         echelle = largeur * DENSITE / w0
-        if nom in NATIF_BRUT:
+        if nom in NATIF_BRUT or nom == 'dj':
             echelle = max(1, round(echelle))  # entier : pas de pixel plus large que son voisin
         images = []
         for nat, _ in etats:

@@ -48,6 +48,12 @@ export class Enceinte extends Boss {
 }
 
 /**
+ * Les poses de sa planche (outils/fixe-objets.py) : quatre images de repos (les deux mains sur les platines) qui tournent,
+ * puis les bras écartés (les lasers), penché en avant (l'anneau d'hypnose) et le poing levé (le Drop).
+ */
+const POSE = { REPOS: 0, IMAGES_REPOS: 4, LASERS: 4, HYPNOSE: 5, DROP: 6 } as const;
+
+/**
  * DJ Boucle, le grand méchant : il produit des beats volontairement
  * répétitifs pour hypnotiser les foules. Lasers en éventail, anneaux
  * d'hypnose (commandes inversées), danseurs en renfort, et, sous la moitié
@@ -55,9 +61,12 @@ export class Enceinte extends Boss {
  */
 export class DjBoucle extends Boss {
   readonly enceintes: Enceinte[] = [];
+  /** ticks restants de la pose d'attaque en cours, et cette pose */
+  private geste = 0;
+  private posture: number = POSE.REPOS;
 
   constructor(ctx: Contexte, x: number, y: number) {
-    super(ctx, G.DJ, 160, x, y, 36, 30, 10000, 230);
+    super(ctx, G.DJ, 160, x, y, 44, 48, 10000, 230);
     for (const s of [-1, 1]) {
       const e = new Enceinte(ctx, x + s * 7 * TUILE, y, this);
       this.enceintes.push(e);
@@ -80,7 +89,11 @@ export class DjBoucle extends Boss {
 
   protected agit(ctx: Contexte, cible: Cible): void {
     this.dir = cible.x > this.cx ? 1 : -1;
-    this.pose = ctx.numeroTemps % 2;
+    // au repos, ses quatre images tournent (les lumières, la tête) ; pendant une attaque, il en prend la pose
+    if (this.geste > 0) {
+      this.geste--;
+      this.pose = this.posture;
+    } else this.pose = Math.floor(this.anim / 12) % POSE.IMAGES_REPOS;
     if (!ctx.surLeTemps) return;
     const n = ctx.numeroTemps;
     const enrage = this.ratio < 0.5;
@@ -101,12 +114,19 @@ export class DjBoucle extends Boss {
         ),
       );
       ctx.son('hypnose', this.cx, this.cy);
+      this.montre(POSE.HYPNOSE);
     }
     if (n % 16 === 8) this.renforts(ctx);
     if (enrage && n % 16 === 0) this.leDrop(ctx, cible);
   }
 
+  private montre(posture: number, ticks = 26): void {
+    this.posture = posture;
+    this.geste = ticks;
+  }
+
   private eventail(ctx: Contexte, cible: Cible, nb: number): void {
+    this.montre(POSE.LASERS);
     const base = Math.atan2(cible.y - this.cy, cible.x - this.cx);
     for (let i = 0; i < nb; i++) {
       const a = base + (i - (nb - 1) / 2) * 0.22;
@@ -129,6 +149,7 @@ export class DjBoucle extends Boss {
   }
 
   private leDrop(ctx: Contexte, cible: Cible): void {
+    this.montre(POSE.DROP, 44);
     ctx.texte(this.cx, this.corps.y - 30, 'LE DROP ARRIVE...', '#ff4fd8');
     ctx.secoue(8);
     for (let i = 0; i < 7; i++) {
