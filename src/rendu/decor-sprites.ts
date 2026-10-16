@@ -65,6 +65,9 @@ export const SPRITES: ReadonlySet<string> = new Set<Sprite>([
 ]);
 
 /** Les accessoires dessinés par une planche fournie (apparence tirée au sort selon `v`, tournée d'un côté ou de l'autre). */
+/** De combien les tas de rochers (au sol, jamais dedans) s'enfoncent, en pixels du jeu. */
+const ENFONCE_ROCHERS = 3;
+
 export function dessineSprite(
   ctx: CanvasRenderingContext2D,
   quoi: Sprite,
@@ -80,6 +83,8 @@ export function dessineSprite(
   if (quoi === 'etagere') return dessineDecorFeuille(ctx, 'etagere', v % 3, voile);
   if (quoi === 'rocher') return dessineDecorFeuille(ctx, 'rocher', v % 4, voile);
   if (quoi === 'rocherNeige') return dessineDecorFeuille(ctx, 'rocherNeige', v % 4, voile);
+  // les tas de rochers ont un pied rond : on les enfonce de quelques pixels, le sol (dessiné devant) cache le bas irrégulier
+  if (quoi === 'rocher' || quoi === 'rocherNeige') ctx.translate(0, ENFONCE_ROCHERS);
   // un peu enfoncé : l'herbe des tuiles, dessinée ensuite, cache le pied
   ctx.translate(0, quoi === 'vacheCasque' ? 2 : 1);
   if (v & 8) ctx.scale(-1, 1);
