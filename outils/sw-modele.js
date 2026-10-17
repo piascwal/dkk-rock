@@ -9,7 +9,14 @@ self.addEventListener('install', (e) => {
   e.waitUntil(
     caches
       .open(CACHE)
-      .then((c) => c.addAll(FICHIERS.map((f) => new Request(f, { cache: 'reload' })))) // « reload » : jamais la copie du cache HTTP
+      // « reload » : jamais la copie du cache HTTP ; les sprites sont gardés sous l'adresse que la page leur donne (?v=version)
+      .then((c) =>
+        c.addAll(
+          FICHIERS.map(
+            (f) => new Request(f.startsWith('sprites/') ? `${f}?v=${VERSION}` : f, { cache: 'reload' }),
+          ),
+        ),
+      )
       .then(() => self.skipWaiting()),
   );
 });
@@ -32,11 +39,15 @@ self.addEventListener('activate', (e) => {
 // tout le reste (fichiers à empreinte, sprites) : le cache d'abord
 // la version courante d'abord : `caches.match` seul fouille les caches dans l'ordre de leur création, et ressortirait
 // l'ancien sprite (même nom de fichier) de la version précédente, que l'on garde
-const trouve = (req) =>
-  caches
+// Une adresse versionnée (?v=...) ne se retrouve que dans le cache de cette version : jamais un sprite de même nom d'une
+// version plus ancienne (taille de planche différente : le dessin serait coupé), le réseau sinon.
+const trouve = (req) => {
+  const versionnee = new URL(req.url).searchParams.has('v');
+  return caches
     .open(CACHE)
-    .then((c) => c.match(req, { ignoreSearch: true }))
-    .then((r) => r || caches.match(req, { ignoreSearch: true }));
+    .then((c) => c.match(req, { ignoreSearch: !versionnee }))
+    .then((r) => r || (versionnee ? undefined : caches.match(req, { ignoreSearch: true })));
+};
 
 self.addEventListener('fetch', (e) => {
   const req = e.request;
