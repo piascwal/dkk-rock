@@ -4,11 +4,12 @@ import { herosDuGenre } from '../entites/heros';
 import { ANIM, G, type EntiteVue } from '../jeu/vue';
 import type { AtlasTuiles } from './atlas-tuiles';
 import { dessineAura } from './aura';
-import { dessineBulle } from './bulle-bonus';
+import { dessineBulle, hauteurBulle } from './bulle-bonus';
 import { DESSINS_BOSS } from './dessins-boss';
 import { DESSINS_ENNEMIS } from './dessins-ennemis';
 import { dessineDecorFeuille, dessineFeuille } from './feuilles-images';
 import { FEUILLES } from './feuilles';
+import { FEUILLES_DECOR } from './feuilles-objets';
 import { dessineHeros, dessineInstrument, dessineKiwi } from './dessins-heros';
 import { DESSINS_OBJETS, iconeArme } from './dessins-objets';
 import { DEMI_TAILLE, DESSINS_TIRS } from './dessins-tirs';
@@ -32,8 +33,35 @@ const DRAPEAUX_SANS_MIROIR = new Set<number>([
 function dessineBonus(ctx: CanvasRenderingContext2D, variante: number): boolean {
   const sprite = armeRamassee(variante)?.sprite;
   if (!sprite) return false;
-  ctx.translate(0, Math.round(Math.sin(performance.now() / 260) * 1.5) - 1);
-  return dessineDecorFeuille(ctx, sprite, 0);
+  const f = FEUILLES_DECOR[sprite];
+  if (!f) return false;
+  // au milieu de sa boîte de verre (et non posée au fond), il flotte doucement
+  const hauteur = (f.h * (f.echelle ?? 1)) / (f.densite ?? 1);
+  // dans un état à part : le décalage ne doit pas entraîner la boîte de verre, dessinée ensuite
+  ctx.save();
+  ctx.translate(
+    0,
+    Math.round(Math.sin(performance.now() / 260) * 1.5) - Math.round((hauteurBulle(G.ARME) - hauteur) / 2),
+  );
+  const dessine = dessineDecorFeuille(ctx, sprite, 0);
+  ctx.restore();
+  return dessine;
+}
+
+/** Le chauffage soufflant dans sa boîte de bonus : un peu réduit (les quatre cinquièmes de sa taille) pour y tenir à l'aise, et centré. */
+function dessineChauffageBonus(ctx: CanvasRenderingContext2D): boolean {
+  const f = FEUILLES[G.CHAUFFAGE];
+  if (!f) return false;
+  // sa hauteur réelle en pixels du jeu : la planche est réduite par `echelle`
+  const hauteur = (f.h * (f.echelle ?? 1)) / (f.densite ?? 1);
+  const k = 0.8;
+  // dans un état à part : la réduction ne doit pas toucher la boîte de verre, dessinée ensuite
+  ctx.save();
+  ctx.translate(0, -Math.round((hauteurBulle(G.ARME) - hauteur * k) / 2));
+  ctx.scale(k, k);
+  const dessine = dessineFeuille(ctx, G.CHAUFFAGE, ANIM.DEBOUT, 0, false);
+  ctx.restore();
+  return dessine;
 }
 
 /** Dessine une entité de la vue, en coordonnées d'écran. */
@@ -105,12 +133,8 @@ export function dessineEntite(
     const epaule = FEUILLES[v.g]?.epaule;
     if (heros && epaule && v.e !== ANIM.ECHELLE && v.e !== ANIM.TYROLIENNE && v.e !== ANIM.MORT)
       dessineInstrument(p, ctx, v.g, v.f, epaule);
-  } else if (
-    v.g === G.ARME &&
-    v.f === ARME_CHAUFFAGE &&
-    dessineFeuille(ctx, G.CHAUFFAGE, ANIM.DEBOUT, 0, false)
-  ) {
-    // l'arme à ramasser : le chauffage lui-même, posé là
+  } else if (v.g === G.ARME && v.f === ARME_CHAUFFAGE && dessineChauffageBonus(ctx)) {
+    // l'arme à ramasser : le chauffage lui-même, en petit, au milieu de sa boîte
   } else if (heros) dessineHeros(p, v.g, v.e, v.f, ctx);
   else if (v.g === G.KIWI) dessineKiwi(p, v.e, v.f);
   else if (estTir) DESSINS_TIRS[v.g]?.(pb, v.f, v.e);
@@ -122,7 +146,11 @@ export function dessineEntite(
     // l'arme à ramasser qui est le chauffage, planche pas encore chargée : son dessin de repli, sans boîte ni icône
     if (v.g === G.ARME && v.f === ARME_CHAUFFAGE) DESSINS_OBJETS[G.CHAUFFAGE]!(p, v.e, v.f);
     else {
+      // le médiator d'or, dessiné en code, est lui aussi centré dans sa boîte
+      if (v.g === G.SOIN) ctx.save();
+      if (v.g === G.SOIN) ctx.translate(0, -Math.round((hauteurBulle(G.SOIN) - 9) / 2));
       DESSINS_OBJETS[v.g]!(p, v.e, v.f);
+      if (v.g === G.SOIN) ctx.restore();
       if (v.g === G.ARME) iconeArme(p, v.f, 0);
     }
   }

@@ -40,6 +40,9 @@ const BULLES: Partial<Record<number, { demi: number; haut: number; verre: string
   [G.SOIN]: { demi: 11, haut: 22, verre: '255,225,120', bord: '255,240,170' },
 };
 
+/** La hauteur de la boîte de verre d'un bonus (0 s'il n'en a pas) : de quoi centrer ce qu'elle contient. */
+export const hauteurBulle = (genre: number): number => BULLES[genre]?.haut ?? 0;
+
 /**
  * La boîte transparente qui entoure un bonus : un verre à peine teinté, un liseré qui respire, un reflet qui la
  * traverse en diagonale et deux étincelles aux coins. Elle ondule d'un pixel : on comprend d'un coup d'œil que
