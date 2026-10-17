@@ -167,7 +167,6 @@ const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAccessoire[]
       'enceinteDeco',
       'enceinte34',
       'projecteur',
-      'boitierCd',
       'etagere',
       'flambeau',
     ],
@@ -178,7 +177,6 @@ const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAccessoire[]
 /** Les petits accessoires se serrent (une tuile et demie entre deux) ; les autres, trois tuiles ; voitures et vaches, quatre. */
 const PETITS = new Set<string>([
   'flambeau',
-  'boitierCd',
   'champignons',
   'cairn',
   'bidon',

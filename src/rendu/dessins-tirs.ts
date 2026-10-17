@@ -13,7 +13,7 @@ export const DEMI_TAILLE: Partial<Record<number, number>> = {
   [G.P_BASSE]: 5,
   [G.P_GROSSE_CAISSE]: 6,
   [G.P_AMPLI]: 4,
-  [G.P_VINYLE]: 3,
+  [G.P_BOITIER]: 4,
   [G.P_GAZ]: 20,
   [G.P_GONG]: 8,
   [G.P_HYPNOSE]: 5,
@@ -71,9 +71,12 @@ export const DESSINS_TIRS: Partial<Record<number, Dessin>> = {
     p(-3, -3, 6, 4, '#c98b3a');
     p(-3, 2, 6, 1, '#ffd23f');
   },
-  [G.P_VINYLE]: (p, f) => {
-    p(-3, -3, 6, 6, '#111');
-    p(-1, -1, 2, 2, f % 6 < 3 ? '#ff4fd8' : '#ffd23f');
+  // repli en code du boîtier de CD (la planche tir-boitier.png le remplace) : une pochette qui tourne
+  [G.P_BOITIER]: (p, f) => {
+    const large = f % 12 < 6;
+    p(large ? -4 : -2, -4, large ? 8 : 4, 8, '#cfd8dc');
+    p(large ? -3 : -1, -3, large ? 6 : 2, 6, '#3a4a6a');
+    p(-1, -1, 2, 2, '#ffd23f');
   },
   [G.P_FLAMME]: (p, f) => {
     const k = f % 6;

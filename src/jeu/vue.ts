@@ -35,7 +35,7 @@ export const G = {
   P_LARSEN: 36,
   P_SOLO: 37,
   P_AMPLI: 38,
-  P_VINYLE: 39,
+  P_BOITIER: 39,
   P_FLAMME: 40,
   P_CORNEMUSE: 41,
   P_GAZ: 42,

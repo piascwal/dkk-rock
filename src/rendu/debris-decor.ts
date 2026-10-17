@@ -25,7 +25,6 @@ const MATIERES: Partial<Record<string, { couleurs: string[]; haut: number }>> = 
   tonneau: { couleurs: BOIS, haut: 14 },
   pneus: { couleurs: ['#1a1a1a', '#3a3a3a', '#555'], haut: 12 },
   voiture: { couleurs: ['#c1121f', '#2a6fdb', ...METAL], haut: 22 },
-  boitierCd: { couleurs: ['#cfd8dc', '#ffffff', '#3a4a6a', '#ffd23f'], haut: 8 },
   flambeau: { couleurs: [...BOIS, ...BRAISES], haut: 30 },
   torche: { couleurs: [...BOIS, ...BRAISES], haut: 30 },
   feuDeCamp: { couleurs: [...BOIS, ...BRAISES], haut: 12 },

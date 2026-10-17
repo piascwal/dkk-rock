@@ -29,7 +29,6 @@ export type Sprite =
   | 'feuDeCamp'
   | 'torche'
   | 'flambeau'
-  | 'boitierCd'
   | 'etagere'
   | 'rocher'
   | 'rocherNeige'
@@ -57,7 +56,6 @@ export const SPRITES: ReadonlySet<string> = new Set<Sprite>([
   'feuDeCamp',
   'torche',
   'flambeau',
-  'boitierCd',
   'etagere',
   'rocher',
   'rocherNeige',
@@ -81,8 +79,6 @@ export function dessineSprite(
   // les panneaux ne sont jamais retournés : on doit pouvoir lire ce qui est écrit dessus
   if (quoi === 'panneauFleche' || quoi === 'panneauNeige' || quoi === 'panneauLounge')
     return dessineDecorFeuille(ctx, 'panneau', v % 4, voile);
-  // le boîtier de CD n'est jamais retourné : on doit y lire « L5 »
-  if (quoi === 'boitierCd') return dessineDecorFeuille(ctx, 'boitier-cd', 0, voile);
   if (quoi === 'etagere') return dessineDecorFeuille(ctx, 'etagere', v % 3, voile);
   // les tas de rochers ont un pied rond : on les enfonce de quelques pixels, le sol (dessiné devant) cache le bas irrégulier
   if (quoi === 'rocher' || quoi === 'rocherNeige') {

@@ -19,6 +19,9 @@ export interface DefProjectile {
   /** traverse aussi les tuiles en les abîmant */
   creuse?: boolean;
   rebonds?: number;
+  /** ce qui s'affiche à chaque rebond, et quand il explose (le dauphin) */
+  ditRebond?: string;
+  ditFin?: string;
   /** roule au sol au lieu de rebondir */
   roule?: boolean;
   /** se colle à la première surface et attend */
@@ -136,16 +139,16 @@ export const BOULET_AMPLI = P({
   taille: 8,
   explosion: { rayon: 40, degats: 6 },
 });
-export const VINYLE = P({
-  genre: G.P_VINYLE,
-  vitesse: 5.5,
-  gravite: 0,
-  degats: 2,
+// la pochette de CD « L5 » : lancée en cloche, par trois, elle rebondit une fois
+export const BOITIER = P({
+  genre: G.P_BOITIER,
+  vitesse: 4,
+  gravite: 0.22,
+  degats: 1.5,
   degatsTuile: 1,
-  duree: 100,
-  taille: 7,
-  perce: true,
-  rebonds: 4,
+  duree: 80,
+  taille: 8,
+  rebonds: 1,
 });
 export const FLAMME = P({
   genre: G.P_FLAMME,
@@ -261,6 +264,8 @@ export const FLIPPER = P({
   taille: 9,
   rebonds: 3,
   explosion: { rayon: 28, degats: 3 },
+  ditRebond: 'Flipper le dauphin',
+  ditFin: 'Aïe, trop répétitif',
 });
 /** Le frisbee : téléguidé, il vire vers l'ennemi le plus proche. */
 export const FRISBEE = P({

@@ -61,11 +61,11 @@ OBJETS = {
     'arme-flipper': (['armes/flipper-base.png'], None, 16),
     'arme-frisbee': (['armes/frisbee-base.png'], None, 16),
     'arme-donuts': (['armes/donuts-base.png'], None, 15),
+    'arme-boitier': (['armes/boitier-cd-base.png'], None, 18),
+    'tir-boitier': (['armes/boitier-cd-base.png'], 'P_BOITIER', 12),
     'tir-pile': (['armes/pile-base.png'], 'P_PILE', 9),
     'tir-flipper': (['armes/flipper-base.png'], 'P_FLIPPER', 14),
     'tir-frisbee': (['armes/frisbee-base.png'], 'P_FRISBEE', 12),
-    # le boîtier de CD « L5 » : clin d'œil à un plaisir coupable d'un membre du groupe, qui traîne dans les coulisses
-    'boitier-cd': (['armes/boitier-cd-base.png'], None, 10),
     # lot 10 : trois étagères de livres (une garnie de bibelots et d'un casque audio), pour les pièces intérieures
     'etagere': ([f'decor/etagere-{k}-base.png' for k in (1, 2, 3)], None, 34),
     # lot 11-12 : des tas de rochers (gris, et sous la neige), en sprites fournis

@@ -1,6 +1,15 @@
 import type { Contexte } from '../jeu/contexte';
 import { Projectile } from './projectile';
-import { DONUT, FLIPPER, FRISBEE, JET_FLAMME, MINIDISC, PILE, type DefProjectile } from './projectiles-defs';
+import {
+  BOITIER,
+  DONUT,
+  FLIPPER,
+  FRISBEE,
+  JET_FLAMME,
+  MINIDISC,
+  PILE,
+  type DefProjectile,
+} from './projectiles-defs';
 
 /** Celui qui tire : la bouche de l'arme, le sens, et l'angle au-dessus de l'horizontale (radians). */
 export interface Tireur {
@@ -99,6 +108,21 @@ export const ARMES_RAMASSABLES: DefArme[] = [
     repliques: [
       'Une machine à donuts. Explosifs, évidemment. Je vote pour.',
       'Sucré, rond, et ça fait boum.',
+    ],
+  },
+  {
+    nom: 'Boîtier de CD « L5 »',
+    cadence: 26,
+    munitions: 12,
+    son: 'boitier',
+    sprite: 'arme-boitier',
+    // trois boîtiers lancés en cloche, en éventail
+    tir: (ctx, t) => {
+      for (const ecart of [-1.2, 0, 1.2]) tire(ctx, t, BOITIER, ecart);
+    },
+    repliques: [
+      'L5. Il traînait dans la boîte à gants. Personne ne dira à qui il est.',
+      'Tout le monde jure ne pas connaître. Pourtant, personne ne saute la piste 4.',
     ],
   },
   {

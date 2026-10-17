@@ -43,7 +43,11 @@ const SONS: Record<string, Son> = {
     accord(s, v, 65, 0.4);
     s.bruit({ duree: 0.3, volume: 0.2 * v, passeBas: 800 });
   },
-  vinyle: (s, v) => s.note({ freq: 900, vers: 300, duree: 0.15, type: 'triangle', volume: 0.1 * v }),
+  // un boîtier de CD qui claque : un petit clac de plastique, un cliquetis
+  boitier: (s, v) => {
+    s.note({ freq: 1100, vers: 600, duree: 0.05, type: 'square', volume: 0.07 * v });
+    s.bruit({ duree: 0.04, volume: 0.06 * v, passeHaut: 4000 });
+  },
   // les armes du lot 9 : un disque qui siffle, un clic de pile, le cri d'un dauphin, un coup de vent, un « pop » sucré
   minidisc: (s, v) => {
     s.note({ freq: 520, vers: 940, duree: 0.2, type: 'triangle', volume: 0.12 * v });

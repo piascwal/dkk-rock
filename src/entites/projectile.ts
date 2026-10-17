@@ -109,6 +109,7 @@ export class Projectile implements EntiteSimulee {
       if (dx !== 0) this.vx = -this.vx;
       else this.vy = -this.vy * 0.8;
       ctx.son('rebond', this.x, this.y);
+      if (d.ditRebond) ctx.texte(this.x, this.y - 12, d.ditRebond, '#7fd8ff');
     } else {
       this.termine(ctx);
     }
@@ -148,6 +149,7 @@ export class Projectile implements EntiteSimulee {
     this.fini = true;
     const d = this.def;
     if (d.explosion) ctx.explosion(this.x, this.y, d.explosion.rayon, d.explosion.degats, this.camp);
+    if (d.ditFin) ctx.texte(this.x, this.y - 16, d.ditFin, '#ffd23f');
     else ctx.evenement({ k: 'impact', x: this.x, y: this.y, c: '#ffffff' });
     if (d.laisse) ctx.ajoute(new Projectile(ctx, d.laisse, this.camp, this.x, this.y - 8, 0, 0));
   }
