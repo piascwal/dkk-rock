@@ -14,6 +14,7 @@ import { DESSINS_OBJETS, iconeArme } from './dessins-objets';
 import { DEMI_TAILLE, DESSINS_TIRS } from './dessins-tirs';
 import { pinceau } from './pinceau';
 import { ecritCentre } from './police';
+import { dessineRockerConverti } from './rockers-convertis';
 import type { Theme } from './themes';
 
 const DRAPEAUX_SANS_MIROIR = new Set<number>([
@@ -72,7 +73,13 @@ export function dessineEntite(
   ctx.translate(x, y);
   if (v.gauche && !DRAPEAUX_SANS_MIROIR.has(v.g)) ctx.scale(-1, 1);
   if (aTerre) {
-    // mis au tapis : couché sur le dos, estompé, et qui s'efface à la fin (`f` : ce qu'il lui reste à rester là)
+    // converti au rock : un rocker tiré au sort prend sa place (un drone, lui, reste un drone qui tombe, couché)
+    if (v.g !== G.DRONE && dessineRockerConverti(ctx, v)) {
+      ctx.restore();
+      ctx.globalAlpha = 1;
+      return;
+    }
+    // repli : couché sur le dos, estompé, et qui s'efface à la fin (`f` : ce qu'il lui reste à rester là)
     ctx.globalAlpha = 0.55 * Math.min(1, v.f / 40);
     ctx.translate(0, -5);
     ctx.rotate(v.g === G.DRONE ? -0.4 : -Math.PI / 2);

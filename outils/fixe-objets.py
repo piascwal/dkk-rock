@@ -22,7 +22,9 @@ DENSITE = 6
 # des planches plus fines que 6 pixels par pixel du jeu, et réduites avec lissage (au lieu d'un agrandissement entier, qui donne des
 # pixels inégaux quand l'écran n'est pas un multiple de la planche) : le DJ, très détaillé, plus grand que le reste
 DENSITES = {'dj': 8}
-LISSES = {'dj', 'voiture'}
+LISSES = {'dj', 'voiture', 'rocker'}
+# celles de ces planches qu'on réduit à 256 couleurs (le DJ, les voitures) ; les rockers en ont trop : douze personnages différents sur une planche
+QUANTIFIEES = {'dj', 'voiture'}
 # objet : (fichiers sources, un par état (une ligne de la planche chacun), genre dans jeu/vue.ts, largeur en jeu en pixels)
 OBJETS = {
     'van': (['van-base.png'], 'VAN', 56),
@@ -69,6 +71,8 @@ OBJETS = {
     # lot 11-12 : des tas de rochers (gris, et sous la neige), en sprites fournis
     'rocher': ([f'decor/rocher-{k}-base.png' for k in (1, 2, 3, 4)], None, 30),
     'rocherNeige': ([f'decor/rocher-neige-{k}-base.png' for k in (1, 2, 3, 4)], None, 30),
+    # lot 18 : douze rockers (un par fan converti au rock), debout, que le jeu tire au sort pour remplacer l'ennemi vaincu
+    'rocker': ([f'ennemis/rocker-{k}-base.png' for k in range(1, 13)], None, 24),
     'parasol': ([f'decor/parasol-{k}-base.png' for k in (1, 2, 3)], None, 28),
     'poubelle': ([f'decor/poubelle-{k}-base.png' for k in (1, 2)], None, 11),
     # le tonneau de décor, sans pancarte (les tonneaux WOG sont des tuiles : outils/fixe-tuiles.py)
@@ -86,7 +90,7 @@ OBJETS = {
 # Ces images ne sont pas du pixel art sur une grille de 2 : leurs pixels sont déjà ceux du jeu. Les ramener à la grille
 # détecterait une case fausse et abîmerait le dessin (bruit, détails perdus) ; on les prend telles quelles, et on les agrandit
 # d'un facteur entier pour que chaque pixel reste carré.
-NATIF_BRUT = {'voiture'}
+NATIF_BRUT = {'voiture', 'rocker'}
 
 
 def redresse(a):
@@ -123,7 +127,9 @@ def natif_brut(chemin):
                 if unis[opaques].mean() >= 0.99:
                     case, depart = c, (ox, oy)
     ox, oy = depart
-    if case > 1:
+    # les rockers viennent tous d'une même toile de 256 px, mais leur grille varie (2 px pour les uns, 1 px pour les autres) : on les
+    # garde à l'échelle de la toile pour que leurs tailles restent comparables
+    if case > 1 and not chemin.name.startswith('rocker'):
         h, w = (a.shape[0] - oy) // case * case, (a.shape[1] - ox) // case * case
         a = a[oy : oy + h, ox : ox + w].reshape(h // case, case, w // case, case, 4)[:, 0, :, 0]
     if chemin.name in ('voiture-5-base.png',):  # l'ancienne Mégane (voiture-2) est déjà de profil ; la Renault 11 est de trois quarts
@@ -205,9 +211,9 @@ def main():
             planche = decale
         # 256 couleurs suffisent aux planches lissées (visuellement identique) : 2 Mo de moins à charger et à garder hors ligne
         sortie = (
-            planche.quantize(256, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.NONE) if nom in LISSES else planche
+            planche.quantize(256, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.NONE) if nom in QUANTIFIEES else planche
         )
-        sortie.save(RACINE / 'public' / 'sprites' / f'{nom}.png', optimize=nom in LISSES)
+        sortie.save(RACINE / 'public' / 'sprites' / f'{nom}.png', optimize=nom in QUANTIFIEES)
         print(f'{nom}.png : {len(images)} état(s), {cw}x{ch} px de planche, {cw / dens:.0f}x{ch / dens:.0f} en jeu')
         ligne = ', '.join(['1'] * len(images))
         cle = f'[G.{genre}]' if genre else f"'{nom}'"
