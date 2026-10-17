@@ -2,6 +2,13 @@
 
 Idées et finitions notées en route, pour ne pas les perdre.
 
+## Histoire
+
+- **Scène du Clos** (image fournie : Tom dérape en Renault 11 devant « Le clos », la maison de famille de JBT où les DKK
+  répétaient) : à placer dans l'intro du niveau 1, avant de partir à l'aventure (voir la proposition de scénario).
+- **Photo du repas** : à fournir (le dernier repas des DKK au Clos, avant le départ) : la rappeler
+  quand on reprend le scénario du niveau 1.
+
 ## Sprites
 
 - **Drone à LED :** les hélices sont fixes dans le sprite fourni. Quand de nouvelles images arriveront (hélices dans une

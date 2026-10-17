@@ -425,9 +425,10 @@ h2 {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
-  padding: 1rem 2rem;
-  background: rgba(10, 5, 12, 0.82);
+  gap: 1.2rem;
+  padding: 1rem 4vw;
+  /* opaque : on assume les dialogues, rien du niveau ne doit transparaître (on peut toujours passer d'un toucher) */
+  background: radial-gradient(ellipse at 50% 40%, #26142f 0%, #0a050c 85%);
   z-index: 8;
   text-align: center;
 }
@@ -458,17 +459,17 @@ h2 {
 
 #histoire .replique {
   display: flex;
-  gap: 1rem;
+  gap: 1.6rem;
   align-items: center;
-  max-width: 44rem;
-  font-size: clamp(0.9rem, 4.4vh, 1.35rem);
-  line-height: 1.4;
+  max-width: min(64rem, 92vw);
+  font-size: clamp(1.05rem, 6vh, 1.9rem);
+  line-height: 1.45;
   text-align: left;
 }
 
 #histoire .portrait {
-  width: 72px;
-  height: 72px;
+  width: clamp(88px, 30vh, 160px);
+  height: clamp(88px, 30vh, 160px);
   flex: none;
 }
 
@@ -476,7 +477,7 @@ h2 {
   font-family: var(--titre);
   color: var(--jaune);
   animation: clignote 1s infinite;
-  font-size: 0.9rem;
+  font-size: clamp(0.9rem, 3.6vh, 1.2rem);
 }
 
 /* l'écran des ennemis « convertis au rock » */
