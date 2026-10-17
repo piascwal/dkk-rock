@@ -120,14 +120,6 @@ function dessineCase(
   // planche plus fine que le canvas (appareil lent) : lissage, sinon on perdrait des pixels au hasard
   const { a, b } = ctx.getTransform();
   ctx.imageSmoothingEnabled = Math.hypot(a, b) < d;
-  // un sprite qui s'enfonce dans le sol : décalé vers le bas, et coupé à la ligne des pieds
-  if (f.enfonce) {
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(-1e4, -1e4, 2e4, 1e4);
-    ctx.clip();
-    ctx.translate(0, f.enfonce);
-  }
   ctx.drawImage(
     img,
     col * f.w,
@@ -139,6 +131,5 @@ function dessineCase(
     f.w * k,
     f.h * k,
   );
-  if (f.enfonce) ctx.restore();
   ctx.imageSmoothingEnabled = false;
 }

@@ -22,7 +22,6 @@ export const FEUILLES_OBJETS: Partial<Record<Genre, Feuille>> = {
     rythme: 1,
     densite: 8,
     pied: 262,
-    enfonce: 12.0,
   },
   [G.ENCEINTE]: {
     fichier: 'enceinte.png',

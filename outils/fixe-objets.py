@@ -190,6 +190,19 @@ def main():
         planche = Image.new('RGBA', (cw, ch * len(images)), (0, 0, 0, 0))
         for k, im in enumerate(images):  # centré, posé en bas de sa case
             planche.alpha_composite(im, ((cw - im.width) // 2, k * ch + ch - im.height))
+        if nom == 'dj':
+            # les montants de l'éclairage (les colonnes du bord) doivent toucher le sol : on descend chaque image de ce qui
+            # dépasse sous eux, et on coupe ce qui sort de la case (le socle des platines, plus bas, est caché sous le sol)
+            opaque = np.array(planche)[..., 3] > 0
+            bord = max(1, cw // 12)
+            colonnes = list(range(bord)) + list(range(cw - bord, cw))
+            bas = max(np.nonzero(opaque[:ch, c])[0].max() for c in colonnes if opaque[:ch, c].any())
+            d = ch - 1 - bas
+            decale = Image.new('RGBA', planche.size, (0, 0, 0, 0))
+            for k in range(len(images)):
+                case = planche.crop((0, k * ch, cw, (k + 1) * ch))
+                decale.paste(case.crop((0, 0, cw, ch - d)), (0, k * ch + d))  # ce qui sort par le bas est perdu, pas recopié dans la case suivante
+            planche = decale
         # 256 couleurs suffisent aux planches lissées (visuellement identique) : 2 Mo de moins à charger et à garder hors ligne
         sortie = (
             planche.quantize(256, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.NONE) if nom in LISSES else planche
@@ -197,17 +210,9 @@ def main():
         sortie.save(RACINE / 'public' / 'sprites' / f'{nom}.png', optimize=nom in LISSES)
         print(f'{nom}.png : {len(images)} état(s), {cw}x{ch} px de planche, {cw / dens:.0f}x{ch / dens:.0f} en jeu')
         ligne = ', '.join(['1'] * len(images))
-        extra = ''
-        if nom == 'dj':
-            # les pieds des montants de l'éclairage (les colonnes du bord) doivent toucher le sol : le socle des platines, plus bas,
-            # s'enfonce dans le sol (la planche est coupée à la ligne du sol à l'affichage)
-            a = np.array(planche)[..., 3] > 0
-            bord = max(1, cw // 12)
-            bas_montants = max(np.nonzero(a[:ch][:, c])[0].max() for c in list(range(bord)) + list(range(cw - bord, cw)) if a[:ch][:, c].any())
-            extra = f', enfonce: {round((ch - 1 - bas_montants) / dens, 1)}'
         cle = f'[G.{genre}]' if genre else f"'{nom}'"
         (lignes if genre else decors).append(
-            f"  {cle}: {{ fichier: '{nom}.png', w: {cw}, h: {ch}, images: [{ligne}], rythme: 1, densite: {dens}, pied: {cw // 2}{extra} }},"
+            f"  {cle}: {{ fichier: '{nom}.png', w: {cw}, h: {ch}, images: [{ligne}], rythme: 1, densite: {dens}, pied: {cw // 2} }},"
         )
     (RACINE / 'src' / 'rendu' / 'feuilles-objets.ts').write_text(
         "// Fichier généré par outils/fixe-objets.py : ne pas modifier à la main.\n"
