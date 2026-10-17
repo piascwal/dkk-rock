@@ -9,61 +9,20 @@ export const GARAGE: Omit<DefNiveau, 'carte'> = {
     {
       qui: 'NARRATEUR',
       texte:
-        '2026. La musique n’est pas morte : elle a été remplacée. Par des boucles de quatre secondes, des voix passées au correcteur et des refrains de trois mots.',
+        '2026. La musique n’est pas morte : elle a été remplacée. Par des boucles de quatre secondes et des refrains de trois mots.',
     },
     {
       qui: 'NARRATEUR',
       texte:
-        'Dans le garage des parents de JBT, cinq anciens du collège ressortent leurs instruments. Le groupe s’appelait les DKK. Personne ne se souvient de ce que ça voulait dire.',
-    },
-    {
-      qui: 'NARRATEUR',
-      texte:
-        'Le Clos : la vieille maison de la famille de JBT, au bout d’un champ. C’est là que les DKK répétaient, avant.',
-      image: 'scene-clos.png',
-    },
-    { qui: 'TOM', texte: 'Regardez ! Dérapage contrôlé !' },
-    { qui: 'JBT', texte: 'Tom. C’est le terrain de mes parents.' },
-    { qui: 'TOM', texte: 'Et la Renault 11 tient la route.' },
-    { qui: 'MAT', texte: 'Elle n’a pas de ceinture, à l’arrière.' },
-    {
-      qui: 'NARRATEUR',
-      texte:
-        'Une dernière fois, ils se retrouvent au Clos pour élaborer le plan. Autour de la table, comme toujours : des spaghettis pour tout le monde.',
+        'Cet été, au Clos, chez les parents de JBT, les cinq DKK se sont retrouvés. Les photos du jour sont restées : un dérapage en Renault 11, des spaghettis, et le plan de l’aventure.',
       image: 'scene-repas.png',
     },
     {
       qui: 'JBM',
-      texte: 'Voilà le plan. On monte le son, on débranche le DJ, et on rentre pour le dessert.',
-    },
-    { qui: 'MAT', texte: 'Regardez bien : un spaghetti par le nez.' },
-    { qui: 'TOM', texte: 'Mat ! Pas pendant que je mange !' },
-    { qui: 'JBM', texte: 'Pfff ! Mon eau !' },
-    {
-      qui: 'NARRATEUR',
       texte:
-        'La scène est restée célèbre chez les DKK. Personne n’en a gardé la vidéo. Personne ne l’a oubliée.',
+        'Ce matin, à la radio : un morceau sans guitare. Il faut débrancher DJ Boucle. Prenez vos instruments : ROCK NEVER DIES.',
+      image: '',
     },
-    { qui: 'JBM', texte: 'Le ventre plein, on peut sauver le rock.', image: '' },
-    {
-      qui: 'JBM',
-      texte: 'Les gars. Ce matin, à la radio, j’ai entendu un morceau. Il n’y avait PAS DE GUITARE.',
-    },
-    { qui: 'JBG', texte: 'Pas de solo ?' },
-    { qui: 'TOM', texte: 'Pas même une rythmique ?' },
-    { qui: 'MAT', texte: '... et la basse ?' },
-    { qui: 'JBM', texte: 'Mat. Personne n’entend jamais la basse.' },
-    {
-      qui: 'JBT',
-      texte:
-        'Il paraît qu’un certain DJ Boucle hypnotise le monde avec un beat qui ne s’arrête jamais. Il faut le débrancher.',
-    },
-    {
-      qui: 'NARRATEUR',
-      texte:
-        'Fadatchi, le kiwi mascotte du groupe — dernier représentant d’une espèce totalement disparue, selon JBM, qui n’a jamais vérifié — hoche la tête.',
-    },
-    { qui: 'JBM', texte: 'Prenez vos instruments. On repart en tournée. ROCK NEVER DIES.' },
   ],
   dialogues: {
     1: [
