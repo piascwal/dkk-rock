@@ -27,6 +27,11 @@ export type Qui = 'JBT' | 'JBM' | 'JBG' | 'MAT' | 'TOM' | 'FADATCHI' | 'NARRATEU
 export interface Replique {
   qui: Qui;
   texte: string;
+  /**
+   * une illustration en grand sur la carte d'histoire (nom d'un fichier de public/sprites/), au-dessus du texte ; elle reste
+   * pour les répliques suivantes, jusqu'à une réplique à `image: ''` (ou une autre image)
+   */
+  image?: string;
 }
 
 export interface DefNiveau {

@@ -31,6 +31,8 @@
 
 html,
 body {
+  /* la police pixel dessine « fi » comme un autre glyphe (« filmée » devenait « Almée ») : pas de ligatures */
+  font-variant-ligatures: none;
   margin: 0;
   height: 100%;
   background: var(--fond);
@@ -465,6 +467,40 @@ h2 {
   font-size: clamp(1.05rem, 6vh, 1.9rem);
   line-height: 1.45;
   text-align: left;
+}
+
+/* une page illustrée : l'image en grand (pixels nets), le dialogue dessous */
+#histoire.avec-image {
+  gap: 0.6rem;
+  padding-block: 0.6rem;
+  justify-content: center;
+}
+
+#histoire .scene {
+  max-width: 92vw;
+  max-height: 42vh;
+  object-fit: contain;
+  border: 3px solid #000;
+  box-shadow:
+    0 0 0 3px var(--jaune),
+    6px 6px 0 #000;
+}
+
+#histoire .scene.nette {
+  image-rendering: pixelated;
+}
+
+#histoire.avec-image .replique {
+  font-size: clamp(0.95rem, 5vh, 1.5rem);
+}
+
+#histoire.avec-image .portrait {
+  width: clamp(56px, 18vh, 96px);
+  height: clamp(56px, 18vh, 96px);
+}
+
+#histoire.avec-image .suite {
+  font-size: clamp(0.7rem, 3vh, 1rem);
 }
 
 #histoire .portrait {

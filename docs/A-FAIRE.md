@@ -4,10 +4,9 @@ Idées et finitions notées en route, pour ne pas les perdre.
 
 ## Histoire
 
-- **Scène du Clos** (image fournie : Tom dérape en Renault 11 devant « Le clos », la maison de famille de JBT où les DKK
-  répétaient) : à placer dans l'intro du niveau 1, avant de partir à l'aventure (voir la proposition de scénario).
-- **Photo du repas** : à fournir (le dernier repas des DKK au Clos, avant le départ) : la rappeler
-  quand on reprend le scénario du niveau 1.
+- **Scène du Clos** (Tom dérape en Renault 11 devant « Le clos », la maison de famille de JBT) et **scène du repas** (le spaghetti
+  de Mat) : intégrées à l'intro du niveau 1 ; d'autres illustrations pour d'autres moments du scénario sont possibles
+  (champ `image` des répliques).
 
 ## Sprites
 

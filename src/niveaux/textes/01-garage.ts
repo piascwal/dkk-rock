@@ -17,6 +17,35 @@ export const GARAGE: Omit<DefNiveau, 'carte'> = {
         'Dans le garage des parents de JBT, cinq anciens du collège ressortent leurs instruments. Le groupe s’appelait les DKK. Personne ne se souvient de ce que ça voulait dire.',
     },
     {
+      qui: 'NARRATEUR',
+      texte:
+        'Le Clos : la vieille maison de la famille de JBT, au bout d’un champ. C’est là que les DKK répétaient, avant.',
+      image: 'scene-clos.png',
+    },
+    { qui: 'TOM', texte: 'Regardez ! Dérapage contrôlé !' },
+    { qui: 'JBT', texte: 'Tom. C’est le terrain de mes parents.' },
+    { qui: 'TOM', texte: 'Et la Renault 11 tient la route.' },
+    { qui: 'MAT', texte: 'Elle n’a pas de ceinture, à l’arrière.' },
+    {
+      qui: 'NARRATEUR',
+      texte:
+        'Une dernière fois, ils se retrouvent au Clos pour élaborer le plan. Autour de la table, comme toujours : des spaghettis pour tout le monde.',
+      image: 'scene-repas.png',
+    },
+    {
+      qui: 'JBM',
+      texte: 'Voilà le plan. On monte le son, on débranche le DJ, et on rentre pour le dessert.',
+    },
+    { qui: 'MAT', texte: 'Regardez bien : un spaghetti par le nez.' },
+    { qui: 'TOM', texte: 'Mat ! Pas pendant que je mange !' },
+    { qui: 'JBM', texte: 'Pfff ! Mon eau !' },
+    {
+      qui: 'NARRATEUR',
+      texte:
+        'La scène est restée célèbre chez les DKK. Personne n’en a gardé la vidéo. Personne ne l’a oubliée.',
+    },
+    { qui: 'JBM', texte: 'Le ventre plein, on peut sauver le rock.', image: '' },
+    {
       qui: 'JBM',
       texte: 'Les gars. Ce matin, à la radio, j’ai entendu un morceau. Il n’y avait PAS DE GUITARE.',
     },
