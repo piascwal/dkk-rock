@@ -72,7 +72,7 @@ OBJETS = {
     'rocher': ([f'decor/rocher-{k}-base.png' for k in (1, 2, 3, 4)], None, 30),
     'rocherNeige': ([f'decor/rocher-neige-{k}-base.png' for k in (1, 2, 3, 4)], None, 30),
     # lot 18 : douze rockers (un par fan converti au rock), debout, que le jeu tire au sort pour remplacer l'ennemi vaincu
-    'rocker': ([f'ennemis/rocker-{k}-base.png' for k in range(1, 13)], None, 24),
+    'rocker': ([f'ennemis/rocker-{k}-base.png' for k in range(1, 13)], None, 13),
     'parasol': ([f'decor/parasol-{k}-base.png' for k in (1, 2, 3)], None, 28),
     'poubelle': ([f'decor/poubelle-{k}-base.png' for k in (1, 2)], None, 11),
     # le tonneau de décor, sans pancarte (les tonneaux WOG sont des tuiles : outils/fixe-tuiles.py)
