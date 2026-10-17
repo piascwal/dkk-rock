@@ -63,18 +63,30 @@ export class Histoire {
 
   private readonly convertis: Convertis;
 
+  /** Le bouton « passer » de l'intro : il saute toutes les pages restantes d'un coup. */
+  private readonly passer = document.createElement('button');
+
   constructor(
     private readonly element: HTMLElement,
     private readonly suivant: () => void,
     son: (nom: string) => void = () => {},
   ) {
     this.convertis = new Convertis(son);
+    this.passer.type = 'button';
+    this.passer.className = 'passer-histoire';
+    this.passer.textContent = 'Passer ▸▸';
     element.addEventListener('pointerdown', (e) => {
       e.preventDefault();
       // l'écran des convertis : un premier toucher finit le comptage, le suivant passe à la suite
       if (this.convertis.enCours) this.convertis.termine();
       else this.suivant();
     });
+  }
+
+  /** Saute les pages restantes de l'intro : autant de « suivant » qu'il en reste, la dernière lance le jeu. */
+  private passeTout(v: EtatVue): void {
+    const restantes = pagesDe(v.phase, v.niveau).length - v.page;
+    for (let i = 0; i < restantes; i++) this.suivant();
   }
 
   maj(v: EtatVue): void {
@@ -133,6 +145,7 @@ export class Histoire {
       suite.className = 'suite';
       suite.textContent = `${v.page + 1}/${pages.length} — touchez l’écran ou appuyez sur Entrée`;
       this.element.append(scene, bloc, suite);
+      this.ajoutePasser(v);
       this.element.hidden = false;
       return;
     }
@@ -164,6 +177,17 @@ export class Histoire {
     suite.className = 'suite';
     suite.textContent = `${v.page + 1}/${pages.length} — touchez l’écran ou appuyez sur Entrée`;
     this.element.append(suite);
+    this.ajoutePasser(v);
     this.element.hidden = false;
+  }
+
+  private ajoutePasser(v: EtatVue): void {
+    if (v.phase !== 'histoire') return;
+    this.passer.onpointerdown = (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      this.passeTout(v);
+    };
+    this.element.append(this.passer);
   }
 }

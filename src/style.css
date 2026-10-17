@@ -420,6 +420,20 @@ h2 {
 }
 
 /* ——— cartes d'histoire ——— */
+.passer-histoire {
+  position: absolute;
+  right: max(10px, env(safe-area-inset-right));
+  top: max(8px, env(safe-area-inset-top));
+  font-family: var(--titre);
+  font-size: 0.7rem;
+  padding: 0.4em 0.8em;
+  border: 2px solid #000;
+  background: var(--encre);
+  color: #111;
+  clip-path: var(--coins);
+  cursor: pointer;
+}
+
 #histoire {
   position: absolute;
   inset: 0;
