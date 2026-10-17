@@ -102,7 +102,7 @@ export function dessineEntite(
   if (v.gauche && !DRAPEAUX_SANS_MIROIR.has(v.g)) ctx.scale(-1, 1);
   if (aTerre) {
     // converti au rock : un rocker tiré au sort prend sa place (un drone, lui, reste un drone qui tombe, couché)
-    if (v.g !== G.DRONE && dessineRockerConverti(ctx, v)) {
+    if (v.g !== G.DRONE && dessineRockerConverti(ctx, v.id)) {
       ctx.restore();
       ctx.globalAlpha = 1;
       return;

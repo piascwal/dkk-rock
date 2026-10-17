@@ -16,6 +16,7 @@ import { Fond } from './fonds';
 import { Braises } from './flammes';
 import { dessineIndicateurs } from './indicateurs';
 import { Particules } from './particules';
+import { RockersRestes } from './rockers-convertis';
 import { THEMES, type Theme } from './themes';
 import { TraitsPersos } from './traits-persos';
 
@@ -28,6 +29,7 @@ export class Rendu {
   readonly camera = new Camera();
   readonly particules = new Particules();
   private readonly emojis = new Emojis();
+  private readonly restes = new RockersRestes();
   private readonly braises = new Braises();
   private readonly traits = new TraitsPersos();
   /** largeur de la vue en pixels du jeu (la hauteur est fixe, la largeur suit la forme de l'écran) */
@@ -220,6 +222,7 @@ export class Rendu {
     // les objets derrière, puis les personnages, puis les tirs
     const tri = (v: EntiteVue) =>
       v.g >= G.CAGE || (v.g < G.P_BAGUETTE && v.e === ANIM.TERRASSE) ? 0 : v.g >= G.P_BAGUETTE ? 2 : 1;
+    this.restes.dessine(ctx, this.restes.maj(vue), camX, camY, this.largeur);
     for (const passe of [0, 1, 2])
       for (const v of vue.entites)
         if (tri(v) === passe) dessineEntite(ctx, v, camX, camY, this.atlas, this.theme.lueur);
