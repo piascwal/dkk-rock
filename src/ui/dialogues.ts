@@ -117,10 +117,10 @@ export class Histoire {
       this.element.hidden = false;
       return;
     }
-    this.element.classList.remove('carte', 'avec-image');
     const cle = `${v.phase}-${v.niveau}-${v.page}`;
     if (cle === this.cle) return;
     this.cle = cle;
+    this.element.classList.remove('carte', 'avec-image', 'plein');
     const pages = pagesDe(v.phase, v.niveau);
     const r = pages[v.page];
     const def = NIVEAUX[v.niveau];
@@ -138,13 +138,19 @@ export class Histoire {
       // une petite image en pixels reste nette ; une grande, réduite à l'écran, est lissée (sinon elle crépite)
       scene.onload = () => scene.classList.toggle('nette', scene.naturalWidth <= 600);
       scene.src = `${import.meta.env.BASE_URL}sprites/${image}?v=${VERSION}`;
-      const bloc = document.createElement('div');
-      bloc.className = 'replique';
-      replique(bloc, r.qui, r.texte);
       const suite = document.createElement('p');
       suite.className = 'suite';
       suite.textContent = `${v.page + 1}/${pages.length} — touchez l’écran ou appuyez sur Entrée`;
-      this.element.append(scene, bloc, suite);
+      if (r.texte === '') {
+        // une page sans texte : l'illustration seule, en plein écran
+        this.element.classList.add('plein');
+        this.element.append(scene, suite);
+      } else {
+        const bloc = document.createElement('div');
+        bloc.className = 'replique';
+        replique(bloc, r.qui, r.texte);
+        this.element.append(scene, bloc, suite);
+      }
       this.ajoutePasser(v);
       this.element.hidden = false;
       return;

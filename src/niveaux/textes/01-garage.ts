@@ -15,8 +15,9 @@ export const GARAGE: Omit<DefNiveau, 'carte'> = {
       qui: 'NARRATEUR',
       texte:
         'Cet été, au Clos, chez les parents de JBT, les cinq DKK se sont retrouvés. Les photos du jour sont restées : un dérapage en Renault 11, des spaghettis, et le plan de l’aventure.',
-      image: 'scene-repas.png',
     },
+    { qui: 'NARRATEUR', texte: '', image: 'scene-clos.png' },
+    { qui: 'NARRATEUR', texte: '', image: 'scene-repas.png' },
     {
       qui: 'JBM',
       texte:
