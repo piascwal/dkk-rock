@@ -22,7 +22,7 @@ DENSITE = 6
 # des planches plus fines que 6 pixels par pixel du jeu, et réduites avec lissage (au lieu d'un agrandissement entier, qui donne des
 # pixels inégaux quand l'écran n'est pas un multiple de la planche) : le DJ, très détaillé, plus grand que le reste
 DENSITES = {'dj': 8}
-LISSES = {'dj'}
+LISSES = {'dj', 'voiture'}
 # objet : (fichiers sources, un par état (une ligne de la planche chacun), genre dans jeu/vue.ts, largeur en jeu en pixels)
 OBJETS = {
     'van': (['van-base.png'], 'VAN', 56),
@@ -126,7 +126,7 @@ def natif_brut(chemin):
     if case > 1:
         h, w = (a.shape[0] - oy) // case * case, (a.shape[1] - ox) // case * case
         a = a[oy : oy + h, ox : ox + w].reshape(h // case, case, w // case, case, 4)[:, 0, :, 0]
-    if chemin.name in ('voiture-2-base.png', 'voiture-5-base.png'):
+    if chemin.name in ('voiture-5-base.png',):  # l'ancienne Mégane (voiture-2) est déjà de profil ; la Renault 11 est de trois quarts
         a = redresse(a)
     return a, case
 
@@ -170,12 +170,12 @@ def main():
         w0 = np.ptp(np.nonzero(premier[..., 3].any(0))[0]) + 1  # la largeur du personnage, pas celle du cadre commun
         dens = DENSITES.get(nom, DENSITE)
         echelle = largeur * dens / w0
-        if nom in NATIF_BRUT:
+        if nom in NATIF_BRUT and nom not in LISSES:
             echelle = max(1, round(echelle))  # entier : pas de pixel plus large que son voisin
         images = []
         for nat, _ in etats:
             h, w = nat.shape[:2]
-            if nom in NATIF_BRUT:  # chaque image a sa grille : son propre facteur entier, pour une largeur en jeu voisine
+            if nom in NATIF_BRUT and nom not in LISSES:  # chaque image a sa grille : son propre facteur entier, pour une largeur en jeu voisine
                 largeur_etat = np.ptp(np.nonzero(nat[..., 3].any(0))[0]) + 1
                 echelle = max(1, round(largeur * dens / largeur_etat))
             nw, nh = round(w * echelle), round(h * echelle)
