@@ -91,6 +91,8 @@ OBJETS = {
 # détecterait une case fausse et abîmerait le dessin (bruit, détails perdus) ; on les prend telles quelles, et on les agrandit
 # d'un facteur entier pour que chaque pixel reste carré.
 NATIF_BRUT = {'voiture', 'rocker'}
+# des personnages qu'on met tous à la même hauteur (et non à la même largeur) : ils ne se ressemblent pas en largeur
+MEME_HAUTEUR = {'rocker': 19}  # pixels du jeu
 
 
 def redresse(a):
@@ -181,7 +183,9 @@ def main():
         images = []
         for nat, _ in etats:
             h, w = nat.shape[:2]
-            if nom in NATIF_BRUT and nom not in LISSES:  # chaque image a sa grille : son propre facteur entier, pour une largeur en jeu voisine
+            if nom in MEME_HAUTEUR:  # chaque image à la même hauteur en jeu
+                echelle = MEME_HAUTEUR[nom] * dens / h
+            elif nom in NATIF_BRUT and nom not in LISSES:  # chaque image a sa grille : son propre facteur entier, pour une largeur en jeu voisine
                 largeur_etat = np.ptp(np.nonzero(nat[..., 3].any(0))[0]) + 1
                 echelle = max(1, round(largeur * dens / largeur_etat))
             nw, nh = round(w * echelle), round(h * echelle)
