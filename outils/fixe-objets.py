@@ -21,8 +21,8 @@ RACINE = pathlib.Path(__file__).resolve().parent.parent
 DENSITE = 6
 # des planches plus fines que 6 pixels par pixel du jeu, et réduites avec lissage (au lieu d'un agrandissement entier, qui donne des
 # pixels inégaux quand l'écran n'est pas un multiple de la planche) : le DJ, très détaillé, plus grand que le reste
-DENSITES = {'dj': 8, 'robot': 8, 'borne': 8}
-LISSES = {'dj', 'voiture', 'rocker', 'robot', 'borne'}
+DENSITES = {'dj': 8, 'robot': 8, 'borne': 8, 'pneus': 8, 'bidon': 8}
+LISSES = {'dj', 'voiture', 'rocker', 'robot', 'borne', 'pneus', 'bidon'}
 # celles de ces planches qu'on réduit à 256 couleurs (le DJ, les voitures) ; les rockers en ont trop : douze personnages différents sur une planche
 QUANTIFIEES = {'dj', 'voiture'}
 # objet : (fichiers sources, un par état (une ligne de la planche chacun), genre dans jeu/vue.ts, largeur en jeu en pixels)
@@ -78,6 +78,9 @@ OBJETS = {
     'parasol': ([f'decor/parasol-{k}-base.png' for k in (1, 2, 3)], None, 28),
     # la borne à incendie des rues (remplace le dessin en code « bouche »)
     'borne': (['decor/borne-base.png'], None, 15),
+    # les pneus empilés et le bidon d'essence (garage, ville)
+    'pneus': (['decor/pneus-base.png'], None, 14),
+    'bidon': (['decor/bidon-base.png'], None, 9),
     'poubelle': ([f'decor/poubelle-{k}-base.png' for k in (1, 2)], None, 11),
     # le tonneau de décor, sans pancarte (les tonneaux WOG sont des tuiles : outils/fixe-tuiles.py)
     'tonneau': (['decor/tonneau-base.png'], None, 13),
@@ -94,7 +97,7 @@ OBJETS = {
 # Ces images ne sont pas du pixel art sur une grille de 2 : leurs pixels sont déjà ceux du jeu. Les ramener à la grille
 # détecterait une case fausse et abîmerait le dessin (bruit, détails perdus) ; on les prend telles quelles, et on les agrandit
 # d'un facteur entier pour que chaque pixel reste carré.
-NATIF_BRUT = {'voiture', 'rocker', 'robot', 'borne'}
+NATIF_BRUT = {'voiture', 'rocker', 'robot', 'borne', 'pneus', 'bidon'}
 # les panneaux de direction (le texte doit se lire) : chaque pixel de l'artiste reste un carré net (agrandissement entier, sans
 # redimensionnement qui rend les pixels inégaux et brouille les lettres)
 ENTIERS = {'panneau'}
