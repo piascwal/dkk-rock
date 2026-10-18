@@ -154,7 +154,8 @@ const voiture: Accessoire = (p, v) => {
   p(6, -4, 6, 4, '#111');
 };
 
-const bouche: Accessoire = (p) => {
+// repli en code de la borne à incendie (planche borne.png, voir decor-sprites.ts)
+const borne: Accessoire = (p) => {
   p(-2, -8, 5, 8, '#c1121f');
   p(-3, -6, 7, 2, '#c1121f');
 };
@@ -224,7 +225,7 @@ export const ACCESSOIRES = {
   afficheRose: affiche('#3a1a4a', '#ff4fd8'),
   afficheBleue: affiche('#102a4a', '#3fe0ff'),
   voiture,
-  bouche,
+  borne,
   enceinteDeco,
   // repli en code de l'enceinte de 3/4 (planche enceinte-34.png, voir decor.ts)
   enceinte34: enceinteDeco,

@@ -76,6 +76,8 @@ OBJETS = {
     # lot 18 : douze rockers (un par fan converti au rock), debout, que le jeu tire au sort pour remplacer l'ennemi vaincu
     'rocker': ([f'ennemis/rocker-{k}-base.png' for k in range(1, 13)], None, 13),
     'parasol': ([f'decor/parasol-{k}-base.png' for k in (1, 2, 3)], None, 28),
+    # la borne à incendie des rues (remplace le dessin en code « bouche »)
+    'borne': (['decor/borne-base.png'], None, 16),
     'poubelle': ([f'decor/poubelle-{k}-base.png' for k in (1, 2)], None, 11),
     # le tonneau de décor, sans pancarte (les tonneaux WOG sont des tuiles : outils/fixe-tuiles.py)
     'tonneau': (['decor/tonneau-base.png'], None, 13),
@@ -95,7 +97,7 @@ OBJETS = {
 NATIF_BRUT = {'voiture', 'rocker'}
 # les panneaux de direction (le texte doit se lire) et le robot : chaque pixel de l'artiste reste un carré net (agrandissement entier, sans
 # redimensionnement qui rend les pixels inégaux et brouille les lettres)
-ENTIERS = {'panneau', 'robot'}
+ENTIERS = {'panneau', 'robot', 'borne'}
 # des personnages qu'on met tous à la même hauteur (et non à la même largeur) : ils ne se ressemblent pas en largeur
 MEME_HAUTEUR = {'rocker': 19}  # pixels du jeu
 

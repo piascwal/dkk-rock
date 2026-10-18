@@ -135,7 +135,7 @@ const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAccessoire[]
       'afficheRose',
       'afficheBleue',
       'voiture',
-      'bouche',
+      'borne',
       'buissonSable',
       'bidon',
       'pneus',
