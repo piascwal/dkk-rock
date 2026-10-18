@@ -16,7 +16,7 @@ const GENRES_ROCKERS = new Set(GENRES_CONVERTIS.filter((g) => g !== G.DRONE));
  * encore debout. Dessiné pieds en (0, 0) ; false si la planche n'est pas encore chargée (l'ennemi couché sert alors de repli).
  */
 export function dessineRockerConverti(ctx: CanvasRenderingContext2D, id: number): boolean {
-  ctx.globalAlpha = 0.5;
+  ctx.globalAlpha = 0.8;
   ctx.shadowColor = 'rgba(255,214,90,0.85)';
   ctx.shadowBlur = 5;
   return dessineDecorFeuille(ctx, 'rocker', id % NB_ROCKERS);
