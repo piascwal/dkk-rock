@@ -237,6 +237,7 @@ export class App implements Actions {
   }
 
   private suivant(): void {
+    if (this.histoire.retient()) return; // une pile de photos : ce toucher pose la suivante
     if (this.client) this.client.envoie({ t: 'suivant' });
     else this.partie?.suivant();
   }

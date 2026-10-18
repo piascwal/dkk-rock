@@ -4,7 +4,7 @@ import { NIVEAUX } from '../niveaux';
 import type { Qui } from '../niveaux/format';
 import { VERSION } from '../version';
 import { Convertis } from './convertis';
-import { pileDePhotos } from './pile-photos';
+import { PileDePhotos } from './pile-photos';
 import { COULEURS, NOMS, portrait } from './portraits';
 
 const QUIS = new Set(Object.keys(NOMS));
@@ -62,6 +62,9 @@ export class Bulles {
 export class Histoire {
   private cle = '';
 
+  /** La pile de photos de la page en cours, s'il y en a une : chaque toucher en pose une avant de passer à la suite. */
+  private pile: PileDePhotos | null = null;
+
   private readonly convertis: Convertis;
 
   /** Le bouton « passer » de l'intro : il saute toutes les pages restantes d'un coup. */
@@ -86,8 +89,14 @@ export class Histoire {
 
   /** Saute les pages restantes de l'intro : autant de « suivant » qu'il en reste, la dernière lance le jeu. */
   private passeTout(v: EtatVue): void {
+    this.pile = null; // on passe tout : plus de photo à attendre
     const restantes = pagesDe(v.phase, v.niveau).length - v.page;
     for (let i = 0; i < restantes; i++) this.suivant();
+  }
+
+  /** Un toucher qui sert à poser la photo suivante de la pile (true) plutôt qu'à passer la page. */
+  retient(): boolean {
+    return this.pile?.enAttente === true && this.pile.pose();
   }
 
   maj(v: EtatVue): void {
@@ -122,6 +131,7 @@ export class Histoire {
     if (cle === this.cle) return;
     this.cle = cle;
     this.element.classList.remove('carte', 'avec-image', 'plein', 'pile');
+    this.pile = null;
     const pages = pagesDe(v.phase, v.niveau);
     const r = pages[v.page];
     const def = NIVEAUX[v.niveau];
@@ -136,7 +146,8 @@ export class Histoire {
       const suite = document.createElement('p');
       suite.className = 'suite';
       suite.textContent = `${v.page + 1}/${pages.length} — touchez l’écran ou appuyez sur Entrée`;
-      this.element.append(pileDePhotos(r.photos), suite);
+      this.pile = new PileDePhotos(r.photos);
+      this.element.append(this.pile.element, suite);
       this.ajoutePasser(v);
       this.element.hidden = false;
       return;
