@@ -35,7 +35,6 @@ export type Sprite =
   | 'parasol'
   | 'borne'
   | 'pneus'
-  | 'bidon'
   | 'fougere';
 export const SPRITES: ReadonlySet<string> = new Set<Sprite>([
   'vacheCasque',
@@ -66,7 +65,6 @@ export const SPRITES: ReadonlySet<string> = new Set<Sprite>([
   'parasol',
   'borne',
   'pneus',
-  'bidon',
   'fougere',
 ]);
 
@@ -116,7 +114,6 @@ export function dessineSprite(
   if (quoi === 'parasol') return dessineDecorFeuille(ctx, 'parasol', v % 3, voile);
   if (quoi === 'borne') return dessineDecorFeuille(ctx, 'borne', 0, voile);
   if (quoi === 'pneus') return dessineDecorFeuille(ctx, 'pneus', 0, voile);
-  if (quoi === 'bidon') return dessineDecorFeuille(ctx, 'bidon', 0, voile);
   if (quoi === 'fougere') return dessineDecorFeuille(ctx, 'fougere', 0, voile);
   if (quoi === 'sapinNeige') return dessineDecorFeuille(ctx, 'sapin', 1 + ((v >> 4) & 1), voile);
   return dessineDecorFeuille(ctx, 'buisson', v % 3, voile);

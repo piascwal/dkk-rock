@@ -25,6 +25,7 @@ export const T = {
   PITON: 17,
   TONNEAU_WOG: 18,
   TONNEAU_OR: 19,
+  BIDON: 20,
 } as const;
 
 export type Tuile = (typeof T)[keyof typeof T];
@@ -92,6 +93,8 @@ export const PROPRIETES: Record<Tuile, ProprietesTuile> = {
   // revient, et dix secondes d'invincibilité)
   [T.TONNEAU_WOG]: base({ nom: 'tonneau WOG', car: 'O', pv: 3, tombe: true, debris: '#7a4a22' }),
   [T.TONNEAU_OR]: base({ nom: 'tonneau d’or WOG', car: 'Q', pv: 6, tombe: true, debris: '#ffd23f' }),
+  // un bidon d'essence : comme une caisse, on monte dessus, et il arrête le héros qui le rencontre
+  [T.BIDON]: base({ nom: 'bidon d’essence', car: 'J', pv: 2, tombe: true, debris: '#c1121f' }),
 };
 
 const PAR_CARACTERE = new Map<string, Tuile>(

@@ -188,7 +188,7 @@ function scelleLesEchelles(tuiles: Uint8Array, largeur: number, hauteur: number)
  * voit le ciel à travers un plancher à pitons ou derrière une échelle.
  */
 /** Celles qui laissent voir le fond, et les caisses : une fois cassées, elles laissent le mur de la pièce. */
-const LEGERES = new Set<number>([...TUILES_LEGERES, T.CAISSE, T.CAISSON]);
+const LEGERES = new Set<number>([...TUILES_LEGERES, T.CAISSE, T.CAISSON, T.BIDON]);
 const PLEINES = new Set<number>([
   T.TERRE,
   T.ROCHE,

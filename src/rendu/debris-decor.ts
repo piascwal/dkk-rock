@@ -21,7 +21,6 @@ const MATIERES: Partial<Record<string, { couleurs: string[]; haut: number }>> = 
   lampadaire: { couleurs: [...METAL, '#ffd56b'], haut: 40 },
   lampadaireNeon: { couleurs: [...METAL, ...NEON], haut: 40 },
   poubelle: { couleurs: METAL, haut: 10 },
-  bidon: { couleurs: [...METAL, '#c1121f'], haut: 12 },
   tonneau: { couleurs: BOIS, haut: 14 },
   pneus: { couleurs: ['#1a1a1a', '#3a3a3a', '#555'], haut: 12 },
   voiture: { couleurs: ['#c1121f', '#2a6fdb', ...METAL], haut: 22 },

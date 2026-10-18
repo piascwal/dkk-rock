@@ -15,6 +15,7 @@ export const COTE = { HAUT: 1, DROITE: 2, BAS: 4, GAUCHE: 8, SOUS_OBJET: 16 } as
 /** Les tuiles « posées » ou construites (caisses, caissons, murs) : la terre en dessous garde son herbe. */
 const POSEES = new Set<number>([
   T.CAISSE,
+  T.BIDON,
   T.CAISSON,
   T.TONNEAU_WOG,
   T.TONNEAU_OR,

@@ -147,6 +147,12 @@ const PEINTRES: Partial<Record<number, Peintre>> = {
     px(c, 3, 3, 1, 4, 'rgba(255,255,255,0.7)');
     px(c, 5, 3, 1, 2, 'rgba(255,255,255,0.7)');
   },
+  [T.BIDON]: (c) => {
+    px(c, 2, 0, 12, 16, '#c1121f');
+    px(c, 2, 0, 2, 16, '#e5432f');
+    px(c, 2, 9, 12, 1, '#7a0c14');
+    px(c, 5, 2, 6, 3, '#222');
+  },
   [T.BETON]: (c, v) => {
     px(c, 0, 0, 16, 16, '#8b8b85');
     moucheture(c, v, '#77776f', 9, 9);
@@ -161,6 +167,7 @@ const IMAGES_TUILES: Partial<Record<number, string>> = {
   [T.CAISSON]: 'tuile-caisson.png',
   [T.TONNEAU_WOG]: 'tuile-tonneau-wog.png',
   [T.TONNEAU_OR]: 'tuile-tonneau-or.png',
+  [T.BIDON]: 'tuile-bidon.png',
   [T.BOIS]: 'tuile-bois.png',
 };
 const imagesTuiles = new Map<number, HTMLImageElement>();

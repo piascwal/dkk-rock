@@ -31,14 +31,6 @@ const sacs: Accessoire = (p) => {
   p(-6, -5, 6, 1, '#8a7448');
 };
 
-const bidon: Accessoire = (p) => {
-  p(-3, -9, 7, 9, '#c1121f');
-  p(-3, -9, 2, 9, '#e5432f');
-  p(-3, -4, 7, 1, '#7a0c14');
-  p(-1, -11, 3, 2, '#c1121f');
-  p(1, -12, 2, 2, '#222');
-};
-
 const pneus: Accessoire = (p) => {
   p(-6, -4, 12, 4, '#1a1a1e');
   p(-5, -5, 10, 1, '#2e2e34');
@@ -137,7 +129,6 @@ const feuDeCamp: Accessoire = (p) => {
 export const ACCESSOIRES_SUPPLEMENTAIRES = {
   tonneau,
   sacs,
-  bidon,
   pneus,
   fougere,
   souche,

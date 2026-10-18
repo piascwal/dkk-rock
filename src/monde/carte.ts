@@ -19,7 +19,7 @@ export interface Modification {
 
 /** La matière du terrain laisse une paroi quand on la détruit ; pas les objets (caisses, caissons, plateformes). */
 const estMatiere = (t: number) =>
-  proprietes(t).solide && !TUILES_LEGERES.has(t) && t !== T.CAISSE && t !== T.CAISSON;
+  proprietes(t).solide && !TUILES_LEGERES.has(t) && t !== T.CAISSE && t !== T.CAISSON && t !== T.BIDON;
 
 /**
  * La grille de tuiles d'un niveau. Hors de la carte : murs de socle à gauche
