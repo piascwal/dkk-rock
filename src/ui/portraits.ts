@@ -30,7 +30,7 @@ export const NOMS: Record<Qui, string> = {
   NARRATEUR: 'Narrateur',
   YETI: 'Yéti',
   DJ: 'DJ Boucle',
-  RADIO: 'Radio',
+  RADIO: 'Radio FM',
 };
 
 const MEMBRES: Partial<Record<Qui, number>> = { JBT: 0, JBM: 1, JBG: 2, MAT: 3, TOM: 4 };

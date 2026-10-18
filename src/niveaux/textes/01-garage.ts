@@ -19,7 +19,13 @@ export const GARAGE: Omit<DefNiveau, 'carte'> = {
     {
       qui: 'NARRATEUR',
       texte: '',
-      photos: ['scene-clos.png', 'scene-repas.png', 'scene-batterie.png', 'scene-tronc.png'],
+      photos: [
+        'scene-clos.png',
+        'scene-repas.png',
+        'scene-batterie.png',
+        'scene-tronc.png',
+        'scene-concert.png',
+      ],
     },
     {
       qui: 'JBM',
