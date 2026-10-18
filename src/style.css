@@ -500,6 +500,57 @@ h2 {
     6px 6px 0 #000;
 }
 
+/* la pile de photos : chacune tombe de haut, de travers, sur la précédente */
+#histoire.pile {
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.pile-photos {
+  position: relative;
+  width: 96vw;
+  height: calc(100vh - 4.4rem);
+}
+
+.pile-photos .photo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: 0;
+  padding: 0.4rem 0.4rem 1.5rem;
+  background: #f4efe3;
+  border: 2px solid #000;
+  box-shadow: 4px 6px 0 rgba(0, 0, 0, 0.6);
+  transform: translate(-50%, -50%) translate(var(--dx), 0) rotate(var(--angle));
+  animation: pose-photo 0.55s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+.pile-photos img {
+  display: block;
+  height: calc(100vh - 11rem);
+  width: auto;
+  max-width: 76vw;
+  object-fit: contain;
+}
+
+@keyframes pose-photo {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) translate(var(--dx), -110vh) rotate(calc(var(--angle) * 4)) scale(1.25);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) translate(var(--dx), 0) rotate(var(--angle)) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pile-photos .photo {
+    animation: none;
+  }
+}
+
 /* une page sans texte : l'illustration occupe tout l'écran */
 #histoire.plein .scene {
   max-width: 96vw;

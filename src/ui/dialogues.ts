@@ -4,6 +4,7 @@ import { NIVEAUX } from '../niveaux';
 import type { Qui } from '../niveaux/format';
 import { VERSION } from '../version';
 import { Convertis } from './convertis';
+import { pileDePhotos } from './pile-photos';
 import { COULEURS, NOMS, portrait } from './portraits';
 
 const QUIS = new Set(Object.keys(NOMS));
@@ -120,7 +121,7 @@ export class Histoire {
     const cle = `${v.phase}-${v.niveau}-${v.page}`;
     if (cle === this.cle) return;
     this.cle = cle;
-    this.element.classList.remove('carte', 'avec-image', 'plein');
+    this.element.classList.remove('carte', 'avec-image', 'plein', 'pile');
     const pages = pagesDe(v.phase, v.niveau);
     const r = pages[v.page];
     const def = NIVEAUX[v.niveau];
@@ -129,6 +130,17 @@ export class Histoire {
     const image = pages
       .slice(0, v.page + 1)
       .reduce<string>((courante, page) => (page.image !== undefined ? page.image : courante), '');
+    if (r?.photos?.length && r.texte === '') {
+      // une pile de photos : elles tombent l'une après l'autre, en plein écran
+      this.element.classList.add('pile');
+      const suite = document.createElement('p');
+      suite.className = 'suite';
+      suite.textContent = `${v.page + 1}/${pages.length} — touchez l’écran ou appuyez sur Entrée`;
+      this.element.append(pileDePhotos(r.photos), suite);
+      this.ajoutePasser(v);
+      this.element.hidden = false;
+      return;
+    }
     if (r && image) {
       // une page illustrée : l'image en grand, puis le dialogue, sans le titre du niveau
       this.element.classList.add('avec-image');

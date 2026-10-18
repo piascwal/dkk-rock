@@ -33,6 +33,8 @@ export interface Replique {
    * avec un `texte` vide, l'image seule occupe tout l'écran
    */
   image?: string;
+  /** avec un `texte` vide : une pile de photos (fichiers de public/sprites/) qui tombent l'une sur l'autre, en plein écran */
+  photos?: string[];
 }
 
 export interface DefNiveau {
