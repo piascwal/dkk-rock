@@ -5,18 +5,19 @@ import { appliqueGravite, deplace, nouveauCorps, type Corps } from '../monde/phy
 
 /** Le baril explosif : deux secondes de clignotement après le premier coup, puis il explose. */
 export const DUREE_MECHE = 120;
-/** Le rayon de l'explosion, en pixels du monde : un cinquième de plus que l'explosion d'une enceinte. */
-export const RAYON_BARIL = 36;
-const DEGATS_BARIL = 2;
+/** Le rayon de l'explosion, en pixels du monde : un cinquième de plus que celui d'un caisson de basses (40 px). */
+export const RAYON_BARIL = 48;
+/** Les dégâts de l'explosion : ceux d'un caisson de basses. */
+const DEGATS_BARIL = 5;
 
 /**
- * Un baril rouge posé au sol, dans le garage et la ville. Il s'allume au premier tir qui le touche (des deux camps :
- * les tirs des héros, et les explosions) ; deux secondes après, il explose et casse ce qui se casse autour de lui. Il est
- * dans le camp des ennemis : les tirs des héros le visent, pas ceux des ennemis.
+ * Un baril rouge posé au sol, dans le garage et la ville. Il s'allume au premier tir qui le touche (ceux des héros comme
+ * ceux des ennemis) ou au premier souffle d'une explosion ; deux secondes après, il explose et casse ce qui se casse
+ * autour de lui. Personne ne le vise : il ne compte dans aucun camp (voir `Contexte.props`).
  */
 export class Baril implements EntiteSimulee, Cible {
   readonly id: number;
-  readonly camp = 'ennemis' as const;
+  readonly camp = 'tous' as const;
   readonly corps: Corps;
   fini = false;
   /** ticks restants avant l'explosion ; 0 tant que le baril n'a pas été touché */

@@ -25,10 +25,9 @@ import { zoneVisible } from './zone-visible';
 import { peuple, releveCarte } from './chargement';
 import { interactions, membreLibre } from './interactions';
 import type { Progression } from './sauvegarde';
+import { CACHE_VIDE, calculeCibles, type CacheCibles } from './cibles';
 import { construitVue } from './vue-partie';
 import { DUREE_CARTE, GENRES_CONVERTIS, type EtatVue, type Evenement, type Phase } from './vue';
-
-const estCible = (e: EntiteSimulee): e is EntiteSimulee & Cible => 'blesse' in e && 'camp' in e;
 
 /**
  * La partie : toute la simulation, sur l'appareil hôte (ou seul). Elle reçoit
@@ -73,7 +72,7 @@ export class Partie implements Contexte {
   private evenements: Evenement[] = [];
   private commandes = new Uint8Array(MAX_JOUEURS);
   private id = 1;
-  private cache: { heros: Cible[]; ennemis: Cible[]; tous: Cible[] } = { heros: [], ennemis: [], tous: [] };
+  private cache: CacheCibles = CACHE_VIDE;
 
   constructor(p: Progression) {
     this.niveau = p.niveau;
@@ -103,6 +102,9 @@ export class Partie implements Contexte {
   }
   cibles(camp: Camp): readonly Cible[] {
     return this.cache[camp];
+  }
+  props(): readonly Cible[] {
+    return this.cache.props;
   }
   explosion(x: number, y: number, rayon: number, degats: number, camp: Camp): void {
     explose(this, x, y, rayon, degats, camp);
@@ -331,11 +333,7 @@ export class Partie implements Contexte {
   }
 
   private recalculeCibles(): void {
-    const heros = this.joueurs.filter((j): j is Joueur => !!j && !j.mort);
-    const ennemis = this.entites.filter(
-      (e): e is EntiteSimulee & Cible => estCible(e) && e.camp === 'ennemis' && !e.fini,
-    );
-    this.cache = { heros, ennemis, tous: [...heros, ...ennemis] };
+    this.cache = calculeCibles(this.joueurs, this.entites);
   }
 
   /** La vie du boss éveillé, pour la barre du HUD. */

@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { VIES_DEPART } from '../src/config';
 import { Baril, DUREE_MECHE, RAYON_BARIL } from '../src/entites/baril';
+import { Projectile } from '../src/entites/projectile';
+import { BAGUETTE } from '../src/entites/projectiles-defs';
+import { NOTE_AUTOTUNE } from '../src/entites/projectiles-ennemis';
 import { Partie } from '../src/jeu/partie';
 
 const nouvelle = (niveau: number) => {
@@ -13,9 +16,9 @@ const nouvelle = (niveau: number) => {
 const barils = (p: Partie) => p.entites.filter((e): e is Baril => e instanceof Baril);
 
 /** Le monde attend loin des héros : on amène le héros tout près du baril. */
-const pres = (p: Partie, b: Baril) => {
+const pres = (p: Partie, b: Baril, ecart = 0) => {
   const j = p.joueurs[0]!;
-  j.corps.x = b.corps.x;
+  j.corps.x = b.corps.x - ecart;
   j.corps.y = b.corps.y;
 };
 
@@ -48,6 +51,34 @@ describe('le baril explosif', () => {
     for (let t = 0; t < 60; t++) p.avance();
     b.blesse(1, p);
     for (let t = 0; t < DUREE_MECHE - 60; t++) p.avance();
+    expect(b.fini).toBe(true);
+  });
+
+  it("n'est visé par personne, mais les tirs des deux camps l'allument", () => {
+    for (const [def, camp] of [
+      [BAGUETTE, 'heros'],
+      [NOTE_AUTOTUNE, 'ennemis'],
+    ] as const) {
+      const p = nouvelle(0);
+      const b = barils(p)[0]!;
+      pres(p, b, 120); // le héros à l'écart : le tir ennemi n'a que le baril sur son chemin
+      p.avance();
+      expect(p.cibles('ennemis')).not.toContain(b);
+      expect(p.cibles('heros')).not.toContain(b);
+      p.ajoute(new Projectile(p, def, camp, b.corps.x + 7, b.corps.y + 8, 0, 0));
+      p.avance();
+      for (let t = 0; t < DUREE_MECHE; t++) p.avance();
+      expect(b.fini).toBe(true);
+    }
+  });
+
+  it("s'allume au souffle d'une explosion voisine", () => {
+    const p = nouvelle(0);
+    const b = barils(p)[0]!;
+    pres(p, b);
+    p.avance();
+    p.explosion(b.corps.x + 20, b.corps.y, 30, 3, 'heros');
+    for (let t = 0; t < DUREE_MECHE; t++) p.avance();
     expect(b.fini).toBe(true);
   });
 });

@@ -43,6 +43,12 @@ export function explose(
     if (force > 0) c.blesse(force, ctx, Math.sign(cx - x) || 1, true);
     pousse(c, cx - x, cy - y);
   }
+  // les barils explosifs prennent le souffle des deux camps (et s'allument)
+  for (const c of ctx.props()) {
+    if (degats <= 0 || !c.vivant()) continue;
+    const d = Math.hypot(c.x + c.w / 2 - x, c.y + c.h / 2 - y) - Math.max(c.w, c.h) / 2;
+    if (d <= rayon) c.blesse(degats, ctx, 1, true);
+  }
 }
 
 /** Le souffle projette ce qui a une vitesse. */

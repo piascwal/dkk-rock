@@ -121,5 +121,10 @@ function collisionsTirs(p: Partie): void {
       if (tir.camp === 'heros' && !p.visible(c.x + c.w / 2, c.y + c.h / 2)) continue;
       tir.touche(p, c);
     }
+    // les barils explosifs s'allument au premier tir, quel que soit son camp
+    for (const c of p.props()) {
+      if (tir.fini) break;
+      if (c.vivant() && chevauche(b, c)) tir.touche(p, c);
+    }
   }
 }

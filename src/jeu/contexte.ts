@@ -50,6 +50,8 @@ export interface Contexte {
   visible(x: number, y: number): boolean;
   /** toutes les cibles d'un camp donné (pour viser, ou pour blesser) */
   cibles(camp: Camp): readonly Cible[];
+  /** les accessoires cassables du niveau (les barils) : touchés par les tirs et les explosions des deux camps, jamais visés */
+  props(): readonly Cible[];
   explosion(x: number, y: number, rayon: number, degats: number, camp: Camp): void;
   evenement(e: Evenement): void;
   son(nom: string, x: number, y: number): void;
