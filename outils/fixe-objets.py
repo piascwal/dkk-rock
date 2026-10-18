@@ -45,7 +45,7 @@ OBJETS = {
     'lampadaire': (['decor/lampadaire-base.png'], None, 15),
     # lot 7 : panneaux de bois (jamais retournés : on doit pouvoir lire l'inscription), voitures, bûches, plantes en pot
     # (cactus, pousse, retombante, grosse jardinière), feu de camp et poubelles (verte, kaki)
-    'panneau': ([f'decor/panneau-{k}-base.png' for k in (1, 2, 3, 4)], None, 20),
+    'panneau': ([f'decor/panneau-{k}-base.png' for k in (1, 2, 3, 4)], None, 26),
     # la voiture 2 (la Mégane) est vue de trois quarts : le générateur la redresse (voir `redresse`) pour que ses roues touchent le sol
     'voiture': ([f'decor/voiture-{k}-base.png' for k in (1, 2, 3, 4, 5)], None, 59),
     'tronc': ([f'decor/tronc-{k}-base.png' for k in (1, 2)], None, 19),
@@ -91,6 +91,9 @@ OBJETS = {
 # détecterait une case fausse et abîmerait le dessin (bruit, détails perdus) ; on les prend telles quelles, et on les agrandit
 # d'un facteur entier pour que chaque pixel reste carré.
 NATIF_BRUT = {'voiture', 'rocker'}
+# les panneaux de direction : le texte doit se lire, alors chaque pixel de l'artiste reste un carré net (agrandissement entier, sans
+# redimensionnement qui rend les pixels inégaux et brouille les lettres)
+ENTIERS = {'panneau'}
 # des personnages qu'on met tous à la même hauteur (et non à la même largeur) : ils ne se ressemblent pas en largeur
 MEME_HAUTEUR = {'rocker': 19}  # pixels du jeu
 
@@ -180,11 +183,15 @@ def main():
         echelle = largeur * dens / w0
         if nom in NATIF_BRUT and nom not in LISSES:
             echelle = max(1, round(echelle))  # entier : pas de pixel plus large que son voisin
+        if nom in ENTIERS:
+            echelle = max(1, round(echelle))
         images = []
         for nat, _ in etats:
             h, w = nat.shape[:2]
             if nom in MEME_HAUTEUR:  # chaque image à la même hauteur en jeu
                 echelle = MEME_HAUTEUR[nom] * dens / h
+            elif nom in ENTIERS:  # le même facteur entier pour toutes les images (le panneau ne change pas de taille)
+                echelle = max(1, round(echelle))
             elif nom in NATIF_BRUT and nom not in LISSES:  # chaque image a sa grille : son propre facteur entier, pour une largeur en jeu voisine
                 largeur_etat = np.ptp(np.nonzero(nat[..., 3].any(0))[0]) + 1
                 echelle = max(1, round(largeur * dens / largeur_etat))
