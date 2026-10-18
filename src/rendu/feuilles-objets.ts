@@ -36,6 +36,7 @@ export const FEUILLES_OBJETS: Partial<Record<Genre, Feuille>> = {
   [G.P_PILE]: { fichier: 'tir-pile.png', w: 54, h: 56, images: [1], rythme: 1, densite: 6, pied: 27 },
   [G.P_FLIPPER]: { fichier: 'tir-flipper.png', w: 84, h: 80, images: [1], rythme: 1, densite: 6, pied: 42 },
   [G.P_FRISBEE]: { fichier: 'tir-frisbee.png', w: 72, h: 51, images: [1], rythme: 1, densite: 6, pied: 36 },
+  [G.ROBOT]: { fichier: 'robot.png', w: 155, h: 185, images: [1], rythme: 1, densite: 6, pied: 77 },
 };
 
 /** Les planches du décor, sans genre : une ligne par apparence. */

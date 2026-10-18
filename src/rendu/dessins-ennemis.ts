@@ -41,17 +41,4 @@ export const DESSINS_ENNEMIS: Partial<Record<number, Dessin>> = {
     const leds = ['#ff4fd8', '#3fe0ff', '#7cfc7c', '#ffd23f'];
     for (let i = 0; i < 4; i++) p(-4 + i * 2, -3, 1, 1, leds[(i + Math.floor(f / 6)) % 4]!);
   },
-  [G.ROBOT]: (p, e, f) => {
-    const pas = pasDe(e, f);
-    p(-5, -6, 3, 6 - (pas === 0 ? 1 : 0), '#555');
-    p(2, -6, 3, 6 - (pas === 2 ? 1 : 0), '#555');
-    p(-7, -20, 14, 14, '#8a96a3');
-    p(-7, -20, 14, 1, '#c4ced8');
-    p(-3, -16, 6, 6, '#333');
-    p(-2, -15, 4, 4, e === ANIM.ATTAQUE ? '#ff2a2a' : '#555');
-    p(-5, -26, 10, 6, '#6d7781');
-    p(-4, -24, 9, 2, '#ff2a2a');
-    p(0, -29, 1, 3, '#aaa');
-    p(-1, -30, 3, 1, f % 20 < 10 ? '#ff2a2a' : '#550000');
-  },
 };

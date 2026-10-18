@@ -71,6 +71,8 @@ OBJETS = {
     # lot 11-12 : des tas de rochers (gris, et sous la neige), en sprites fournis
     'rocher': ([f'decor/rocher-{k}-base.png' for k in (1, 2, 3, 4)], None, 30),
     'rocherNeige': ([f'decor/rocher-neige-{k}-base.png' for k in (1, 2, 3, 4)], None, 30),
+    # le robot vocodeur des boîtes de nuit (le videur de la ville et du club), en sprite fourni : debout, un seul état
+    'robot': (['ennemis/robot-base.png'], 'ROBOT', 26),
     # lot 18 : douze rockers (un par fan converti au rock), debout, que le jeu tire au sort pour remplacer l'ennemi vaincu
     'rocker': ([f'ennemis/rocker-{k}-base.png' for k in range(1, 13)], None, 13),
     'parasol': ([f'decor/parasol-{k}-base.png' for k in (1, 2, 3)], None, 28),
@@ -91,9 +93,9 @@ OBJETS = {
 # détecterait une case fausse et abîmerait le dessin (bruit, détails perdus) ; on les prend telles quelles, et on les agrandit
 # d'un facteur entier pour que chaque pixel reste carré.
 NATIF_BRUT = {'voiture', 'rocker'}
-# les panneaux de direction : le texte doit se lire, alors chaque pixel de l'artiste reste un carré net (agrandissement entier, sans
+# les panneaux de direction (le texte doit se lire) et le robot : chaque pixel de l'artiste reste un carré net (agrandissement entier, sans
 # redimensionnement qui rend les pixels inégaux et brouille les lettres)
-ENTIERS = {'panneau'}
+ENTIERS = {'panneau', 'robot'}
 # des personnages qu'on met tous à la même hauteur (et non à la même largeur) : ils ne se ressemblent pas en largeur
 MEME_HAUTEUR = {'rocker': 19}  # pixels du jeu
 
