@@ -61,12 +61,14 @@ def souterrain(r, ennemis='a'):
 
 
 def tonneaux_de_surface(r):
-    """Des tonneaux WOG sur le terrain : un raccord sur trois (le reste du temps, le chemin est libre). Le tonneau d'or de
-    secours (si aucune cache n'en a reçu) se pose au premier raccord."""
+    """Des tonneaux WOG sur le terrain : un raccord sur deux en tonneau de bois, et au milieu du parcours un tonneau d'or
+    bien en vue (on le voit forcément, pas seulement dans une cache). Sans raccord assez large, pas de tonneau d'or sur le
+    terrain (la cache en garde un)."""
     n = r.n
     raccords = [(a, b) for a, b, g in r.pieces if g == 'raccord' and b - a >= 4]
     for k, (a, b) in enumerate(raccords):
-        if k % 3 == 1:
+        if k % 2 == 0:
             n.repere(a + 1, 'O', ymin=n.base - 3, surface=True)
-    if not any('Q' in ligne for ligne in n.g):
-        n.repere(raccords[0][0] + 1, 'Q', ymin=n.base - 3, surface=True)
+    if raccords:
+        a, b = raccords[len(raccords) // 2]
+        n.repere(a + 1, 'Q', ymin=n.base - 3, surface=True)

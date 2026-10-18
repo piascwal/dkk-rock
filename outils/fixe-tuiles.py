@@ -19,8 +19,10 @@ from prepare_instrument import natif_et_case
 RACINE = pathlib.Path(__file__).resolve().parent.parent
 COTE = 96
 TUILES = ['caisse', 'caisson', 'tonneau-wog', 'tonneau-or', 'bois']
-# les tuiles qui gardent leurs proportions (un tonneau n'est pas carré) : centrées en bas de la case
+# les tuiles qui gardent leurs proportions (un tonneau n'est pas carré) : centrées en bas de la case, et agrandies d'un
+# facteur ENTIER (3) : chaque pixel de l'artiste reste un carré net, sans les pixels inégaux d'un redimensionnement
 PROPORTIONS = {'tonneau-wog', 'tonneau-or'}
+FACTEUR_ENTIER = 3
 
 
 def main():
@@ -30,14 +32,13 @@ def main():
         nat = nat[ys.min() : ys.max() + 1, xs.min() : xs.max() + 1]
         h, w = nat.shape[:2]
         if nom in PROPORTIONS:
-            echelle = COTE / max(h, w)
-            nw, nh = round(w * echelle), round(h * echelle)
-            yy = np.minimum((np.arange(nh) / echelle).astype(int), h - 1)
-            xx = np.minimum((np.arange(nw) / echelle).astype(int), w - 1)
-            case = Image.new('RGBA', (COTE, COTE), (0, 0, 0, 0))
-            case.alpha_composite(Image.fromarray(nat[np.ix_(yy, xx)]), ((COTE - nw) // 2, COTE - nh))
+            cote = FACTEUR_ENTIER * max(h, w)
+            agrandi = np.repeat(np.repeat(nat, FACTEUR_ENTIER, axis=0), FACTEUR_ENTIER, axis=1)
+            nh, nw = agrandi.shape[:2]
+            case = Image.new('RGBA', (cote, cote), (0, 0, 0, 0))
+            case.alpha_composite(Image.fromarray(agrandi), ((cote - nw) // 2, cote - nh))
             case.save(RACINE / 'public' / 'sprites' / f'tuile-{nom}.png')
-            print(f'tuile-{nom}.png : {w}x{h} pixels d’origine -> {nw}x{nh} dans {COTE}x{COTE}')
+            print(f'tuile-{nom}.png : {w}x{h} pixels d’origine -> {cote}x{cote}, pixels ×{FACTEUR_ENTIER}')
             continue
         yy = np.minimum((np.arange(COTE) * h / COTE).astype(int), h - 1)
         xx = np.minimum((np.arange(COTE) * w / COTE).astype(int), w - 1)
