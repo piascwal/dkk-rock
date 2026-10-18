@@ -94,7 +94,7 @@ OBJETS = {
 # Ces images ne sont pas du pixel art sur une grille de 2 : leurs pixels sont déjà ceux du jeu. Les ramener à la grille
 # détecterait une case fausse et abîmerait le dessin (bruit, détails perdus) ; on les prend telles quelles, et on les agrandit
 # d'un facteur entier pour que chaque pixel reste carré.
-NATIF_BRUT = {'voiture', 'rocker'}
+NATIF_BRUT = {'voiture', 'rocker', 'robot', 'borne'}
 # les panneaux de direction (le texte doit se lire) : chaque pixel de l'artiste reste un carré net (agrandissement entier, sans
 # redimensionnement qui rend les pixels inégaux et brouille les lettres)
 ENTIERS = {'panneau'}
