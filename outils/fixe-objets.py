@@ -77,7 +77,7 @@ OBJETS = {
     'rocker': ([f'ennemis/rocker-{k}-base.png' for k in range(1, 13)], None, 13),
     'parasol': ([f'decor/parasol-{k}-base.png' for k in (1, 2, 3)], None, 28),
     # la borne à incendie des rues (remplace le dessin en code « bouche »)
-    'borne': (['decor/borne-base.png'], None, 22),
+    'borne': (['decor/borne-base.png'], None, 15),
     'poubelle': ([f'decor/poubelle-{k}-base.png' for k in (1, 2)], None, 11),
     # le tonneau de décor, sans pancarte (les tonneaux WOG sont des tuiles : outils/fixe-tuiles.py)
     'tonneau': (['decor/tonneau-base.png'], None, 13),

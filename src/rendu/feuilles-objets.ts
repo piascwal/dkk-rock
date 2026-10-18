@@ -111,7 +111,7 @@ export const FEUILLES_DECOR: Record<string, Feuille> = {
     pied: 55,
   },
   parasol: { fichier: 'parasol.png', w: 168, h: 168, images: [1, 1, 1], rythme: 1, densite: 6, pied: 84 },
-  borne: { fichier: 'borne.png', w: 176, h: 228, images: [1], rythme: 1, densite: 8, pied: 88 },
+  borne: { fichier: 'borne.png', w: 120, h: 155, images: [1], rythme: 1, densite: 8, pied: 60 },
   poubelle: { fichier: 'poubelle.png', w: 66, h: 96, images: [1, 1], rythme: 1, densite: 6, pied: 33 },
   tonneau: { fichier: 'tonneau.png', w: 78, h: 95, images: [1], rythme: 1, densite: 6, pied: 39 },
   cloture: { fichier: 'cloture.png', w: 167, h: 108, images: [1, 1, 1], rythme: 1, densite: 6, pied: 83 },
