@@ -36,7 +36,7 @@ export const FEUILLES_OBJETS: Partial<Record<Genre, Feuille>> = {
   [G.P_PILE]: { fichier: 'tir-pile.png', w: 54, h: 56, images: [1], rythme: 1, densite: 6, pied: 27 },
   [G.P_FLIPPER]: { fichier: 'tir-flipper.png', w: 84, h: 80, images: [1], rythme: 1, densite: 6, pied: 42 },
   [G.P_FRISBEE]: { fichier: 'tir-frisbee.png', w: 72, h: 51, images: [1], rythme: 1, densite: 6, pied: 36 },
-  [G.ROBOT]: { fichier: 'robot.png', w: 155, h: 185, images: [1], rythme: 1, densite: 6, pied: 77 },
+  [G.ROBOT]: { fichier: 'robot.png', w: 208, h: 248, images: [1], rythme: 1, densite: 8, pied: 104 },
 };
 
 /** Les planches du décor, sans genre : une ligne par apparence. */
@@ -111,7 +111,7 @@ export const FEUILLES_DECOR: Record<string, Feuille> = {
     pied: 55,
   },
   parasol: { fichier: 'parasol.png', w: 168, h: 168, images: [1, 1, 1], rythme: 1, densite: 6, pied: 84 },
-  borne: { fichier: 'borne.png', w: 102, h: 132, images: [1], rythme: 1, densite: 6, pied: 51 },
+  borne: { fichier: 'borne.png', w: 176, h: 228, images: [1], rythme: 1, densite: 8, pied: 88 },
   poubelle: { fichier: 'poubelle.png', w: 66, h: 96, images: [1, 1], rythme: 1, densite: 6, pied: 33 },
   tonneau: { fichier: 'tonneau.png', w: 78, h: 95, images: [1], rythme: 1, densite: 6, pied: 39 },
   cloture: { fichier: 'cloture.png', w: 167, h: 108, images: [1, 1, 1], rythme: 1, densite: 6, pied: 83 },

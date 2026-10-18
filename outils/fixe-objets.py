@@ -21,8 +21,8 @@ RACINE = pathlib.Path(__file__).resolve().parent.parent
 DENSITE = 6
 # des planches plus fines que 6 pixels par pixel du jeu, et réduites avec lissage (au lieu d'un agrandissement entier, qui donne des
 # pixels inégaux quand l'écran n'est pas un multiple de la planche) : le DJ, très détaillé, plus grand que le reste
-DENSITES = {'dj': 8}
-LISSES = {'dj', 'voiture', 'rocker'}
+DENSITES = {'dj': 8, 'robot': 8, 'borne': 8}
+LISSES = {'dj', 'voiture', 'rocker', 'robot', 'borne'}
 # celles de ces planches qu'on réduit à 256 couleurs (le DJ, les voitures) ; les rockers en ont trop : douze personnages différents sur une planche
 QUANTIFIEES = {'dj', 'voiture'}
 # objet : (fichiers sources, un par état (une ligne de la planche chacun), genre dans jeu/vue.ts, largeur en jeu en pixels)
@@ -77,7 +77,7 @@ OBJETS = {
     'rocker': ([f'ennemis/rocker-{k}-base.png' for k in range(1, 13)], None, 13),
     'parasol': ([f'decor/parasol-{k}-base.png' for k in (1, 2, 3)], None, 28),
     # la borne à incendie des rues (remplace le dessin en code « bouche »)
-    'borne': (['decor/borne-base.png'], None, 16),
+    'borne': (['decor/borne-base.png'], None, 22),
     'poubelle': ([f'decor/poubelle-{k}-base.png' for k in (1, 2)], None, 11),
     # le tonneau de décor, sans pancarte (les tonneaux WOG sont des tuiles : outils/fixe-tuiles.py)
     'tonneau': (['decor/tonneau-base.png'], None, 13),
@@ -95,9 +95,9 @@ OBJETS = {
 # détecterait une case fausse et abîmerait le dessin (bruit, détails perdus) ; on les prend telles quelles, et on les agrandit
 # d'un facteur entier pour que chaque pixel reste carré.
 NATIF_BRUT = {'voiture', 'rocker'}
-# les panneaux de direction (le texte doit se lire) et le robot : chaque pixel de l'artiste reste un carré net (agrandissement entier, sans
+# les panneaux de direction (le texte doit se lire) : chaque pixel de l'artiste reste un carré net (agrandissement entier, sans
 # redimensionnement qui rend les pixels inégaux et brouille les lettres)
-ENTIERS = {'panneau', 'robot', 'borne'}
+ENTIERS = {'panneau'}
 # des personnages qu'on met tous à la même hauteur (et non à la même largeur) : ils ne se ressemblent pas en largeur
 MEME_HAUTEUR = {'rocker': 19}  # pixels du jeu
 
