@@ -1,5 +1,6 @@
 import { TUILE } from '../config';
 import { ARMES_RAMASSABLES } from '../entites/armes';
+import { Baril } from '../entites/baril';
 import { Chauffage } from '../entites/chauffage';
 import { DjBoucle } from '../entites/ennemis/dj';
 import { ENNEMIS_PAR_LETTRE } from '../entites/ennemis/definitions';
@@ -20,6 +21,7 @@ export function peuple(p: Partie): void {
     p.ajoute(o);
   });
   for (const c of lu.cages) p.ajoute(new Objet(p, 'cage', c.x, c.y));
+  for (const b of lu.barils) p.ajoute(new Baril(p, b.tx, b.ty));
   for (const a of lu.armes)
     p.ajoute(new Objet(p, 'arme', a.x, a.y, p.rng.entier(1, ARMES_RAMASSABLES.length)));
   for (const s of lu.soins) p.ajoute(new Objet(p, 'soin', s.x, s.y));

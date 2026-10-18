@@ -273,7 +273,7 @@ def fabrique(cle):
     plan = enchaine(cfg['lieux'], cfg['graine'], cfg['raccord'])
     r = construit(cfg['nom'], cfg['theme'], cfg['textes'], plan, '', '', cfg['graine'], base=cfg['base'], van=cfg.get('van', True))
     souterrain(r, cfg['caves'])
-    tonneaux_de_surface(r)
+    tonneaux_de_surface(r, barils=cle in ('garage', 'ville'))
     if cle == 'cimes':
         arene_du_yeti(r)
     if cle == 'club':

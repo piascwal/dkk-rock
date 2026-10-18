@@ -26,6 +26,8 @@ export const G = {
   YETI_ALPHA: 20,
   DJ: 21,
   ENCEINTE: 22,
+  /** le baril explosif (garage, ville) : il clignote deux secondes après le premier coup, puis explose */
+  BARIL: 23,
   P_BAGUETTE: 30,
   P_ONDE: 31,
   P_ACCORD: 32,

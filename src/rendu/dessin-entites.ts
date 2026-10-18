@@ -91,6 +91,8 @@ export function dessineEntite(
   const heros = herosDuGenre(v.g);
   const aTerre = v.e === ANIM.TERRASSE && heros === undefined && v.g < G.P_BAGUETTE;
   if (v.clignote && heros) ctx.globalAlpha = 0.35;
+  // le baril explosif, pendant sa mèche : il pâlit une fois sur deux
+  if (v.clignote && v.g === G.BARIL) ctx.globalAlpha = 0.4;
 
   ctx.save();
   // monde sombre : un liseré lumineux détache les personnages du fond (cyan pour les héros, rose pour ceux d'en face)

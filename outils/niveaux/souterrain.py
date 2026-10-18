@@ -60,7 +60,7 @@ def souterrain(r, ennemis='a'):
                 dore = True
 
 
-def tonneaux_de_surface(r):
+def tonneaux_de_surface(r, barils=False):
     """Des tonneaux WOG sur le terrain : un raccord sur deux en tonneau de bois, et au milieu du parcours un tonneau d'or
     bien en vue (on le voit forcément, pas seulement dans une cache). Sans raccord assez large, pas de tonneau d'or sur le
     terrain (la cache en garde un)."""
@@ -69,6 +69,8 @@ def tonneaux_de_surface(r):
     for k, (a, b) in enumerate(raccords):
         if k % 2 == 0:
             n.repere(a + 1, 'O', ymin=n.base - 3, surface=True)
+        elif barils and k % 4 == 1:
+            n.repere(a + 1, '%', ymin=n.base - 3, surface=True)  # un baril explosif, entre deux tonneaux de bois
     if raccords:
         a, b = raccords[len(raccords) // 2]
         n.repere(a + 1, 'Q', ymin=n.base - 3, surface=True)

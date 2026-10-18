@@ -16,6 +16,7 @@ import type { NomTheme } from '../rendu/themes';
  * Repères (la case est vide une fois lue) :
  *   @ départ   F le van (fin du niveau)   ! drapeau (point de sauvegarde)
  *   K cage (un membre du groupe à libérer)   * arme au hasard   + médiator d'or (soin + spécial)
+ *   % baril explosif (s'allume au premier tir, explose deux secondes après)
  *   ( et ) : extrémités d'une tyrolienne ; chaque ( est reliée à la ) la plus proche à sa droite
  *   1 à 9 : déclencheurs de dialogue (quand un joueur franchit la colonne)
  *   a..z : ennemis, voir ENNEMIS_PAR_LETTRE dans entites/ennemis/definitions.ts
@@ -71,6 +72,8 @@ export interface NiveauLu {
   fin: Repere | null;
   drapeaux: Repere[];
   cages: Repere[];
+  /** les barils explosifs (`%`) */
+  barils: Repere[];
   armes: Repere[];
   soins: Repere[];
   ennemis: (Repere & { lettre: string })[];
@@ -98,6 +101,7 @@ export function litNiveau(def: DefNiveau): NiveauLu {
     fond,
     drapeaux: [],
     cages: [],
+    barils: [],
     armes: [],
     soins: [],
     ennemis: [],
@@ -129,6 +133,7 @@ export function litNiveau(def: DefNiveau): NiveauLu {
       else if (c === 'F') lu.fin = r;
       else if (c === '!') lu.drapeaux.push(r);
       else if (c === 'K') lu.cages.push(r);
+      else if (c === '%') lu.barils.push(r);
       else if (c === '*') lu.armes.push(r);
       else if (c === '+') lu.soins.push(r);
       else if (c === '(') debuts.push(r);
