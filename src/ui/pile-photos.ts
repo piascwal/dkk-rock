@@ -26,6 +26,8 @@ export class PileDePhotos {
       photo.style.zIndex = String(i + 1);
       const img = document.createElement('img');
       img.alt = '';
+      // une petite image en pixels reste nette ; une grande, réduite à l'écran, est lissée
+      img.onload = () => img.classList.toggle('nette', img.naturalWidth <= 600);
       img.src = `${import.meta.env.BASE_URL}sprites/${fichier}?v=${VERSION}`;
       photo.append(img);
       this.element.append(photo);

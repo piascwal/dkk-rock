@@ -16,7 +16,11 @@ export const GARAGE: Omit<DefNiveau, 'carte'> = {
       texte:
         'La veille du grand départ, les cinq DKK se sont retrouvés au Clos, chez les parents de JBT. Il reste quelques photos de cette soirée.',
     },
-    { qui: 'NARRATEUR', texte: '', photos: ['scene-clos.png', 'scene-repas.png', 'scene-batterie.png'] },
+    {
+      qui: 'NARRATEUR',
+      texte: '',
+      photos: ['scene-clos.png', 'scene-repas.png', 'scene-batterie.png', 'scene-tronc.png'],
+    },
     {
       qui: 'JBM',
       texte:
