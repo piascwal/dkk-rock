@@ -35,7 +35,8 @@ export type Sprite =
   | 'parasol'
   | 'borne'
   | 'pneus'
-  | 'bidon';
+  | 'bidon'
+  | 'fougere';
 export const SPRITES: ReadonlySet<string> = new Set<Sprite>([
   'vacheCasque',
   'lampadaire',
@@ -66,6 +67,7 @@ export const SPRITES: ReadonlySet<string> = new Set<Sprite>([
   'borne',
   'pneus',
   'bidon',
+  'fougere',
 ]);
 
 /** Les accessoires dessinés par une planche fournie (apparence tirée au sort selon `v`, tournée d'un côté ou de l'autre). */
@@ -115,6 +117,7 @@ export function dessineSprite(
   if (quoi === 'borne') return dessineDecorFeuille(ctx, 'borne', 0, voile);
   if (quoi === 'pneus') return dessineDecorFeuille(ctx, 'pneus', 0, voile);
   if (quoi === 'bidon') return dessineDecorFeuille(ctx, 'bidon', 0, voile);
+  if (quoi === 'fougere') return dessineDecorFeuille(ctx, 'fougere', 0, voile);
   if (quoi === 'sapinNeige') return dessineDecorFeuille(ctx, 'sapin', 1 + ((v >> 4) & 1), voile);
   return dessineDecorFeuille(ctx, 'buisson', v % 3, voile);
 }
