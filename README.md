@@ -37,6 +37,7 @@ minimale, et le Yéti Alpha) → la Plage du Tube de l'Été → la Ville Autotu
 - Échelles, tyroliennes, saut et escalade contre les murs.
 - **Pause :** « Recommencer le niveau » (et « Recommencer au drapeau » une fois un drapeau levé) refait la carte, détruite ou non,
   pour se sortir d'une impasse ; les vies et le score restent. Deux pressions (3 s pour confirmer) ; réservé à l'hôte.
+- **Ennemis touchés** : ils clignotent en blanc (sprite compris) pendant un instant, et ceux qui tiennent plus d'un coup montrent leur barre de vie au-dessus de la tête pendant deux secondes.
 - **Bidons d'essence** (garage et ville, marqueur `J`) : des tuiles comme les caisses, on monte dessus, et elles arrêtent le héros ; un tir les casse.
 - **Barils explosifs** (garage et ville, marqueur `%`) : rouges, à terre. Le premier tir qui les touche (le leur comme celui d'une explosion voisine) les allume ; deux secondes plus tard, ils explosent (rayon 48 px, 5 dégâts aux héros comme aux ennemis : un cinquième de plus qu'un caisson de basses) et cassent ce qui se casse autour. Personne ne les vise, mais les tirs des ennemis les allument aussi.
 - **Tonneaux WOG** (le WOG, une passion magique pour les membres des DKK ; l'histoire sera retravaillée) : ce sont des tuiles

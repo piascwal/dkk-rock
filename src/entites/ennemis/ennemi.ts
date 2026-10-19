@@ -8,6 +8,8 @@ import type { DefEnnemi } from './definitions';
 const ECART_ETAGE = 22;
 /** Après un coup reçu, l'ennemi cherche son tireur sans égard à l'étage (ticks). */
 const DUREE_PROVOCATION = 150;
+/** combien de temps la barre de vie d'un ennemi reste visible après un coup (deux secondes) */
+const DUREE_BARRE = 120;
 
 /** Combien de temps (en ticks) un ennemi vaincu reste étendu sur la scène avant de s'effacer. */
 const DUREE_A_TERRE = 300;
@@ -38,6 +40,8 @@ export class Ennemi implements Cible, EntiteSimulee {
   /** délai avant un nouveau demi-tour : évite de pivoter à chaque pas contre un obstacle */
   virage = 0;
   private flash = 0;
+  /** ticks restants pendant lesquels sa barre de vie reste affichée après un coup */
+  private barre = 0;
   /** ticks restants pendant lesquels un coup reçu lui fait repérer son tireur, même à un autre étage */
   private provoque = 0;
   /** ticks restants à terre une fois vaincu (0 : debout) ; il ne gêne ni ne se bat plus */
@@ -91,7 +95,8 @@ export class Ennemi implements Cible, EntiteSimulee {
     if (dx) this.projete = dx > 0 ? 1 : -1;
     this.provoque = DUREE_PROVOCATION;
     this.pv -= degats;
-    this.flash = 4;
+    this.flash = 6;
+    this.barre = DUREE_BARRE;
     if (explosion) this.corps.vy = -3;
     if (this.etat === 'patrouille' && dx) {
       this.dir = dx > 0 ? -1 : 1;
@@ -188,6 +193,7 @@ export class Ennemi implements Cible, EntiteSimulee {
     }
     this.anim++;
     if (this.flash > 0) this.flash--;
+    if (this.barre > 0) this.barre--;
     if (this.provoque > 0) this.provoque--;
     if (this.recharge > 0) this.recharge--;
     if ((ctx.tick + this.id) % 8 === 0) this.percoit(ctx);
@@ -317,6 +323,8 @@ export class Ennemi implements Cible, EntiteSimulee {
       y: this.corps.y + this.corps.h,
       gauche: this.dir < 0,
       clignote: this.flash > 0,
+      // la barre de vie, en fraction de 1 à 255 (0 : pas de barre) : pour les ennemis qui tiennent plus d'un coup
+      vie: this.barre > 0 && this.def.pv > 1 ? Math.max(1, Math.ceil((this.pv / this.def.pv) * 255)) : 0,
       e:
         this.etat === 'attaque' && this.recharge > 0 && this.def.cadence - this.recharge < 8
           ? ANIM.ATTAQUE

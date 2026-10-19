@@ -1,7 +1,7 @@
 import { TUILE } from '../config';
 import { ARME_CHAUFFAGE, armeRamassee } from '../entites/armes';
 import { herosDuGenre } from '../entites/heros';
-import { ANIM, G, type EntiteVue } from '../jeu/vue';
+import { ANIM, G, type EntiteVue, type Genre } from '../jeu/vue';
 import type { AtlasTuiles } from './atlas-tuiles';
 import { dessineAura } from './aura';
 import { dessineBulle, hauteurBulle } from './bulle-bonus';
@@ -13,7 +13,7 @@ import { FEUILLES_DECOR } from './feuilles-objets';
 import { dessineHeros, dessineInstrument, dessineKiwi } from './dessins-heros';
 import { DESSINS_OBJETS, iconeArme } from './dessins-objets';
 import { DEMI_TAILLE, DESSINS_TIRS } from './dessins-tirs';
-import { pinceau } from './pinceau';
+import { pinceau, type Pinceau } from './pinceau';
 import { ecritCentre } from './police';
 import { dessineRockerConverti } from './rockers-convertis';
 import type { Theme } from './themes';
@@ -118,6 +118,9 @@ export function dessineEntite(
   const p = pinceau(ctx);
   const blanc = v.clignote && !heros && !estTir;
   const pb = blanc ? (x0: number, y0: number, w: number, h: number) => p(x0, y0, w, h, '#ffffff') : p;
+  // un ennemi touché passe au blanc, sprite compris : la planche est éclaircie et désaturée le temps du coup
+  const flashe = blanc && 'filter' in ctx;
+  if (flashe) ctx.filter = 'grayscale(1) brightness(3)';
 
   // sprites à apparences : l'identifiant choisit l'apparence ; héros : phase d'animation ; autres : compteur
   const compteur = aTerre ? 0 : FEUILLES[v.g]?.variantes ? v.id : heros ? v.f & 15 : v.f;
@@ -156,10 +159,23 @@ export function dessineEntite(
       if (v.g === G.ARME) iconeArme(p, v.f, 0);
     }
   }
+  if (flashe) ctx.filter = 'none';
+  if (v.vie && !heros) dessineBarreDeVie(p, v.g, v.vie);
   dessineBulle(ctx, v.g, performance.now());
   ctx.restore();
   ctx.globalAlpha = 1;
 
   if (v.e === ANIM.ALERTE && !heros) ecritCentre(ctx, '!', x, y - 30, '#ff2a2a');
   if (v.e === ANIM.PERDU && !heros) ecritCentre(ctx, '?', x, y - 30, '#ffd23f');
+}
+
+/** La barre de vie d'un ennemi qui tient plus d'un coup : au-dessus de sa tête, verte, puis orangée, puis rose. */
+function dessineBarreDeVie(p: Pinceau, genre: Genre, vie: number): void {
+  const f = FEUILLES[genre];
+  const haut = f ? Math.round(f.h / (f.densite ?? 1)) : 20;
+  const k = vie / 255;
+  const couleur = k > 0.5 ? '#7cfc7c' : k > 0.25 ? '#ffd23f' : '#ff4fd8';
+  const y = -haut - 5;
+  p(-7, y, 14, 3, '#000');
+  p(-6, y + 1, Math.max(1, Math.round(12 * k)), 1, couleur);
 }

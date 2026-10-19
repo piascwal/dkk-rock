@@ -97,6 +97,8 @@ export interface EntiteVue {
   gauche: boolean;
   /** clignote (invulnérable, sur le point d'exploser) */
   clignote: boolean;
+  /** barre de vie d'un ennemi, de 1 à 255 (0 ou absent : pas de barre) */
+  vie?: number;
   /** une forte aura autour du héros : il est invincible (le cœur d'or) */
   aura?: boolean;
   /** état d'animation, 0 à 15 */

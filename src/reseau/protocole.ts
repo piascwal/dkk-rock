@@ -20,14 +20,14 @@ import {
  *
  * Changer ce fichier de façon incompatible : augmenter VERSION_PROTOCOLE.
  */
-export const VERSION_PROTOCOLE = 8;
+export const VERSION_PROTOCOLE = 9;
 export const APP_DKK = { id: 'dkk-rock', version: VERSION_PROTOCOLE };
 
 const TYPE_ETAT = 1;
 const TYPE_COMMANDES = 2;
 const OCTETS_ENTETE = 15 + GENRES_CONVERTIS.length;
 const OCTETS_JOUEUR = 10;
-const OCTETS_ENTITE = 9;
+const OCTETS_ENTITE = 10;
 
 export function encodeEtat(v: EtatVue): ArrayBuffer {
   const n = v.entites.length;
@@ -72,6 +72,7 @@ export function encodeEtat(v: EtatVue): ArrayBuffer {
     i16(e.y);
     u8((e.gauche ? 1 : 0) | (e.clignote ? 2 : 0) | (e.aura ? 4 : 0) | ((e.e & 15) << 4));
     u8(e.f);
+    u8(e.vie ?? 0);
   }
   return buf;
 }
@@ -126,6 +127,8 @@ export function decodeEtat(buf: ArrayBuffer): EtatVue | null {
     const x = i16();
     const y = i16();
     const fl = u8();
+    const f = u8();
+    const vie = u8();
     entites.push({
       id,
       g,
@@ -135,7 +138,8 @@ export function decodeEtat(buf: ArrayBuffer): EtatVue | null {
       clignote: (fl & 2) !== 0,
       ...((fl & 4) !== 0 ? { aura: true } : {}),
       e: fl >> 4,
-      f: u8(),
+      f,
+      ...(vie ? { vie } : {}),
     });
   }
   return {
