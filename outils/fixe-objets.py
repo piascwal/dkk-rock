@@ -21,10 +21,12 @@ RACINE = pathlib.Path(__file__).resolve().parent.parent
 DENSITE = 6
 # les héros dont les images de dos sur l'échelle sont fournies (planches du décor « <héros>-echelle », à la densité des héros : 6)
 ECHELLES = ('tom', 'mat', 'jbt', 'jbm', 'jbg')
+# et celles du saut (en l'air), une image par héros, de profil
+SAUTS = tuple(f'{h}-saut' for h in ECHELLES)
 # des planches plus fines que 6 pixels par pixel du jeu, et réduites avec lissage (au lieu d'un agrandissement entier, qui donne des
 # pixels inégaux quand l'écran n'est pas un multiple de la planche) : le DJ, très détaillé, plus grand que le reste
-DENSITES = {'dj': 8, 'robot': 8, 'borne': 8, 'pneus': 8, 'baril': 8, 'fougere': 8, **{f'{h}-echelle': 6 for h in ECHELLES}}
-LISSES = {'dj', 'voiture', 'rocker', 'robot', 'borne', 'pneus', 'baril', 'fougere', *(f'{h}-echelle' for h in ECHELLES)}
+DENSITES = {'dj': 8, 'robot': 8, 'borne': 8, 'pneus': 8, 'baril': 8, 'fougere': 8, **{f'{h}-echelle': 6 for h in ECHELLES}, **{n: 6 for n in SAUTS}}
+LISSES = {'dj', 'voiture', 'rocker', 'robot', 'borne', 'pneus', 'baril', 'fougere', *(f'{h}-echelle' for h in ECHELLES), *SAUTS}
 # celles de ces planches qu'on réduit à 256 couleurs (le DJ, les voitures) ; les rockers en ont trop : douze personnages différents sur une planche
 QUANTIFIEES = {'dj', 'voiture'}
 # objet : (fichiers sources, un par état (une ligne de la planche chacun), genre dans jeu/vue.ts, largeur en jeu en pixels)
@@ -91,6 +93,13 @@ OBJETS = {
     'jbt-echelle': ([f'heros/jbt-echelle-{k}-base.png' for k in (1, 2)], None, 13.4),
     'jbm-echelle': ([f'heros/jbm-echelle-{k}-base.png' for k in (1, 2)], None, 9.9),
     'jbg-echelle': ([f'heros/jbg-echelle-{k}-base.png' for k in (1, 2)], None, 10.8),
+    # le saut : l'instrument est dans l'image ; l'échelle des images est la même pour tous (tête d'environ 75 px dans l'image
+    # d'origine, 27 px de planche chez le héros debout, soit 0,37 px de planche par pixel d'image)
+    'tom-saut': (['heros/tom-saut-base.png'], None, 20.2),
+    'mat-saut': (['heros/mat-saut-base.png'], None, 17.9),
+    'jbt-saut': (['heros/jbt-saut-base.png'], None, 16.8),
+    'jbm-saut': (['heros/jbm-saut-base.png'], None, 14.4),
+    'jbg-saut': (['heros/jbg-saut-base.png'], None, 16.0),
     # la fougère (garage, alpages, plage)
     'fougere': (['decor/fougere-base.png'], None, 14),
     # le baril explosif (garage, ville) : un objet du jeu (genre BARIL), pas un décor
@@ -111,7 +120,7 @@ OBJETS = {
 # Ces images ne sont pas du pixel art sur une grille de 2 : leurs pixels sont déjà ceux du jeu. Les ramener à la grille
 # détecterait une case fausse et abîmerait le dessin (bruit, détails perdus) ; on les prend telles quelles, et on les agrandit
 # d'un facteur entier pour que chaque pixel reste carré.
-NATIF_BRUT = {'voiture', 'rocker', 'robot', 'borne', 'pneus', 'baril', 'fougere', *(f'{h}-echelle' for h in ECHELLES)}
+NATIF_BRUT = {'voiture', 'rocker', 'robot', 'borne', 'pneus', 'baril', 'fougere', *(f'{h}-echelle' for h in ECHELLES), *SAUTS}
 # les panneaux de direction (le texte doit se lire) : chaque pixel de l'artiste reste un carré net (agrandissement entier, sans
 # redimensionnement qui rend les pixels inégaux et brouille les lettres)
 ENTIERS = {'panneau'}
