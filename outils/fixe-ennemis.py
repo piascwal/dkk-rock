@@ -46,6 +46,8 @@ TYPES = {
     'drone': ('DRONE', 22, 8),
     # la bigoudène (arc breton) : cornemuse, harpe, harpe 2 ; une apparence par ennemi, tirée au sort selon son identifiant
     'bigouden': ('BIGOUDEN', 24),
+    # le marin (arc breton) : accordéon, clarinette ; une apparence par ennemi, tirée au sort selon son identifiant
+    'marin': ('MARIN', 22),
     # le goéland (arc breton) : deux apparences, le vol et le piqué ; chacune va dans la ligne de son état (voir ETATS)
     'goeland': ('GOELAND', 18, 8),
 }

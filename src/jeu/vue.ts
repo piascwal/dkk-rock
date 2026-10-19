@@ -32,6 +32,8 @@ export const G = {
   GOELAND: 24,
   /** la bigoudène (arc breton) : elle joue son instrument (cornemuse, harpe) en airs de trois notes */
   BIGOUDEN: 25,
+  /** le marin (arc breton) : il fonce sur le héros et le frappe de son instrument (accordéon, clarinette) */
+  MARIN: 26,
   P_BAGUETTE: 30,
   P_ONDE: 31,
   P_ACCORD: 32,
@@ -141,6 +143,7 @@ export const GENRES_CONVERTIS: readonly number[] = [
   G.DRONE,
   G.GOELAND,
   G.BIGOUDEN,
+  G.MARIN,
   G.INFLUENCEUR,
   G.YETI,
   G.ROBOT,

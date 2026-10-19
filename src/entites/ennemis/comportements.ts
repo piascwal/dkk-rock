@@ -65,6 +65,16 @@ export const charge: Comportement = (e, ctx, cible) => {
   e.marcheVers(ctx, cible.x + cible.w / 2, e.def.vitesse * 1.6);
 };
 
+/**
+ * Marin : marche droit sur le héros et le frappe de son instrument (voir `contact`) ; toutes les 100 images, un coup de
+ * reins : un élan court, trois fois plus vite.
+ */
+export const marin: Comportement = (e, ctx, cible) => {
+  e.memoire++;
+  const elan = e.memoire % 100 > 85;
+  e.marcheVers(ctx, cible.x + cible.w / 2, e.def.vitesse * (elan ? 3 : 1.2));
+};
+
 /** Danseur du tube de l'été : court vers vous en dansant, et explose. */
 export const kamikaze: Comportement = (e, ctx, cible) => {
   e.marcheVers(ctx, cible.x + cible.w / 2, e.def.vitesse * 2);

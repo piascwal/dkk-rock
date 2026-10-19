@@ -196,21 +196,21 @@ NIVEAUX = {
         constante='CARTE_PORT', graine=88, base=30, raccord='acdh', caves='acdh',
         lieux=[
             ('plat', 12, dict(lettres='a', deco=3)),
-            ('plat', 10, dict(lettres='ach', digit='1')),  # le festival
-            ('maison', 14, dict(lettres='ach')),
-            ('toits', 42, dict(lettres='acdh')),  # les toits d'ardoise de la ville close
-            ('forteresse', 34, dict(etages=3, lettres='acdh', mat='B', cage=True)),  # la citadelle
-            ('ponton', 42, dict(lettres='cdh', digit='2')),  # les pontons du port de pêche
-            ('echafaudage', 22, dict(niveaux=3, lettres='acdh')),  # les grues du port
-            ('gouffre', 20, dict(lettres='acdh', nb=4)),
-            ('barrage', 20, dict(haut=12, lettres='acdh', butin='*')),
-            ('forteresse', 38, dict(etages=4, lettres='acdfh', mat='B', cage=True)),
-            ('traversee', 36, dict(lettres='acdfh', mode='pont')),
-            ('toits', 42, dict(lettres='acdfh')),
-            ('plat', 10, dict(lettres='acdfh', digit='3', drones=2)),  # le ferry est à quai
-            ('ponton', 42, dict(lettres='cdfh')),
-            ('barrage', 20, dict(haut=16, lettres='acdfh', tyro=11, butin='+')),
-            ('arene', 44, dict(lettres='acdfh')),  # la gare maritime ; la traversée viendra ensuite (étape 5)
+            ('plat', 10, dict(lettres='achm', digit='1')),  # le festival
+            ('maison', 14, dict(lettres='achm')),
+            ('toits', 42, dict(lettres='acdhm')),  # les toits d'ardoise de la ville close
+            ('forteresse', 34, dict(etages=3, lettres='acdhm', mat='B', cage=True)),  # la citadelle
+            ('ponton', 42, dict(lettres='cdhm', digit='2')),  # les pontons du port de pêche
+            ('echafaudage', 22, dict(niveaux=3, lettres='acdhm')),  # les grues du port
+            ('gouffre', 20, dict(lettres='acdhm', nb=4)),
+            ('barrage', 20, dict(haut=12, lettres='acdhm', butin='*')),
+            ('forteresse', 38, dict(etages=4, lettres='acdfhm', mat='B', cage=True)),
+            ('traversee', 36, dict(lettres='acdfhm', mode='pont')),
+            ('toits', 42, dict(lettres='acdfhm')),
+            ('plat', 10, dict(lettres='acdfhm', digit='3', drones=2)),  # le ferry est à quai
+            ('ponton', 42, dict(lettres='cdfhm')),
+            ('barrage', 20, dict(haut=16, lettres='acdfhm', tyro=11, butin='+')),
+            ('arene', 44, dict(lettres='acdfhm')),  # la gare maritime ; la traversée viendra ensuite (étape 5)
         ],
     ),
     'groix': dict(
@@ -218,21 +218,21 @@ NIVEAUX = {
         constante='CARTE_GROIX', graine=99, base=32, raccord='acdh', caves='acdh',
         lieux=[
             ('plat', 12, dict(lettres='a', deco=3)),
-            ('ponton', 42, dict(lettres='cdh', digit='1')),  # Port-Tudy, l'arrivée du ferry
-            ('colline', 18, dict(haut=3, lettres='ach')),
-            ('falaise', 28, dict(lettres='acdh', digit='2')),  # les falaises de la côte sauvage
-            ('forteresse', 34, dict(etages=3, lettres='acdh', mat='R', cage=True)),  # le fort
-            ('gouffre', 22, dict(lettres='acdh', nb=4)),  # le Trou de l'Enfer
-            ('traversee', 36, dict(lettres='acdh', mode='iles')),
-            ('tour', 22, dict(etages=3, lettres='acdfh', mat='R', digit='3')),  # le phare de Pen-Men
-            ('barrage', 20, dict(haut=12, lettres='acdh', butin='*')),
-            ('falaise', 30, dict(lettres='acdfh')),
-            ('forteresse', 38, dict(etages=4, lettres='acdfh', mat='R', cage=True)),
-            ('cheminee', 24, dict(haut=11, lettres='acdfh')),
-            ('plat', 10, dict(lettres='acdfh', digit='4', drones=2)),  # la plage des Grands Sables
-            ('traversee', 36, dict(lettres='acdfh', mode='pont')),
-            ('barrage', 20, dict(haut=16, lettres='acdfh', tyro=11, butin='+')),
-            ('arene', 46, dict(lettres='acdfh')),
+            ('ponton', 42, dict(lettres='cdhm', digit='1')),  # Port-Tudy, l'arrivée du ferry
+            ('colline', 18, dict(haut=3, lettres='achm')),
+            ('falaise', 28, dict(lettres='acdhm', digit='2')),  # les falaises de la côte sauvage
+            ('forteresse', 34, dict(etages=3, lettres='acdhm', mat='R', cage=True)),  # le fort
+            ('gouffre', 22, dict(lettres='acdhm', nb=4)),  # le Trou de l'Enfer
+            ('traversee', 36, dict(lettres='acdhm', mode='iles')),
+            ('tour', 22, dict(etages=3, lettres='acdfhm', mat='R', digit='3')),  # le phare de Pen-Men
+            ('barrage', 20, dict(haut=12, lettres='acdhm', butin='*')),
+            ('falaise', 30, dict(lettres='acdfhm')),
+            ('forteresse', 38, dict(etages=4, lettres='acdfhm', mat='R', cage=True)),
+            ('cheminee', 24, dict(haut=11, lettres='acdfhm')),
+            ('plat', 10, dict(lettres='acdfhm', digit='4', drones=2)),  # la plage des Grands Sables
+            ('traversee', 36, dict(lettres='acdfhm', mode='pont')),
+            ('barrage', 20, dict(haut=16, lettres='acdfhm', tyro=11, butin='+')),
+            ('arene', 46, dict(lettres='acdfhm')),
         ],
     ),
 }
