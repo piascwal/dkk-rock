@@ -15,6 +15,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent / 'niveaux'))
 from peintre import Niveau
 from plans import NIVEAUX, enchaine
 from souterrain import souterrain, tonneaux_de_surface
+from ferry import ferry
 from signatures import falaise, glacier, parking, ponton, scene, toits
 from structures import forteresse, traversee
 from verrous import barrage, gouffre
@@ -188,6 +189,9 @@ class Recette:
     def p_toits(self, x0, x1, lettres='a'):
         toits(self.n, x0, x1 - x0, lettres, self.n.t['mur'])
 
+    def p_ferry(self, x0, x1, lettres='a'):
+        ferry(self.n, x0, x1 - x0, lettres)
+
     def p_arene(self, x0, x1, lettres='ab', plus=2):
         n = self.n
         n.plat(x0, x1, 5)
@@ -268,7 +272,7 @@ def construit(nom, theme, textes, plan, fichier, constante, graine, base=30, van
             r.drapeau(x0 + (x1 - x0) // 2)
             dernier = x0
     for x0, x1, g in r.pieces:
-        if g in ('arene', 'vide') and x1 - x0 >= 40:
+        if g in ('arene', 'vide', 'ferry') and x1 - x0 >= 40:
             r.drapeau(x0 + 3)
     # le van, au bout (le club n'en a pas : le niveau finit avec le DJ)
     if van:

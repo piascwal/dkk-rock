@@ -65,6 +65,7 @@ export function construitVue(p: Partie): EtatVue {
     score: p.score,
     boss: boss ? boss.ratio : -1,
     secousse: Math.round(p.secousse),
+    traversee: p.traversee ? Math.min(65534, p.traversee.sillage) : -1,
     joueurs,
     entites,
   };

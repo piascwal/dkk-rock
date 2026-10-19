@@ -171,6 +171,8 @@ export interface EtatVue {
   boss: number;
   /** secousse de l'écran, 0 à 255 */
   secousse: number;
+  /** la traversée en ferry : images écoulées depuis l'embarquement (figées à l'arrivée), ou -1 hors traversée */
+  traversee: number;
   joueurs: JoueurVue[];
   entites: EntiteVue[];
 }

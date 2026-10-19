@@ -6,7 +6,6 @@ import {
   MAX_JOUEURS,
   TICKS_PAR_SECONDE,
   TUILE,
-  VIES_DEPART,
 } from '../config';
 import { Aleatoire } from '../moteur/maths';
 import { Carte } from '../monde/carte';
@@ -16,13 +15,15 @@ import { Boss } from '../entites/ennemis/boss';
 import { DjBoucle } from '../entites/ennemis/dj';
 import { ATTENTE_VAN, Objet } from '../entites/objets';
 import { niveauLu } from '../niveaux';
-import { arcOuvertPar, suivantDansArc, suivantDansMonde } from '../niveaux/arcs';
+import { suivantDansMonde } from '../niveaux/arcs';
 import type { NiveauLu } from '../niveaux/format';
 import { pagesDe } from '../histoire/pages';
 import type { Camp, Cible, Contexte, EntiteSimulee, Tyrolienne } from './contexte';
 import { explose } from './explosions';
 import { zoneVisible } from './zone-visible';
 import { peuple, releveCarte } from './chargement';
+import { changePhase } from './phases';
+import { majTraversee, prepareTraversee, type Traversee } from './traversee';
 import { interactions, membreLibre } from './interactions';
 import type { Progression } from './sauvegarde';
 import { CACHE_VIDE, calculeCibles, type CacheCibles } from './cibles';
@@ -48,6 +49,8 @@ export class Partie implements Contexte {
   carte!: Carte;
   lu!: NiveauLu;
   tyroliennes: Tyrolienne[] = [];
+  /** la traversée en ferry du niveau du port, une fois embarqué (voir traversee.ts) */
+  traversee: Traversee | null = null;
   entites: EntiteSimulee[] = [];
   readonly joueurs: (Joueur | null)[] = Array<Joueur | null>(MAX_JOUEURS).fill(null);
   readonly rng = new Aleatoire(Date.now() & 0xffff);
@@ -161,24 +164,7 @@ export class Partie implements Contexte {
       return;
     }
     this.page = 0;
-    if (this.phase === 'histoire') this.phase = 'jeu';
-    else if (this.phase === 'convertis')
-      this.phase = 'bilan'; // l'écran des convertis passé, place au récit
-    else if (this.phase === 'bilan') {
-      if (suivantDansArc(this.niveau) !== null) {
-        // le van roule vers le niveau suivant sur la carte du monde
-        this.phase = 'carte';
-        this.page = 0;
-      } else this.phase = 'fin';
-    } else if (this.phase === 'perdu') {
-      this.vies = VIES_DEPART;
-      this.charge(this.niveau, this.drapeau);
-      this.phase = 'jeu';
-    } else if (this.phase === 'fin' && arcOuvertPar(this.niveau) !== null) {
-      // l'épilogue lu, la route continue vers l'arc suivant
-      this.phase = 'carte';
-      this.page = 0;
-    }
+    changePhase(this);
   }
 
   /** Le départ du niveau, ou le dernier drapeau levé. */
@@ -190,6 +176,8 @@ export class Partie implements Contexte {
 
   /** Où réapparaît un héros : près d'un autre héros vivant, sinon au départ. */
   pointApparition(): [number, number] {
+    // en pleine traversée, le pont est fermé : on revient à bord, pas sur le quai
+    if (this.traversee) return this.traversee.pointApparition;
     const vivant = this.joueurs.find((j) => j && !j.mort);
     if (vivant) return [vivant.corps.x, vivant.corps.y - 4];
     return this.pointDeDepart();
@@ -213,6 +201,7 @@ export class Partie implements Contexte {
     this.van = null;
     this.dejaDit = new Set();
     peuple(this);
+    prepareTraversee(this);
     // un nouveau niveau, ou une reprise : tout le monde repart du départ, pas de là où il était
     const [x, y] = this.pointDeDepart();
     for (const j of this.joueurs) if (j) j.reapparait(x, y, j.membre);
@@ -266,6 +255,7 @@ export class Partie implements Contexte {
       }
       e.maj(this);
     }
+    majTraversee(this);
     this.recalculeCibles();
     interactions(this);
     this.entites = this.entites.filter((e) => !e.fini);

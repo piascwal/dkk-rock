@@ -20,6 +20,9 @@ import { RockersRestes } from './rockers-convertis';
 import { THEMES, type Theme } from './themes';
 import { TraitsPersos } from './traits-persos';
 
+/** De combien le fond défile par image pendant la traversée en ferry (pixels du monde par image de traversée). */
+const VITESSE_FERRY = 1.6;
+
 /**
  * Dessine une vue de la partie (EtatVue) : fond, tuiles, entités, particules.
  * Il ne connaît pas la simulation : l'hôte et les clients l'utilisent pareil.
@@ -183,7 +186,17 @@ export class Rendu {
     const camX = this.camera.x + (s ? (Math.random() - 0.5) * s * 0.6 : 0);
     const camY = this.camera.y + (s ? (Math.random() - 0.5) * s * 0.6 : 0);
 
-    this.fond.dessine(ctx, camX, camY, this.largeur, (niveauLu(vue.niveau).depart.ty + 1) * TUILE, this.tick);
+    // en traversée, le ferry avance : le fond défile en plus de la caméra
+    const decalage = Math.max(0, vue.traversee) * VITESSE_FERRY;
+    this.fond.dessine(
+      ctx,
+      camX,
+      camY,
+      this.largeur,
+      (niveauLu(vue.niveau).depart.ty + 1) * TUILE,
+      this.tick,
+      decalage,
+    );
     // le décor est semé à partir de la carte d'origine (avant destruction) : au chargement de chaque carte
     if (this.carteDecor !== carte) {
       this.carteDecor = carte;

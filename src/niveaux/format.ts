@@ -15,6 +15,7 @@ import type { NomTheme } from '../rendu/themes';
  *
  * Repères (la case est vide une fois lue) :
  *   @ départ   F le van (fin du niveau)   ! drapeau (point de sauvegarde)
+ *   & embarquement (le ferry : le pont se ferme, des vagues montent à l'abordage, voir jeu/traversee.ts)
  *   K cage (un membre du groupe à libérer)   * arme au hasard   + médiator d'or (soin + spécial)
  *   % baril explosif (s'allume au premier tir, explose deux secondes après)
  *   ( et ) : extrémités d'une tyrolienne ; chaque ( est reliée à la ) la plus proche à sa droite
@@ -70,6 +71,8 @@ export interface NiveauLu {
   depart: Repere;
   /** le van ; null dans le niveau du boss final, qui se termine par sa chute */
   fin: Repere | null;
+  /** l'embarquement du ferry (`&`) : le pont s'étend à droite de ce repère ; null hors du port */
+  embarquement: Repere | null;
   drapeaux: Repere[];
   cages: Repere[];
   /** les barils explosifs (`%`) */
@@ -99,6 +102,7 @@ export function litNiveau(def: DefNiveau): NiveauLu {
     hauteur,
     tuiles,
     fond,
+    embarquement: null,
     drapeaux: [],
     cages: [],
     barils: [],
@@ -131,6 +135,7 @@ export function litNiveau(def: DefNiveau): NiveauLu {
       if (ligne[tx - 1] === '.' || ligne[tx + 1] === '.') fond[ty * largeur + tx] = 1;
       if (c === '@') lu.depart = r;
       else if (c === 'F') lu.fin = r;
+      else if (c === '&') lu.embarquement = r;
       else if (c === '!') lu.drapeaux.push(r);
       else if (c === 'K') lu.cages.push(r);
       else if (c === '%') lu.barils.push(r);

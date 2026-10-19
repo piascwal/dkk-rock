@@ -6,7 +6,7 @@ Un lieu : (genre, largeur, options) ; les genres sont les méthodes `p_<genre>` 
 """
 import random
 
-FIN = ('arene',)
+FIN = ('arene', 'ferry')
 
 
 def enchaine(lieux, graine, lettres):
@@ -193,7 +193,7 @@ NIVEAUX = {
     ),
     'port': dict(
         nom='Le Port de Lorient', theme='port', textes='08-port.ts', fichier='08-port.ts',
-        constante='CARTE_PORT', graine=88, base=30, raccord='acdh', caves='acdh',
+        constante='CARTE_PORT', graine=88, base=30, raccord='acdh', caves='acdh', van=False,  # le van est sur le ferry
         lieux=[
             ('plat', 12, dict(lettres='a', deco=3)),
             ('plat', 10, dict(lettres='achm', digit='1')),  # le festival
@@ -210,7 +210,7 @@ NIVEAUX = {
             ('plat', 10, dict(lettres='acdfhm', digit='3', drones=2)),  # le ferry est à quai
             ('ponton', 42, dict(lettres='cdfhm')),
             ('barrage', 20, dict(haut=16, lettres='acdfhm', tyro=11, butin='+')),
-            ('arene', 44, dict(lettres='acdfhm')),  # la gare maritime ; la traversée viendra ensuite (étape 5)
+            ('ferry', 42, dict(lettres='acdfhm')),  # le quai, puis la traversée en ferry : des vagues à l'abordage (traversee.ts)
         ],
     ),
     'groix': dict(

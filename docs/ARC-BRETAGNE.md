@@ -36,10 +36,15 @@ Un arc à part, ouvert après la fin de l'arc principal, en trois niveaux.
    sillage de ferry. Après l'épilogue de la tournée, le van roule directement vers la forêt.
 3. ✅ Menhirs (sprite fourni, `assets-sources/decor/menhir-1-base.png`) et dolmens (dessinés en code) semés dans la forêt et sur Groix.
 4. ✅ Goéland (lettre `g`, genre `GOELAND`) : il plane au-dessus du héros, pique sur lui (son attaque, image de piqué), puis remonte. Il ne vit que dans les niveaux bretons ; le protocole passe en version 10 (nouveau genre).
-5. Phase ferry : défilement automatique, vagues d'ennemis par les côtés, bastingage.
+5. ✅ Phase ferry, à la fin du niveau du port : la pièce `ferry` du générateur (`outils/niveaux/ferry.py`) pose un quai, le repère
+   `&` d'embarquement, un pont de bois de 24 tuiles, la proue et le van. Quand tous les héros sont à bord
+   (`src/jeu/traversee.ts`), le pont se ferme derrière eux, cinq vagues montent à l'abordage par les deux côtés (marins,
+   bigoudènes, goélands ; un pont vide fait venir la suivante plus tôt), puis la porte (à 19 tuiles du repère) s'ouvre sur le
+   van. Le monde ne bouge pas : `EtatVue.traversee` transporte le temps de traversée et le fond défile (protocole version 13).
+   Un héros qui réapparaît en pleine traversée revient sur le pont.
 6. Bigoudènes ✅ (lettre `h`, genre `BIGOUDEN`, trois apparences tirées au sort ; elles gardent leurs distances et jouent un air de trois notes, puis soufflent ; protocole version 11). Marins ✅ (lettre `m`, genre `MARIN`, deux apparences, accordéon et clarinette ; ils foncent au corps-à-corps, frappent de leur instrument et ont un coup de reins toutes les 100 images ; au port et sur Groix seulement ; protocole version 12). Les trois ennemis bretons sont branchés ; restent la phase ferry (étape 5) et les niveaux à affiner.
 
 ## Idées de gameplay à valider
 
-- Sur le ferry : recharger le canon à un poste fixe, en alternance avec la défense au centre.
+- Sur le ferry : recharger le canon à un poste fixe, en alternance avec la défense au centre (pas fait : la traversée est pour l'instant une défense simple).
 - Dans la forêt : une lumière qui se déplace, et les ennemis apparaissent en dehors du halo.

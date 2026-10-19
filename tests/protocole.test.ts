@@ -49,6 +49,14 @@ describe('le protocole réseau', () => {
     expect(d.convertis.reduce((a, b) => a + b, 0)).toBe(3);
   });
 
+  it('le temps de traversée en ferry traverse le réseau (et -1 hors traversée)', () => {
+    const p = new Partie({ niveau: 7, drapeau: -1, vies: 5, score: 0 });
+    p.ajouteJoueur(0, 0);
+    expect(decodeEtat(encodeEtat(p.vue()))!.traversee).toBe(-1);
+    const v = { ...p.vue(), traversee: 1234 };
+    expect(decodeEtat(encodeEtat(v))!.traversee).toBe(1234);
+  });
+
   it("l'aura d'invincibilité traverse le réseau", () => {
     const p = new Partie({ niveau: 0, drapeau: -1, vies: 5, score: 0 });
     p.ajouteJoueur(0, 0);

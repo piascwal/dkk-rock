@@ -203,20 +203,23 @@ export class Fond {
     largeur: number,
     surface: number,
     tick: number,
+    /** le ferry avance : de combien le fond a défilé en plus de la caméra (en pixels du monde) */
+    decalage = 0,
   ): void {
     const th = this.theme;
+    const camFond = camX + decalage;
     const g = ctx.createLinearGradient(0, 0, 0, HAUTEUR_VUE);
     g.addColorStop(0, th.ciel[0]);
     g.addColorStop(1, th.ciel[1]);
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, largeur, HAUTEUR_VUE);
     this.astres(ctx, largeur, tick);
-    this.ciel.dessine(ctx, camX, largeur, tick);
+    this.ciel.dessine(ctx, camFond, largeur, tick);
     // chaque plan est posé sur l'horizon : le pied de ses arbres suit le sol quand on marche, et glisse moins vite que lui
     // quand on monte ou descend (plus le plan est loin, moins il bouge) : de la profondeur, et des forêts visibles
     const solEcran = surface - camY;
     PARALLAXE.forEach((f, i) => {
-      const x = -((camX * f) % LARGEUR_BANDE);
+      const x = -((camFond * f) % LARGEUR_BANDE);
       const pied = HORIZON + (solEcran - HORIZON) * PARALLAXE_VERTICALE[i]!;
       const y = Math.round(pied) - PIED_DE_BANDE;
       // sous la bande : de la couleur du plan, seulement là où l'écran existe
@@ -236,7 +239,7 @@ export class Fond {
         if (sw > 0) ctx.drawImage(this.plans[i]!, sx, h0, sw, h1 - h0, dx + sx, y + h0, sw, h1 - h0);
       }
     });
-    this.ciel.oiseaux(ctx, camX, largeur, tick);
+    this.ciel.oiseaux(ctx, camFond, largeur, tick);
     if (th.decor === 'club') this.lasers(ctx, largeur, tick);
   }
 
