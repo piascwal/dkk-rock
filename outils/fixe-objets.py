@@ -21,7 +21,7 @@ RACINE = pathlib.Path(__file__).resolve().parent.parent
 DENSITE = 6
 # des planches plus fines que 6 pixels par pixel du jeu, et réduites avec lissage (au lieu d'un agrandissement entier, qui donne des
 # pixels inégaux quand l'écran n'est pas un multiple de la planche) : le DJ, très détaillé, plus grand que le reste
-DENSITES = {'dj': 8, 'robot': 8, 'borne': 8, 'pneus': 8, 'baril': 8, 'fougere': 8, 'tom-echelle': 3}
+DENSITES = {'dj': 8, 'robot': 8, 'borne': 8, 'pneus': 8, 'baril': 8, 'fougere': 8, 'tom-echelle': 6}
 LISSES = {'dj', 'voiture', 'rocker', 'robot', 'borne', 'pneus', 'baril', 'fougere', 'tom-echelle'}
 # celles de ces planches qu'on réduit à 256 couleurs (le DJ, les voitures) ; les rockers en ont trop : douze personnages différents sur une planche
 QUANTIFIEES = {'dj', 'voiture'}
@@ -80,8 +80,9 @@ OBJETS = {
     'borne': (['decor/borne-base.png'], None, 15),
     # les pneus empilés (garage, ville) ; le bidon d'essence est une tuile (outils/fixe-tuiles.py)
     'pneus': (['decor/pneus-base.png'], None, 14),
-    # Tom de dos sur une échelle : deux images qui alternent (montée comme descente) ; même densité que les planches des héros (3)
-    'tom-echelle': ([f'heros/tom-echelle-{k}-base.png' for k in (1, 2)], None, 26),
+    # Tom de dos sur une échelle : deux images qui alternent (montée comme descente) ; même densité que les planches des héros (6),
+    # largeur choisie pour que sa taille égale celle de Tom debout (118 px de planche de la tête aux pieds)
+    'tom-echelle': ([f'heros/tom-echelle-{k}-base.png' for k in (1, 2)], None, 13),
     # la fougère (garage, alpages, plage)
     'fougere': (['decor/fougere-base.png'], None, 14),
     # le baril explosif (garage, ville) : un objet du jeu (genre BARIL), pas un décor

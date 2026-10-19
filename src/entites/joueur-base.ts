@@ -35,6 +35,8 @@ export abstract class JoueurBase implements Cible, EtatSpecial {
   protected echelle = false;
   protected tyro: Tyrolienne | null = null;
   protected anim = 0;
+  /** la phase d'animation sur une échelle : elle n'avance que lorsque le joystick monte ou descend */
+  protected animEchelle = 0;
   protected angle = 0;
   /** dégâts encaissés ce pas-ci (les effets de zone ne comptent qu'une fois) */
   private dejaBlesse = -1;

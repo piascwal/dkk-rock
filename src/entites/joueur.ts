@@ -164,6 +164,7 @@ export class Joueur extends JoueurBase {
     c.x += borne(centre - c.x, -1.5, 1.5);
     c.vx = k.horizontal * 0.8;
     c.vy = v * VITESSE_ECHELLE;
+    if (v !== 0) this.animEchelle++;
     if (k.horizontal) this.dir = k.horizontal > 0 ? 1 : -1;
     deplace(c, ctx.carte, true);
     if (v > 0 && c.auSol) this.echelle = false;
@@ -280,7 +281,10 @@ export class Joueur extends JoueurBase {
       e,
       // 4 bits de phase d'animation (cycle de 12 pas de 3 ticks : 6 images de course de 6 ticks chacune, sans à-coup),
       // 3 bits de visée, 1 bit « tire »
-      f: (Math.floor(this.anim / 3) % 12) | (codeVisee(this.angle) << 4) | (tire ? 128 : 0),
+      f:
+        (Math.floor((e === ANIM.ECHELLE ? this.animEchelle : this.anim) / 3) % 12) |
+        (codeVisee(this.angle) << 4) |
+        (tire ? 128 : 0),
     };
   }
 }

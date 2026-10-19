@@ -120,7 +120,7 @@ export const FEUILLES_DECOR: Record<string, Feuille> = {
     h: 130,
     images: [1, 1],
     rythme: 1,
-    densite: 3,
+    densite: 6,
     pied: 39,
   },
   fougere: { fichier: 'fougere.png', w: 112, h: 107, images: [1], rythme: 1, densite: 8, pied: 56 },
