@@ -17,6 +17,10 @@ Un arc à part, ouvert après la fin de l'arc principal, en trois niveaux.
 
 ## Assets
 
+- **Reçus (lot 22, `assets-sources/breton/`, 256 × 256) :** `bigouden-biniou.png`, `bigouden-harpe.png`,
+  `bigouden-harpe-2.png` (bigoudènes avec leur instrument), `marin-accordeon.png`, `marin-clarinette.png` (marins), et les
+  deux poses du goéland : `goeland-vol.png`, `goeland-pique.png`. Pas encore branchés (voir étapes 4 et 6).
+
 - **Menhirs :** sprite fourni (un seul reçu). **Dolmens :** dessinés en code (`decor-accessoires.ts`), pas encore de planche.
 - **Attendus du client :** bigoudens et marins avec leurs instruments (utilisés comme armes), et deux sprites de goéland
   (en vol, et en piqué).
