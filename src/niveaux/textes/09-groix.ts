@@ -3,7 +3,7 @@ import type { DefNiveau } from '../format';
 export const GROIX: Omit<DefNiveau, 'carte'> = {
   id: 'groix',
   titre: 'L’Île de Groix',
-  sousTitre: 'Breizh 3 — La note du phare',
+  sousTitre: 'Breizh 4 — La note du phare',
   theme: 'groix',
   intro: [
     {

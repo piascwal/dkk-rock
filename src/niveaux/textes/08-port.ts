@@ -36,11 +36,11 @@ export const PORT: Omit<DefNiveau, 'carte'> = {
     ],
   },
   outro: [
-    { qui: 'JBM', texte: 'Le ferry est à nous ! Cap sur Groix.' },
-    { qui: 'JBG', texte: 'J’ai toujours le mal de mer.' },
+    { qui: 'JBM', texte: 'Le port est à nous. Il ne reste que le ferry pour Groix.' },
+    { qui: 'JBG', texte: 'J’ai déjà le mal de mer, et on n’a pas encore quitté le quai.' },
     {
       qui: 'NARRATEUR',
-      texte: 'Au loin, sur l’île, une note s’élève de l’ancien phare. Toujours la même. Plus fort.',
+      texte: 'Sur le quai, le ferry est à l’heure. Son équipage, lui, joue toujours la même note.',
     },
   ],
 };

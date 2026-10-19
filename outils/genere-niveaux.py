@@ -285,7 +285,8 @@ def fabrique(cle):
     cfg = NIVEAUX[cle]
     plan = enchaine(cfg['lieux'], cfg['graine'], cfg['raccord'])
     r = construit(cfg['nom'], cfg['theme'], cfg['textes'], plan, '', '', cfg['graine'], base=cfg['base'], van=cfg.get('van', True))
-    souterrain(r, cfg['caves'])
+    if not cfg.get('sans_caves'):  # le ferry est un petit niveau : rien sous le quai
+        souterrain(r, cfg['caves'])
     tonneaux_de_surface(r, barils=cle in ('garage', 'ville'))
     if cle == 'cimes':
         arene_du_yeti(r)

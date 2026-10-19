@@ -31,7 +31,8 @@ export const ARCS: DefArc[] = [
     id: 'bretagne',
     titre: 'Breizh Tour',
     resume: 'De la forêt des légendes à l’île de Groix : rendre leurs airs aux binious.',
-    niveaux: [6, 7, 8],
+    // la forêt, le port, la traversée en ferry (niveau 9 de la liste, ajouté après coup), puis Groix
+    niveaux: [6, 7, 9, 8],
     apres: 5,
     fin: FIN_BRETAGNE,
   },

@@ -7,7 +7,7 @@ import type { Cible } from './contexte';
 import type { Partie } from './partie';
 
 /**
- * La traversée en ferry (fin du niveau du port, voir outils/niveaux/ferry.py). Une fois tous les héros à bord (repère `&` de la
+ * La traversée en ferry (le niveau « La Traversée », entre le port et Groix ; voir outils/niveaux/ferry.py). Une fois tous les héros à bord (repère `&` de la
  * carte), le pont se ferme derrière eux et des vagues montent à l'abordage par les deux côtés : marins, bigoudènes, goélands.
  * La porte du pont s'ouvre quand la dernière vague est vaincue, sur le van. Le monde, lui, ne bouge pas : la vue transporte le
  * temps de traversée (`EtatVue.traversee`) et le rendu fait défiler le fond, comme si le ferry avançait.

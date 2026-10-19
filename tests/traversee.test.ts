@@ -4,9 +4,9 @@ import { Partie } from '../src/jeu/partie';
 import { G } from '../src/jeu/vue';
 import { T } from '../src/monde/tuiles';
 
-/** Le port, le héros sur le pont (déjà à bord). */
+/** La traversée (niveau 9 de la liste), le héros sur le pont (déjà à bord). */
 function surLePont() {
-  const p = new Partie({ niveau: 7, drapeau: -1, vies: VIES_DEPART, score: 0 });
+  const p = new Partie({ niveau: 9, drapeau: -1, vies: VIES_DEPART, score: 0 });
   p.ajouteJoueur(0, 0);
   while (p.phase === 'histoire') p.suivant();
   const emb = p.lu.embarquement!;
@@ -22,15 +22,16 @@ function surLePont() {
   return { p, emb, j, pas };
 }
 
-describe('la traversée en ferry (port)', () => {
-  it('la carte du port a son embarquement, et la porte du pont est fermée au chargement', () => {
-    const p = new Partie({ niveau: 7, drapeau: -1, vies: VIES_DEPART, score: 0 });
+describe('la traversée en ferry (niveau à part)', () => {
+  it('la carte du ferry a son embarquement, et la porte du pont est fermée au chargement', () => {
+    const p = new Partie({ niveau: 9, drapeau: -1, vies: VIES_DEPART, score: 0 });
     const emb = p.lu.embarquement!;
     expect(emb).not.toBeNull();
     expect(p.carte.get(emb.tx + 19, emb.ty)).toBe(T.SOCLE);
     expect(p.traversee).toBeNull();
     // les autres niveaux n'ont pas de ferry
-    expect(new Partie({ niveau: 6, drapeau: -1, vies: 5, score: 0 }).lu.embarquement).toBeNull();
+    for (const n of [6, 7, 8])
+      expect(new Partie({ niveau: n, drapeau: -1, vies: 5, score: 0 }).lu.embarquement).toBeNull();
   });
 
   it('le pont se ferme derrière les héros à bord, et les vagues montent à l’abordage', () => {

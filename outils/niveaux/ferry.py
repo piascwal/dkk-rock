@@ -1,4 +1,4 @@
-"""Le ferry du port (niveau « Le Port de Lorient ») : un quai d'approche, puis le pont de bois d'un ferry, fermé par une proue.
+"""Le ferry (niveau « La Traversée », entre le port et Groix) : un quai d'approche, puis le pont de bois d'un ferry, fermé par une proue.
 
 Le repère `&` marque l'embarquement. Le jeu fait le reste (src/jeu/traversee.ts) : une fois tous les héros à bord, le pont se
 ferme derrière eux, des vagues montent à l'abordage des deux côtés, et la porte du pont (à 19 tuiles du repère) ne s'ouvre

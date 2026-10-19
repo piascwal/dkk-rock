@@ -7,6 +7,7 @@ import { CARTE_CLUB } from './cartes/06-club';
 import { CARTE_FORET } from './cartes/07-foret';
 import { CARTE_PORT } from './cartes/08-port';
 import { CARTE_GROIX } from './cartes/09-groix';
+import { CARTE_FERRY } from './cartes/10-ferry';
 import { litNiveau, type DefNiveau, type NiveauLu } from './format';
 import { GARAGE } from './textes/01-garage';
 import { ALPAGES } from './textes/02-alpages';
@@ -17,6 +18,7 @@ import { CLUB } from './textes/06-club';
 import { FORET } from './textes/07-foret';
 import { PORT } from './textes/08-port';
 import { GROIX } from './textes/09-groix';
+import { FERRY } from './textes/10-ferry';
 
 /** Les niveaux, arc après arc (voir arcs.ts). Pour en ajouter un : un texte, une carte, une ligne ici. */
 export const NIVEAUX: DefNiveau[] = [
@@ -30,6 +32,8 @@ export const NIVEAUX: DefNiveau[] = [
   { ...FORET, carte: CARTE_FORET },
   { ...PORT, carte: CARTE_PORT },
   { ...GROIX, carte: CARTE_GROIX },
+  // ajouté après coup : il vient avant Groix dans son arc (voir arcs.ts), mais garde la fin de la liste pour ne pas décaler les sauvegardes
+  { ...FERRY, carte: CARTE_FERRY },
 ];
 
 const lus = new Map<number, NiveauLu>();

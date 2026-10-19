@@ -193,7 +193,7 @@ NIVEAUX = {
     ),
     'port': dict(
         nom='Le Port de Lorient', theme='port', textes='08-port.ts', fichier='08-port.ts',
-        constante='CARTE_PORT', graine=88, base=30, raccord='acdh', caves='acdh', van=False,  # le van est sur le ferry
+        constante='CARTE_PORT', graine=88, base=30, raccord='acdh', caves='acdh',
         lieux=[
             ('plat', 12, dict(lettres='a', deco=3)),
             ('plat', 10, dict(lettres='achm', digit='1')),  # le festival
@@ -210,7 +210,7 @@ NIVEAUX = {
             ('plat', 10, dict(lettres='acdfhm', digit='3', drones=2)),  # le ferry est à quai
             ('ponton', 42, dict(lettres='cdfhm')),
             ('barrage', 20, dict(haut=16, lettres='acdfhm', tyro=11, butin='+')),
-            ('ferry', 42, dict(lettres='acdfhm')),  # le quai, puis la traversée en ferry : des vagues à l'abordage (traversee.ts)
+            ('plat', 16, dict(lettres='acdfhm')),  # le quai, et le van : le ferry est un niveau à part (La Traversée)
         ],
     ),
     'groix': dict(
@@ -233,6 +233,15 @@ NIVEAUX = {
             ('traversee', 36, dict(lettres='acdfhm', mode='pont')),
             ('barrage', 20, dict(haut=16, lettres='acdfhm', tyro=11, butin='+')),
             ('arene', 46, dict(lettres='acdfhm')),
+        ],
+    ),
+    # le ferry : un niveau à part entre le port et Groix, rejouable depuis la carte (voir outils/niveaux/ferry.py)
+    'ferry': dict(
+        nom='La Traversée', theme='port', textes='10-ferry.ts', fichier='10-ferry.ts',
+        constante='CARTE_FERRY', graine=89, base=30, raccord='acdh', caves='acdh', van=False, sans_caves=True,
+        lieux=[
+            ('plat', 12, dict(lettres='a', digit='1')),  # les marins et les goélands
+            ('ferry', 42, dict(lettres='ahm')),  # le quai, puis la traversée ; ni danseurs ni lanceurs : leurs explosions creuseraient le pont
         ],
     ),
 }

@@ -12,8 +12,12 @@ Un arc à part, ouvert après la fin de l'arc principal, en trois niveaux.
 ## Niveaux
 
 1. **La forêt** (thème « forêt mystique », sans prononcer le nom de la forêt) : sous-bois, brume, menhirs, dolmens, goélands.
-2. **Le port** (ville portuaire) : on y prend le ferry ; la traversée est la phase de défense.
-3. **Groix** : l'île, avec ses marins et ses bigoudens.
+2. **Le port** (ville portuaire) : il finit par le van, au bout du quai.
+3. **La Traversée** : le ferry, un niveau à part (la phase de défense), entre le port et Groix ; rejouable depuis la carte.
+4. **Groix** : l'île, avec ses marins et ses bigoudens.
+
+Ordre de l'arc : forêt, port, traversée, Groix (`arcs.ts`). La traversée est le niveau 9 de la liste (ajouté à la fin pour ne pas
+décaler les sauvegardes), mais vient avant Groix dans l'arc.
 
 ## Assets
 
@@ -36,7 +40,7 @@ Un arc à part, ouvert après la fin de l'arc principal, en trois niveaux.
    sillage de ferry. Après l'épilogue de la tournée, le van roule directement vers la forêt.
 3. ✅ Menhirs (sprite fourni, `assets-sources/decor/menhir-1-base.png`) et dolmens (dessinés en code) semés dans la forêt et sur Groix.
 4. ✅ Goéland (lettre `g`, genre `GOELAND`) : il plane au-dessus du héros, pique sur lui (son attaque, image de piqué), puis remonte. Il ne vit que dans les niveaux bretons ; le protocole passe en version 10 (nouveau genre).
-5. ✅ Phase ferry, à la fin du niveau du port : la pièce `ferry` du générateur (`outils/niveaux/ferry.py`) pose un quai, le repère
+5. ✅ Phase ferry, dans son propre niveau « La Traversée » (`10-ferry`, ni danseurs ni lanceurs : leurs explosions creuseraient le pont) : la pièce `ferry` du générateur (`outils/niveaux/ferry.py`) pose un quai, le repère
    `&` d'embarquement, un pont de bois de 24 tuiles, la proue et le van. Quand tous les héros sont à bord
    (`src/jeu/traversee.ts`), le pont se ferme derrière eux, cinq vagues montent à l'abordage par les deux côtés (marins,
    bigoudènes, goélands ; un pont vide fait venir la suivante plus tôt), puis la porte (à 19 tuiles du repère) s'ouvre sur le

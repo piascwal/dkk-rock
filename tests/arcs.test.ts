@@ -34,6 +34,11 @@ describe('les arcs de l’histoire', () => {
     expect(suivantDansArc(tournee.at(-1)!)).toBeNull();
   });
 
+  it('l’arc breton : la forêt, le port, la traversée en ferry, puis Groix', () => {
+    const ids = ARCS.find((a) => a.id === 'bretagne')!.niveaux.map((i) => NIVEAUX[i]!.id);
+    expect(ids).toEqual(['foret', 'port', 'ferry', 'groix']);
+  });
+
   it('une seule route : après le dernier niveau de la tournée, on continue vers la Bretagne', () => {
     const club = ARCS[0]!.niveaux.at(-1)!;
     const foret = ARCS.find((a) => a.id === 'bretagne')!.niveaux[0]!;
