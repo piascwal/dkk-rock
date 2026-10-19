@@ -124,7 +124,9 @@ export function dessineEntite(
 
   // sprites à apparences : l'identifiant choisit l'apparence ; héros : phase d'animation ; autres : compteur
   const compteur = aTerre ? 0 : FEUILLES[v.g]?.variantes ? v.id : heros ? v.f & 15 : v.f;
-  if (
+  if (v.g === G.TOM && v.e === ANIM.ECHELLE && dessineDecorFeuille(ctx, 'tom-echelle', (compteur >> 2) & 1)) {
+    // Tom de dos sur une échelle : deux images qui alternent, à la montée comme à la descente
+  } else if (
     dessineFeuille(
       ctx,
       v.g,
