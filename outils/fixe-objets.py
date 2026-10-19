@@ -88,7 +88,7 @@ OBJETS = {
     # largeur choisie pour que sa taille égale celle de Tom debout (118 px de planche de la tête aux pieds)
     'tom-echelle': ([f'heros/tom-echelle-{k}-base.png' for k in (1, 2)], None, 14.5),
     # Mat de dos sur une échelle (même principe) : largeur calée sur sa taille debout (120 px de planche), un peu plus que pile
-    'mat-echelle': ([f'heros/mat-echelle-{k}-base.png' for k in (1, 2)], None, 10.8),
+    'mat-echelle': ([f'heros/mat-echelle-{k}-base.png' for k in (1, 2)], None, 11.6),
     # les trois autres héros, même principe ; largeurs calées sur leur taille debout (la tête aux pieds), un peu plus que pile
     'jbt-echelle': ([f'heros/jbt-echelle-{k}-base.png' for k in (1, 2)], None, 13.4),
     'jbm-echelle': ([f'heros/jbm-echelle-{k}-base.png' for k in (1, 2)], None, 9.9),

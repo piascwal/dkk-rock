@@ -125,12 +125,12 @@ export const FEUILLES_DECOR: Record<string, Feuille> = {
   },
   'mat-echelle': {
     fichier: 'mat-echelle.png',
-    w: 65,
-    h: 133,
+    w: 70,
+    h: 143,
     images: [1, 1],
     rythme: 1,
     densite: 6,
-    pied: 32,
+    pied: 35,
   },
   'jbt-echelle': {
     fichier: 'jbt-echelle.png',

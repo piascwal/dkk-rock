@@ -4,12 +4,14 @@ import '@fontsource/silkscreen/400.css';
 import '@fontsource/silkscreen/700.css';
 import './style.css';
 import { App } from './app';
+import { installeAntiZoom } from './entrees/anti-zoom';
 import { installeCurseurVoile } from './ui/curseur-voile';
 
 /** Point d'entrée : DKK : Rock Never Dies. */
 const app = new App();
 app.demarre();
 installeCurseurVoile();
+installeAntiZoom();
 // le jeu a démarré : le filet de secours (public/secours.js) n'a rien à faire
 document.documentElement.dataset.demarre = '1';
 
