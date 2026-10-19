@@ -143,7 +143,9 @@ export function dessineEntite(
   // sprites à apparences : l'identifiant choisit l'apparence ; héros : phase d'animation ; autres : compteur
   const compteur = aTerre ? 0 : FEUILLES[v.g]?.variantes ? v.id : heros ? v.f & 15 : v.f;
   const imagesEchelle = v.e === ANIM.ECHELLE ? IMAGES_ECHELLE[v.g] : undefined;
-  const imageSaut = v.e === ANIM.SAUT && heros !== undefined ? `${NOMS_HEROS[v.g]}-saut` : undefined;
+  // en l'air, et sur une tyrolienne (pour l'instant, la même image que le saut)
+  const enLair = v.e === ANIM.SAUT || v.e === ANIM.TYROLIENNE;
+  const imageSaut = enLair && heros !== undefined ? `${NOMS_HEROS[v.g]}-saut` : undefined;
   if (imageSaut && dessineDecorFeuille(ctx, imageSaut, 0)) {
     // en l'air : une image par héros, avec son instrument
   } else if (imagesEchelle && dessineDecorFeuille(ctx, imagesEchelle, (compteur >> 2) & 1)) {
