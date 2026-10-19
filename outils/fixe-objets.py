@@ -82,7 +82,7 @@ OBJETS = {
     'pneus': (['decor/pneus-base.png'], None, 14),
     # Tom de dos sur une échelle : deux images qui alternent (montée comme descente) ; même densité que les planches des héros (6),
     # largeur choisie pour que sa taille égale celle de Tom debout (118 px de planche de la tête aux pieds)
-    'tom-echelle': ([f'heros/tom-echelle-{k}-base.png' for k in (1, 2)], None, 13),
+    'tom-echelle': ([f'heros/tom-echelle-{k}-base.png' for k in (1, 2)], None, 14.5),
     # la fougère (garage, alpages, plage)
     'fougere': (['decor/fougere-base.png'], None, 14),
     # le baril explosif (garage, ville) : un objet du jeu (genre BARIL), pas un décor
