@@ -21,22 +21,33 @@ describe('le goéland (arc breton)', () => {
     expect(goelands(partieAu(6)).length).toBeGreaterThan(0);
   });
 
-  it('plane au-dessus du héros, pique sur lui en prenant l’image d’attaque, puis remonte', () => {
+  it('plane à hauteur d’écran sans image d’attaque, prévient, pique sur le héros puis remonte', () => {
     const p = partieAu(6);
     const e = goelands(p)[0]!;
     const j = p.joueurs[0]!;
     j.invulnerable = 9999;
     Object.assign(e.corps, { x: j.corps.x, y: j.corps.y - 150 });
     e.recharge = 0;
+    let preavis = 0;
     let plonge = false;
     let remonte = false;
     let avantY = e.corps.y;
-    for (let i = 0; i < 120; i++) {
+    for (let i = 0; i < 400; i++) {
       e.etat = 'attaque';
       e.cible = j;
       e.vuA = p.tick;
       p.avance();
       p.releveEvenements();
+      const ecart = j.corps.y + j.corps.h / 2 - e.cy; // de combien il est au-dessus du héros
+      if (e.memoire === 0 && !plonge) {
+        // en vol ou en préavis : l'image de vol, et à hauteur d'écran une fois descendu
+        expect(e.vue().e).not.toBe(ANIM.ATTAQUE);
+        if (e.minuteur > 0) {
+          preavis++;
+          expect(ecart).toBeGreaterThan(20);
+          expect(ecart).toBeLessThan(60);
+        }
+      }
       if (e.memoire > 0) {
         plonge = true;
         expect(e.vue().e).toBe(ANIM.ATTAQUE);
@@ -48,6 +59,8 @@ describe('le goéland (arc breton)', () => {
       }
       avantY = e.corps.y;
     }
+    // un préavis d'au moins une demi-seconde avant le piqué
+    expect(preavis).toBeGreaterThanOrEqual(30);
     expect(plonge).toBe(true);
     expect(remonte).toBe(true);
   });

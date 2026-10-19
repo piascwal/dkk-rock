@@ -130,7 +130,10 @@ class Niveau:
             x = self.rng.randrange(x0, x1)
             y = self.sol(x)
             if y is not None:
-                self.set(x, max(2, y - self.rng.randrange(5, 8)), lettre)
+                # le goéland vole plus bas que le drone (3 à 5 tuiles au-dessus du sol) : on doit le voir avant son attaque ;
+                # le tirage est le même, les cartes ne changent que de ces deux rangées
+                haut = self.rng.randrange(5, 8) - (2 if lettre == 'g' else 0)
+                self.set(x, max(2, y - haut), lettre)
 
     def repere(self, x, c, ymin=0, surface=False):
         """Pose un repère (@ ! F * + K) sur le sol de la colonne x ; `surface` : sur le terrain, décor écarté."""

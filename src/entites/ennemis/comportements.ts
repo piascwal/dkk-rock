@@ -108,14 +108,17 @@ export const drone: Comportement = (e, ctx, cible) => {
   }
 };
 
-/** Durée du piqué et de la remontée du goéland, en images. */
+/** Le goéland, en images : le préavis avant le piqué, le piqué, la remontée ; et sa hauteur de vol au-dessus du héros. */
+const PREAVIS = 40;
 const PIQUE = 26;
 const RETOUR = 40;
+const HAUTEUR_DE_VOL = 38;
 
 /**
- * Goéland : plane au-dessus du héros, pique sur lui dès qu'il est à la verticale, puis remonte. Il ne tire pas : son
- * piqué est son attaque (il blesse à son contact, voir `contact` dans definitions.ts). `memoire` : plus de 0 en piqué,
- * moins de 0 en remontée, 0 en vol.
+ * Goéland : plane au-dessus du héros, annonce son attaque (il bat des ailes sur place, un « ! » apparaît), pique sur lui
+ * à l'endroit où il se trouve alors, puis remonte. Il ne tire pas : son piqué est son attaque (il blesse à son contact,
+ * voir `contact` dans definitions.ts). `memoire` : plus de 0 en piqué, moins de 0 en remontée, 0 sinon ; `minuteur` :
+ * le préavis qui reste.
  */
 export const goeland: Comportement = (e, ctx, cible) => {
   const c = centre(cible);
@@ -135,14 +138,26 @@ export const goeland: Comportement = (e, ctx, cible) => {
     if (e.memoire === 0) e.recharge = e.def.cadence;
     return;
   }
-  // en vol : au-dessus du héros, un peu plus haut que le drone pour laisser de la place au piqué
-  const visee = c.y - 72;
+  if (e.minuteur > 0) {
+    // le préavis : sur place, les ailes battent ; au bout, il part droit sur le héros, où qu'il soit alors
+    e.minuteur--;
+    e.corps.vx = 0;
+    e.corps.vy = Math.sin(e.anim / 2) * 0.5;
+    if (e.minuteur === 0) {
+      e.memoire = PIQUE;
+      e.corps.vx = (c.x - e.cx) / PIQUE;
+      e.corps.vy = (c.y - e.cy) / PIQUE;
+    }
+    return;
+  }
+  // en vol : au-dessus du héros, à hauteur d'écran (plus haut, on ne le verrait qu'au moment du piqué)
+  const visee = c.y - HAUTEUR_DE_VOL;
   e.corps.vy = Math.max(-1, Math.min(1, (visee - e.cy) * 0.05));
   e.marcheVers(ctx, c.x, e.def.vitesse);
-  if (e.recharge === 0 && Math.abs(c.x - e.cx) < 20) {
-    e.memoire = PIQUE;
-    e.corps.vx = (c.x - e.cx) / PIQUE;
-    e.corps.vy = (c.y - e.cy) / PIQUE;
+  if (e.recharge === 0 && Math.abs(c.x - e.cx) < 24 && Math.abs(visee - e.cy) < 12) {
+    e.minuteur = PREAVIS;
+    ctx.texte(e.cx, e.corps.y - 12, '!', '#ffd23f');
+    ctx.son('alerte', e.cx, e.cy);
   }
 };
 

@@ -211,6 +211,7 @@ export class Ennemi implements Cible, EntiteSimulee {
           this.etat = 'perdu';
           this.minuteur = 60;
           this.cible = null;
+          if (this.def.vole) this.memoire = 0; // un piqué interrompu ne laisse pas son image d'attaque
           break;
         }
         this.def.comportement(this, ctx, this.cible);
@@ -325,10 +326,10 @@ export class Ennemi implements Cible, EntiteSimulee {
       clignote: this.flash > 0,
       // la barre de vie, en fraction de 1 à 255 (0 : pas de barre) : pour les ennemis qui tiennent plus d'un coup
       vie: this.barre > 0 && this.def.pv > 1 ? Math.max(1, Math.ceil((this.pv / this.def.pv) * 255)) : 0,
-      // un tireur montre son attaque au moment du tir ; un ennemi volant, pendant toute son attaque (le piqué du goéland)
+      // un tireur montre son attaque au moment du tir ; un ennemi volant, pendant son piqué (`memoire` > 0 : le goéland)
       e:
         this.etat === 'attaque' &&
-        (this.def.vole || (this.recharge > 0 && this.def.cadence - this.recharge < 8))
+        (this.def.vole ? this.memoire > 0 : this.recharge > 0 && this.def.cadence - this.recharge < 8)
           ? ANIM.ATTAQUE
           : e,
       f: this.anim & 255,
