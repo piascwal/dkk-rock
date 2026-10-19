@@ -3,7 +3,7 @@
 lieux (forteresses, barrages, traversées de gouffres, tours...) reliés par de très courts raccords, et sous la terre des
 caves entrées par une échelle (outils/niveaux/souterrain.py). Jamais de longue ligne droite sans rien à y faire.
 
-Usage : python3 outils/genere-niveaux.py [garage|alpages|cimes|plage|ville ...]     Sortie : les cartes + un aperçu PNG
+Usage : python3 outils/genere-niveaux.py [garage|alpages|cimes|plage|ville|club|foret|port|groix ...]     Sortie : les cartes + un aperçu PNG
 Les cartes sont ensuite modifiables à la main (c'est du texte) ; relancer le script les écrase.
 """
 import pathlib
@@ -30,6 +30,9 @@ THEMES = {
     'plage': dict(sol='S', sous='S', profond='#', mur='W', deco=['C', 'W']),
     'ville': dict(sol='D', sous='D', profond='D', mur='D', deco=['C', 'T', 'M']),
     'club': dict(sol='D', sous='D', profond='D', mur='M', deco=['C', 'T', 'T']),
+    'foret': dict(sol='#', sous='#', profond='R', mur='W', deco=['C', 'W']),
+    'port': dict(sol='D', sous='#', profond='R', mur='B', deco=['C', 'T', 'W']),
+    'groix': dict(sol='#', sous='R', profond='R', mur='R', deco=['C', 'W']),
 }
 
 

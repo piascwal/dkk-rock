@@ -4,6 +4,9 @@ import { CARTE_CIMES } from './cartes/03-cimes';
 import { CARTE_PLAGE } from './cartes/04-plage';
 import { CARTE_VILLE } from './cartes/05-ville';
 import { CARTE_CLUB } from './cartes/06-club';
+import { CARTE_FORET } from './cartes/07-foret';
+import { CARTE_PORT } from './cartes/08-port';
+import { CARTE_GROIX } from './cartes/09-groix';
 import { litNiveau, type DefNiveau, type NiveauLu } from './format';
 import { GARAGE } from './textes/01-garage';
 import { ALPAGES } from './textes/02-alpages';
@@ -11,8 +14,11 @@ import { CIMES } from './textes/03-cimes';
 import { PLAGE } from './textes/04-plage';
 import { VILLE } from './textes/05-ville';
 import { CLUB } from './textes/06-club';
+import { FORET } from './textes/07-foret';
+import { PORT } from './textes/08-port';
+import { GROIX } from './textes/09-groix';
 
-/** Les niveaux, dans l'ordre de la tournée. Pour en ajouter un : un texte, une carte, une ligne ici. */
+/** Les niveaux, arc après arc (voir arcs.ts). Pour en ajouter un : un texte, une carte, une ligne ici. */
 export const NIVEAUX: DefNiveau[] = [
   { ...GARAGE, carte: CARTE_GARAGE },
   { ...ALPAGES, carte: CARTE_ALPAGES },
@@ -20,6 +26,10 @@ export const NIVEAUX: DefNiveau[] = [
   { ...PLAGE, carte: CARTE_PLAGE },
   { ...VILLE, carte: CARTE_VILLE },
   { ...CLUB, carte: CARTE_CLUB },
+  // l'arc breton
+  { ...FORET, carte: CARTE_FORET },
+  { ...PORT, carte: CARTE_PORT },
+  { ...GROIX, carte: CARTE_GROIX },
 ];
 
 const lus = new Map<number, NiveauLu>();

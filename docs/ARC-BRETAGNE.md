@@ -1,4 +1,4 @@
-# Arc breton (à faire)
+# Arc breton (en cours : étapes 1 et 2 faites)
 
 Un arc à part, ouvert après la fin de l'arc principal, en trois niveaux.
 
@@ -24,8 +24,12 @@ Un arc à part, ouvert après la fin de l'arc principal, en trois niveaux.
 
 ## Étapes (dans l'ordre)
 
-1. Thème `bretagne` (couleurs, fonds, ciel) et les trois niveaux en carte ASCII, avec `outils/genere-niveaux.py`.
-2. Entrée de l'arc dans `arcs.ts` et la carte du monde (`src/rendu/carte-monde.ts`) : une région par décor.
+1. ✅ Thèmes `foret`, `port`, `groix` (décors `sousbois`, `quais`, `falaises` : `src/rendu/fonds-bretagne.ts`) et les trois
+   niveaux (`outils/niveaux/plans.py`, cartes `07-foret.ts`, `08-port.ts`, `09-groix.ts`). Ennemis de la tournée en attendant
+   bigoudens, marins et goélands.
+2. ✅ Arc « Breizh Tour » dans `arcs.ts` (ouvert après le Club Infini), épilogue `src/histoire/fin-bretagne.ts`. Sur la carte
+   du monde : menhirs, dolmens, chênes, pentys, chalutiers, phares ; Groix est une île à part, séparée par un détroit que la
+   route franchit en sillage de ferry. L'écran de la carte permet de passer d'un arc ouvert à l'autre (bouton ⇄).
 3. Menhirs et dolmens en décor programmatique.
 4. Goéland : déplacement en vol, attaque en piqué, rattaché à la région bretonne uniquement.
 5. Phase ferry : défilement automatique, vagues d'ennemis par les côtés, bastingage.

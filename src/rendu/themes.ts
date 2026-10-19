@@ -1,8 +1,10 @@
 /** L'ambiance de chaque monde : couleurs du ciel, du sol, décor de fond, météo et musique. */
 
-export type NomTheme = 'garage' | 'montagne' | 'neige' | 'plage' | 'ville' | 'club';
+export type NomTheme =
+  'garage' | 'montagne' | 'neige' | 'plage' | 'ville' | 'club' | 'foret' | 'port' | 'groix';
 
-export type Decor = 'pavillons' | 'montagnes' | 'pics' | 'palmiers' | 'immeubles' | 'club';
+export type Decor =
+  'pavillons' | 'montagnes' | 'pics' | 'palmiers' | 'immeubles' | 'club' | 'sousbois' | 'quais' | 'falaises';
 
 export interface Theme {
   /** dégradé du ciel, du haut vers l'horizon */
@@ -91,5 +93,40 @@ export const THEMES: Record<NomTheme, Theme> = {
     lueur: { heros: '#8fe8ff', ennemis: '#ff7ad9' },
     meteo: 'confettis',
     musique: 'boss',
+  },
+  // l'arc breton : une forêt mystique (brume, lucioles, vieux chênes), un port de granit, l'île et ses falaises
+  foret: {
+    ciel: ['#142a2e', '#5f8a7a'],
+    lointain: '#2e4a44',
+    proche: '#1a2e28',
+    paroi: '#2a2620',
+    dessus: '#3f7a3a',
+    terre: '#4a3a2a',
+    decor: 'sousbois',
+    lueur: { heros: '#d8ffb0', ennemis: '#ffb07a' },
+    meteo: 'lucioles',
+    musique: 'montagne',
+  },
+  port: {
+    ciel: ['#5a7a9a', '#d8dfe0'],
+    lointain: '#7a8a96',
+    proche: '#3a4650',
+    paroi: '#3a3a40',
+    dessus: '#8a8a86',
+    terre: '#5e5a56',
+    decor: 'quais',
+    meteo: null,
+    musique: 'ville',
+  },
+  groix: {
+    ciel: ['#3f86c8', '#bfe2f0'],
+    lointain: '#2f6f9a',
+    proche: '#4a6a3a',
+    paroi: '#4a4238',
+    dessus: '#7aa04a',
+    terre: '#6a5a46',
+    decor: 'falaises',
+    meteo: null,
+    musique: 'plage',
   },
 };

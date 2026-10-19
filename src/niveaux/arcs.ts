@@ -1,3 +1,4 @@
+import { FIN_BRETAGNE } from '../histoire/fin-bretagne';
 import { FIN_TOURNEE } from '../histoire/fin-tournee';
 import type { Replique } from './format';
 
@@ -25,6 +26,14 @@ export const ARCS: DefArc[] = [
     resume: 'Du garage au Club Infini : débrancher DJ Boucle.',
     niveaux: [0, 1, 2, 3, 4, 5],
     fin: FIN_TOURNEE,
+  },
+  {
+    id: 'bretagne',
+    titre: 'Breizh Tour',
+    resume: 'De la forêt des légendes à l’île de Groix : rendre leurs airs aux binious.',
+    niveaux: [6, 7, 8],
+    apres: 5,
+    fin: FIN_BRETAGNE,
   },
 ];
 

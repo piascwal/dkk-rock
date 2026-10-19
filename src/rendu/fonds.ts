@@ -3,13 +3,12 @@ import { POSITION_HEROS } from './camera';
 import { Aleatoire } from '../moteur/maths';
 import { Ciel } from './ciel';
 import { arbreRond, brume, palmierPixel, sapinPixel } from './fonds-arbres';
+import { DECORS_BRETONS, type Peinture } from './fonds-bretagne';
 import type { Decor, Theme } from './themes';
 
 const LARGEUR_BANDE = 960;
 /** Les décors sont peints sur une bande de 270 px de haut, calée en bas de la vue. */
 const HAUTEUR_BANDE = 270;
-
-type Peinture = (c: CanvasRenderingContext2D, r: Aleatoire, th: Theme, plan: 0 | 1) => void;
 
 /** Une ligne de crêtes : du point (x, y) on monte et on descend au hasard. */
 function cretes(
@@ -163,6 +162,7 @@ const DECORS: Record<Decor, Peinture> = {
       c.fillStyle = plan ? th.proche : th.lointain;
     }
   },
+  ...DECORS_BRETONS,
 };
 
 /** Vitesse de défilement des trois plans (1 = la même que le jeu) : lointain, moyen, proche. */
@@ -242,8 +242,8 @@ export class Fond {
 
   private astres(ctx: CanvasRenderingContext2D, largeur: number, tick: number): void {
     const d = this.theme.decor;
-    if (d === 'pavillons' || d === 'palmiers') {
-      ctx.fillStyle = d === 'palmiers' ? '#fff3b0' : '#ffb36b';
+    if (d === 'pavillons' || d === 'palmiers' || d === 'falaises') {
+      ctx.fillStyle = d === 'pavillons' ? '#ffb36b' : '#fff3b0';
       ctx.beginPath();
       ctx.arc(largeur * 0.7, 120, 26, 0, Math.PI * 2);
       ctx.fill();

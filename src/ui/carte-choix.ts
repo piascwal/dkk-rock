@@ -36,7 +36,14 @@ export function ecranCarte(
   const precedent = bouton('◀', () => choisit(choix - 1));
   const suivant = bouton('▶', () => choisit(choix + 1));
   const barre = el('div', '', 'carte-barre');
-  barre.append(precedent, jouerB, suivant, bouton('Retour', retour));
+  barre.append(precedent, jouerB, suivant);
+  // un autre arc ouvert : on passe d'une île à l'autre, le van posé sur son dernier niveau ouvert
+  const autres = ARCS.filter((a) => a !== arc && niveauOuvert(a.niveaux[0]!, faits));
+  for (const a of autres) {
+    const dernier = a.niveaux.filter((n) => niveauOuvert(n, faits)).at(-1)!;
+    barre.append(bouton(`⇄ ${a.titre}`, () => ecranCarte(conteneur, faits, dernier, jouer, retour)));
+  }
+  barre.append(bouton('Retour', retour));
   conteneur(toile, el('h2', arc.titre, 'carte-arc'), titre, barre);
 
   let largeur = 240;

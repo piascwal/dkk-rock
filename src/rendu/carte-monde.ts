@@ -5,10 +5,10 @@ import { NIVEAUX } from '../niveaux';
 import { arcDe, suivantDansArc, type DefArc } from '../niveaux/arcs';
 import { C, SOLS, mer, type Px } from './carte-monde-decor';
 import { brouillard } from './carte-brouillard';
-import { longueur, surRoute } from './carte-route';
+import { dessineRoute, detroit, longueur, surRoute } from './carte-route';
 import { imageDe } from './feuilles-images';
 import { ecrit, ecritCentre } from './police';
-import { THEMES } from './themes';
+import { THEMES, type Decor } from './themes';
 
 /**
  * La carte du monde entre deux niveaux, façon Super Mario Bros 3 : une île vue de dessus, une route qui serpente
@@ -29,6 +29,9 @@ interface Plan {
 }
 
 const plans = new Map<string, Plan>();
+
+/** Les décors d'une île à part, au large : on y arrive en ferry. */
+const AU_LARGE = new Set<Decor>(['falaises']);
 
 function plan(arc: DefArc): Plan {
   const deja = plans.get(arc.id);
@@ -81,7 +84,7 @@ function plan(arc: DefArc): Plan {
     c.fillStyle = col;
     c.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
   };
-  const ile = (x: number, y: number) => {
+  const grandeIle = (x: number, y: number) => {
     const nx = (x - LT / 2) / (LT / 2 - 2.2);
     const ny = (y - HT / 2) / (HT / 2 - 2.2);
     return nx * nx * nx * nx + ny * ny * ny * ny + Math.sin(x * 1.3 + y * 0.7) * 0.08 < 1;
@@ -96,12 +99,16 @@ function plan(arc: DefArc): Plan {
       });
       region.push(mieux);
     }
+  // une région au large (l'île de Groix) : un détroit la sépare du reste, que la route franchit en ferry
+  const decorDe = (k: number) => THEMES[NIVEAUX[arc.niveaux[k]!]!.theme].decor;
+  const eau = detroit(region, (k) => AU_LARGE.has(decorDe(k)), LT, HT);
+  const ile = (x: number, y: number) => grandeIle(x, y) && !eau.has(y * LT + x);
   // sol, côtes et décors
   const occupe = new Set<number>();
   for (let y = 0; y < HT; y++)
     for (let x = 0; x < LT; x++) {
       if (!ile(x, y)) continue;
-      const sol = SOLS[THEMES[NIVEAUX[arc.niveaux[region[y * LT + x]!]!]!.theme].decor];
+      const sol = SOLS[decorDe(region[y * LT + x]!)];
       p(x * C, y * C, C, C, (x + y) % 2 ? sol.clair : sol.sombre);
     }
   // la plage autour de l'île : un liseré de sable et d'écume
@@ -126,7 +133,7 @@ function plan(arc: DefArc): Plan {
       const libre = (i: number) =>
         ile(i % LT, Math.floor(i / LT)) && !surRouteOuPres.has(i) && !occupe.has(i);
       if (!libre(k) || r.suivant() > 0.42) continue;
-      const sol = SOLS[THEMES[NIVEAUX[arc.niveaux[region[k]!]!]!.theme].decor];
+      const sol = SOLS[decorDe(region[k]!)];
       const grand =
         [k, k + 1, k + LT, k + LT + 1].every(libre) && region[k + LT + 1] === region[k] && r.suivant() < 0.35;
       if (grand) {
@@ -137,21 +144,7 @@ function plan(arc: DefArc): Plan {
         occupe.add(k);
       }
     }
-  // la route : un chemin clair bordé de sombre, en pointillés au milieu
-  for (const pass of [0, 1])
-    for (let i = 0; i + 1 < route.length; i++) {
-      const [ax, ay] = route[i]!;
-      const [bx, by] = route[i + 1]!;
-      const x0 = Math.min(ax, bx) * C + C / 2;
-      const y0 = Math.min(ay, by) * C + C / 2;
-      const w = Math.abs(bx - ax) * C;
-      const h = Math.abs(by - ay) * C;
-      if (pass === 0) p(x0 - 3, y0 - 3, w + 6, h + 6, '#4a2e12');
-      else {
-        p(x0 - 2, y0 - 2, w + 4, h + 4, '#f2dca4');
-        for (let k = 0; k <= Math.max(w, h); k += 4) p(x0 + (w ? k : 0), y0 + (h ? k : 0), 1, 1, '#c8a868');
-      }
-    }
+  dessineRoute(p, route, C, LT, eau);
   const pl = { route, etapes, fond: toile, region };
   plans.set(arc.id, pl);
   return pl;

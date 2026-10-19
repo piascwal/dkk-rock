@@ -23,4 +23,14 @@ describe('les arcs de l’histoire', () => {
     expect(niveauOuvert(b!, [a!])).toBe(true);
     expect(niveauOuvert(c!, [a!])).toBe(false);
   });
+
+  it('l’arc breton s’ouvre une fois la tournée finie', () => {
+    const bretagne = ARCS.find((a) => a.id === 'bretagne')!;
+    const tournee = ARCS[0]!.niveaux;
+    const premier = bretagne.niveaux[0]!;
+    expect(niveauOuvert(premier, tournee.slice(0, -1))).toBe(false);
+    expect(niveauOuvert(premier, tournee)).toBe(true);
+    expect(niveauOuvert(bretagne.niveaux[1]!, tournee)).toBe(false);
+    expect(suivantDansArc(tournee.at(-1)!)).toBeNull();
+  });
 });

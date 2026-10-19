@@ -25,6 +25,9 @@ const STYLES: Record<Decor, Style> = {
   palmiers: { sorte: 'liane', couleurs: ['#5a8a3a', '#8ab04a', '#b5d060'] },
   immeubles: { sorte: 'cable', couleurs: ['#0c0a18', '#2a2a36', '#55556a'] },
   club: { sorte: 'neon', couleurs: ['#ff4fd8', '#3fe0ff', '#7cfc7c'] },
+  sousbois: { sorte: 'liane', couleurs: ['#24402e', '#3f7a3a', '#8ad06a'], mousse: ['#3f7a3a', '#6aa84a'] },
+  quais: { sorte: 'cable', couleurs: ['#3a2a1a', '#6a5a3a', '#a8946a'] },
+  falaises: { sorte: 'liane', couleurs: ['#4a6a3a', '#7aa04a', '#ffd23f'], mousse: ['#7a8a4a', '#9aa85a'] },
 };
 
 /** Les matières qui portent des lianes, de la mousse, des glaçons. */

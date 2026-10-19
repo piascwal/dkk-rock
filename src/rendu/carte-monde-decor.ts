@@ -3,7 +3,7 @@ import type { Decor } from './themes';
 
 /**
  * Les tuiles de la carte du monde (8 px), façon Super Mario Bros 3 : un sol en léger damier par région, et des décors
- * (buissons, collines, maisons, sapins, pics, palmiers, immeubles, néons) posés hors de la route.
+ * (buissons, collines, maisons, sapins, pics, palmiers, immeubles, néons, menhirs, dolmens, phares) posés hors de la route.
  */
 export const C = 8;
 
@@ -88,6 +88,67 @@ const tourClub = (p: Px, x: number, y: number) => {
   p(x + 7, y - 1, 2, 2, '#3fe0ff');
 };
 
+const menhir = (p: Px, x: number, y: number) => {
+  p(x + 3, y + 1, 3, 7, '#3a3e44');
+  p(x + 3, y + 1, 2, 6, '#8a929a');
+  p(x + 3, y + 1, 1, 6, '#b8c0c6');
+  p(x + 1, y + 7, 7, 1, '#2a3a2a');
+};
+
+const dolmen = (p: Px, x: number, y: number) => {
+  p(x, y + 2, 8, 2, '#3a3e44');
+  p(x, y + 2, 8, 1, '#a8b0b6');
+  p(x + 1, y + 4, 2, 4, '#7a828a');
+  p(x + 5, y + 4, 2, 4, '#7a828a');
+};
+
+/** Une maison bretonne : murs blancs, toit d'ardoise, volets bleus. */
+const penty = (p: Px, x: number, y: number) => {
+  p(x + 1, y + 3, 6, 4, '#2a2a30');
+  p(x + 2, y + 4, 4, 3, '#f2f0ea');
+  p(x + 1, y + 1, 6, 2, '#2e3644');
+  p(x + 2, y + 1, 4, 1, '#4a5668');
+  p(x + 2, y + 5, 1, 1, '#2f6fb0');
+  p(x + 5, y + 5, 1, 1, '#2f6fb0');
+};
+
+/** Un vieux chêne (2×2 tuiles) : une large couronne sombre sur un tronc épais. */
+const chene = (p: Px, x: number, y: number) => {
+  p(x + 6, y + 9, 4, 7, '#3a2a1a');
+  p(x + 1, y + 2, 14, 8, '#14281a');
+  p(x + 2, y + 1, 12, 8, '#24402e');
+  p(x + 3, y + 2, 6, 3, '#3f7a3a');
+  p(x + 4, y + 2, 2, 1, '#8ad06a');
+};
+
+/** Un phare (2×2 tuiles) sur son rocher, bandes rouges et lanterne jaune. */
+const phare = (p: Px, x: number, y: number) => {
+  p(x + 2, y + 13, 12, 3, '#5a5248');
+  p(x + 6, y + 3, 4, 10, '#f2f0ea');
+  p(x + 6, y + 6, 4, 2, '#c8322a');
+  p(x + 6, y + 10, 4, 2, '#c8322a');
+  p(x + 5, y + 1, 6, 2, '#2a2a30');
+  p(x + 7, y + 1, 2, 1, '#ffe27a');
+};
+
+/** Un chalutier à quai (2×2 tuiles) : une coque, une cabine, un mât. */
+const chalutier = (p: Px, x: number, y: number) => {
+  p(x + 1, y + 9, 14, 5, '#1a2a3a');
+  p(x + 2, y + 9, 12, 3, '#c8322a');
+  p(x + 2, y + 9, 12, 1, '#f2f0ea');
+  p(x + 8, y + 5, 5, 4, '#f2f0ea');
+  p(x + 9, y + 6, 2, 1, '#2f6fb0');
+  p(x + 5, y + 1, 1, 8, '#3a2a1a');
+  p(x + 2, y + 14, 12, 1, '#2f86d8');
+};
+
+/** Une bitte d'amarrage et un casier à homards, sur le quai. */
+const casier = (p: Px, x: number, y: number) => {
+  p(x + 1, y + 3, 6, 4, '#6a4a2a');
+  p(x + 2, y + 4, 4, 2, '#3a2a1a');
+  p(x + 1, y + 3, 6, 1, '#a8743a');
+};
+
 export const SOLS: Record<Decor, Sol> = {
   pavillons: {
     clair: '#5aa83f',
@@ -124,6 +185,24 @@ export const SOLS: Record<Decor, Sol> = {
     sombre: '#26103c',
     petits: [neon, neon, caillou],
     grands: [tourClub],
+  },
+  sousbois: {
+    clair: '#2f5a33',
+    sombre: '#2a5030',
+    petits: [sapin, buisson, menhir, menhir, dolmen],
+    grands: [chene, chene],
+  },
+  quais: {
+    clair: '#8a8a86',
+    sombre: '#7e7e7a',
+    petits: [penty, penty, casier, caillou],
+    grands: [chalutier, chalutier, phare],
+  },
+  falaises: {
+    clair: '#7aa04a',
+    sombre: '#6e9442',
+    petits: [penty, menhir, caillou, buisson],
+    grands: [phare, colline('#6e9442', '#5e8438', '#b8d070'), colline('#6e9442', '#5e8438', '#b8d070')],
   },
 };
 
