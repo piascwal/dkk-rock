@@ -4,6 +4,8 @@ import { Aleatoire, borne } from '../moteur/maths';
 import { NIVEAUX } from '../niveaux';
 import { arcDe, suivantDansArc, type DefArc } from '../niveaux/arcs';
 import { C, SOLS, mer, type Px } from './carte-monde-decor';
+import { brouillard } from './carte-brouillard';
+import { longueur, surRoute } from './carte-route';
 import { imageDe } from './feuilles-images';
 import { ecrit, ecritCentre } from './police';
 import { THEMES } from './themes';
@@ -22,25 +24,8 @@ interface Plan {
   route: [number, number][];
   etapes: number[];
   fond: HTMLCanvasElement;
-}
-
-const longueur = (r: [number, number][], i: number) =>
-  Math.abs(r[i + 1]![0] - r[i]![0]) + Math.abs(r[i + 1]![1] - r[i]![1]);
-
-/** Le point de la route à la distance `d` (en tuiles). */
-function surRoute(route: [number, number][], d: number): [number, number] {
-  for (let i = 0; i + 1 < route.length; i++) {
-    const l = longueur(route, i);
-    if (d <= l || i + 2 === route.length) {
-      const t = l ? Math.min(1, d / l) : 0;
-      return [
-        route[i]![0] + (route[i + 1]![0] - route[i]![0]) * t,
-        route[i]![1] + (route[i + 1]![1] - route[i]![1]) * t,
-      ];
-    }
-    d -= l;
-  }
-  return route[0]!;
+  /** la région (l'étape) de chaque case, pour le brouillard */
+  region: number[];
 }
 
 const plans = new Map<string, Plan>();
@@ -167,7 +152,7 @@ function plan(arc: DefArc): Plan {
         for (let k = 0; k <= Math.max(w, h); k += 4) p(x0 + (w ? k : 0), y0 + (h ? k : 0), 1, 1, '#c8a868');
       }
     }
-  const pl = { route, etapes, fond: toile };
+  const pl = { route, etapes, fond: toile, region };
   plans.set(arc.id, pl);
   return pl;
 }
@@ -257,6 +242,16 @@ export function dessineCarte(
     p(x - 5, y - 5, 10, 2, haut);
     ecrit(ctx, String(k + 1), x - 1, y - 2, etat === 'fermee' ? '#8a8492' : '#ffffff');
   });
+  // le brouillard de guerre : les régions des niveaux encore fermés restent sous les nuages
+  const voile = brouillard(
+    arc.id,
+    pl.region,
+    LT,
+    HT,
+    C,
+    pl.etapes.map((_, k) => (etats[k] ?? 'fermee') !== 'fermee'),
+  );
+  if (voile) ctx.drawImage(voile, -camX, -camY);
   // les pneus qui crissent : gomme et poussière projetées par les roues arrière, traces au sol
   if (roule) {
     const rx = vanX - cap * 7;
@@ -313,7 +308,7 @@ export function dessineCarteMonde(
   // le trajet : un temps d'arrêt, la route (accélération puis freinage), l'arrivée
   const t = borne((page / DUREE_CARTE - 0.08) / 0.82, 0, 1);
   const pos = i + (j - i) * t * t * (3 - 2 * t);
-  const etats = arc.niveaux.map((_, k): EtatEtape => (k <= i ? 'faite' : k === j ? 'cible' : 'ouverte'));
+  const etats = arc.niveaux.map((_, k): EtatEtape => (k <= i ? 'faite' : k === j ? 'cible' : 'fermee'));
   const def = suivant === null ? null : NIVEAUX[suivant];
   ctx.fillStyle = '#2f86d8';
   ctx.fillRect(0, 0, largeur, HAUTEUR_CARTE);
