@@ -2,7 +2,7 @@ import { HAUTEUR_CARTE } from '../config';
 import { DUREE_CARTE, G } from '../jeu/vue';
 import { Aleatoire, borne } from '../moteur/maths';
 import { NIVEAUX } from '../niveaux';
-import { arcDe, suivantDansArc, type DefArc } from '../niveaux/arcs';
+import { arcDe, MONDE, suivantDansMonde } from '../niveaux/arcs';
 import { C, SOLS, mer, type Px } from './carte-monde-decor';
 import { brouillard } from './carte-brouillard';
 import { dessineRoute, detroit, longueur, surRoute } from './carte-route';
@@ -13,10 +13,11 @@ import { THEMES, type Decor } from './themes';
 /**
  * La carte du monde entre deux niveaux, façon Super Mario Bros 3 : une île vue de dessus, une route qui serpente
  * d'étape en étape, une région par niveau (aux bords irréguliers) avec son sol et ses décors, et le van qui roule.
- * Elle se construit d'après l'arc et le thème de ses niveaux : un nouvel arc a sa carte tout seul, un nouveau thème doit
- * avoir son sol dans carte-monde-decor.ts (SOLS).
+ * Une seule carte pour tous les arcs : la route part du garage, traverse la tournée, puis continue vers l'arc suivant
+ * (la Bretagne, à l'est, et Groix au large). Un nouvel arc prolonge la route ; un nouveau thème doit avoir son sol dans
+ * carte-monde-decor.ts (SOLS).
  */
-const LT = 46; // largeur de la carte, en tuiles
+const LT = 74; // largeur de la carte, en tuiles
 const HT = 27;
 
 interface Plan {
@@ -28,39 +29,42 @@ interface Plan {
   region: number[];
 }
 
-const plans = new Map<string, Plan>();
+let monde: Plan | null = null;
 
 /** Les décors d'une île à part, au large : on y arrive en ferry. */
 const AU_LARGE = new Set<Decor>(['falaises']);
 
-function plan(arc: DefArc): Plan {
-  const deja = plans.get(arc.id);
-  if (deja) return deja;
-  // la route serpente : trois allers-retours sur l'île, avec des détours
+function plan(): Plan {
+  if (monde) return monde;
+  // la route serpente : la tournée à l'ouest (trois allers-retours, avec des détours), puis la Bretagne à l'est
   const route: [number, number][] = [
-    [5, 21],
-    [12, 21],
-    [12, 17],
-    [20, 17],
-    [20, 21],
-    [30, 21],
-    [30, 18],
-    [40, 18],
-    [40, 12],
-    [33, 12],
-    [33, 8],
-    [24, 8],
-    [24, 12],
-    [14, 12],
-    [14, 6],
-    [6, 6],
+    [4, 21],
+    [11, 21],
+    [11, 16],
+    [18, 16],
+    [18, 21],
+    [27, 21],
+    [27, 13],
+    [19, 13],
+    [19, 6],
+    [30, 6],
+    [30, 11],
+    [38, 11],
+    [38, 19],
+    [47, 19],
+    [47, 9],
+    [56, 9],
+    [56, 16],
+    [64, 16],
+    [64, 7],
+    [70, 7],
   ];
   let total = 0;
   for (let i = 0; i + 1 < route.length; i++) total += longueur(route, i);
-  const n = arc.niveaux.length;
-  const etapes = arc.niveaux.map((_, i) => Math.round((i * total) / Math.max(1, n - 1)));
+  const n = MONDE.length;
+  const etapes = MONDE.map((_, i) => Math.round((i * total) / Math.max(1, n - 1)));
   const pos = etapes.map((d) => surRoute(route, d));
-  const r = new Aleatoire(arc.id.length * 31 + 5);
+  const r = new Aleatoire(36);
 
   // chaque case appartient à la région de l'étape la plus proche (bruitée : des bords irréguliers)
   const region: number[] = [];
@@ -100,7 +104,7 @@ function plan(arc: DefArc): Plan {
       region.push(mieux);
     }
   // une région au large (l'île de Groix) : un détroit la sépare du reste, que la route franchit en ferry
-  const decorDe = (k: number) => THEMES[NIVEAUX[arc.niveaux[k]!]!.theme].decor;
+  const decorDe = (k: number) => THEMES[NIVEAUX[MONDE[k]!]!.theme].decor;
   const eau = detroit(region, (k) => AU_LARGE.has(decorDe(k)), LT, HT);
   const ile = (x: number, y: number) => grandeIle(x, y) && !eau.has(y * LT + x);
   // sol, côtes et décors
@@ -146,7 +150,7 @@ function plan(arc: DefArc): Plan {
     }
   dessineRoute(p, route, C, LT, eau);
   const pl = { route, etapes, fond: toile, region };
-  plans.set(arc.id, pl);
+  monde = pl;
   return pl;
 }
 
@@ -165,8 +169,8 @@ const COULEURS_ETAPE: Record<EtatEtape, [string, string]> = {
 };
 
 /** Où se trouvent le van et la caméra, le van étant à la position `pos` (en étapes : 2,5 = entre la 3e et la 4e). */
-function cadrage(arc: DefArc, largeur: number, hauteur: number, pos: number) {
-  const pl = plan(arc);
+function cadrage(largeur: number, hauteur: number, pos: number) {
+  const pl = plan();
   const a = Math.floor(borne(pos, 0, pl.etapes.length - 1));
   const b = Math.min(pl.etapes.length - 1, a + 1);
   const d = pl.etapes[a]! + (pl.etapes[b]! - pl.etapes[a]!) * (pos - a);
@@ -179,27 +183,19 @@ function cadrage(arc: DefArc, largeur: number, hauteur: number, pos: number) {
 }
 
 /** L'étape sous le point (x, y) de l'écran, ou -1 (pour la choisir du doigt). */
-export function etapeTouchee(
-  arc: DefArc,
-  largeur: number,
-  hauteur: number,
-  pos: number,
-  x: number,
-  y: number,
-): number {
-  const { pl, camX, camY } = cadrage(arc, largeur, hauteur, pos);
+export function etapeTouchee(largeur: number, hauteur: number, pos: number, x: number, y: number): number {
+  const { pl, camX, camY } = cadrage(largeur, hauteur, pos);
   return pl.etapes.findIndex((e) => {
     const [ex, ey] = surRoute(pl.route, e);
     return Math.abs(ex * C + C / 2 - camX - x) < 10 && Math.abs(ey * C + C / 2 - camY - y) < 10;
   });
 }
 
-/** Dessine la carte de l'arc, le van à la position `pos` (en étapes), chaque étape dans son état. */
+/** Dessine la carte du monde (étapes : MONDE), le van à la position `pos` (en étapes), chaque étape dans son état. */
 export function dessineCarte(
   ctx: CanvasRenderingContext2D,
   largeur: number,
   hauteur: number,
-  arc: DefArc,
   pos: number,
   etats: readonly EtatEtape[],
   titre: string,
@@ -207,7 +203,7 @@ export function dessineCarte(
   /** 1 : il roule vers les étapes suivantes, -1 : vers les précédentes, 0 : arrêté */
   sens: number,
 ): void {
-  const { pl, vanX, vanY, camX, camY, d } = cadrage(arc, largeur, hauteur, pos);
+  const { pl, vanX, vanY, camX, camY, d } = cadrage(largeur, hauteur, pos);
   const roule = sens !== 0;
   // le van regarde où il va : sur une portion verticale de la route, il garde son dernier côté
   if (roule) {
@@ -237,7 +233,7 @@ export function dessineCarte(
   });
   // le brouillard de guerre : les régions des niveaux encore fermés restent sous les nuages
   const voile = brouillard(
-    arc.id,
+    'monde',
     pl.region,
     LT,
     HT,
@@ -294,14 +290,13 @@ export function dessineCarteMonde(
   page: number,
   tick: number,
 ): void {
-  const arc = arcDe(niveau);
-  const i = arc.niveaux.indexOf(niveau);
-  const suivant = suivantDansArc(niveau);
-  const j = suivant === null ? i : arc.niveaux.indexOf(suivant);
+  const i = MONDE.indexOf(niveau);
+  const suivant = suivantDansMonde(niveau);
+  const j = suivant === null ? i : MONDE.indexOf(suivant);
   // le trajet : un temps d'arrêt, la route (accélération puis freinage), l'arrivée
   const t = borne((page / DUREE_CARTE - 0.08) / 0.82, 0, 1);
   const pos = i + (j - i) * t * t * (3 - 2 * t);
-  const etats = arc.niveaux.map((_, k): EtatEtape => (k <= i ? 'faite' : k === j ? 'cible' : 'fermee'));
+  const etats = MONDE.map((_, k): EtatEtape => (k <= i ? 'faite' : k === j ? 'cible' : 'fermee'));
   const def = suivant === null ? null : NIVEAUX[suivant];
   ctx.fillStyle = '#2f86d8';
   ctx.fillRect(0, 0, largeur, HAUTEUR_CARTE);
@@ -309,10 +304,9 @@ export function dessineCarteMonde(
     ctx,
     largeur,
     HAUTEUR_CARTE,
-    arc,
     pos,
     etats,
-    def ? `En route : ${def.titre}` : arc.titre,
+    def ? `En route : ${def.titre}` : arcDe(niveau).titre,
     tick,
     t > 0 && t < 1 ? Math.sign(j - i) : 0,
   );

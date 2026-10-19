@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ARCS, arcDe, niveauOuvert, suivantDansArc } from '../src/niveaux/arcs';
+import { ARCS, arcDe, MONDE, niveauOuvert, suivantDansArc, suivantDansMonde } from '../src/niveaux/arcs';
 import { NIVEAUX } from '../src/niveaux';
 
 describe('les arcs de l’histoire', () => {
@@ -32,5 +32,13 @@ describe('les arcs de l’histoire', () => {
     expect(niveauOuvert(premier, tournee)).toBe(true);
     expect(niveauOuvert(bretagne.niveaux[1]!, tournee)).toBe(false);
     expect(suivantDansArc(tournee.at(-1)!)).toBeNull();
+  });
+
+  it('une seule route : après le dernier niveau de la tournée, on continue vers la Bretagne', () => {
+    const club = ARCS[0]!.niveaux.at(-1)!;
+    const foret = ARCS.find((a) => a.id === 'bretagne')!.niveaux[0]!;
+    expect(suivantDansMonde(club)).toBe(foret);
+    expect(MONDE.indexOf(foret)).toBe(MONDE.indexOf(club) + 1);
+    expect(suivantDansMonde(MONDE.at(-1)!)).toBeNull();
   });
 });

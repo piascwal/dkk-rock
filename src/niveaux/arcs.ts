@@ -46,6 +46,17 @@ export function suivantDansArc(niveau: number): number | null {
   return a.niveaux[a.niveaux.indexOf(niveau) + 1] ?? null;
 }
 
+/** Tous les niveaux dans l'ordre du monde, arc après arc : les étapes de l'unique carte du monde. */
+export const MONDE: readonly number[] = ARCS.flatMap((a) => a.niveaux);
+
+/** Le premier niveau de l'arc qu'ouvre la fin de ce niveau, ou null. */
+export const arcOuvertPar = (niveau: number): number | null =>
+  ARCS.find((a) => a.apres === niveau)?.niveaux[0] ?? null;
+
+/** Le niveau qui suit sur la route : le suivant de son arc, sinon le premier de l'arc qu'il ouvre. */
+export const suivantDansMonde = (niveau: number): number | null =>
+  suivantDansArc(niveau) ?? arcOuvertPar(niveau);
+
 /** Un niveau est ouvert si c'est le premier de son arc (arc ouvert) ou si le précédent est terminé. */
 export function niveauOuvert(niveau: number, faits: readonly number[]): boolean {
   const a = arcDe(niveau);

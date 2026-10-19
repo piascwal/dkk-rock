@@ -16,7 +16,7 @@ import { Boss } from '../entites/ennemis/boss';
 import { DjBoucle } from '../entites/ennemis/dj';
 import { ATTENTE_VAN, Objet } from '../entites/objets';
 import { niveauLu } from '../niveaux';
-import { suivantDansArc } from '../niveaux/arcs';
+import { arcOuvertPar, suivantDansArc, suivantDansMonde } from '../niveaux/arcs';
 import type { NiveauLu } from '../niveaux/format';
 import { pagesDe } from '../histoire/pages';
 import type { Camp, Cible, Contexte, EntiteSimulee, Tyrolienne } from './contexte';
@@ -174,7 +174,11 @@ export class Partie implements Contexte {
       this.vies = VIES_DEPART;
       this.charge(this.niveau, this.drapeau);
       this.phase = 'jeu';
-    } else if (this.phase === 'fin') this.phase = 'fin';
+    } else if (this.phase === 'fin' && arcOuvertPar(this.niveau) !== null) {
+      // l'épilogue lu, la route continue vers l'arc suivant
+      this.phase = 'carte';
+      this.page = 0;
+    }
   }
 
   /** Le départ du niveau, ou le dernier drapeau levé. */
@@ -225,7 +229,7 @@ export class Partie implements Contexte {
   }
 
   private chargeNiveauSuivant(): void {
-    this.charge(suivantDansArc(this.niveau) ?? this.niveau, -1);
+    this.charge(suivantDansMonde(this.niveau) ?? this.niveau, -1);
     this.phase = 'histoire';
     this.page = 0;
   }
@@ -326,7 +330,7 @@ export class Partie implements Contexte {
     this.drapeau = -1;
     this.son('victoire', 0, 0);
     this.onProgression(
-      { ...this.progression(), niveau: suivantDansArc(this.niveau) ?? this.niveau },
+      { ...this.progression(), niveau: suivantDansMonde(this.niveau) ?? this.niveau },
       true,
       this.niveau,
     );
