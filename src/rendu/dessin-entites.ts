@@ -19,7 +19,13 @@ import { dessineRockerConverti } from './rockers-convertis';
 import type { Theme } from './themes';
 
 /** Les héros qui ont leurs propres images de dos pour l'échelle (planches du décor, voir outils/fixe-objets.py). */
-const IMAGES_ECHELLE: Partial<Record<number, string>> = { [G.TOM]: 'tom-echelle', [G.MAT]: 'mat-echelle' };
+const IMAGES_ECHELLE: Partial<Record<number, string>> = {
+  [G.JBT]: 'jbt-echelle',
+  [G.JBM]: 'jbm-echelle',
+  [G.JBG]: 'jbg-echelle',
+  [G.MAT]: 'mat-echelle',
+  [G.TOM]: 'tom-echelle',
+};
 
 const DRAPEAUX_SANS_MIROIR = new Set<number>([
   G.CAGE,

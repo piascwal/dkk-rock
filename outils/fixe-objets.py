@@ -19,10 +19,12 @@ from prepare_instrument import natif_et_case
 
 RACINE = pathlib.Path(__file__).resolve().parent.parent
 DENSITE = 6
+# les héros dont les images de dos sur l'échelle sont fournies (planches du décor « <héros>-echelle », à la densité des héros : 6)
+ECHELLES = ('tom', 'mat', 'jbt', 'jbm', 'jbg')
 # des planches plus fines que 6 pixels par pixel du jeu, et réduites avec lissage (au lieu d'un agrandissement entier, qui donne des
 # pixels inégaux quand l'écran n'est pas un multiple de la planche) : le DJ, très détaillé, plus grand que le reste
-DENSITES = {'dj': 8, 'robot': 8, 'borne': 8, 'pneus': 8, 'baril': 8, 'fougere': 8, 'tom-echelle': 6, 'mat-echelle': 6}
-LISSES = {'dj', 'voiture', 'rocker', 'robot', 'borne', 'pneus', 'baril', 'fougere', 'tom-echelle', 'mat-echelle'}
+DENSITES = {'dj': 8, 'robot': 8, 'borne': 8, 'pneus': 8, 'baril': 8, 'fougere': 8, **{f'{h}-echelle': 6 for h in ECHELLES}}
+LISSES = {'dj', 'voiture', 'rocker', 'robot', 'borne', 'pneus', 'baril', 'fougere', *(f'{h}-echelle' for h in ECHELLES)}
 # celles de ces planches qu'on réduit à 256 couleurs (le DJ, les voitures) ; les rockers en ont trop : douze personnages différents sur une planche
 QUANTIFIEES = {'dj', 'voiture'}
 # objet : (fichiers sources, un par état (une ligne de la planche chacun), genre dans jeu/vue.ts, largeur en jeu en pixels)
@@ -85,6 +87,10 @@ OBJETS = {
     'tom-echelle': ([f'heros/tom-echelle-{k}-base.png' for k in (1, 2)], None, 14.5),
     # Mat de dos sur une échelle (même principe) : largeur calée sur sa taille debout (120 px de planche), un peu plus que pile
     'mat-echelle': ([f'heros/mat-echelle-{k}-base.png' for k in (1, 2)], None, 10.8),
+    # les trois autres héros, même principe ; largeurs calées sur leur taille debout (la tête aux pieds), un peu plus que pile
+    'jbt-echelle': ([f'heros/jbt-echelle-{k}-base.png' for k in (1, 2)], None, 13.4),
+    'jbm-echelle': ([f'heros/jbm-echelle-{k}-base.png' for k in (1, 2)], None, 9.9),
+    'jbg-echelle': ([f'heros/jbg-echelle-{k}-base.png' for k in (1, 2)], None, 10.8),
     # la fougère (garage, alpages, plage)
     'fougere': (['decor/fougere-base.png'], None, 14),
     # le baril explosif (garage, ville) : un objet du jeu (genre BARIL), pas un décor
@@ -105,7 +111,7 @@ OBJETS = {
 # Ces images ne sont pas du pixel art sur une grille de 2 : leurs pixels sont déjà ceux du jeu. Les ramener à la grille
 # détecterait une case fausse et abîmerait le dessin (bruit, détails perdus) ; on les prend telles quelles, et on les agrandit
 # d'un facteur entier pour que chaque pixel reste carré.
-NATIF_BRUT = {'voiture', 'rocker', 'robot', 'borne', 'pneus', 'baril', 'fougere', 'tom-echelle', 'mat-echelle'}
+NATIF_BRUT = {'voiture', 'rocker', 'robot', 'borne', 'pneus', 'baril', 'fougere', *(f'{h}-echelle' for h in ECHELLES)}
 # les panneaux de direction (le texte doit se lire) : chaque pixel de l'artiste reste un carré net (agrandissement entier, sans
 # redimensionnement qui rend les pixels inégaux et brouille les lettres)
 ENTIERS = {'panneau'}
