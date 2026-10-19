@@ -8,11 +8,12 @@ import math
 ETAGE = 6  # hauteur d'un étage, dalle comprise
 
 
-def forteresse(n, x0, largeur=30, etages=3, lettres='a', mat=None, sous_sol=True, cage=False):
+def forteresse(n, x0, largeur=30, etages=3, lettres='a', mat=None, sous_sol=True, cage=False, balcon=True, annexe=True, toit=True):
     """Un bâtiment de `etages` étages, des pièces séparées par des cloisons à porte, des échelles qui alternent d'un
     côté à l'autre (pour monter, il faut traverser les pièces), des fenêtres, un toit avec sa cabane, et un sous-sol
     creusé dans la terre (accès par une trappe au rez-de-chaussée). Le rez-de-chaussée a une porte à chaque bout : le
-    chemin de surface le traverse. Renvoie la rangée du toit."""
+    chemin de surface le traverse. `balcon` et `annexe` : les avancées de gauche et de droite ; `toit` : le parapet et la cabane
+    (une tour en hauteur les retire : le toit est un chemin). Renvoie la rangée du toit."""
     mat = mat or n.t['mur']
     base = n.base
     top = base - etages * ETAGE
@@ -41,14 +42,15 @@ def forteresse(n, x0, largeur=30, etages=3, lettres='a', mat=None, sous_sol=True
     for x in (x0, x1 - 1):  # les portes du rez-de-chaussée
         n.rect(x, base - 2, x + 1, base, ' ')
     n.repere(x0 + largeur // 2 + 5, '+', ymin=base - 2 * ETAGE + 1)
-    _avancees(n, x0, x1, etages, mat, lettres)
-    _toit(n, x0, x1, top, mat, lettres)
+    _avancees(n, x0, x1, etages, mat, lettres, balcon, annexe)
+    if toit:
+        _toit(n, x0, x1, top, mat, lettres)
     if sous_sol:
         _sous_sol(n, x0, x1, mat, lettres, cage)
     return top
 
 
-def _avancees(n, x0, x1, etages, mat, lettres):
+def _avancees(n, x0, x1, etages, mat, lettres, balcon=True, annexe=True):
     """Des avancées sur les façades, pour qu'on ne grimpe pas le bâtiment en sautant de mur en mur : à gauche, un balcon de quatre
     tuiles à chaque étage, gardé par un ennemi (on se cogne dessous) ; à droite, une annexe fermée (un bow-window) où l'on ne
     peut qu'entrer par la pièce. Chaque avancée a sa porte sur l'étage : il faut passer par le bâtiment."""
@@ -56,22 +58,24 @@ def _avancees(n, x0, x1, etages, mat, lettres):
     droite = x1 - 1  # le mur de droite
     for k in range(1, etages):
         ys = base - k * ETAGE
-        for x in range(x0 - 4, x0):  # le balcon, à la hauteur de la dalle
-            n.set(x, ys, mat)
-        n.set(x0, ys - 2, ' ')
-        n.set(x0, ys - 1, ' ')
-        n.ennemis(x0 - 4, x0, lettres, 1, ymin=ys - 1)
-        for x in range(droite + 1, droite + 6):  # l'annexe : un plancher, un toit, un mur au bout
-            n.set(x, ys, mat)
-            n.set(x, ys - 5, mat)
-        for y in range(ys - 4, ys):
-            n.set(droite + 5, y, mat)
-            for x in range(droite + 1, droite + 5):
-                n.set(x, y, '.')
-        n.set(droite, ys - 2, ' ')
-        n.set(droite, ys - 1, ' ')
-        n.set(droite + 3, ys - 1, 'C' if k % 2 else 'T')
-        n.ennemis(droite + 1, droite + 5, lettres, 1, ymin=ys - 4)
+        if balcon:
+            for x in range(x0 - 4, x0):  # le balcon, à la hauteur de la dalle
+                n.set(x, ys, mat)
+            n.set(x0, ys - 2, ' ')
+            n.set(x0, ys - 1, ' ')
+            n.ennemis(x0 - 4, x0, lettres, 1, ymin=ys - 1)
+        if annexe:
+            for x in range(droite + 1, droite + 6):  # l'annexe : un plancher, un toit, un mur au bout
+                n.set(x, ys, mat)
+                n.set(x, ys - 5, mat)
+            for y in range(ys - 4, ys):
+                n.set(droite + 5, y, mat)
+                for x in range(droite + 1, droite + 5):
+                    n.set(x, y, '.')
+            n.set(droite, ys - 2, ' ')
+            n.set(droite, ys - 1, ' ')
+            n.set(droite + 3, ys - 1, 'C' if k % 2 else 'T')
+            n.ennemis(droite + 1, droite + 5, lettres, 1, ymin=ys - 4)
 
 
 def _toit(n, x0, x1, top, mat, lettres):

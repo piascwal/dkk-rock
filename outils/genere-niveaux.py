@@ -16,7 +16,7 @@ from peintre import Niveau
 from plans import NIVEAUX, enchaine
 from souterrain import souterrain, tonneaux_de_surface
 from ferry import ferry
-from hauteurs import corniches, descente, grotte, pont_de_singe, vide_partout
+from hauteurs import corniches, descente, grotte, pont_de_singe, tours, vide_partout
 from signatures import falaise, glacier, parking, ponton, scene, toits
 from structures import forteresse, traversee
 from verrous import barrage, gouffre
@@ -203,6 +203,9 @@ class Recette:
 
     def p_corniches(self, x0, x1, monte=6, lettres='a', butin='+'):
         corniches(self.n, x0, x1 - x0, monte, lettres, butin)
+
+    def p_tours(self, x0, x1, etages=3, mode='pont', lettres='a', mat=None):
+        tours(self.n, x0, x1 - x0, etages, mode, lettres, mat)
 
     def p_ferry(self, x0, x1, lettres='a'):
         ferry(self.n, x0, x1 - x0, lettres)

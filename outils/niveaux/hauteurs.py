@@ -123,3 +123,39 @@ def corniches(n, x0, largeur, monte=6, lettres='a', butin='+'):
     n.ennemis(xc, x0 + largeur, lettres, 2, ymin=top - 3)
     n.repere(xc + 2, butin, ymin=top - 3)
     n.base = top
+
+
+def tours(n, x0, largeur, etages=3, mode='pont', lettres='a', mat=None):
+    """Deux tours à étages, façon Broforce, face à face au-dessus d'un gouffre sans fond de 9 tuiles. On monte la première par
+    l'intérieur (pièces, cloisons à porte, échelles qui alternent) ; de là, deux façons de passer à la seconde :
+    - `pont` : une passerelle de planches entre deux portes, à l'avant-dernier étage ; on finit de monter dans la seconde ;
+    - `tyro` : la première a un étage de plus ; une tyrolienne file de son toit à celui de la seconde, plus bas.
+    Dans les deux cas, on sort par le toit de la seconde : `base` monte de `etages` étages."""
+    from structures import ETAGE, forteresse
+
+    mat = mat or n.t['mur']
+    base = n.base
+    tw = 14
+    xa = x0 + 5  # la place des balcons de la première tour
+    g0 = xa + tw
+    g1 = g0 + 9
+    ea = etages + (mode == 'tyro')
+    abime(n, g0, g1)
+    top_a = forteresse(n, xa, tw, ea, lettres, mat, sous_sol=False, annexe=False, toit=False)
+    top_b = forteresse(n, g1, tw, etages, lettres, mat, sous_sol=False, balcon=False, annexe=False, toit=False)
+    for x in (g0 - 1, g1, g1 + tw - 1):  # les portes du rez-de-chaussée qui donnent sur le vide ou sur le roc
+        n.rect(x, base - 2, x + 1, base, mat)
+    for top, x in ((top_a, xa), (top_b, g1)):  # des guetteurs sur les toits
+        n.ennemis(x + 2, x + tw - 2, lettres, 2, ymin=top - 1)
+    if mode == 'pont':
+        ys = base - (etages - 1) * ETAGE
+        for x in (g0 - 1, g1):  # les deux portes de la passerelle
+            n.rect(x, ys - 2, x + 1, ys, ' ')
+        pont(n, g0, g1, ys, creux=2)
+        n.ennemis(g0 + 2, g1 - 2, lettres, 1, ymin=ys - 3)
+    else:
+        n.tyro(g0 - 2, top_a - 1, g1 + 3, top_b - 2)
+    n.repere(g1 + tw // 2, '*', ymin=top_b - 1)
+    for x in range(g1 + tw, x0 + largeur):  # le roc d'après, au niveau du toit de la seconde
+        n.base_col(x, top_b)
+    n.base = top_b

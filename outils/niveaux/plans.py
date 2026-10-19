@@ -88,21 +88,18 @@ NIVEAUX = {
             ('colline', 16, dict(haut=2, lettres='y')),
             ('corniches', 14, dict(monte=9, lettres='y')),
             ('pont_singe', 16, dict(lettres='y')),
-            ('forteresse', 32, dict(etages=3, lettres='y', mat='R', cage=True)),
-            ('grotte', 18, dict(monte=12, lettres='y', butin='*')),
+            ('tours', 46, dict(etages=3, mode='pont', lettres='y', mat='R')),  # deux tours reliées par une passerelle
             ('plat', 10, dict(lettres='y', digit='2')),  # la glace et la neige qui tombe
             ('glacier', 44, dict(lettres='y', nb=2)),
             ('pont_singe', 18, dict(lettres='ya', butin='*')),
             ('barrage', 20, dict(haut=12, lettres='y', butin='*')),  # l'à-pic
-            ('corniches', 14, dict(monte=9, lettres='ya')),
             ('descente', 22, dict(chute=12, lettres='ya')),  # d'une montagne à l'autre, bien plus bas : le vide se voit
             ('grotte', 18, dict(monte=12, lettres='ya', butin='K')),
-            ('forteresse', 30, dict(etages=4, lettres='ya', mat='R', cage=True)),
+            ('tours', 46, dict(etages=3, mode='tyro', lettres='ya', mat='R')),  # une tyrolienne de toit en toit
             ('pont_singe', 16, dict(lettres='ya')),
             ('cheminee', 24, dict(haut=11, lettres='ya')),
             ('corniches', 14, dict(monte=9, lettres='ya')),
             ('plat', 10, dict(lettres='yy', digit='3')),  # flash spécial : Detroit
-            ('grotte', 18, dict(monte=12, lettres='ya', butin='+')),
             ('pont_singe', 16, dict(lettres='ya')),
             ('vide', 64, dict()),  # l'arène du Yéti Alpha, au sommet, peinte après coup
         ],

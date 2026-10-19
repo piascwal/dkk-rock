@@ -177,8 +177,10 @@ validé.
   monter** : l'à-pic (`barrage` dans `outils/niveaux/verrous.py`) est un gouffre sans fond de 7 tuiles, qu'on ne franchit
   qu'en montant l'échafaudage collé au bord, puis par une tyrolienne ou un pont de singe. Les modules du vide
   (`outils/niveaux/hauteurs.py`) : le _pont de singe_ (un gouffre sans fond, un pont de planches qui ploie), la _descente_
-  (une tyrolienne vers un massif plus bas), la _grotte_ (une paroi qu'on gravit par l'intérieur, d'étage en étage) et les
-  _corniches_ (la même par l'extérieur). Un niveau **en hauteur** (`altitude` dans le plan : les Cimes) part d'un monde
+  (une tyrolienne vers un massif plus bas), la _grotte_ (une paroi qu'on gravit par l'intérieur, d'étage en étage), les
+  _corniches_ (la même par l'extérieur) et les _tours_ : deux bâtiments à étages (pièces, échelles, ennemis à chaque étage)
+  face à face au-dessus du vide, qu'on relie par une passerelle entre deux portes (`pont`) ou par une tyrolienne de toit en
+  toit (`tyro`), comme dans Broforce. Un niveau **en hauteur** (`altitude` dans le plan : les Cimes) part d'un monde
   vide où chaque pièce pose son massif : on monte de la vallée au sommet, et tomber entre deux massifs, c'est mourir.
   **Le van à réacteur** (`envol` dans les textes du niveau, sprite `van-reacteur`) remplace le van d'origine là où le niveau
   finit au sommet : il décolle, nez en l'air, réacteur en feu (`rendu/reacteur.ts`). Partout ailleurs, le van d'origine part
