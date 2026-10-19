@@ -290,6 +290,8 @@ export class Partie implements Contexte {
   /** Les héros montent dans le van : il démarre, la caméra le suit, le bilan vient quand il a disparu. */
   lanceDepart(van: Objet): void {
     if (this.phase !== 'jeu' || this.departDans >= 0) return;
+    // sur le ferry, c'est la traversée qui conduit le van (il descend tout seul à Groix, voir traversee.ts)
+    if (this.traversee) return;
     van.demarre();
     this.van = van;
     this.departDans = ATTENTE_VAN + DUREE_FUITE;

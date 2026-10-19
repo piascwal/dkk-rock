@@ -1,10 +1,19 @@
 /** L'ambiance de chaque monde : couleurs du ciel, du sol, décor de fond, météo et musique. */
 
 export type NomTheme =
-  'garage' | 'montagne' | 'neige' | 'plage' | 'ville' | 'club' | 'foret' | 'port' | 'groix';
+  'garage' | 'montagne' | 'neige' | 'plage' | 'ville' | 'club' | 'foret' | 'port' | 'groix' | 'mer';
 
 export type Decor =
-  'pavillons' | 'montagnes' | 'pics' | 'palmiers' | 'immeubles' | 'club' | 'sousbois' | 'quais' | 'falaises';
+  | 'pavillons'
+  | 'montagnes'
+  | 'pics'
+  | 'palmiers'
+  | 'immeubles'
+  | 'club'
+  | 'sousbois'
+  | 'quais'
+  | 'falaises'
+  | 'large';
 
 export interface Theme {
   /** dégradé du ciel, du haut vers l'horizon */
@@ -126,6 +135,18 @@ export const THEMES: Record<NomTheme, Theme> = {
     dessus: '#7aa04a',
     terre: '#6a5a46',
     decor: 'falaises',
+    meteo: null,
+    musique: 'plage',
+  },
+  // la traversée en ferry : la pleine mer, des îles au loin
+  mer: {
+    ciel: ['#3f7fc0', '#d6ecf5'],
+    lointain: '#2f6f9a',
+    proche: '#2a5f86',
+    paroi: '#3a3a40',
+    dessus: '#8a8a86',
+    terre: '#5e5a56',
+    decor: 'large',
     meteo: null,
     musique: 'plage',
   },

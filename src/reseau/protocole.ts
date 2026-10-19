@@ -20,12 +20,12 @@ import {
  *
  * Changer ce fichier de façon incompatible : augmenter VERSION_PROTOCOLE.
  */
-export const VERSION_PROTOCOLE = 13;
+export const VERSION_PROTOCOLE = 14;
 export const APP_DKK = { id: 'dkk-rock', version: VERSION_PROTOCOLE };
 
 const TYPE_ETAT = 1;
 const TYPE_COMMANDES = 2;
-const OCTETS_ENTETE = 17 + GENRES_CONVERTIS.length;
+const OCTETS_ENTETE = 18 + GENRES_CONVERTIS.length;
 const OCTETS_JOUEUR = 10;
 const OCTETS_ENTITE = 10;
 
@@ -52,6 +52,7 @@ export function encodeEtat(v: EtatVue): ArrayBuffer {
   u8(v.secousse);
   d.setUint16(o, v.traversee < 0 ? 0xffff : v.traversee);
   o += 2;
+  u8(v.navire);
   for (let i = 0; i < GENRES_CONVERTIS.length; i++) u8(v.convertis[i] ?? 0);
   for (let s = 0; s < MAX_JOUEURS; s++) {
     const j = v.joueurs[s]!;
@@ -104,6 +105,7 @@ export function decodeEtat(buf: ArrayBuffer): EtatVue | null {
   const secousse = u8();
   const sillage = d.getUint16(o);
   o += 2;
+  const navire = u8();
   const convertis = GENRES_CONVERTIS.map(() => u8());
   const joueurs: JoueurVue[] = [];
   for (let s = 0; s < MAX_JOUEURS; s++) {
@@ -156,6 +158,7 @@ export function decodeEtat(buf: ArrayBuffer): EtatVue | null {
     boss: b === 255 ? -1 : b / 254,
     secousse,
     traversee: sillage === 0xffff ? -1 : sillage,
+    navire,
     convertis,
     joueurs,
     entites,

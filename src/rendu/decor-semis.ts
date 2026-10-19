@@ -219,4 +219,10 @@ export const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAcces
       dedans: ['caisseDeco', 'etagere', 'enceinte34', 'tonneau', 'flambeau'],
       densite: 0.8,
     },
+    // la traversée : le navire est du socle, rien n'y pousse ; au cas où, un peu de matériel de quai
+    mer: {
+      dehors: ['tonneau', 'sacs', 'pneus'],
+      dedans: ['caisseDeco', 'tonneau'],
+      densite: 0.4,
+    },
   };

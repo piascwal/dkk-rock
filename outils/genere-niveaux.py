@@ -34,11 +34,12 @@ THEMES = {
     'foret': dict(sol='#', sous='#', profond='R', mur='W', deco=['C', 'W']),
     'port': dict(sol='D', sous='#', profond='R', mur='B', deco=['C', 'T', 'W']),
     'groix': dict(sol='#', sous='R', profond='R', mur='R', deco=['C', 'W']),
+    'mer': dict(sol='D', sous='#', profond='R', mur='B', deco=['C']),
 }
 
 
 # les niveaux de l'arc breton (voir docs/ARC-BRETAGNE.md) : le goéland y remplace le drone
-BRETON = {'foret', 'port', 'groix'}
+BRETON = {'foret', 'port', 'groix', 'mer'}
 
 
 def declencheurs(fichier):
@@ -272,7 +273,7 @@ def construit(nom, theme, textes, plan, fichier, constante, graine, base=30, van
             r.drapeau(x0 + (x1 - x0) // 2)
             dernier = x0
     for x0, x1, g in r.pieces:
-        if g in ('arene', 'vide', 'ferry') and x1 - x0 >= 40:
+        if g in ('arene', 'vide') and x1 - x0 >= 40:
             r.drapeau(x0 + 3)
     # le van, au bout (le club n'en a pas : le niveau finit avec le DJ)
     if van:

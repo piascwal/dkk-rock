@@ -237,11 +237,9 @@ NIVEAUX = {
     ),
     # le ferry : un niveau à part entre le port et Groix, rejouable depuis la carte (voir outils/niveaux/ferry.py)
     'ferry': dict(
-        nom='La Traversée', theme='port', textes='10-ferry.ts', fichier='10-ferry.ts',
-        constante='CARTE_FERRY', graine=89, base=30, raccord='acdh', caves='acdh', van=False, sans_caves=True,
-        lieux=[
-            ('plat', 12, dict(lettres='a', digit='1')),  # les marins et les goélands
-            ('ferry', 42, dict(lettres='ahm')),  # le quai, puis la traversée ; ni danseurs ni lanceurs : leurs explosions creuseraient le pont
-        ],
+        nom='La Traversée', theme='mer', textes='10-ferry.ts', fichier='10-ferry.ts',
+        constante='CARTE_FERRY', graine=89, base=30, raccord='h', caves='h', van=False, sans_caves=True,
+        # le niveau n'est que le navire : les vagues d'ennemis viennent du jeu (src/jeu/traversee.ts), pas de la carte
+        lieux=[('ferry', 58, dict())],
     ),
 }

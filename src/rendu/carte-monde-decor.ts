@@ -198,6 +198,13 @@ export const SOLS: Record<Decor, Sol> = {
     petits: [penty, penty, casier, caillou],
     grands: [chalutier, chalutier, phare],
   },
+  // l'embarquement du ferry : un quai, des chalutiers, le phare
+  large: {
+    clair: '#8a8a86',
+    sombre: '#7e7e7a',
+    petits: [casier, caillou, casier],
+    grands: [chalutier, phare],
+  },
   falaises: {
     clair: '#7aa04a',
     sombre: '#6e9442',

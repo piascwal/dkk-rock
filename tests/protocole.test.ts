@@ -53,8 +53,10 @@ describe('le protocole réseau', () => {
     const p = new Partie({ niveau: 7, drapeau: -1, vies: 5, score: 0 });
     p.ajouteJoueur(0, 0);
     expect(decodeEtat(encodeEtat(p.vue()))!.traversee).toBe(-1);
-    const v = { ...p.vue(), traversee: 1234 };
-    expect(decodeEtat(encodeEtat(v))!.traversee).toBe(1234);
+    const v = { ...p.vue(), traversee: 1234, navire: 163 };
+    const d = decodeEtat(encodeEtat(v))!;
+    expect(d.traversee).toBe(1234);
+    expect(d.navire).toBe(163);
   });
 
   it("l'aura d'invincibilité traverse le réseau", () => {

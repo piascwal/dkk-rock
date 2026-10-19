@@ -66,6 +66,12 @@ export class Objet implements EntiteSimulee {
     this.partant = true;
   }
 
+  /** Le van roule à `vx` px par image, sans démarrer en trombe (il monte sur le ferry) ; 0 : il est garé. */
+  conduit(vx: number): void {
+    this.vx = vx;
+    this.corps.x += vx;
+  }
+
   maj(ctx: Contexte): void {
     this.anim++;
     if (this.partant) {
@@ -93,13 +99,14 @@ export class Objet implements EntiteSimulee {
       y: c.y + c.h,
       gauche: false,
       clignote: false,
-      // e = 2 : le van démarre ; f est alors sa vitesse (×20), de quoi fabriquer fumée et graviers côté rendu
-      e: this.partant ? 2 : this.active ? 1 : 0,
-      f: this.partant
-        ? Math.round(this.vx * 20)
-        : this.sorte === 'arme' || this.sorte === 'cage'
-          ? this.variante
-          : this.anim & 255,
+      // e = 2 : le van démarre en trombe (fumée, graviers) ; e = 3 : il roule tranquillement (il monte sur le ferry) ; f : sa vitesse (×20)
+      e: this.partant ? 2 : this.vx > 0 ? 3 : this.active ? 1 : 0,
+      f:
+        this.partant || this.vx > 0
+          ? Math.round(this.vx * 20)
+          : this.sorte === 'arme' || this.sorte === 'cage'
+            ? this.variante
+            : this.anim & 255,
     };
   }
 }

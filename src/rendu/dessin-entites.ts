@@ -96,7 +96,7 @@ export function dessineEntite(
   const x = Math.round((v.x - Math.round(camX)) * d) / d;
   let y = Math.round((v.y - Math.round(camY)) * d) / d;
   // le van qui démarre tressaute sur ses amortisseurs
-  if (v.g === G.VAN && v.e === 2) y -= (Math.floor(performance.now() / 45) % 2) * 0.5;
+  if (v.g === G.VAN && (v.e === 2 || v.e === 3)) y -= (Math.floor(performance.now() / 45) % 2) * 0.5;
   const estTir = v.g >= G.P_BAGUETTE && v.g < G.CAGE;
   if (estTir) y -= DEMI_TAILLE[v.g] ?? 2;
 

@@ -130,7 +130,7 @@ function maisonGranit(
     }
 }
 
-export const DECORS_BRETONS: Record<'sousbois' | 'quais' | 'falaises', Peinture> = {
+export const DECORS_BRETONS: Record<'sousbois' | 'quais' | 'falaises' | 'large', Peinture> = {
   sousbois: (c, r, th, plan) => {
     if (!plan) {
       // des troncs lointains très hauts dans la brume, des rais de lumière qui tombent de la canopée
@@ -237,5 +237,46 @@ export const DECORS_BRETONS: Record<'sousbois' | 'quais' | 'falaises', Peinture>
       c.fillRect(x + 15, 222, 3, 4);
     }
     phare(c, r.entier(400, 600), 226, 44);
+  },
+  large: (c, r, th, plan) => {
+    if (!plan) {
+      // la pleine mer jusqu'à l'horizon : des îles basses au loin, un phare, des voiles
+      mer(c, r, 176, th.lointain);
+      c.fillStyle = teinte(th.lointain, [210, 225, 240], 0.45);
+      for (let i = 0; i < 3; i++) {
+        const x = r.entier(40, L - 160);
+        const w = r.entier(60, 140);
+        const haut = r.entre(5, 9);
+        for (let k = 0; k < w; k++) {
+          const h = Math.round(Math.sin((k / w) * Math.PI) * haut);
+          c.fillRect(x + k, 176 - h, 1, h);
+        }
+      }
+      phare(c, r.entier(200, 700), 175, 14);
+      for (let i = 0; i < 3; i++) {
+        const x = r.entier(20, L - 20);
+        c.fillStyle = '#f2f0ea';
+        for (let k = 0; k < 7; k++) c.fillRect(x + 3, 178 + k, 1 + (k >> 1), 1);
+        c.fillStyle = '#2e3644';
+        c.fillRect(x, 185, 10, 2);
+      }
+      return;
+    }
+    // la houle : des rangées de crêtes qui s'allongent en approchant, et quelques bouées
+    c.fillStyle = th.proche;
+    c.fillRect(0, 200, L, H - 200);
+    const crete = teinte(th.proche, [220, 240, 255], 0.35);
+    for (let y = 204; y < H; y += 7) {
+      c.fillStyle = crete;
+      for (let x = r.entier(0, 20); x < L; x += r.entier(18, 40))
+        c.fillRect(x, y, r.entier(4, 6 + (y - 200) / 4), 1);
+    }
+    for (let i = 0; i < 3; i++) {
+      const x = r.entier(30, L - 30);
+      c.fillStyle = i % 2 ? '#c8322a' : '#2a8a4a';
+      c.fillRect(x, 212, 4, 6);
+      c.fillStyle = '#2e3644';
+      c.fillRect(x + 1, 208, 2, 4);
+    }
   },
 };

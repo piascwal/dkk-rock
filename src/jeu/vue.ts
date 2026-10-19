@@ -171,8 +171,10 @@ export interface EtatVue {
   boss: number;
   /** secousse de l'écran, 0 à 255 */
   secousse: number;
-  /** la traversée en ferry : images écoulées depuis l'embarquement (figées à l'arrivée), ou -1 hors traversée */
+  /** la traversée en ferry : le chemin parcouru par le ferry (le fond défile d'autant), ou -1 hors traversée */
   traversee: number;
+  /** l'étape de la traversée et son avancement, sur un octet (voir `codeEtape` dans jeu/traversee.ts) ; 0 hors traversée */
+  navire: number;
   joueurs: JoueurVue[];
   entites: EntiteVue[];
 }

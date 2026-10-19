@@ -19,6 +19,8 @@ import { Particules } from './particules';
 import { RockersRestes } from './rockers-convertis';
 import { THEMES, type Theme } from './themes';
 import { TraitsPersos } from './traits-persos';
+import { RenduNavire } from './navire';
+import { geometrieNavire } from '../niveaux/navire';
 
 /** De combien le fond défile par image pendant la traversée en ferry (pixels du monde par image de traversée). */
 const VITESSE_FERRY = 1.6;
@@ -40,6 +42,8 @@ export class Rendu {
   theme: Theme = THEMES.garage;
   private atlas = new AtlasTuiles(THEMES.garage);
   private fond = new Fond(THEMES.garage);
+  /** le ferry, dans le niveau de la traversée */
+  private navire: RenduNavire | null = null;
   private niveau = -1;
   private decor: ReturnType<typeof semeDecor> = [];
   /** les accessoires posés sur chaque tuile (clé : rangée × 100000 + colonne), pour les briser avec elle */
@@ -129,6 +133,8 @@ export class Rendu {
     this.theme = THEMES[NIVEAUX[niveau]?.theme ?? 'garage'];
     this.atlas = new AtlasTuiles(this.theme);
     this.fond = new Fond(this.theme);
+    const emb = niveauLu(niveau).embarquement;
+    this.navire = emb ? new RenduNavire(geometrieNavire(emb)) : null;
     this.camera.recadre();
     this.traits.reinitialise();
   }
@@ -213,6 +219,11 @@ export class Rendu {
         this.decorParTuile.set(cle, [...(this.decorParTuile.get(cle) ?? []), o]);
       }
     }
+    // sur le ferry : les quais d'abord ; puis tout ce qui est à bord tangue, et la mer passe devant (voir navire.ts)
+    const navire = this.navire;
+    navire?.quais(ctx, camX, camY, vue.navire);
+    ctx.save();
+    if (navire) ctx.translate(0, navire.tangage(vue.navire, this.tick));
     const decore = (couche: CoucheDecor) =>
       dessineDecor(
         ctx,
@@ -227,6 +238,7 @@ export class Rendu {
       );
     decore('fond');
     dessineTuiles(ctx, carte, this.atlas, camX, camY, this.largeur, this.tick);
+    navire?.navire(ctx, camX, camY, vue.navire, this.tick);
     decore('interieur');
     dessineTyroliennes(ctx, niveauLu(vue.niveau).tyroliennes, carte, camX, camY);
     this.particules.meteo(this.theme.meteo, camX, camY, this.largeur);
@@ -242,6 +254,8 @@ export class Rendu {
     for (const v of vue.entites) if (v.g === G.VAN && v.e === 2) this.particules.van(v.x, v.y, v.f / 20);
     decore('devant');
     this.particules.dessine(ctx, camX, camY);
+    ctx.restore();
+    navire?.mer(ctx, camX, camY, this.largeur, vue.navire, this.tick);
     // les braises sont un petit plus : on les coupe dès que l'appareil peine (mode éco, ou trop peu d'images par seconde)
     if (this.braisesPermises()) {
       this.braises.emetDepuis(carte, camX, this.largeur);

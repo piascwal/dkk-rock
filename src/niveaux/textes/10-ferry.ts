@@ -4,7 +4,7 @@ export const FERRY: Omit<DefNiveau, 'carte'> = {
   id: 'ferry',
   titre: 'La Traversée',
   sousTitre: 'Breizh 3 — Tenez le pont !',
-  theme: 'port',
+  theme: 'mer',
   intro: [
     {
       qui: 'NARRATEUR',

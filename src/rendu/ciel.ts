@@ -23,6 +23,7 @@ const NUAGES: Partial<Record<Decor, Palette>> = {
   club: { haut: '#6a2a7e', corps: '#4a1a5e', bas: '#301044' },
   quais: { haut: '#f2f4f4', corps: '#c8d0d6', bas: '#98a4b0' },
   falaises: { haut: '#ffffff', corps: '#e6f1fb', bas: '#b9d3ea' },
+  large: { haut: '#ffffff', corps: '#eef6fc', bas: '#c4dcef' },
 };
 
 /** Les mondes de plein ciel : des oiseaux y volent (couleur de leur silhouette). */
@@ -34,6 +35,7 @@ const OISEAUX: Partial<Record<Decor, string>> = {
   // des goélands : une silhouette claire sur le ciel gris
   quais: '#f4f4f0',
   falaises: '#f4f4f0',
+  large: '#f4f4f0',
 };
 
 /** Le ciel est dessiné pour une vue de 120 px de haut : on étire ses hauteurs à la vue actuelle. */

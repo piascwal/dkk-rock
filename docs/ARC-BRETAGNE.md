@@ -40,12 +40,15 @@ décaler les sauvegardes), mais vient avant Groix dans l'arc.
    sillage de ferry. Après l'épilogue de la tournée, le van roule directement vers la forêt.
 3. ✅ Menhirs (sprite fourni, `assets-sources/decor/menhir-1-base.png`) et dolmens (dessinés en code) semés dans la forêt et sur Groix.
 4. ✅ Goéland (lettre `g`, genre `GOELAND`) : il plane au-dessus du héros, pique sur lui (son attaque, image de piqué), puis remonte. Il ne vit que dans les niveaux bretons ; le protocole passe en version 10 (nouveau genre).
-5. ✅ Phase ferry, dans son propre niveau « La Traversée » (`10-ferry`, ni danseurs ni lanceurs : leurs explosions creuseraient le pont) : la pièce `ferry` du générateur (`outils/niveaux/ferry.py`) pose un quai, le repère
-   `&` d'embarquement, un pont de bois de 24 tuiles, la proue et le van. Quand tous les héros sont à bord
-   (`src/jeu/traversee.ts`), le pont se ferme derrière eux, cinq vagues montent à l'abordage par les deux côtés (marins,
-   bigoudènes, goélands ; un pont vide fait venir la suivante plus tôt), puis la porte (à 19 tuiles du repère) s'ouvre sur le
-   van. Le monde ne bouge pas : `EtatVue.traversee` transporte le temps de traversée et le fond défile (protocole version 13).
-   Un héros qui réapparaît en pleine traversée revient sur le pont.
+5. ✅ Phase ferry, dans son propre niveau « La Traversée » (`10-ferry`). Le niveau n'est que le navire, posé sur la mer :
+   pont, coque, poupe et proue en socle indestructible (on ne creuse pas sous un bateau), et le vide (la mer) dessous et
+   autour ; mesures dans `src/niveaux/navire.ts` (et `outils/niveaux/ferry.py`). Le déroulé (`src/jeu/traversee.ts`) : le van
+   monte à bord par la rampe arrière avec les héros et se gare sur le pont arrière ; la rampe se relève, les héros descendent,
+   le quai de Lorient s'éloigne ; cinq vagues montent à l'abordage (marins, bigoudènes, goélands) ; puis le quai de Groix
+   s'approche, la rampe avant s'abaisse et le van redescend tout seul : fin du niveau. Les quais sont dessinés, pas posés
+   (`src/rendu/navire-quais.ts`) ; le rendu (`src/rendu/navire.ts`) dessine la coque, la cabine, la cheminée qui fume, le
+   gwenn-ha-du, le bastingage, les rampes qui pivotent, la mer devant (écume, sillage) et fait tanguer ce qui est à bord. La vue
+   transporte l'étape et le chemin parcouru (protocole version 14) ; le fond est la pleine mer (thème `mer`, décor `large`).
 6. Bigoudènes ✅ (lettre `h`, genre `BIGOUDEN`, trois apparences tirées au sort ; elles gardent leurs distances et jouent un air de trois notes, puis soufflent ; protocole version 11). Marins ✅ (lettre `m`, genre `MARIN`, deux apparences, accordéon et clarinette ; ils foncent au corps-à-corps, frappent de leur instrument et ont un coup de reins toutes les 100 images ; au port et sur Groix seulement ; protocole version 12). Les trois ennemis bretons sont branchés ; restent la phase ferry (étape 5) et les niveaux à affiner.
 
 ## Idées de gameplay à valider

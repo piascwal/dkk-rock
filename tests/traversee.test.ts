@@ -1,78 +1,105 @@
 import { describe, expect, it } from 'vitest';
-import { HEROS_HAUTEUR, TUILE, VIES_DEPART } from '../src/config';
+import { TUILE, VIES_DEPART } from '../src/config';
+import { Objet } from '../src/entites/objets';
 import { Partie } from '../src/jeu/partie';
-import { G } from '../src/jeu/vue';
 import { T } from '../src/monde/tuiles';
+import { decodeEtape, geometrieNavire, NAVIRE } from '../src/niveaux/navire';
 
-/** La traversée (niveau 9 de la liste), le héros sur le pont (déjà à bord). */
-function surLePont() {
+/** La traversée (niveau 9 de la liste), un héros, l'intro passée. */
+function ferry() {
   const p = new Partie({ niveau: 9, drapeau: -1, vies: VIES_DEPART, score: 0 });
   p.ajouteJoueur(0, 0);
   while (p.phase === 'histoire') p.suivant();
   const emb = p.lu.embarquement!;
-  const j = p.joueurs[0]!;
-  Object.assign(j.corps, { x: emb.x + 5 * TUILE, y: emb.y + TUILE - HEROS_HAUTEUR });
-  const pas = (n: number) => {
+  const g = geometrieNavire(emb);
+  const t = p.traversee!;
+  const van = p.entites.find((e): e is Objet => e instanceof Objet && e.sorte === 'van')!;
+  const pas = (n = 1) => {
     for (let i = 0; i < n; i++) {
-      j.invulnerable = 9999;
+      for (const j of p.joueurs) if (j) j.invulnerable = 9999;
       p.avance();
       p.releveEvenements();
     }
   };
-  return { p, emb, j, pas };
+  /** avance jusqu'à l'étape voulue (ou échoue au bout de `max` pas) */
+  const jusqua = (etape: string, max = 3000) => {
+    for (let i = 0; i < max && t.etape !== etape; i++) pas();
+    expect(t.etape).toBe(etape);
+  };
+  return { p, emb, g, t, van, pas, jusqua };
 }
 
-describe('la traversée en ferry (niveau à part)', () => {
-  it('la carte du ferry a son embarquement, et la porte du pont est fermée au chargement', () => {
-    const p = new Partie({ niveau: 9, drapeau: -1, vies: VIES_DEPART, score: 0 });
-    const emb = p.lu.embarquement!;
-    expect(emb).not.toBeNull();
-    expect(p.carte.get(emb.tx + 19, emb.ty)).toBe(T.SOCLE);
-    expect(p.traversee).toBeNull();
-    // les autres niveaux n'ont pas de ferry
-    for (const n of [6, 7, 8])
-      expect(new Partie({ niveau: n, drapeau: -1, vies: 5, score: 0 }).lu.embarquement).toBeNull();
+describe('la traversée en ferry', () => {
+  it('seul le navire est solide, indestructible ; dessous et autour, la mer (le vide)', () => {
+    const { p, emb, g } = ferry();
+    const pont = emb.ty + 1;
+    const avant = [5, 15, 25].map((dx) => p.carte.get(emb.tx + dx, pont + 2));
+    expect(p.carte.get(emb.tx + 5, pont)).toBe(T.SOCLE);
+    // une grosse explosion contre la coque ne l'entame pas : impossible de creuser sous le bateau
+    p.explosion(g.poupe + 10 * TUILE, g.pont + 2 * TUILE, 80, 99, 'tous');
+    p.releveEvenements();
+    expect([5, 15, 25].map((dx) => p.carte.get(emb.tx + dx, pont + 2))).toEqual(avant);
+    // sous la quille, et entre le navire et les quais (dessinés), rien
+    expect(p.carte.get(emb.tx + 5, pont + NAVIRE.coque + 1)).toBe(T.VIDE);
+    expect(p.carte.get(emb.tx - 3, pont)).toBe(T.VIDE);
+    expect(p.carte.get(emb.tx + NAVIRE.longueur + 1, pont)).toBe(T.VIDE);
   });
 
-  it('le pont se ferme derrière les héros à bord, et les vagues montent à l’abordage', () => {
-    const { p, emb, pas } = surLePont();
-    pas(5);
-    const t = p.traversee!;
-    expect(t).not.toBeNull();
-    expect(p.carte.get(emb.tx - 1, emb.ty)).toBe(T.SOCLE);
-    // la première vague : deux marins
-    pas(200);
-    expect(t.vague).toBe(1);
-    expect(t.ennemis).toHaveLength(2);
-    expect(t.ennemis.every((e) => e.def.genre === G.MARIN)).toBe(true);
-    // la vue transporte le temps de traversée
-    expect(p.vue().traversee).toBe(t.sillage);
+  it('l’intro : le van monte à bord avec les héros, se gare ; la rampe se relève, puis les héros descendent', () => {
+    const { p, g, t, van, pas, jusqua } = ferry();
+    expect(van.corps.x).toBeLessThan(g.poupe);
+    pas();
+    expect(p.joueurs[0]!.embarque).toBe(true);
+    jusqua('rampe');
+    expect(Math.abs(van.corps.x - g.parking)).toBeLessThan(1);
+    expect(p.joueurs[0]!.embarque).toBe(true);
+    jusqua('appareillage');
+    const j = p.joueurs[0]!;
+    expect(j.embarque).toBe(false);
+    expect(j.corps.x).toBeGreaterThan(g.poupe);
+    expect(j.corps.x).toBeLessThan(g.proue);
+    // la vue transmet l'étape au rendu
+    expect(decodeEtape(p.vue().navire).etape).toBe('appareillage');
+    expect(t.vitesse).toBeLessThan(0.1);
   });
 
-  it('la porte ne s’ouvre qu’à la dernière vague vaincue, et le fond cesse alors de défiler', () => {
-    const { p, emb, pas } = surLePont();
-    pas(5);
-    const t = p.traversee!;
-    for (let i = 0; i < 8000 && t.arrivee < 0; i++) {
-      // chaque assaillant est vaincu dès qu'il monte à bord
+  it('en mer, toucher le van ne fait rien : il ne repart qu’à Groix', () => {
+    const { p, van, jusqua } = ferry();
+    jusqua('traversee');
+    p.lanceDepart(van);
+    expect(p.departDans).toBe(-1);
+    expect(p.joueurs[0]!.embarque).toBe(false);
+  });
+
+  it('les vagues vaincues, le ferry accoste, la rampe s’abaisse et le van redescend : fin du niveau', () => {
+    const { p, t, pas, jusqua } = ferry();
+    jusqua('traversee');
+    for (let i = 0; i < 9000 && t.etape === 'traversee'; i++) {
       for (const e of t.ennemis) if (e.vivant()) e.meurt(p);
-      // tant que des vagues restent à venir, la porte reste fermée
-      if (t.vague < 5) expect(p.carte.get(emb.tx + 19, emb.ty)).toBe(T.SOCLE);
-      pas(1);
+      pas();
     }
     expect(t.vague).toBe(5);
-    expect(t.arrivee).toBeGreaterThan(0);
-    expect(p.carte.get(emb.tx + 19, emb.ty)).toBe(T.VIDE);
-    const figee = p.vue().traversee;
-    pas(120);
-    expect(p.vue().traversee).toBe(figee);
+    jusqua('debarquement');
+    // le ferry est à quai : le fond ne défile plus
+    const sillage = p.vue().traversee;
+    pas(20);
+    expect(p.vue().traversee).toBe(sillage);
+    for (let i = 0; i < 600 && p.phase === 'jeu'; i++) pas();
+    expect(p.joueurs[0]!.embarque).toBe(true);
+    expect(p.phase).toBe('convertis');
   });
 
-  it('un héros qui réapparaît en pleine traversée revient sur le pont, pas sur le quai', () => {
-    const { p, emb, pas } = surLePont();
-    pas(5);
-    const [x] = p.pointApparition();
-    expect(x).toBeGreaterThan(emb.x);
-    expect(x).toBeLessThan(emb.x + 19 * TUILE);
+  it('un héros qui réapparaît en pleine traversée revient sur le pont', () => {
+    const { p, g, jusqua } = ferry();
+    jusqua('traversee');
+    const [x, y] = p.pointApparition();
+    expect(x).toBeGreaterThan(g.poupe);
+    expect(x).toBeLessThan(g.proue);
+    expect(y).toBeLessThan(g.pont);
+  });
+
+  it('les autres niveaux n’ont pas de ferry', () => {
+    for (const n of [6, 7, 8])
+      expect(new Partie({ niveau: n, drapeau: -1, vies: 5, score: 0 }).traversee).toBeNull();
   });
 });
