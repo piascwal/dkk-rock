@@ -86,23 +86,23 @@ NIVEAUX = {
         lieux=[
             ('plat', 12, dict(lettres='y', deco=2, digit='1')),  # le premier yéti
             ('colline', 16, dict(haut=2, lettres='y')),
-            ('corniches', 14, dict(monte=6, lettres='y')),
+            ('corniches', 14, dict(monte=9, lettres='y')),
             ('pont_singe', 16, dict(lettres='y')),
             ('forteresse', 32, dict(etages=3, lettres='y', mat='R', cage=True)),
-            ('grotte', 18, dict(monte=8, lettres='y', butin='*')),
+            ('grotte', 18, dict(monte=12, lettres='y', butin='*')),
             ('plat', 10, dict(lettres='y', digit='2')),  # la glace et la neige qui tombe
             ('glacier', 44, dict(lettres='y', nb=2)),
             ('pont_singe', 18, dict(lettres='ya', butin='*')),
             ('barrage', 20, dict(haut=12, lettres='y', butin='*')),  # l'à-pic
-            ('corniches', 14, dict(monte=6, lettres='ya')),
-            ('descente', 20, dict(chute=5, lettres='ya')),  # d'une montagne à l'autre
-            ('grotte', 18, dict(monte=8, lettres='ya', butin='K')),
+            ('corniches', 14, dict(monte=9, lettres='ya')),
+            ('descente', 22, dict(chute=12, lettres='ya')),  # d'une montagne à l'autre, bien plus bas : le vide se voit
+            ('grotte', 18, dict(monte=12, lettres='ya', butin='K')),
             ('forteresse', 30, dict(etages=4, lettres='ya', mat='R', cage=True)),
             ('pont_singe', 16, dict(lettres='ya')),
             ('cheminee', 24, dict(haut=11, lettres='ya')),
-            ('corniches', 14, dict(monte=6, lettres='ya')),
+            ('corniches', 14, dict(monte=9, lettres='ya')),
             ('plat', 10, dict(lettres='yy', digit='3')),  # flash spécial : Detroit
-            ('grotte', 18, dict(monte=8, lettres='ya', butin='+')),
+            ('grotte', 18, dict(monte=12, lettres='ya', butin='+')),
             ('pont_singe', 16, dict(lettres='ya')),
             ('vide', 64, dict()),  # l'arène du Yéti Alpha, au sommet, peinte après coup
         ],
