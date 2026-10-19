@@ -126,7 +126,29 @@ const feuDeCamp: Accessoire = (p) => {
   flamme(p, 0, -5, 8);
 };
 
+/** Une pierre levée (repli en code du sprite menhir) : une pointe, un ventre éclairé à gauche, de la mousse au pied. */
+const menhir: Accessoire = (p) => {
+  p(-4, -22, 8, 22, '#8a929b');
+  p(-3, -24, 6, 2, '#8a929b');
+  p(-4, -22, 2, 22, '#b0b8c0');
+  p(2, -20, 2, 20, '#5a626b');
+  p(-4, -6, 8, 2, '#4f7a3a');
+};
+
+/** Un dolmen : deux pierres de soutien et une table qui déborde ; dessiné en code seulement (pas de planche). */
+const dolmen: Accessoire = (p) => {
+  p(-10, -9, 4, 9, '#6d7680');
+  p(6, -9, 4, 9, '#6d7680');
+  p(-13, -12, 26, 3, '#8a929b');
+  p(-13, -12, 26, 1, '#b0b8c0');
+  p(-13, -10, 26, 1, '#4e565e');
+  p(-10, -2, 4, 2, '#4f7a3a');
+  p(6, -2, 4, 2, '#4f7a3a');
+};
+
 export const ACCESSOIRES_SUPPLEMENTAIRES = {
+  menhir,
+  dolmen,
   tonneau,
   sacs,
   pneus,

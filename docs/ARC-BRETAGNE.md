@@ -17,8 +17,7 @@ Un arc à part, ouvert après la fin de l'arc principal, en trois niveaux.
 
 ## Assets
 
-- **Générés programmatiquement en premier :** menhirs et dolmens (décor dessiné en code, `decor-accessoires.ts`), en attendant
-  les sprites du client.
+- **Menhirs :** sprite fourni (un seul reçu). **Dolmens :** dessinés en code (`decor-accessoires.ts`), pas encore de planche.
 - **Attendus du client :** bigoudens et marins avec leurs instruments (utilisés comme armes), et deux sprites de goéland
   (en vol, et en piqué).
 
@@ -31,7 +30,7 @@ Un arc à part, ouvert après la fin de l'arc principal, en trois niveaux.
    carte du monde pour tous les arcs (`MONDE` dans `arcs.ts`) : la route continue après le Club Infini vers l'est (menhirs,
    dolmens, chênes, pentys, chalutiers, phares), et Groix est une île à part, séparée par un détroit que la route franchit en
    sillage de ferry. Après l'épilogue de la tournée, le van roule directement vers la forêt.
-3. Menhirs et dolmens en décor programmatique.
+3. ✅ Menhirs (sprite fourni, `assets-sources/decor/menhir-1-base.png`) et dolmens (dessinés en code) semés dans la forêt et sur Groix.
 4. Goéland : déplacement en vol, attaque en piqué, rattaché à la région bretonne uniquement.
 5. Phase ferry : défilement automatique, vagues d'ennemis par les côtés, bastingage.
 6. Bigoudens et marins, avec leurs instruments comme armes, une fois les sprites reçus.

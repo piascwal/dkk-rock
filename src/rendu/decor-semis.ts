@@ -149,7 +149,7 @@ export const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAcces
       ],
       densite: 0.7,
     },
-    // l'arc breton (en attendant les menhirs et les dolmens dessinés : étape 3 de docs/ARC-BRETAGNE.md)
+    // l'arc breton : les menhirs (sprite) et les dolmens (en code) de la forêt et de l'île
     foret: {
       dehors: [
         'arbre',
@@ -166,6 +166,9 @@ export const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAcces
         'rocher',
         'cairn',
         'cairn',
+        'menhir',
+        'menhir',
+        'dolmen',
         'torche',
         'feuDeCamp',
         'enceinte34',
@@ -202,6 +205,8 @@ export const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAcces
         'rocher',
         'rocher',
         'cairn',
+        'menhir',
+        'dolmen',
         'cloture',
         'vacheCasque',
         'tonneau',
