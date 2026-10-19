@@ -50,6 +50,8 @@ export interface DefNiveau {
   dialogues: Partial<Record<string, Replique[]>>;
   /** répliques à la fin du niveau */
   outro: Replique[];
+  /** le van décolle à la fin du niveau, à la force de son réacteur, au lieu de partir sur la route (un sommet) */
+  envol?: boolean;
   carte: string[];
 }
 

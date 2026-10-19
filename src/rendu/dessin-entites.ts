@@ -17,6 +17,7 @@ import { pinceau, type Pinceau } from './pinceau';
 import { ecritCentre } from './police';
 import { dessineRockerConverti } from './rockers-convertis';
 import type { Theme } from './themes';
+import { CABRE } from './reacteur';
 
 /** Les héros qui ont leurs propres images de dos pour l'échelle (planches du décor, voir outils/fixe-objets.py). */
 /** Le préfixe des planches de chaque héros (`<nom>-echelle`, `<nom>-saut`). */
@@ -40,6 +41,7 @@ const DRAPEAUX_SANS_MIROIR = new Set<number>([
   G.CAGE,
   G.DRAPEAU,
   G.VAN,
+  G.VAN_REACTEUR,
   G.ARME,
   G.SOIN,
   G.BLOC,
@@ -119,6 +121,7 @@ export function dessineEntite(
     ctx.shadowBlur = heros ? 10 : 6;
   }
   ctx.translate(x, y);
+  if (v.g === G.VAN_REACTEUR && v.e === 4) ctx.rotate(CABRE); // il décolle, nez en l'air
   if (v.gauche && !DRAPEAUX_SANS_MIROIR.has(v.g)) ctx.scale(-1, 1);
   if (aTerre) {
     // converti au rock : un rocker tiré au sort prend sa place (un drone, lui, reste un drone qui tombe, couché)

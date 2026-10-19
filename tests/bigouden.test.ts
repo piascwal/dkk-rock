@@ -3,6 +3,7 @@ import { VIES_DEPART } from '../src/config';
 import { Ennemi } from '../src/entites/ennemis/ennemi';
 import { Partie } from '../src/jeu/partie';
 import { G } from '../src/jeu/vue';
+import { auSolPlat } from './terrain';
 
 function partieAu(niveau: number): Partie {
   const p = new Partie({ niveau, drapeau: -1, vies: VIES_DEPART, score: 0 });
@@ -22,7 +23,7 @@ describe('la bigoudène (arc breton)', () => {
 
   it('joue un air de trois notes, souffle, puis recommence', () => {
     const p = partieAu(6);
-    const e = bigoudens(p)[0]!;
+    const e = auSolPlat(p, bigoudens(p));
     const j = p.joueurs[0]!;
     j.invulnerable = 9999;
     Object.assign(j.corps, { x: e.corps.x - 100, y: e.corps.y });

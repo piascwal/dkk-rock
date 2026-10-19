@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { VIES_DEPART } from '../src/config';
+import { TUILE, VIES_DEPART } from '../src/config';
 import { Ennemi } from '../src/entites/ennemis/ennemi';
 import { Partie } from '../src/jeu/partie';
 import { G } from '../src/jeu/vue';
+import { T } from '../src/monde/tuiles';
 
 function partieAu(niveau: number): Partie {
   const p = new Partie({ niveau, drapeau: -1, vies: VIES_DEPART, score: 0 });
@@ -24,10 +25,16 @@ describe('le marin (arc breton)', () => {
 
   it('marche droit sur le héros, et plus vite pendant son coup de reins', () => {
     const p = partieAu(7);
+    // un marin et le héros sur le replat du départ : les cartes sont générées, le terrain ailleurs peut changer
     const e = marins(p)[0]!;
+    const d = p.lu.depart;
+    Object.assign(e.corps, { x: d.x + 170, y: d.y + TUILE - e.corps.h, vx: 0, vy: 0 });
+    // le passage dégagé (une caisse de décor peut traîner sur le replat)
+    for (let tx = d.tx; tx <= d.tx + 13; tx++)
+      for (const ty of [d.ty, d.ty - 1]) p.carte.pose(tx, ty, T.VIDE);
     const j = p.joueurs[0]!;
     j.invulnerable = 9999;
-    Object.assign(j.corps, { x: e.corps.x - 150, y: e.corps.y });
+    Object.assign(j.corps, { x: d.x + 20, y: d.y + TUILE - j.corps.h });
     e.etat = 'attaque';
     e.cible = j;
     let vitesseMax = 0;

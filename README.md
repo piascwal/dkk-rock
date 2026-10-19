@@ -173,7 +173,16 @@ validé.
   existe en trois modes (`mixte`, `pont`, `iles`), et forteresses, barrages et gouffres changent de taille d'un niveau à l'autre.
   **Pas de longues lignes droites :** chaque niveau est un enchaînement de _lieux_ (`outils/niveaux/plans.py`, un plan par
   niveau) reliés par des raccords de 4 à 6 colonnes : forteresses à étages et sous-sol, traversées de gouffre (passerelle,
-  tyrolienne ou îlots), barrages à escalader, gouffres à descendre, tours, échafaudages, murs. Sous terre, pas de galerie
+  tyrolienne ou îlots), à-pics, gouffres à descendre, tours, échafaudages, murs. **Pas de mur incassable pour forcer à
+  monter** : l'à-pic (`barrage` dans `outils/niveaux/verrous.py`) est un gouffre sans fond de 7 tuiles, qu'on ne franchit
+  qu'en montant l'échafaudage collé au bord, puis par une tyrolienne ou un pont de singe. Les modules du vide
+  (`outils/niveaux/hauteurs.py`) : le _pont de singe_ (un gouffre sans fond, un pont de planches qui ploie), la _descente_
+  (une tyrolienne vers un massif plus bas), la _grotte_ (une paroi qu'on gravit par l'intérieur, d'étage en étage) et les
+  _corniches_ (la même par l'extérieur). Un niveau **en hauteur** (`altitude` dans le plan : les Cimes) part d'un monde
+  vide où chaque pièce pose son massif : on monte de la vallée au sommet, et tomber entre deux massifs, c'est mourir.
+  **Le van à réacteur** (`envol` dans les textes du niveau, sprite `van-reacteur`) remplace le van d'origine là où le niveau
+  finit au sommet : il décolle, nez en l'air, réacteur en feu (`rendu/reacteur.ts`). Partout ailleurs, le van d'origine part
+  sur la route. Sous terre, pas de galerie
   continue (`outils/niveaux/souterrain.py`) : des complexes de pierre, des cavernes et des caches, qu'on atteint par une
   échelle depuis la surface et qui sont des impasses gardées (butin, arme ou cage +1 vie). Le monde est peu profond :
   24 rangées sous la surface, puis le vide.

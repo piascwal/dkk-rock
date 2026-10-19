@@ -1,4 +1,4 @@
-"""Les verrous verticaux : des obstacles qui obligent à monter (barrage) ou à descendre (gouffre), et les salles de
+"""Les verrous verticaux : des obstacles qui obligent à monter (l'à-pic, `barrage`) ou à descendre (gouffre), et les salles de
 combat souterraines. Sans eux, on traverse un niveau en ligne droite sans jamais lever ni baisser le regard.
 
 Un verrou ne bloque jamais le niveau : il y a toujours un chemin (échelles scellées, planches, tyrolienne) et le test
@@ -7,26 +7,34 @@ d'accessibilité de tests/niveaux.test.ts le vérifie.
 
 
 def barrage(n, x0, haut=12, lettres='a', tyro=0, butin='*'):
-    """Un mur incassable, haut de `haut` tuiles (multiple de 4), qui coupe aussi la galerie : on ne le contourne pas.
+    """Un à-pic : un gouffre sans fond de 7 tuiles, trop large pour être sauté, qu'on ne franchit que par en haut. On monte un
+    échafaudage collé au bord (planches tous les 4 rangs, échelles en alternance, des ennemis sur chaque planche) jusqu'à `haut`
+    tuiles ; de là, une tyrolienne (si `tyro`) file jusqu'au sol d'en face, ou un pont de singe mène à un piton de roche dont on
+    redescend par une échelle. Le gouffre coupe aussi le dessous : on ne le contourne pas par les caves.
+    Renvoie (début du gouffre, rangée du haut de l'échafaudage)."""
+    from hauteurs import abime, pont
 
-    À gauche, un échafaudage (planches tous les 4 rangs, échelles en alternance, des ennemis sur chaque planche) mène
-    au sommet du mur ; de l'autre côté, une échelle (et, si `tyro`, une tyrolienne de `tyro` tuiles) ramène au sol.
-    Renvoie (x du mur, rangée du sommet) : le mur est à reposer après le creusement des galeries.
-    """
-    largeur = 9
+    largeur = 8
     top = n.base - haut
     ys = n.echafaudage(x0, largeur, haut // 4)
-    xw = x0 + largeur
-    n.rect(xw, top, xw + 3, n.h, 'X')
-    for y in range(top, n.base):  # l'échelle de descente, collée au mur
-        n.set(xw + 3, y, 'H')
+    g0 = x0 + largeur
+    g1 = g0 + 7
+    abime(n, g0, g1)
     for y in ys:
-        n.ennemis(x0 + 2, xw - 1, lettres, 1, ymin=y - 1)
-    n.ennemis(xw, xw + 3, lettres, 1, ymin=top - 1)  # un garde sur le mur
-    n.repere(xw + 1, butin, ymin=top - 1)
+        n.ennemis(x0 + 2, g0 - 1, lettres, 1, ymin=y - 1)
+    n.repere(x0 + largeur // 2, butin, ymin=top - 1)
     if tyro:
-        n.tyro(xw + 2, top - 1, xw + 3 + tyro, n.base - 5)
-    return xw, top
+        n.tyro(g0 - 2, top - 1, g1 + 3, n.base - 5)  # le palier d'arrivée reste au-dessus de la zone des drapeaux
+        n.ennemis(g1 + 1, g1 + 6, lettres, 1)
+    else:
+        # le piton d'en face, à la hauteur du dernier plancher, et l'échelle qui en redescend
+        mat = n.t['mur']
+        n.rect(g1, top, g1 + 2, n.base, mat)
+        for y in range(top, n.base):
+            n.set(g1 + 2, y, 'H')
+        pont(n, g0, g1, top, creux=1)
+        n.ennemis(g1, g1 + 2, lettres, 1, ymin=top - 1)  # un garde sur le piton
+    return g0, top
 
 
 def trou(n, x0, largeur, base=None):

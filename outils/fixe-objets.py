@@ -32,6 +32,8 @@ QUANTIFIEES = {'dj', 'voiture'}
 # objet : (fichiers sources, un par état (une ligne de la planche chacun), genre dans jeu/vue.ts, largeur en jeu en pixels)
 OBJETS = {
     'van': (['van-base.png'], 'VAN', 56),
+    # le van à réacteur, des niveaux qui finissent au sommet (il décolle à la propulsion) : la carrosserie garde la taille du van
+    'van-reacteur': (['van-reacteur-base.png'], 'VAN_REACTEUR', 76),
     'cage': (['cage-1-base.png', 'cage-2-base.png'], 'CAGE', 22),  # fermée, puis ouverte
     # le Yéti Alpha : repos, bras levés (deux), touché (trois) ; les poses gardent leur place (cadre commun)
     'yeti-alpha': ([f'boss/yeti-alpha-{k}-base.png' for k in range(1, 7)], 'YETI_ALPHA', 46, True),

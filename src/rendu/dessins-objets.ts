@@ -4,6 +4,23 @@ import { DESSINS_TIRS } from './dessins-tirs';
 
 type Dessin = (p: Pinceau, e: number, f: number) => void;
 
+/** Le van, faute de planche (les deux vans : celui de la route et celui à réacteur). */
+const dessineVan: Dessin = (p, _e, f) => {
+  p(-22, -22, 44, 12, '#efe6cc');
+  p(-22, -11, 44, 8, '#d64545');
+  p(-22, -22, 44, 1, '#ffffff');
+  for (const x of [-19, -9, 1]) p(x, -20, 8, 6, '#9fd8f0');
+  p(12, -20, 8, 7, '#9fd8f0');
+  p(-14, -10, 2, 6, '#ffd23f');
+  p(-10, -9, 2, 5, '#ff9b2f');
+  p(-6, -10, 2, 6, '#ffd23f');
+  for (const x of [-15, 11]) {
+    p(x, -4, 7, 4, '#111');
+    p(x + 2, -3, 3, 2, '#888');
+  }
+  p(20, -14, 2, 2, f % 30 < 15 ? '#fff3b0' : '#ffd23f');
+};
+
 /** Le dessin qui sert d'icône à chaque arme ramassable (dans l'ordre d'ARMES_RAMASSABLES). */
 const ICONES_ARMES = [G.P_JET_FLAMME];
 
@@ -76,21 +93,8 @@ export const DESSINS_OBJETS: Partial<Record<number, Dessin>> = {
     p(3, -26, 8, 1, '#111');
     p(5, -28, 4, 2, '#ffffff');
   },
-  [G.VAN]: (p, _e, f) => {
-    p(-22, -22, 44, 12, '#efe6cc');
-    p(-22, -11, 44, 8, '#d64545');
-    p(-22, -22, 44, 1, '#ffffff');
-    for (const x of [-19, -9, 1]) p(x, -20, 8, 6, '#9fd8f0');
-    p(12, -20, 8, 7, '#9fd8f0');
-    p(-14, -10, 2, 6, '#ffd23f');
-    p(-10, -9, 2, 5, '#ff9b2f');
-    p(-6, -10, 2, 6, '#ffd23f');
-    for (const x of [-15, 11]) {
-      p(x, -4, 7, 4, '#111');
-      p(x + 2, -3, 3, 2, '#888');
-    }
-    p(20, -14, 2, 2, f % 30 < 15 ? '#fff3b0' : '#ffd23f');
-  },
+  [G.VAN]: dessineVan,
+  [G.VAN_REACTEUR]: dessineVan,
   [G.ARME]: (p, _e, f) => {
     const b = f % 40 < 20 ? 0 : -1;
     p(-6, -12 + b, 12, 12, '#2b2b2b');

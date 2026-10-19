@@ -5,6 +5,8 @@ export const CIMES: Omit<DefNiveau, 'carte'> = {
   titre: 'Les Cimes Minimales',
   sousTitre: 'Niveau 3 — Boum. Tchk. Boum. Tchk.',
   theme: 'neige',
+  // le niveau finit au sommet : le van en repart en décollant
+  envol: true,
   intro: [
     {
       qui: 'NARRATEUR',

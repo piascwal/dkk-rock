@@ -72,6 +72,8 @@ export const G = {
   BLOC: 65,
   COEUR: 66,
   COEUR_OR: 67,
+  /** le van à réacteur : celui des niveaux qui finissent au sommet, d’où il décolle */
+  VAN_REACTEUR: 68,
 } as const;
 
 export type Genre = (typeof G)[keyof typeof G];

@@ -20,6 +20,10 @@ const GENRES: Record<SorteObjet, Genre> = {
 export const ATTENTE_VAN = 28;
 const ACCELERATION_VAN = 0.3;
 const VITESSE_VAN = 10;
+/** Le décollage (au sommet, au bout du monde) : il avance à peine (px/tick, px/tick²), son réacteur le monte jusqu'à MONTEE_ENVOL px/tick. */
+const VITESSE_ENVOL = 0.5;
+const ACCELERATION_ENVOL = 0.04;
+const MONTEE_ENVOL = 4.5;
 
 const TAILLES: Record<SorteObjet, [number, number]> = {
   cage: [20, 18],
@@ -44,6 +48,8 @@ export class Objet implements EntiteSimulee {
   private anim = 0;
   /** le van qui démarre : il attend un instant, puis file vers la droite en accélérant à fond */
   partant = false;
+  /** au sommet : le van décolle (son réacteur l'emporte vers le haut) au lieu de filer sur la route */
+  envol = false;
   private vx = 0;
   private depuis = 0;
 
@@ -77,8 +83,15 @@ export class Objet implements EntiteSimulee {
     if (this.partant) {
       this.depuis++;
       if (this.depuis > ATTENTE_VAN) {
-        this.vx = Math.min(VITESSE_VAN, this.vx + ACCELERATION_VAN);
-        this.corps.x += this.vx;
+        if (this.envol) {
+          // le décollage : il avance à peine, son réacteur l'emporte vers le haut, de plus en plus vite
+          this.vx = Math.min(VITESSE_ENVOL, this.vx + ACCELERATION_ENVOL);
+          this.corps.x += this.vx;
+          this.corps.y -= Math.min(MONTEE_ENVOL, (this.depuis - ATTENTE_VAN) * 0.09);
+        } else {
+          this.vx = Math.min(VITESSE_VAN, this.vx + ACCELERATION_VAN);
+          this.corps.x += this.vx;
+        }
         if (this.depuis === ATTENTE_VAN + 1) ctx.son('derapage', this.corps.x, this.corps.y);
       } else if (this.depuis % 8 === 0) ctx.secoue(2);
     }
@@ -94,13 +107,13 @@ export class Objet implements EntiteSimulee {
     const c = this.corps;
     return {
       id: this.id,
-      g: GENRES[this.sorte],
+      g: this.envol ? G.VAN_REACTEUR : GENRES[this.sorte],
       x: c.x + c.w / 2,
       y: c.y + c.h,
       gauche: false,
       clignote: false,
       // e = 2 : le van démarre en trombe (fumée, graviers) ; e = 3 : il roule tranquillement (il monte sur le ferry) ; f : sa vitesse (×20)
-      e: this.partant ? 2 : this.vx > 0 ? 3 : this.active ? 1 : 0,
+      e: this.partant ? (this.envol ? 4 : 2) : this.vx > 0 ? 3 : this.active ? 1 : 0,
       f:
         this.partant || this.vx > 0
           ? Math.round(this.vx * 20)

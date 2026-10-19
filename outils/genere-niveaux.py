@@ -16,6 +16,7 @@ from peintre import Niveau
 from plans import NIVEAUX, enchaine
 from souterrain import souterrain, tonneaux_de_surface
 from ferry import ferry
+from hauteurs import corniches, descente, grotte, pont_de_singe, vide_partout
 from signatures import falaise, glacier, parking, ponton, scene, toits
 from structures import forteresse, traversee
 from verrous import barrage, gouffre
@@ -190,6 +191,19 @@ class Recette:
     def p_toits(self, x0, x1, lettres='a'):
         toits(self.n, x0, x1 - x0, lettres, self.n.t['mur'])
 
+    # ---- le vide et l'escalade (voir niveaux/hauteurs.py)
+    def p_pont_singe(self, x0, x1, lettres='a', butin=None):
+        pont_de_singe(self.n, x0, x1 - x0, lettres, butin)
+
+    def p_descente(self, x0, x1, chute=6, lettres='a'):
+        descente(self.n, x0, x1 - x0, chute, lettres)
+
+    def p_grotte(self, x0, x1, monte=8, lettres='a', butin='*'):
+        grotte(self.n, x0, x1 - x0, monte, lettres, butin)
+
+    def p_corniches(self, x0, x1, monte=6, lettres='a', butin='+'):
+        corniches(self.n, x0, x1 - x0, monte, lettres, butin)
+
     def p_ferry(self, x0, x1, lettres='a'):
         ferry(self.n, x0, x1 - x0, lettres)
 
@@ -251,10 +265,14 @@ def apercu(lignes, nom, z=3):
 # Les recettes. Chaque recette : une liste de pièces (genre, largeur, options), puis les galeries et le butin.
 
 
-def construit(nom, theme, textes, plan, fichier, constante, graine, base=30, van=True):  # fichier et constante : inutilisés ici
+def construit(nom, theme, textes, plan, fichier, constante, graine, base=30, van=True, altitude=False):  # fichier et constante : inutilisés ici
     total = 12 + sum(p[1] for p in plan)
     r = Recette(nom, theme, textes, largeur=total, graine=graine, base=base)
     n = r.n
+    if altitude:
+        # un niveau en hauteur : tout est vide, chaque pièce pose son massif (voir niveaux/hauteurs.py) ; le départ a le sien
+        vide_partout(n)
+        n.niveler(0, 6)
     n.repere(3, '@', surface=True)
     digits = iter(r.digits)
     for genre, w, kw in plan:
@@ -275,6 +293,8 @@ def construit(nom, theme, textes, plan, fichier, constante, graine, base=30, van
     for x0, x1, g in r.pieces:
         if g in ('arene', 'vide') and x1 - x0 >= 40:
             r.drapeau(x0 + 3)
+    if altitude:  # le bout du niveau, après la dernière pièce : un replat pour le van
+        n.niveler(r.x, total)
     # le van, au bout (le club n'en a pas : le niveau finit avec le DJ)
     if van:
         n.repere(total - 5, 'F', surface=True)
@@ -285,7 +305,10 @@ def fabrique(cle):
     """Construit un niveau d'après son plan (outils/niveaux/plans.py), puis ses caves, et l'écrit."""
     cfg = NIVEAUX[cle]
     plan = enchaine(cfg['lieux'], cfg['graine'], cfg['raccord'])
-    r = construit(cfg['nom'], cfg['theme'], cfg['textes'], plan, '', '', cfg['graine'], base=cfg['base'], van=cfg.get('van', True))
+    r = construit(
+        cfg['nom'], cfg['theme'], cfg['textes'], plan, '', '', cfg['graine'], base=cfg['base'], van=cfg.get('van', True),
+        altitude=cfg.get('altitude', False),
+    )
     if not cfg.get('sans_caves'):  # le ferry est un petit niveau : rien sous le quai
         souterrain(r, cfg['caves'])
     tonneaux_de_surface(r, barils=cle in ('garage', 'ville'))

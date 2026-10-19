@@ -14,7 +14,11 @@ import type { Partie } from './partie';
 /** Place tout ce que la carte du niveau annonce : objets, ennemis, boss, et Fadatchi le kiwi. */
 export function peuple(p: Partie): void {
   const lu = p.lu;
-  if (lu.fin) p.ajoute(new Objet(p, 'van', lu.fin.x, lu.fin.y));
+  if (lu.fin) {
+    const van = new Objet(p, 'van', lu.fin.x, lu.fin.y);
+    van.envol = lu.def.envol === true;
+    p.ajoute(van);
+  }
   lu.drapeaux.forEach((d, i) => {
     const o = new Objet(p, 'drapeau', d.x, d.y, i);
     o.active = i <= p.drapeau;

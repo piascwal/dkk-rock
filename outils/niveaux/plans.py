@@ -61,6 +61,7 @@ NIVEAUX = {
             ('plat', 10, dict(lettres='a', digit='3', drones=1)),  # les vaches
             ('forteresse', 36, dict(etages=3, lettres='ad', cage=True)),
             ('falaise', 26, dict(lettres='ad')),  # la falaise à corniches, propre aux alpages
+            ('pont_singe', 16, dict(lettres='ad')),  # un ravin, et son pont de singe
             ('gouffre', 22, dict(lettres='ad', nb=4)),
             ('maison', 14, dict(lettres='ac')),
             ('traversee', 36, dict(lettres='ad', mode='pont')),
@@ -68,7 +69,9 @@ NIVEAUX = {
             ('mur', 18, dict(haut=6, lettres='ad')),
             ('forteresse', 30, dict(etages=4, lettres='adf', cage=True)),
             ('cheminee', 24, dict(haut=11, lettres='ad')),
-            ('falaise', 30, dict(lettres='adf')),
+            ('grotte', 18, dict(monte=8, lettres='adf', butin='*')),  # on monte par l'intérieur de la montagne
+            ('pont_singe', 16, dict(lettres='adf')),
+            ('descente', 20, dict(chute=8, lettres='adf')),  # et on redescend en tyrolienne vers la vallée
             ('plat', 10, dict(lettres='adf', digit='4', drones=2)),  # le yodel
             ('traversee', 36, dict(lettres='adf', mode='iles')),
             ('barrage', 20, dict(haut=16, lettres='adf', tyro=11, butin='+')),
@@ -77,25 +80,31 @@ NIVEAUX = {
     ),
     'cimes': dict(
         nom='Les Cimes Minimales', theme='cimes', textes='03-cimes.ts', fichier='03-cimes.ts',
-        constante='CARTE_CIMES', graine=33, base=34, raccord='y', caves='y',
+        constante='CARTE_CIMES', graine=33, base=86, raccord='y', caves='y', altitude=True, sans_caves=True,
+        # un niveau en hauteur (voir niveaux/hauteurs.py) : on ne fait que monter, de massif en massif, au-dessus du vide,
+        # par des corniches, des grottes et des forteresses, jusqu'à l'arène du Yéti Alpha au sommet ; le van s'envole de là-haut
         lieux=[
-            ('plat', 12, dict(lettres='y', deco=2)),
-            ('colline', 18, dict(haut=3, lettres='y')),
+            ('plat', 12, dict(lettres='y', deco=2, digit='1')),  # le premier yéti
+            ('colline', 16, dict(haut=2, lettres='y')),
+            ('corniches', 14, dict(monte=6, lettres='y')),
+            ('pont_singe', 16, dict(lettres='y')),
+            ('forteresse', 32, dict(etages=3, lettres='y', mat='R', cage=True)),
+            ('grotte', 18, dict(monte=8, lettres='y', butin='*')),
             ('plat', 10, dict(lettres='y', digit='2')),  # la glace et la neige qui tombe
-            ('forteresse', 34, dict(etages=3, lettres='y', mat='R', cage=True)),
-            ('glacier', 52, dict(lettres='y', nb=3)),  # le glacier, propre aux cimes
-            ('gouffre', 20, dict(lettres='y', nb=4)),
-            ('barrage', 20, dict(haut=12, lettres='y', butin='*')),
-            ('traversee', 36, dict(lettres='ya')),
-            ('mur', 18, dict(haut=6, lettres='y')),
-            ('echafaudage', 22, dict(niveaux=2, lettres='y')),
+            ('glacier', 44, dict(lettres='y', nb=2)),
+            ('pont_singe', 18, dict(lettres='ya', butin='*')),
+            ('barrage', 20, dict(haut=12, lettres='y', butin='*')),  # l'à-pic
+            ('corniches', 14, dict(monte=6, lettres='ya')),
+            ('descente', 20, dict(chute=5, lettres='ya')),  # d'une montagne à l'autre
+            ('grotte', 18, dict(monte=8, lettres='ya', butin='K')),
             ('forteresse', 30, dict(etages=4, lettres='ya', mat='R', cage=True)),
-            ('traversee', 36, dict(lettres='ya', mode='iles')),
-            ('glacier', 40, dict(lettres='ya', nb=2)),
-            ('barrage', 20, dict(haut=16, lettres='ya', tyro=11, butin='+')),
+            ('pont_singe', 16, dict(lettres='ya')),
+            ('cheminee', 24, dict(haut=11, lettres='ya')),
+            ('corniches', 14, dict(monte=6, lettres='ya')),
             ('plat', 10, dict(lettres='yy', digit='3')),  # flash spécial : Detroit
-            ('gouffre', 20, dict(lettres='ya', nb=5)),
-            ('vide', 64, dict()),  # l'arène du Yéti Alpha, peinte après coup
+            ('grotte', 18, dict(monte=8, lettres='ya', butin='+')),
+            ('pont_singe', 16, dict(lettres='ya')),
+            ('vide', 64, dict()),  # l'arène du Yéti Alpha, au sommet, peinte après coup
         ],
     ),
     'plage': dict(
@@ -176,6 +185,7 @@ NIVEAUX = {
             ('plat', 12, dict(lettres='a', deco=3)),
             ('colline', 18, dict(haut=3, lettres='a', digit='1')),  # la brume, les pierres levées
             ('falaise', 26, dict(lettres='adh')),  # les rochers moussus
+            ('pont_singe', 16, dict(lettres='adh')),  # un ravin dans la forêt
             ('plat', 10, dict(lettres='ach', digit='2', drones=1)),  # la fontaine qui rend les guitares neuves
             ('forteresse', 34, dict(etages=3, lettres='adh', mat='R', cage=True)),  # le vieux manoir en ruine
             ('gouffre', 20, dict(lettres='adh', nb=4)),
@@ -183,7 +193,8 @@ NIVEAUX = {
             ('traversee', 36, dict(lettres='acdh', mode='iles')),
             ('tour', 22, dict(etages=3, lettres='adfh', mat='R', tyro=10, apres=14, digit='3')),  # la tour de l'enchanteur
             ('barrage', 20, dict(haut=12, lettres='acdh', butin='*')),
-            ('falaise', 30, dict(lettres='acdfh')),
+            ('grotte', 18, dict(monte=6, lettres='acdfh', butin='+')),  # une grotte sous les racines, qui remonte
+            ('descente', 20, dict(chute=6, lettres='acdfh')),
             ('forteresse', 36, dict(etages=4, lettres='acdfh', mat='R', cage=True)),
             ('traversee', 36, dict(lettres='acdfh', mode='pont')),
             ('plat', 10, dict(lettres='acdfh', digit='4', drones=2)),  # le lac et l'épée
@@ -226,7 +237,9 @@ NIVEAUX = {
             ('traversee', 36, dict(lettres='acdhm', mode='iles')),
             ('tour', 22, dict(etages=3, lettres='acdfhm', mat='R', digit='3')),  # le phare de Pen-Men
             ('barrage', 20, dict(haut=12, lettres='acdhm', butin='*')),
-            ('falaise', 30, dict(lettres='acdfhm')),
+            ('corniches', 14, dict(monte=6, lettres='acdfhm')),  # la côte sauvage : on grimpe la falaise
+            ('pont_singe', 18, dict(lettres='acdfhm', butin='*')),  # une faille au-dessus de la mer
+            ('descente', 20, dict(chute=6, lettres='acdfhm')),
             ('forteresse', 38, dict(etages=4, lettres='acdfhm', mat='R', cage=True)),
             ('cheminee', 24, dict(haut=11, lettres='acdfhm')),
             ('plat', 10, dict(lettres='acdfhm', digit='4', drones=2)),  # la plage des Grands Sables

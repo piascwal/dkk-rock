@@ -20,6 +20,7 @@ import { RockersRestes } from './rockers-convertis';
 import { THEMES, type Theme } from './themes';
 import { TraitsPersos } from './traits-persos';
 import { RenduNavire } from './navire';
+import { CABRE, flammeReacteur, TUYERE } from './reacteur';
 import { geometrieNavire } from '../niveaux/navire';
 
 /** De combien le fond défile par image pendant la traversée en ferry (pixels du monde par image de traversée). */
@@ -251,7 +252,17 @@ export class Rendu {
     for (const passe of [0, 1, 2])
       for (const v of vue.entites)
         if (tri(v) === passe) dessineEntite(ctx, v, camX, camY, this.atlas, this.theme.lueur);
-    for (const v of vue.entites) if (v.g === G.VAN && v.e === 2) this.particules.van(v.x, v.y, v.f / 20);
+    for (const v of vue.entites) {
+      // le van démarre sur la route (e = 2) : graviers et fumée
+      if (v.g === G.VAN && v.e === 2) this.particules.van(v.x, v.y, v.f / 20);
+      if (v.g !== G.VAN_REACTEUR || v.e !== 4) continue;
+      // le van à réacteur décolle : la flamme suit le van qui se cabre, plein gaz
+      ctx.save();
+      ctx.translate(Math.round(v.x - camX), Math.round(v.y - camY));
+      ctx.rotate(CABRE);
+      flammeReacteur(ctx, TUYERE.x, TUYERE.y, 1, this.tick);
+      ctx.restore();
+    }
     decore('devant');
     this.particules.dessine(ctx, camX, camY);
     ctx.restore();
