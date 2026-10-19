@@ -18,6 +18,9 @@ import { ecritCentre } from './police';
 import { dessineRockerConverti } from './rockers-convertis';
 import type { Theme } from './themes';
 
+/** Les héros qui ont leurs propres images de dos pour l'échelle (planches du décor, voir outils/fixe-objets.py). */
+const IMAGES_ECHELLE: Partial<Record<number, string>> = { [G.TOM]: 'tom-echelle', [G.MAT]: 'mat-echelle' };
+
 const DRAPEAUX_SANS_MIROIR = new Set<number>([
   G.CAGE,
   G.DRAPEAU,
@@ -124,8 +127,9 @@ export function dessineEntite(
 
   // sprites à apparences : l'identifiant choisit l'apparence ; héros : phase d'animation ; autres : compteur
   const compteur = aTerre ? 0 : FEUILLES[v.g]?.variantes ? v.id : heros ? v.f & 15 : v.f;
-  if (v.g === G.TOM && v.e === ANIM.ECHELLE && dessineDecorFeuille(ctx, 'tom-echelle', (compteur >> 2) & 1)) {
-    // Tom de dos sur une échelle : deux images qui alternent, à la montée comme à la descente
+  const imagesEchelle = v.e === ANIM.ECHELLE ? IMAGES_ECHELLE[v.g] : undefined;
+  if (imagesEchelle && dessineDecorFeuille(ctx, imagesEchelle, (compteur >> 2) & 1)) {
+    // de dos sur une échelle : deux images qui alternent, à la montée comme à la descente (la phase ne bouge qu'avec le joystick)
   } else if (
     dessineFeuille(
       ctx,
