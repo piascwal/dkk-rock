@@ -171,68 +171,68 @@ NIVEAUX = {
     # ---- l'arc breton (docs/ARC-BRETAGNE.md) : les ennemis de la tournée en attendant bigoudens, marins et goélands
     'foret': dict(
         nom='La Forêt des Murmures', theme='foret', textes='07-foret.ts', fichier='07-foret.ts',
-        constante='CARTE_FORET', graine=77, base=32, raccord='ad', caves='ad',
+        constante='CARTE_FORET', graine=77, base=32, raccord='adh', caves='adh',
         lieux=[
             ('plat', 12, dict(lettres='a', deco=3)),
             ('colline', 18, dict(haut=3, lettres='a', digit='1')),  # la brume, les pierres levées
-            ('falaise', 26, dict(lettres='ad')),  # les rochers moussus
-            ('plat', 10, dict(lettres='ac', digit='2', drones=1)),  # la fontaine qui rend les guitares neuves
-            ('forteresse', 34, dict(etages=3, lettres='ad', mat='R', cage=True)),  # le vieux manoir en ruine
-            ('gouffre', 20, dict(lettres='ad', nb=4)),
-            ('cheminee', 24, dict(haut=10, lettres='ad')),
-            ('traversee', 36, dict(lettres='acd', mode='iles')),
-            ('tour', 22, dict(etages=3, lettres='adf', mat='R', tyro=10, apres=14, digit='3')),  # la tour de l'enchanteur
-            ('barrage', 20, dict(haut=12, lettres='acd', butin='*')),
-            ('falaise', 30, dict(lettres='acdf')),
-            ('forteresse', 36, dict(etages=4, lettres='acdf', mat='R', cage=True)),
-            ('traversee', 36, dict(lettres='acdf', mode='pont')),
-            ('plat', 10, dict(lettres='acdf', digit='4', drones=2)),  # le lac et l'épée
-            ('barrage', 20, dict(haut=16, lettres='acdf', tyro=11, butin='+')),
-            ('arene', 44, dict(lettres='acdf')),
+            ('falaise', 26, dict(lettres='adh')),  # les rochers moussus
+            ('plat', 10, dict(lettres='ach', digit='2', drones=1)),  # la fontaine qui rend les guitares neuves
+            ('forteresse', 34, dict(etages=3, lettres='adh', mat='R', cage=True)),  # le vieux manoir en ruine
+            ('gouffre', 20, dict(lettres='adh', nb=4)),
+            ('cheminee', 24, dict(haut=10, lettres='adh')),
+            ('traversee', 36, dict(lettres='acdh', mode='iles')),
+            ('tour', 22, dict(etages=3, lettres='adfh', mat='R', tyro=10, apres=14, digit='3')),  # la tour de l'enchanteur
+            ('barrage', 20, dict(haut=12, lettres='acdh', butin='*')),
+            ('falaise', 30, dict(lettres='acdfh')),
+            ('forteresse', 36, dict(etages=4, lettres='acdfh', mat='R', cage=True)),
+            ('traversee', 36, dict(lettres='acdfh', mode='pont')),
+            ('plat', 10, dict(lettres='acdfh', digit='4', drones=2)),  # le lac et l'épée
+            ('barrage', 20, dict(haut=16, lettres='acdfh', tyro=11, butin='+')),
+            ('arene', 44, dict(lettres='acdfh')),
         ],
     ),
     'port': dict(
         nom='Le Port de Lorient', theme='port', textes='08-port.ts', fichier='08-port.ts',
-        constante='CARTE_PORT', graine=88, base=30, raccord='acd', caves='acd',
+        constante='CARTE_PORT', graine=88, base=30, raccord='acdh', caves='acdh',
         lieux=[
             ('plat', 12, dict(lettres='a', deco=3)),
-            ('plat', 10, dict(lettres='ac', digit='1')),  # le festival
-            ('maison', 14, dict(lettres='ac')),
-            ('toits', 42, dict(lettres='acd')),  # les toits d'ardoise de la ville close
-            ('forteresse', 34, dict(etages=3, lettres='acd', mat='B', cage=True)),  # la citadelle
-            ('ponton', 42, dict(lettres='cd', digit='2')),  # les pontons du port de pêche
-            ('echafaudage', 22, dict(niveaux=3, lettres='acd')),  # les grues du port
-            ('gouffre', 20, dict(lettres='acd', nb=4)),
-            ('barrage', 20, dict(haut=12, lettres='acd', butin='*')),
-            ('forteresse', 38, dict(etages=4, lettres='acdf', mat='B', cage=True)),
-            ('traversee', 36, dict(lettres='acdf', mode='pont')),
-            ('toits', 42, dict(lettres='acdf')),
-            ('plat', 10, dict(lettres='acdf', digit='3', drones=2)),  # le ferry est à quai
-            ('ponton', 42, dict(lettres='cdf')),
-            ('barrage', 20, dict(haut=16, lettres='acdf', tyro=11, butin='+')),
-            ('arene', 44, dict(lettres='acdf')),  # la gare maritime ; la traversée viendra ensuite (étape 5)
+            ('plat', 10, dict(lettres='ach', digit='1')),  # le festival
+            ('maison', 14, dict(lettres='ach')),
+            ('toits', 42, dict(lettres='acdh')),  # les toits d'ardoise de la ville close
+            ('forteresse', 34, dict(etages=3, lettres='acdh', mat='B', cage=True)),  # la citadelle
+            ('ponton', 42, dict(lettres='cdh', digit='2')),  # les pontons du port de pêche
+            ('echafaudage', 22, dict(niveaux=3, lettres='acdh')),  # les grues du port
+            ('gouffre', 20, dict(lettres='acdh', nb=4)),
+            ('barrage', 20, dict(haut=12, lettres='acdh', butin='*')),
+            ('forteresse', 38, dict(etages=4, lettres='acdfh', mat='B', cage=True)),
+            ('traversee', 36, dict(lettres='acdfh', mode='pont')),
+            ('toits', 42, dict(lettres='acdfh')),
+            ('plat', 10, dict(lettres='acdfh', digit='3', drones=2)),  # le ferry est à quai
+            ('ponton', 42, dict(lettres='cdfh')),
+            ('barrage', 20, dict(haut=16, lettres='acdfh', tyro=11, butin='+')),
+            ('arene', 44, dict(lettres='acdfh')),  # la gare maritime ; la traversée viendra ensuite (étape 5)
         ],
     ),
     'groix': dict(
         nom='L’Île de Groix', theme='groix', textes='09-groix.ts', fichier='09-groix.ts',
-        constante='CARTE_GROIX', graine=99, base=32, raccord='acd', caves='acd',
+        constante='CARTE_GROIX', graine=99, base=32, raccord='acdh', caves='acdh',
         lieux=[
             ('plat', 12, dict(lettres='a', deco=3)),
-            ('ponton', 42, dict(lettres='cd', digit='1')),  # Port-Tudy, l'arrivée du ferry
-            ('colline', 18, dict(haut=3, lettres='ac')),
-            ('falaise', 28, dict(lettres='acd', digit='2')),  # les falaises de la côte sauvage
-            ('forteresse', 34, dict(etages=3, lettres='acd', mat='R', cage=True)),  # le fort
-            ('gouffre', 22, dict(lettres='acd', nb=4)),  # le Trou de l'Enfer
-            ('traversee', 36, dict(lettres='acd', mode='iles')),
-            ('tour', 22, dict(etages=3, lettres='acdf', mat='R', digit='3')),  # le phare de Pen-Men
-            ('barrage', 20, dict(haut=12, lettres='acd', butin='*')),
-            ('falaise', 30, dict(lettres='acdf')),
-            ('forteresse', 38, dict(etages=4, lettres='acdf', mat='R', cage=True)),
-            ('cheminee', 24, dict(haut=11, lettres='acdf')),
-            ('plat', 10, dict(lettres='acdf', digit='4', drones=2)),  # la plage des Grands Sables
-            ('traversee', 36, dict(lettres='acdf', mode='pont')),
-            ('barrage', 20, dict(haut=16, lettres='acdf', tyro=11, butin='+')),
-            ('arene', 46, dict(lettres='acdf')),
+            ('ponton', 42, dict(lettres='cdh', digit='1')),  # Port-Tudy, l'arrivée du ferry
+            ('colline', 18, dict(haut=3, lettres='ach')),
+            ('falaise', 28, dict(lettres='acdh', digit='2')),  # les falaises de la côte sauvage
+            ('forteresse', 34, dict(etages=3, lettres='acdh', mat='R', cage=True)),  # le fort
+            ('gouffre', 22, dict(lettres='acdh', nb=4)),  # le Trou de l'Enfer
+            ('traversee', 36, dict(lettres='acdh', mode='iles')),
+            ('tour', 22, dict(etages=3, lettres='acdfh', mat='R', digit='3')),  # le phare de Pen-Men
+            ('barrage', 20, dict(haut=12, lettres='acdh', butin='*')),
+            ('falaise', 30, dict(lettres='acdfh')),
+            ('forteresse', 38, dict(etages=4, lettres='acdfh', mat='R', cage=True)),
+            ('cheminee', 24, dict(haut=11, lettres='acdfh')),
+            ('plat', 10, dict(lettres='acdfh', digit='4', drones=2)),  # la plage des Grands Sables
+            ('traversee', 36, dict(lettres='acdfh', mode='pont')),
+            ('barrage', 20, dict(haut=16, lettres='acdfh', tyro=11, butin='+')),
+            ('arene', 46, dict(lettres='acdfh')),
         ],
     ),
 }

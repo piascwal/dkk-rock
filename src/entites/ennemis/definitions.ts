@@ -1,5 +1,6 @@
 import { G, type Genre } from '../../jeu/vue';
 import {
+  bigoudene,
   charge,
   drone,
   goeland,
@@ -123,6 +124,21 @@ export const ENNEMIS_PAR_LETTRE: Record<string, DefEnnemi> = {
     vole: true,
     contact: 1,
     cris: ['Mouette !'],
+  },
+  /** la bigoudène de l'arc breton : trois apparences (cornemuse, harpe) tirées au sort selon l'identifiant */
+  h: {
+    nom: 'Bigoudène',
+    genre: G.BIGOUDEN,
+    pv: 3,
+    w: 9,
+    h: 22,
+    vitesse: 0.8,
+    vision: 180,
+    visionVerticale: 60,
+    cadence: 110,
+    points: 200,
+    comportement: bigoudene,
+    cris: ['Pas touche à la coiffe !', 'Un petit air ?', 'Ça va sonner !'],
   },
   f: {
     nom: 'Influenceur',

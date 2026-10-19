@@ -44,6 +44,8 @@ TYPES = {
     'lanceur': ('LANCEUR', 20),
     # une animation : les fichiers sont les images successives (le drone-boule à facettes clignote), 3e valeur : durée d'une image
     'drone': ('DRONE', 22, 8),
+    # la bigoudène (arc breton) : cornemuse, harpe, harpe 2 ; une apparence par ennemi, tirée au sort selon son identifiant
+    'bigouden': ('BIGOUDEN', 24),
     # le goéland (arc breton) : deux apparences, le vol et le piqué ; chacune va dans la ligne de son état (voir ETATS)
     'goeland': ('GOELAND', 18, 8),
 }

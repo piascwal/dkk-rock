@@ -37,7 +37,7 @@ Un arc à part, ouvert après la fin de l'arc principal, en trois niveaux.
 3. ✅ Menhirs (sprite fourni, `assets-sources/decor/menhir-1-base.png`) et dolmens (dessinés en code) semés dans la forêt et sur Groix.
 4. ✅ Goéland (lettre `g`, genre `GOELAND`) : il plane au-dessus du héros, pique sur lui (son attaque, image de piqué), puis remonte. Il ne vit que dans les niveaux bretons ; le protocole passe en version 10 (nouveau genre).
 5. Phase ferry : défilement automatique, vagues d'ennemis par les côtés, bastingage.
-6. Bigoudens et marins, avec leurs instruments comme armes, une fois les sprites reçus.
+6. Bigoudènes ✅ (lettre `h`, genre `BIGOUDEN`, trois apparences tirées au sort ; elles gardent leurs distances et jouent un air de trois notes, puis soufflent ; protocole version 11). Marins : sprites reçus (accordéon, clarinette), pas encore branchés.
 
 ## Idées de gameplay à valider
 

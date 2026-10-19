@@ -10,6 +10,7 @@ export const FEUILLES_ENNEMIS: Partial<Record<Genre, Feuille>> = {
   [G.DANSEUR]: { fichier: 'danseurs.png', w: 87, h: 120, images: [1], variantes: true, densite: 6 },
   [G.LANCEUR]: { fichier: 'lanceurs.png', w: 61, h: 120, images: [1], variantes: true, densite: 6 },
   [G.DRONE]: { fichier: 'drones.png', w: 138, h: 132, images: [3], rythme: 8, densite: 6 },
+  [G.BIGOUDEN]: { fichier: 'bigoudens.png', w: 115, h: 144, images: [3], variantes: true, densite: 6 },
   [G.GOELAND]: {
     fichier: 'goelands.png',
     w: 116,

@@ -27,23 +27,37 @@ function lobeVers(e: Ennemi, ctx: Contexte, def: DefProjectile, cible: Cible, du
   ctx.ajoute(new Projectile(ctx, def, 'ennemis', e.cx, e.corps.y, vx, Math.max(-7, vy)));
 }
 
-/** Fêtard autotuné : garde ses distances et chante des notes parfaitement justes (hélas). */
-export const tireur: Comportement = (e, ctx, cible) => {
+/** Se tourne vers la cible et garde ses distances : recule en deçà de `proche`, avance au-delà de `loin`. */
+function gardeDistance(e: Ennemi, ctx: Contexte, cible: Cible, proche: number, loin: number): void {
   e.faceA(cible);
   // « vers » : le côté du héros ; reculer, c'est aller du côté opposé, sans jamais se retourner pour autant
   const vers = e.dir;
   const dx = Math.abs(cible.x - e.cx);
-  if (dx < 70) e.marcheVers(ctx, e.cx - vers * 30, e.def.vitesse);
-  else if (dx > 150) e.marcheVers(ctx, cible.x, e.def.vitesse);
+  if (dx < proche) e.marcheVers(ctx, e.cx - vers * 30, e.def.vitesse);
+  else if (dx > loin) e.marcheVers(ctx, cible.x, e.def.vitesse);
   else e.corps.vx = 0;
   e.dir = vers;
-  if (e.recharge === 0 && e.peutTirer(cible, ctx)) {
-    tireVers(e, ctx, NOTE_AUTOTUNE, cible);
-    e.memoire++;
-    // rafale de deux notes, puis pause
-    e.recharge = e.memoire % 2 ? 14 : e.def.cadence;
-    ctx.son('autotune', e.cx, e.cy);
-  }
+}
+
+/** Joue des notes en rafale de `notes`, puis fait une pause (`cadence`) : fêtard autotuné et bigoudène s'y prennent pareil. */
+function joueUnAir(e: Ennemi, ctx: Contexte, cible: Cible, notes: number): void {
+  if (e.recharge > 0 || !e.peutTirer(cible, ctx)) return;
+  tireVers(e, ctx, NOTE_AUTOTUNE, cible);
+  e.memoire++;
+  e.recharge = e.memoire % notes ? 14 : e.def.cadence;
+  ctx.son('autotune', e.cx, e.cy);
+}
+
+/** Fêtard autotuné : garde ses distances et chante des notes parfaitement justes (hélas), deux par deux. */
+export const tireur: Comportement = (e, ctx, cible) => {
+  gardeDistance(e, ctx, cible, 70, 150);
+  joueUnAir(e, ctx, cible, 2);
+};
+
+/** Bigoudène : plus près et plus patiente que le fêtard, elle joue un air de trois notes (cornemuse, harpe) puis souffle. */
+export const bigoudene: Comportement = (e, ctx, cible) => {
+  gardeDistance(e, ctx, cible, 55, 130);
+  joueUnAir(e, ctx, cible, 3);
 };
 
 /** Videur : fonce droit sur le héros. */

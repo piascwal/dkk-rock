@@ -30,6 +30,8 @@ export const G = {
   BARIL: 23,
   /** le goéland (arc breton) : il plane, puis pique sur le héros ; remplace le drone dans ce seul arc */
   GOELAND: 24,
+  /** la bigoudène (arc breton) : elle joue son instrument (cornemuse, harpe) en airs de trois notes */
+  BIGOUDEN: 25,
   P_BAGUETTE: 30,
   P_ONDE: 31,
   P_ACCORD: 32,
@@ -138,6 +140,7 @@ export const GENRES_CONVERTIS: readonly number[] = [
   G.LANCEUR,
   G.DRONE,
   G.GOELAND,
+  G.BIGOUDEN,
   G.INFLUENCEUR,
   G.YETI,
   G.ROBOT,
