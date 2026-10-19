@@ -84,6 +84,44 @@ export const drone: Comportement = (e, ctx, cible) => {
   }
 };
 
+/** Durée du piqué et de la remontée du goéland, en images. */
+const PIQUE = 26;
+const RETOUR = 40;
+
+/**
+ * Goéland : plane au-dessus du héros, pique sur lui dès qu'il est à la verticale, puis remonte. Il ne tire pas : son
+ * piqué est son attaque (il blesse à son contact, voir `contact` dans definitions.ts). `memoire` : plus de 0 en piqué,
+ * moins de 0 en remontée, 0 en vol.
+ */
+export const goeland: Comportement = (e, ctx, cible) => {
+  const c = centre(cible);
+  if (e.memoire > 0) {
+    // en piqué : droit sur sa cible ; il remonte à l'arrivée, ou quand il a dépassé les pieds du héros
+    e.memoire--;
+    if (e.memoire === 0 || e.corps.y + e.corps.h > c.y) {
+      e.memoire = -RETOUR;
+      e.corps.vx = 0;
+      e.corps.vy = -2.4;
+    }
+    return;
+  }
+  if (e.memoire < 0) {
+    e.memoire++;
+    e.corps.vy = -2.4;
+    if (e.memoire === 0) e.recharge = e.def.cadence;
+    return;
+  }
+  // en vol : au-dessus du héros, un peu plus haut que le drone pour laisser de la place au piqué
+  const visee = c.y - 72;
+  e.corps.vy = Math.max(-1, Math.min(1, (visee - e.cy) * 0.05));
+  e.marcheVers(ctx, c.x, e.def.vitesse);
+  if (e.recharge === 0 && Math.abs(c.x - e.cx) < 20) {
+    e.memoire = PIQUE;
+    e.corps.vx = (c.x - e.cx) / PIQUE;
+    e.corps.vy = (c.y - e.cy) / PIQUE;
+  }
+};
+
 /** Influenceur : un selfie au flash qui éblouit, puis il fuit pour poster. */
 export const influenceur: Comportement = (e, ctx, cible) => {
   if (e.memoire > 0) {

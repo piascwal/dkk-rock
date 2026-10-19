@@ -124,12 +124,13 @@ class Niveau:
                 pose += 1
         return pose
 
-    def drones(self, x0, x1, n):
+    def drones(self, x0, x1, n, lettre='e'):
+        """Pose n ennemis volants (le drone 'e', ou le goéland 'g' dans l'arc breton) au-dessus du sol."""
         for _ in range(n):
             x = self.rng.randrange(x0, x1)
             y = self.sol(x)
             if y is not None:
-                self.set(x, max(2, y - self.rng.randrange(5, 8)), 'e')
+                self.set(x, max(2, y - self.rng.randrange(5, 8)), lettre)
 
     def repere(self, x, c, ymin=0, surface=False):
         """Pose un repère (@ ! F * + K) sur le sol de la colonne x ; `surface` : sur le terrain, décor écarté."""

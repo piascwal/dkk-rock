@@ -1,7 +1,7 @@
 import { TUILE } from '../config';
 import { ARME_CHAUFFAGE, armeRamassee } from '../entites/armes';
 import { herosDuGenre } from '../entites/heros';
-import { ANIM, G, type EntiteVue, type Genre } from '../jeu/vue';
+import { ANIM, G, VOLANTS, type EntiteVue, type Genre } from '../jeu/vue';
 import type { AtlasTuiles } from './atlas-tuiles';
 import { dessineAura } from './aura';
 import { dessineBulle, hauteurBulle } from './bulle-bonus';
@@ -122,7 +122,7 @@ export function dessineEntite(
   if (v.gauche && !DRAPEAUX_SANS_MIROIR.has(v.g)) ctx.scale(-1, 1);
   if (aTerre) {
     // converti au rock : un rocker tiré au sort prend sa place (un drone, lui, reste un drone qui tombe, couché)
-    if (v.g !== G.DRONE && dessineRockerConverti(ctx, v.id)) {
+    if (!VOLANTS.has(v.g) && dessineRockerConverti(ctx, v.id)) {
       ctx.restore();
       ctx.globalAlpha = 1;
       return;
@@ -130,7 +130,7 @@ export function dessineEntite(
     // repli : couché sur le dos, estompé, et qui s'efface à la fin (`f` : ce qu'il lui reste à rester là)
     ctx.globalAlpha = 0.55 * Math.min(1, v.f / 40);
     ctx.translate(0, -5);
-    ctx.rotate(v.g === G.DRONE ? -0.4 : -Math.PI / 2);
+    ctx.rotate(VOLANTS.has(v.g) ? -0.4 : -Math.PI / 2);
   }
   if (v.aura && heros) dessineAura(ctx, performance.now());
   const p = pinceau(ctx);

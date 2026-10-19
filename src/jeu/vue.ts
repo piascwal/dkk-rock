@@ -28,6 +28,8 @@ export const G = {
   ENCEINTE: 22,
   /** le baril explosif (garage, ville) : il clignote deux secondes après le premier coup, puis explose */
   BARIL: 23,
+  /** le goéland (arc breton) : il plane, puis pique sur le héros ; remplace le drone dans ce seul arc */
+  GOELAND: 24,
   P_BAGUETTE: 30,
   P_ONDE: 31,
   P_ACCORD: 32,
@@ -135,12 +137,16 @@ export const GENRES_CONVERTIS: readonly number[] = [
   G.DANSEUR,
   G.LANCEUR,
   G.DRONE,
+  G.GOELAND,
   G.INFLUENCEUR,
   G.YETI,
   G.ROBOT,
   G.YETI_ALPHA,
   G.DJ,
 ];
+
+/** Les ennemis qui volent : un drone ou un goéland tombé n'est pas un rocker, il tombe comme un oiseau. */
+export const VOLANTS: ReadonlySet<number> = new Set([G.DRONE, G.GOELAND]);
 
 /** Durée du trajet sur la carte du monde, en ticks (tient dans un octet : c'est `page`). */
 export const DUREE_CARTE = 255;

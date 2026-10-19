@@ -1,4 +1,4 @@
-import { ANIM, G, GENRES_CONVERTIS, type EtatVue } from '../jeu/vue';
+import { ANIM, GENRES_CONVERTIS, VOLANTS, type EtatVue } from '../jeu/vue';
 import { dessineDecorFeuille } from './feuilles-images';
 
 /** Les rockers de la planche (outils/fixe-objets.py) : un ennemi vaincu n'est pas tué, il est converti au rock. */
@@ -8,7 +8,7 @@ const NB_ROCKERS = 12;
 const MAX_RESTES = 300;
 
 /** Les ennemis qui deviennent des rockers (un drone, lui, tombe en morceaux). */
-const GENRES_ROCKERS = new Set(GENRES_CONVERTIS.filter((g) => g !== G.DRONE));
+const GENRES_ROCKERS = new Set(GENRES_CONVERTIS.filter((g) => !VOLANTS.has(g)));
 
 /**
  * L'ennemi qu'on vient de convertir : à sa place, un rocker tiré au sort (toujours le même pour un ennemi donné) qui reste

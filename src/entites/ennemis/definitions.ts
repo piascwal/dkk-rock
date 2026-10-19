@@ -2,6 +2,7 @@ import { G, type Genre } from '../../jeu/vue';
 import {
   charge,
   drone,
+  goeland,
   influenceur,
   kamikaze,
   lobeur,
@@ -105,6 +106,23 @@ export const ENNEMIS_PAR_LETTRE: Record<string, DefEnnemi> = {
     comportement: drone,
     vole: true,
     cris: [],
+  },
+  /** le goéland de l'arc breton : remplace le drone (la lettre g, que seuls les niveaux bretons utilisent) */
+  g: {
+    nom: 'Goéland',
+    genre: G.GOELAND,
+    pv: 2,
+    w: 16,
+    h: 10,
+    vitesse: 1.2,
+    vision: 200,
+    visionVerticale: 140,
+    cadence: 150,
+    points: 150,
+    comportement: goeland,
+    vole: true,
+    contact: 1,
+    cris: ['Mouette !'],
   },
   f: {
     nom: 'Influenceur',

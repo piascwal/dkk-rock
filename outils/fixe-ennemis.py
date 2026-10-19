@@ -44,7 +44,13 @@ TYPES = {
     'lanceur': ('LANCEUR', 20),
     # une animation : les fichiers sont les images successives (le drone-boule à facettes clignote), 3e valeur : durée d'une image
     'drone': ('DRONE', 22, 8),
+    # le goéland (arc breton) : deux apparences, le vol et le piqué ; chacune va dans la ligne de son état (voir ETATS)
+    'goeland': ('GOELAND', 18, 8),
 }
+
+# les lignes de la planche par état d'animation (ANIM dans jeu/vue.ts) : le vol au repos (0), le piqué en attaque (10).
+# Une planche à lignes : chaque apparence va dans sa ligne, les autres lignes restent vides.
+ETATS = {'goeland': (0, 10)}
 
 
 def natif(chemin):
@@ -86,16 +92,25 @@ def main():
             images.append(agrandi(nat, hauteur * DENSITE))
         largeur = max(im.width for im in images)
         h = max(im.height for im in images)
-        planche = Image.new('RGBA', (largeur * len(images), h), (0, 0, 0, 0))
-        for i, im in enumerate(images):
-            # centré dans sa case, les pieds en bas
-            planche.alpha_composite(im, (i * largeur + (largeur - im.width) // 2, h - im.height))
         nom = f'{type_}s.png'
+        if type_ in ETATS:
+            # une ligne par état : images[k] va dans la ligne ETATS[type_][k], la planche a autant de lignes que l'état le plus haut
+            rangees = [1 if k in ETATS[type_] else 0 for k in range(max(ETATS[type_]) + 1)]
+            planche = Image.new('RGBA', (largeur, h * len(rangees)), (0, 0, 0, 0))
+            for im, ligne in zip(images, ETATS[type_]):
+                planche.alpha_composite(im, ((largeur - im.width) // 2, ligne * h + h - im.height))
+            compte = rangees
+        else:
+            planche = Image.new('RGBA', (largeur * len(images), h), (0, 0, 0, 0))
+            for i, im in enumerate(images):
+                # centré dans sa case, les pieds en bas
+                planche.alpha_composite(im, (i * largeur + (largeur - im.width) // 2, h - im.height))
+            compte = [len(images)]
         planche.save(SORTIE / nom)
         print(f'{nom} : {len(images)} apparence(s), {largeur} x {h} px chacune (silhouettes : {[im.width for im in images]})')
         mode = f'rythme: {anim[0]}' if anim else 'variantes: true'
         lignes.append(
-            f"  [G.{genre}]: {{ fichier: '{nom}', w: {largeur}, h: {h}, images: [{len(images)}], {mode}, densite: {DENSITE} }},"
+            f"  [G.{genre}]: {{ fichier: '{nom}', w: {largeur}, h: {h}, images: [{', '.join(map(str, compte))}], {mode}, densite: {DENSITE} }},"
         )
     TS.write_text(
         "// Fichier généré par outils/fixe-ennemis.py : ne pas modifier à la main.\n"

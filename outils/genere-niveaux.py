@@ -36,6 +36,10 @@ THEMES = {
 }
 
 
+# les niveaux de l'arc breton (voir docs/ARC-BRETAGNE.md) : le goéland y remplace le drone
+BRETON = {'foret', 'port', 'groix'}
+
+
 def declencheurs(fichier):
     s = (TEXTES / fichier).read_text()
     m = re.search(r'dialogues:\s*\{(.*?)\n  \},\n  outro', s, re.S)
@@ -48,6 +52,8 @@ class Recette:
     def __init__(self, nom, theme, fichier_textes, largeur=430, base=30, graine=1):
         # peu de profondeur : 30 rangées sous la surface, dont 6 de vide ; le monde finit vite, on tombe vite
         self.nom, self.n = nom, Niveau(largeur, base + 30, base, graine, THEMES[theme])
+        # l'arc breton a son goéland (g) à la place du drone (e) : les autres niveaux gardent le drone
+        self.volant = 'g' if theme in BRETON else 'e'
         self.x = 6
         self.digits = declencheurs(fichier_textes)
         self.pieces = []  # (x0, x1, genre)
@@ -70,7 +76,7 @@ class Recette:
         k = 1 + int(self.d * 3) + plus
         self.n.ennemis(x0 + 3, x1 - 2, lettres, max(0, k))
         if drones:
-            self.n.drones(x0 + 3, x1 - 2, drones)
+            self.n.drones(x0 + 3, x1 - 2, drones, self.volant)
 
     # ---- pièces de surface
     def p_palier(self, x0, x1, dy=-4, lettres='a'):
