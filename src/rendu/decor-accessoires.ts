@@ -216,6 +216,7 @@ export const ACCESSOIRES_SUPPLEMENTAIRES = {
   portiqueFlat: carre('#2a2a30', 72, 44),
   portiqueDance: carre('#2a2a30', 72, 44),
   juryBreak: carre('#2f6fd0', 40, 26),
+  danseurFise: carre('#c8322a', 23, 36),
   archeFise: carre('#ff4f6d', 80, 46),
   platane,
   platane2: platane,

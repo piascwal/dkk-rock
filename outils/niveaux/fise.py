@@ -168,6 +168,7 @@ def _estrade(n, x0, largeur, lettres, portique, texte):
     _pose(n, (a + b) // 2, portique, top)
     _pose(n, a + 3, 'enceinte34', top)
     _pose(n, b - 4, 'enceinte34', top)
+    _pose(n, a + 7, 'danseurFise', top)  # un danseur de décor, sur l'estrade (pas un ennemi)
     n.ennemis(a + 2, b - 2, lettres, max(3, largeur // 10), ymin=top - 3)
 
 

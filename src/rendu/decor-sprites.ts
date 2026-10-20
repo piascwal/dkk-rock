@@ -55,6 +55,7 @@ export type Sprite =
   | 'portiqueFlat'
   | 'portiqueDance'
   | 'juryBreak'
+  | 'danseurFise'
   | 'tablePique'
   | 'tableSkate'
   | 'tableBmx'
@@ -112,6 +113,7 @@ export const SPRITES: ReadonlySet<string> = new Set<Sprite>([
   'portiqueFlat',
   'portiqueDance',
   'juryBreak',
+  'danseurFise',
   'tablePique',
   'tableSkate',
   'tableBmx',
@@ -149,6 +151,7 @@ const FISE = new Set<string>([
   'portiqueFlat',
   'portiqueDance',
   'juryBreak',
+  'danseurFise',
 ]);
 
 /**

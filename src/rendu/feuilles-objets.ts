@@ -174,6 +174,7 @@ export const FEUILLES_DECOR: Record<string, Feuille> = {
     pied: 216,
   },
   juryBreak: { fichier: 'juryBreak.png', w: 240, h: 154, images: [1], rythme: 1, densite: 6, pied: 120 },
+  danseurFise: { fichier: 'danseurFise.png', w: 138, h: 248, images: [1], rythme: 1, densite: 6, pied: 69 },
   foodDuke: { fichier: 'foodDuke.png', w: 276, h: 261, images: [1], rythme: 1, densite: 6, pied: 138 },
   foodRougail: { fichier: 'foodRougail.png', w: 276, h: 261, images: [1], rythme: 1, densite: 6, pied: 138 },
   foodCroque: { fichier: 'foodCroque.png', w: 276, h: 261, images: [1], rythme: 1, densite: 6, pied: 138 },
