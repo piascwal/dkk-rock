@@ -59,7 +59,7 @@ TYPES = {
     'bmxpro': ('BMX_PRO', 21),
     # le Champion du FISE (boss) : le pro du BMX en deux fois plus grand, en attendant son propre sprite (roule, puis figure)
     'champion': ('CHAMPION', 40),
-    # la danseuse de breaking du FISE (ennemi) : la b-girl ; les b-boys viendront s'ajouter comme autres apparences
+    # la danseuse de breaking du FISE (ennemi) : la b-girl ; le b-boy est sa seconde apparence
     'breaker': ('BREAKER', 21),
 }
 
