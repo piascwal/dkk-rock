@@ -93,7 +93,7 @@ def food_court(n, x0, largeur, lettres='f'):
         _pose(n, x + 4, trucks[k % 4])
         k += 1
     for x in range(x0 + 6, x0 + largeur - 10, 9):
-        _pose(n, x + 2, 'tableFoodCourt')
+        _pose(n, x + 2, ['tablePique', 'tableSkate', 'tableBmx', 'tableFamille'][k % 4])
     _pose(n, x0 + largeur - 6, 'pissotiere')
     _pose(n, x0 + largeur - 2, 'pissotiere')
     n.ennemis(x0 + 2, x0 + largeur - 2, lettres, 2)

@@ -26,7 +26,7 @@ SAUTS = tuple(f'{h}-saut' for h in ECHELLES)
 # des planches plus fines que 6 pixels par pixel du jeu, et réduites avec lissage (au lieu d'un agrandissement entier, qui donne des
 # pixels inégaux quand l'écran n'est pas un multiple de la planche) : le DJ, très détaillé, plus grand que le reste
 DENSITES = {'dj': 8, 'robot': 8, 'borne': 8, 'pneus': 8, 'baril': 8, 'fougere': 8, 'menhir': 8, **{f'{h}-echelle': 6 for h in ECHELLES}, **{n: 6 for n in SAUTS}}
-LISSES = {'barriere', 'archeFise', 'foodDuke', 'foodRougail', 'foodCroque', 'foodGlace', 'pissotiere', 'toilettes', 'platane', 'platane2', 'dj', 'voiture', 'rocker', 'robot', 'borne', 'pneus', 'baril', 'fougere', 'menhir', *(f'{h}-echelle' for h in ECHELLES), *SAUTS}
+LISSES = {'barriere', 'archeFise', 'foodDuke', 'foodRougail', 'foodCroque', 'foodGlace', 'pissotiere', 'toilettes', 'platane', 'platane2', 'tablePique', 'tableSkate', 'tableBmx', 'tableFamille', 'dj', 'voiture', 'rocker', 'robot', 'borne', 'pneus', 'baril', 'fougere', 'menhir', *(f'{h}-echelle' for h in ECHELLES), *SAUTS}
 # celles de ces planches qu'on réduit à 256 couleurs (le DJ, les voitures) ; les rockers en ont trop : douze personnages différents sur une planche
 QUANTIFIEES = {'dj', 'voiture'}
 # objet : (fichiers sources, un par état (une ligne de la planche chacun), genre dans jeu/vue.ts, largeur en jeu en pixels)
@@ -106,8 +106,13 @@ OBJETS = {
     'pissotiere': (['decor/fise/pissotiere-base.png'], None, 14),
     'toilettes': (['decor/fise/toilettes-base.png'], None, 14),
     # lot 27 : les platanes du food court, en deux versions (couronne ronde ; branches étalées), alternées le long des berges
-    'platane': (['decor/fise/platane-1-base.png'], None, 34),
-    'platane2': (['decor/fise/platane-2-base.png'], None, 34),
+    'platane': (['decor/fise/platane-1-base.png'], None, 50),
+    'platane2': (['decor/fise/platane-2-base.png'], None, 50),
+    # lot 28 : les tables du food court, pieds au ras du sol (ce qui dépasse sous les pieds est rogné ; la roue du BMX aussi)
+    'tablePique': (['decor/fise/table-pique-base.png'], None, 40),
+    'tableSkate': (['decor/fise/table-skate-base.png'], None, 40),
+    'tableBmx': (['decor/fise/table-bmx-base.png'], None, 40),
+    'tableFamille': (['decor/fise/table-famille-base.png'], None, 40),
     # l'enceinte basse du club, à LED rose (décor seulement : elle n'explose pas)
     'enceinteRose': (['decor/enceinte-rose-base.png'], None, 20),
     # la borne à incendie des rues (remplace le dessin en code « bouche »)
