@@ -193,7 +193,7 @@ validé.
   **Le FISE** (Montpellier, sur les berges du Lez) est fait à la main, zone par zone (`outils/niveaux/fise.py`) : l'entrée
   (l'arche et le logo officiel), le grand parc noir à plateaux roses (tuiles `L` et `U`), le food court à l'ombre des platanes
   et ses pissotières, le Freestyle Park de bois (half-pipe : descente, plat, remontée ; mini spine ; tuile `A`), la scène de
-  breaking (BREAK, danseurs ennemis `k`), une plateforme avec le jury du breakdance, le flat BMX (FLAT), la scène de danse (DANCE), les tribunes, un second parc, le big air, le village des marques, puis la finale sur la main
+  breakdance, une seule plateforme (BREAK, le jury au centre, DANCE ; danseurs ennemis `k`), le flat BMX (FLAT), les tribunes, un second parc, le big air, le village des marques, puis la finale sur la main
   stage avec le Champion (`P`). Son décor n'est jamais semé au hasard : le générateur le place et l'écrit avec la carte
   (`DECOR_FISE`, voir `DefNiveau.decor`) ; ce dont on n'a pas encore le sprite est un carré d'attente
   (`decor-accessoires.ts`). Au fond (`rendu/fonds-fise.ts`) : la ville beige, le Lez turquoise et sa berge en pente où le
