@@ -216,6 +216,7 @@ export const ACCESSOIRES_SUPPLEMENTAIRES = {
   porticoBreaking: carre('#2a2a30', 70, 44),
   archeFise: carre('#ff4f6d', 80, 46),
   platane,
+  platane2: platane,
   standBmx: stand('#e8a020'),
   standSkate: stand('#2f5fb0'),
   standTrottinette: stand('#2f8a4a'),

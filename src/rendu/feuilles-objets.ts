@@ -152,6 +152,8 @@ export const FEUILLES_DECOR: Record<string, Feuille> = {
   foodGlace: { fichier: 'foodGlace.png', w: 276, h: 261, images: [1], rythme: 1, densite: 6, pied: 138 },
   pissotiere: { fichier: 'pissotiere.png', w: 84, h: 109, images: [1], rythme: 1, densite: 6, pied: 42 },
   toilettes: { fichier: 'toilettes.png', w: 84, h: 109, images: [1], rythme: 1, densite: 6, pied: 42 },
+  platane: { fichier: 'platane.png', w: 204, h: 195, images: [1], rythme: 1, densite: 6, pied: 102 },
+  platane2: { fichier: 'platane2.png', w: 204, h: 195, images: [1], rythme: 1, densite: 6, pied: 102 },
   enceinteRose: { fichier: 'enceinteRose.png', w: 120, h: 126, images: [1], rythme: 1, densite: 6, pied: 60 },
   borne: { fichier: 'borne.png', w: 120, h: 155, images: [1], rythme: 1, densite: 8, pied: 60 },
   pneus: { fichier: 'pneus.png', w: 112, h: 141, images: [1], rythme: 1, densite: 8, pied: 56 },

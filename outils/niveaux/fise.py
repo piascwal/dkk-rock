@@ -89,7 +89,7 @@ def food_court(n, x0, largeur, lettres='f'):
     trucks = ['foodDuke', 'foodRougail', 'foodCroque', 'foodGlace']
     k = 0
     for x in range(x0 + 3, x0 + largeur - 8, 9):
-        _pose(n, x, 'platane')
+        _pose(n, x, 'platane' if k % 2 == 0 else 'platane2')
         _pose(n, x + 4, trucks[k % 4])
         k += 1
     for x in range(x0 + 6, x0 + largeur - 10, 9):
