@@ -5,6 +5,27 @@ import type { Accessoire } from './decor-objets';
  * les niveaux. Même convention que decor-objets.ts : autour du milieu de la base (0, 0), la base en bas.
  */
 
+/** Un stand du festival : une toile de couleur sur quatre montants, un comptoir (repli des stands du FISE). */
+const stand =
+  (toile: string): Accessoire =>
+  (p) => {
+    p(-14, -26, 28, 5, toile);
+    p(-13, -21, 1, 21, '#5a5a62');
+    p(12, -21, 1, 21, '#5a5a62');
+    p(-12, -9, 24, 9, '#8a5a2b');
+    p(-12, -9, 24, 1, '#a8743a');
+  };
+
+/** Le half-pipe : la courbe de bois sur ses échafaudages (repli de la planche). */
+const halfpipe: Accessoire = (p) => {
+  p(-52, -40, 4, 40, '#6b4520');
+  p(48, -40, 4, 40, '#6b4520');
+  p(-48, -40, 8, 26, '#d8a868');
+  p(40, -40, 8, 26, '#d8a868');
+  p(-42, -16, 84, 8, '#d8a868');
+  p(-42, -8, 84, 2, '#8a5a2b');
+};
+
 const tonneau: Accessoire = (p) => {
   p(-4, -11, 9, 11, '#6b4520');
   p(-5, -9, 11, 7, '#6b4520');
@@ -162,4 +183,10 @@ export const ACCESSOIRES_SUPPLEMENTAIRES = {
   torche,
   flambeau: torche,
   feuDeCamp,
+  standBmx: stand('#e8a020'),
+  standSkate: stand('#2f5fb0'),
+  standTrottinette: stand('#2f8a4a'),
+  buvette: stand('#c8322a'),
+  standFringues: stand('#8a1f2a'),
+  halfpipe,
 } satisfies Record<string, Accessoire>;

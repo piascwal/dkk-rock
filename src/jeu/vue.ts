@@ -23,6 +23,9 @@ export const G = {
   INFLUENCEUR: 15,
   YETI: 16,
   ROBOT: 17,
+  /** les riders du FISE : le skateur et le roller */
+  SKATEUR: 18,
+  ROLLER: 19,
   YETI_ALPHA: 20,
   DJ: 21,
   ENCEINTE: 22,
@@ -34,6 +37,10 @@ export const G = {
   BIGOUDEN: 25,
   /** le marin (arc breton) : il fonce sur le héros et le frappe de son instrument (accordéon, clarinette) */
   MARIN: 26,
+  /** les riders du FISE : la trottinette, le gamin en BMX, et le pro du BMX (il saute sur le héros en figure) */
+  TROTTINETTE: 27,
+  BMX: 28,
+  BMX_PRO: 29,
   P_BAGUETTE: 30,
   P_ONDE: 31,
   P_ACCORD: 32,
@@ -146,6 +153,11 @@ export const GENRES_CONVERTIS: readonly number[] = [
   G.GOELAND,
   G.BIGOUDEN,
   G.MARIN,
+  G.SKATEUR,
+  G.ROLLER,
+  G.TROTTINETTE,
+  G.BMX,
+  G.BMX_PRO,
   G.INFLUENCEUR,
   G.YETI,
   G.ROBOT,

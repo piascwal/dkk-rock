@@ -35,6 +35,12 @@ export type Sprite =
   | 'parasol'
   | 'transat'
   | 'enceinteRose'
+  | 'standBmx'
+  | 'standSkate'
+  | 'standTrottinette'
+  | 'buvette'
+  | 'standFringues'
+  | 'halfpipe'
   | 'borne'
   | 'pneus'
   | 'fougere'
@@ -68,6 +74,12 @@ export const SPRITES: ReadonlySet<string> = new Set<Sprite>([
   'parasol',
   'transat',
   'enceinteRose',
+  'standBmx',
+  'standSkate',
+  'standTrottinette',
+  'buvette',
+  'standFringues',
+  'halfpipe',
   'borne',
   'pneus',
   'fougere',
@@ -75,6 +87,16 @@ export const SPRITES: ReadonlySet<string> = new Set<Sprite>([
 ]);
 
 /** Les accessoires dessinés par une planche fournie (apparence tirée au sort selon `v`, tournée d'un côté ou de l'autre). */
+/** Les stands et le half-pipe du FISE : chacun a sa planche, du même nom. */
+const FISE = new Set<string>([
+  'standBmx',
+  'standSkate',
+  'standTrottinette',
+  'buvette',
+  'standFringues',
+  'halfpipe',
+]);
+
 /**
  * De combien les tas de rochers (au sol, jamais dedans) s'enfoncent, en pixels du jeu : assez pour que le pied le plus
  * haut de leur contour rond (l'écart mesuré dans la planche, outils/fixe-objets.py) soit sous le sol.
@@ -96,6 +118,11 @@ export function dessineSprite(
   if (quoi === 'rocher' || quoi === 'rocherNeige') {
     ctx.translate(0, ENFONCE_ROCHERS[quoi] ?? 0);
     return dessineDecorFeuille(ctx, quoi === 'rocher' ? 'rocher' : 'rocherNeige', v % 4, voile);
+  }
+  // les stands et le half-pipe du FISE (lot 23) : jamais retournés, on doit lire leurs enseignes ; un peu enfoncés
+  if (FISE.has(quoi)) {
+    ctx.translate(0, 1);
+    return dessineDecorFeuille(ctx, quoi, 0, voile);
   }
   // un peu enfoncé : l'herbe des tuiles, dessinée ensuite, cache le pied
   ctx.translate(0, quoi === 'vacheCasque' ? 2 : 1);

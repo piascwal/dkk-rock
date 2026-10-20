@@ -191,9 +191,11 @@ validé.
 - **Un arc de l'histoire :** les niveaux d'un arc s'enchaînent, avec leur épilogue ; l'arc principal est « La tournée ».
   Viennent ensuite le « Breizh Tour » (la forêt, le port, la traversée, Groix) puis « Le FISE » : le Festival International
   des Sports Extrêmes, à Montpellier, un niveau plat fait de modules de skatepark (`outils/niveaux/fise.py` : bowl, funbox et
-  rail, tribune avec sa salle dessous, tour du big air et bac à mousse). Ses stands et son half-pipe (lot 23) ne sont pas
-  semés au sol : ils forment un plan à part, au premier arrière-plan, qui défile un peu moins vite que le jeu
-  (`rendu/fonds-fise.ts`).
+  rail, tribune avec sa salle dessous, tour du big air et bac à mousse). Ses stands et son half-pipe (lot 23) forment le
+  premier arrière-plan : ils se posent en file, uniquement sur le sol principal du niveau, plat et à ciel ouvert sur toute
+  leur largeur (`LARGES` dans `rendu/decor-sol.ts`), jamais en l'air ni sur un toit. Ses ennemis sont les riders (lot 24,
+  `entites/ennemis/definitions-riders.ts`) : skateur, roller, trottinette, gamin en BMX, qui foncent sur le héros, le
+  traversent et reviennent ; et le pro du BMX, qui lui saute dessus en figure.
   Pour un autre (un voyage en Jamaïque, par exemple) : ajouter ses niveaux à la fin de `NIVEAUX`, puis une entrée dans
   `ARCS` (`niveaux/arcs.ts`) avec son titre, son résumé, son épilogue et, si on veut, `apres` (le niveau à terminer pour
   l'ouvrir). Le menu « Choisir un niveau » les liste par arc. Entre deux niveaux, la carte du monde de l'arc montre le van

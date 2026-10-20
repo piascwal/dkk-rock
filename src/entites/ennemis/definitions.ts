@@ -13,6 +13,7 @@ import {
   yeti,
   type Comportement,
 } from './comportements';
+import { RIDERS } from './definitions-riders';
 
 export interface DefEnnemi {
   nom: string;
@@ -30,6 +31,8 @@ export interface DefEnnemi {
   /** dégâts au contact */
   contact?: number;
   vole?: boolean;
+  /** en l'air, il montre son image d'attaque (le pro du BMX en figure) */
+  figure?: boolean;
   explose?: { rayon: number; degats: number };
   /** ce qu'il crie quand il vous repère */
   cris: string[];
@@ -205,4 +208,6 @@ export const ENNEMIS_PAR_LETTRE: Record<string, DefEnnemi> = {
     explose: { rayon: 30, degats: 2 },
     cris: ['A-RRÊ-TEZ LA GUI-TARE', 'MU-SI-QUE NON CON-FOR-ME'],
   },
+  // les riders du FISE
+  ...RIDERS,
 };

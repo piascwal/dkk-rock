@@ -20,4 +20,16 @@ export const FEUILLES_ENNEMIS: Partial<Record<Genre, Feuille>> = {
     rythme: 8,
     densite: 6,
   },
+  [G.SKATEUR]: { fichier: 'skateurs.png', w: 110, h: 132, images: [1], variantes: true, densite: 6 },
+  [G.ROLLER]: { fichier: 'rollers.png', w: 115, h: 132, images: [1], variantes: true, densite: 6 },
+  [G.TROTTINETTE]: { fichier: 'trottinettes.png', w: 110, h: 132, images: [1], variantes: true, densite: 6 },
+  [G.BMX]: { fichier: 'bmxs.png', w: 105, h: 126, images: [1], variantes: true, densite: 6 },
+  [G.BMX_PRO]: {
+    fichier: 'bmxpros.png',
+    w: 116,
+    h: 126,
+    images: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    variantes: true,
+    densite: 6,
+  },
 };

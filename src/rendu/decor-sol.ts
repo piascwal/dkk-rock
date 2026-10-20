@@ -42,3 +42,45 @@ export const emprise = (tx: number, ty: number): [number, number][] => {
   for (let dx = -1; dx <= 1; dx++) for (let dy = 1; dy <= 3; dy++) cases.push([tx + dx, ty - dy]);
   return cases;
 };
+
+/**
+ * Les grands accessoires du premier arrière-plan (les stands et le half-pipe du FISE) : leur demi-largeur, en tuiles. Ils ne
+ * se posent que sur le sol principal du niveau, plat et à ciel ouvert sur toute leur largeur (jamais en l'air, sur un toit ou
+ * au fond d'un bowl), en file, avant le reste du décor (voir semeDecor).
+ */
+export const LARGES: Readonly<Partial<Record<string, number>>> = {
+  standBmx: 2,
+  standSkate: 2,
+  standTrottinette: 2,
+  buvette: 1,
+  standFringues: 1,
+  halfpipe: 5,
+};
+
+/** Rien de plein ni de mur de fond au-dessus de la tuile (tx, ty), jusqu'en haut de la carte. */
+const cielOuvert = (carte: Carte, tx: number, ty: number): boolean => {
+  for (let y = 0; y < ty; y++) if (carte.solide(tx, y) || carte.aFond(tx, y)) return false;
+  return true;
+};
+
+/** La rangée du sol à ciel ouvert la plus fréquente : le sol principal du niveau (-1 s'il n'y en a pas). */
+export function solPrincipal(carte: Carte): number {
+  const compte = new Map<number, number>();
+  for (let tx = 0; tx < carte.largeur; tx++)
+    for (let ty = 1; ty < carte.hauteur; ty++)
+      if (carte.solide(tx, ty)) {
+        compte.set(ty, (compte.get(ty) ?? 0) + 1);
+        break;
+      }
+  let mieux = -1;
+  for (const [ty, n] of compte) if (mieux < 0 || n > compte.get(mieux)!) mieux = ty;
+  return mieux;
+}
+
+/** Un grand accessoire de demi-largeur `demi` tient en (tx, ty) : le sol principal, plat et à ciel ouvert sur toute sa largeur. */
+export function tientLarge(carte: Carte, tx: number, ty: number, demi: number, sol: number): boolean {
+  if (ty !== sol) return false;
+  for (let dx = -demi; dx <= demi; dx++)
+    if (!solLibre(carte, tx + dx, ty) || !cielOuvert(carte, tx + dx, ty)) return false;
+  return true;
+}

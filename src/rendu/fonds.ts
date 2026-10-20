@@ -4,7 +4,7 @@ import { Aleatoire } from '../moteur/maths';
 import { Ciel } from './ciel';
 import { arbreRond, brume, palmierPixel, sapinPixel } from './fonds-arbres';
 import { DECORS_BRETONS, type Peinture } from './fonds-bretagne';
-import { dessinePlanFise, PEINTURE_FISE } from './fonds-fise';
+import { PEINTURE_FISE } from './fonds-fise';
 import type { Decor, Theme } from './themes';
 
 const LARGEUR_BANDE = 960;
@@ -241,8 +241,6 @@ export class Fond {
         if (sw > 0) ctx.drawImage(this.plans[i]!, sx, h0, sw, h1 - h0, dx + sx, y + h0, sw, h1 - h0);
       }
     });
-    // le FISE : les stands et le half-pipe, au premier arrière-plan
-    if (th.decor === 'fise') dessinePlanFise(ctx, camFond, solEcran, largeur, th.lointain);
     this.ciel.oiseaux(ctx, camFond, largeur, tick);
   }
 

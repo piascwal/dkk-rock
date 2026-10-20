@@ -1,13 +1,11 @@
 import type { Aleatoire } from '../moteur/maths';
 import { arbreRond } from './fonds-arbres';
 import type { Peinture } from './fonds-bretagne';
-import { FEUILLES_DECOR } from './feuilles-objets';
-import { dessineDecorFeuille } from './feuilles-images';
 
 /**
  * Le FISE de Montpellier : au loin, la ville (les façades d'Antigone, quelques tours) ; plus près, les platanes des berges
- * du Lez et les drapeaux du festival. Devant ces bandes, un plan à part (`dessinePlanFise`) : les stands et le half-pipe
- * (sprites du lot 23), grands, au premier arrière-plan, qui défilent un peu moins vite que le jeu.
+ * du Lez et les drapeaux du festival. Les stands et le half-pipe (lot 23), eux, sont posés au sol, comme le reste du décor
+ * (voir decor-semis.ts et LARGES dans decor-sol.ts).
  */
 
 const L = 960;
@@ -45,60 +43,3 @@ export const PEINTURE_FISE: Peinture = (c, r, th, plan) => {
     arbreRond(c, x, SOL, r.entier(40, 60), th.proche, '#5a4a3a');
   for (let x = 40; x < L; x += r.entier(40, 80)) drapeau(c, x, r.choix(DRAPEAUX));
 };
-
-/** Les stands et le half-pipe, dans l'ordre, et l'écart (px du jeu) avant le suivant ; la suite se répète. */
-const SUITE: readonly (readonly [string, number])[] = [
-  ['standBmx', 40],
-  ['buvette', 70],
-  ['halfpipe', 50],
-  ['standSkate', 30],
-  ['standFringues', 110],
-  ['standTrottinette', 40],
-  ['buvette', 60],
-  ['halfpipe', 80],
-];
-/** Le plan des stands défile un peu moins vite que le jeu (il est derrière) ; il reste posé sur le sol (le pied caché derrière). */
-const PARALLAXE = 0.8;
-const ENFONCE = 2;
-
-const largeurDe = (nom: string): number => {
-  const f = FEUILLES_DECOR[nom];
-  return f ? f.w / (f.densite ?? 1) : 0;
-};
-
-/** Le milieu de chaque élément dans la suite, et la longueur de la suite. */
-const PLACES = (() => {
-  let x = 0;
-  const milieux = SUITE.map(([nom, ecart]) => {
-    const w = largeurDe(nom);
-    const m = x + w / 2;
-    x += w + ecart;
-    return m;
-  });
-  return { milieux, periode: x };
-})();
-
-/** Le plan des stands (pieds sur le sol de l'écran `solEcran`), un peu voilé de la couleur du lointain. */
-export function dessinePlanFise(
-  ctx: CanvasRenderingContext2D,
-  camX: number,
-  solEcran: number,
-  largeur: number,
-  voile: string,
-): void {
-  const { milieux, periode } = PLACES;
-  if (periode <= 0) return;
-  const decale = camX * PARALLAXE;
-  const pied = Math.round(solEcran) + ENFONCE;
-  const premier = Math.floor((decale - 200) / periode);
-  for (let k = premier; k * periode - decale < largeur + 200; k++)
-    SUITE.forEach(([nom], i) => {
-      const x = Math.round(k * periode + milieux[i]! - decale);
-      const demi = largeurDe(nom) / 2;
-      if (x + demi < 0 || x - demi > largeur) return;
-      ctx.save();
-      ctx.translate(x, pied);
-      dessineDecorFeuille(ctx, nom, 0, voile);
-      ctx.restore();
-    });
-}

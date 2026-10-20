@@ -50,11 +50,18 @@ TYPES = {
     'marin': ('MARIN', 22),
     # le goéland (arc breton) : deux apparences, le vol et le piqué ; chacune va dans la ligne de son état (voir ETATS)
     'goeland': ('GOELAND', 18, 8),
+    # les riders du FISE : le skateur, le roller, la trottinette, le gamin en BMX ; et le pro du BMX, qui roule (1) puis part
+    # en figure (2) dès qu'il quitte le sol (la ligne de l'attaque, voir ETATS)
+    'skateur': ('SKATEUR', 22),
+    'roller': ('ROLLER', 22),
+    'trottinette': ('TROTTINETTE', 22),
+    'bmx': ('BMX', 21),
+    'bmxpro': ('BMX_PRO', 21),
 }
 
 # les lignes de la planche par état d'animation (ANIM dans jeu/vue.ts) : le vol au repos (0), le piqué en attaque (10).
 # Une planche à lignes : chaque apparence va dans sa ligne, les autres lignes restent vides.
-ETATS = {'goeland': (0, 10)}
+ETATS = {'goeland': (0, 10), 'bmxpro': (0, 10)}
 
 
 def natif(chemin):

@@ -227,9 +227,17 @@ export const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAcces
       dedans: ['caisseDeco', 'tonneau'],
       densite: 0.4,
     },
-    // le FISE : le village du festival, au bord du Lez (les stands, eux, sont au premier arrière-plan : fonds-fise.ts)
+    // le FISE : le village du festival, au bord du Lez ; ses stands et son half-pipe ne se posent que sur le sol principal
+    // (voir LARGES dans decor-sol.ts)
     fise: {
       dehors: [
+        'halfpipe',
+        'standBmx',
+        'buvette',
+        'standSkate',
+        'halfpipe',
+        'standFringues',
+        'standTrottinette',
         'palmier',
         'parasol',
         'parasol',

@@ -6,7 +6,17 @@ import { ACCESSOIRES, type NomAccessoire } from './decor-objets';
 import { imageTuile } from './atlas-tuiles';
 import { pinceau } from './pinceau';
 import { dessineDecorFeuille } from './feuilles-images';
-import { ECART_VOITURES, SOLS_DECORES, dehors, echelleProche, emprise, solLibre } from './decor-sol';
+import {
+  ECART_VOITURES,
+  LARGES,
+  SOLS_DECORES,
+  dehors,
+  echelleProche,
+  emprise,
+  solLibre,
+  solPrincipal,
+  tientLarge,
+} from './decor-sol';
 import { dessineSprite, SPRITES, type Sprite } from './decor-sprites';
 import type { NomTheme } from './themes';
 import { SEMIS } from './decor-semis';
@@ -70,6 +80,22 @@ export function semeDecor(carte: Carte, theme: NomTheme, graine: number): Pose[]
     if (libre) for (const [x, y] of cases) prises.add(cle(x, y));
     return libre;
   };
+  // le premier arrière-plan : les grands accessoires du monde (les stands du FISE), en file sur le sol principal, à tour de
+  // rôle, partout où ils tiennent : loin des échelles, et rien d'autre ne se pose sur leur largeur
+  const solNiveau = solPrincipal(carte);
+  const grands = semis.dehors.filter((q) => LARGES[q]);
+  const petitsDehors = semis.dehors.filter((q) => !LARGES[q]);
+  for (let tx = 3, k = 0; grands.length && tx < carte.largeur - 3; tx++) {
+    const quoi = grands[k % grands.length]!;
+    const demi = LARGES[quoi]!;
+    if (!tientLarge(carte, tx + demi, solNiveau, demi, solNiveau)) continue;
+    const span = Array.from({ length: 2 * demi + 1 }, (_, i) => tx + i);
+    if (span.some((x) => echelleProche(carte, x, solNiveau))) continue;
+    for (const x of span) for (const [cx, cy] of emprise(x, solNiveau)) prises.add(cle(cx, cy));
+    poses.push({ tx: tx + demi, ty: solNiveau, quoi, v: rng.entier(0, 255), devant: false, dedans: false });
+    tx += 2 * demi + rng.entier(1, 4);
+    k++;
+  }
   for (let tx = 3; tx < carte.largeur - 3; tx++) {
     for (let ty = 1; ty < carte.hauteur - 1; ty++) {
       const sol = carte.get(tx, ty);
@@ -77,7 +103,7 @@ export function semeDecor(carte: Carte, theme: NomTheme, graine: number): Pose[]
       if (carte.props(tx, ty - 1).solide || tx < (libreDepuis.get(ty) ?? 0) || rng.suivant() > semis.densite)
         continue;
       const dedans = carte.aFond(tx, ty - 1);
-      const quoi = rng.choix(dedans ? semis.dedans : semis.dehors);
+      const quoi = rng.choix(dedans ? semis.dedans : petitsDehors);
       // une vache a besoin de pré : de l'herbe sous elle et sous ses voisines, sinon elle finit dans le sous-sol
       // une voiture a besoin de cinq tuiles de sol d'affilée (sinon elle déborde d'une corniche) et ne côtoie pas une autre
       // voiture : une tous les vingt-quatre tuiles au plus, tous niveaux de sol confondus
@@ -134,7 +160,7 @@ export function dessineDecor(
   for (const o of poses) {
     if (o.devant !== (couche === 'devant') || (!o.devant && o.dedans !== (couche === 'interieur'))) continue;
     const x = o.tx * TUILE + TUILE / 2 - Math.round(camX);
-    if (x < -40 || x > largeur + 40) continue;
+    if (x < -90 || x > largeur + 90) continue; // le half-pipe déborde de 75 px de part et d'autre
     if (!carte.props(o.tx, o.ty).solide || carte.solide(o.tx, o.ty - 1)) continue;
     ctx.save();
     ctx.translate(x, o.ty * TUILE - Math.round(camY));

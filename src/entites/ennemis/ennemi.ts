@@ -328,10 +328,12 @@ export class Ennemi implements Cible, EntiteSimulee {
       vie: this.barre > 0 && this.def.pv > 1 ? Math.max(1, Math.ceil((this.pv / this.def.pv) * 255)) : 0,
       // un tireur montre son attaque au moment du tir ; un ennemi volant, pendant son piqué (`memoire` > 0 : le goéland)
       e:
-        this.etat === 'attaque' &&
-        (this.def.vole ? this.memoire > 0 : this.recharge > 0 && this.def.cadence - this.recharge < 8)
+        this.def.figure && !this.corps.auSol
           ? ANIM.ATTAQUE
-          : e,
+          : this.etat === 'attaque' &&
+              (this.def.vole ? this.memoire > 0 : this.recharge > 0 && this.def.cadence - this.recharge < 8)
+            ? ANIM.ATTAQUE
+            : e,
       f: this.anim & 255,
     };
   }
