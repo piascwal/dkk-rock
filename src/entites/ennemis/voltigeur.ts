@@ -4,8 +4,8 @@ import { appliqueGravite, deplace } from '../../monde/physique';
 import { ENNEMIS_PAR_LETTRE } from './definitions';
 import { Ennemi } from './ennemi';
 
-/** Les tours qu'il fait sur lui-même entre le haut de l'écran et la piste. */
-const TOURS = 1;
+/** Les tours qu'il fait sur lui-même entre le haut de l'écran et la piste : deux, assez lents pour se voir. */
+const TOURS = 2;
 
 /**
  * Un pro du BMX qui arrive d'en haut de l'écran en figure (un tour sur lui-même, en avant ou en arrière) et se pose sur ses

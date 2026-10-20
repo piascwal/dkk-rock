@@ -9,9 +9,9 @@ import type { NiveauLu } from '../src/niveaux/format';
  * marcher, tomber, sauter de 2 cases vers le haut et 3 de côté, grimper aux
  * échelles, prendre les tyroliennes.
  */
-export function casesAccessibles(lu: NiveauLu): Set<string> {
-  // la barrière du boss s'ouvre quand on le bat : elle ne coupe pas le chemin
-  const tuiles = Uint8Array.from(lu.tuiles, (t) => (t === T.BARRIERE ? T.VIDE : t));
+export function casesAccessibles(lu: NiveauLu, barriereOuverte = true): Set<string> {
+  // la barrière du boss s'ouvre quand on le bat : elle ne coupe pas le chemin (sauf pour vérifier qu'on ne la contourne pas)
+  const tuiles = Uint8Array.from(lu.tuiles, (t) => (barriereOuverte && t === T.BARRIERE ? T.VIDE : t));
   const c = new Carte(lu.largeur, lu.hauteur, tuiles, lu.fond);
   // le héros fait presque deux tuiles de haut : il lui faut la case et celle du dessus
   const libre = (x: number, y: number) => y >= 1 && !c.solide(x, y) && !c.solide(x, y - 1);

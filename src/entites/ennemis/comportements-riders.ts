@@ -47,33 +47,45 @@ export const bmxPro: Comportement = (e, ctx, cible) => {
   rider(e, ctx, cible);
 };
 
-/** Jusqu'où un rider rôde de son point de départ (px), et la plus grande marche qu'il saute (en tuiles). */
-const RONDE = 7 * TUILE;
+/** La plus grande marche qu'un rider saute (en tuiles) ; au-delà, c'est un mur, il fait demi-tour. */
 const MARCHE_MAX = 3;
 
 /**
- * Au repos, un rider roule dans son module : il monte et descend les rampes (il saute les marches, et ça lui arrive sans raison),
- * fait demi-tour devant un à-pic, une paroi trop haute, ou quand il s'est trop éloigné de son point de départ.
+ * Au repos, un rider parcourt tout son module : il marche jusqu'à son bord (qu'il peut descendre, d'un plateau comme d'une rampe),
+ * saute les marches, et fait de petits sauts à des hauteurs différentes, au hasard. Il ne sort pas de son module : `zone`, ses
+ * bornes en pixels, ou à défaut huit tuiles de part et d'autre de son point de départ.
  */
 export function roule(e: Ennemi, ctx: Contexte): void {
   const c = e.corps;
   if (e.virage > 0) e.virage--;
+  const [gauche, droite] = e.zone ?? [e.foyer - 8 * TUILE, e.foyer + 8 * TUILE];
+  const auBord = e.dir < 0 ? e.cx < gauche + 6 : e.cx > droite - 6;
+  // hors de son module (un coup, une chute) : il revient tout de suite
+  if (e.cx < gauche || e.cx > droite) {
+    e.dir = e.cx < gauche ? 1 : -1;
+    e.virage = 30;
+  }
   if (c.auSol) {
     const px = e.dir > 0 ? c.x + c.w + 4 : c.x - 4;
-    const paroi = e.murDevant(ctx);
+    const mur = e.murDevant(ctx);
     const trop = ctx.carte.solideEnPixel(px, c.y + c.h - MARCHE_MAX * TUILE);
-    const vide = !e.solDevant(ctx, 3);
-    const loin = (e.cx - e.foyer) * e.dir > RONDE;
-    if (paroi && !trop && e.recharge === 0) {
-      c.vy = SAUT;
-      e.recharge = 30;
-    } else if ((paroi || vide || loin) && e.virage === 0) {
+    if (auBord && e.virage === 0) {
+      e.dir = -e.dir as 1 | -1;
+      e.virage = 30;
+    } else if (mur && !trop && e.recharge === 0) {
+      saute(e, 3 + ctx.rng.suivant() * 2.5); // une marche : il la passe
+    } else if (mur && e.virage === 0) {
       e.dir = -e.dir as 1 | -1;
       e.virage = 30;
     } else if (e.recharge === 0 && ctx.rng.suivant() < 0.012) {
-      c.vy = SAUT; // un saut pour le plaisir
-      e.recharge = 40;
+      saute(e, 2.5 + ctx.rng.suivant() * 3); // un petit saut, à une hauteur au hasard
     }
   }
   c.vx = e.dir * e.def.vitesse * 0.7;
+}
+
+/** Un saut de `force` (la vitesse de montée) ; le rider attend un peu avant le suivant. */
+function saute(e: Ennemi, force: number): void {
+  e.corps.vy = -force;
+  e.recharge = 30;
 }

@@ -39,8 +39,10 @@ export class Ennemi implements Cible, EntiteSimulee {
   memoire = 0;
   /** délai avant un nouveau demi-tour : évite de pivoter à chaque pas contre un obstacle */
   virage = 0;
-  /** là où il rôde (x, en pixels) : un rider ne s'en éloigne pas trop au repos (voir `errance`) */
+  /** là où il rôde (x, en pixels) : à défaut de `zone`, huit tuiles autour (voir `roule`) */
   foyer: number;
+  /** les bornes de son module, en pixels (gauche, droite) : un rider au repos y reste (voir `roule`) */
+  zone: [number, number] | null = null;
   /** sa rotation en figure, de 0 à 255 (un tour = 256) : 0 en roulant ; le pro du BMX tourne sur lui-même en l'air */
   salto = 0;
   private flash = 0;

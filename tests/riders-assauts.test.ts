@@ -13,11 +13,10 @@ function fise(): Partie {
 }
 
 describe('les riders du FISE', () => {
-  it('rôdent dans leur module au repos : ils roulent, sautent, restent près de leur point de départ', () => {
+  it('rôdent dans tout leur module au repos : ils roulent, sautent, et n’en sortent pas', () => {
     const p = fise();
     const j = p.joueurs[0]!;
     const r = p.entites.find((e): e is Ennemi => e instanceof Ennemi && e.def.genre === G.SKATEUR)!;
-    const foyer = r.foyer;
     let xMin = Infinity;
     let xMax = -Infinity;
     let saute = false;
@@ -34,7 +33,11 @@ describe('les riders du FISE', () => {
     }
     expect(xMax - xMin).toBeGreaterThan(30);
     expect(saute).toBe(true);
-    expect(Math.max(foyer - xMin, xMax - foyer)).toBeLessThan(10 * TUILE);
+    // il reste dans son module (les bornes, à deux pixels près) et y roule sur une bonne partie de sa largeur
+    const [gauche, droite] = r.zone!;
+    expect(xMin).toBeGreaterThanOrEqual(gauche - 2);
+    expect(xMax).toBeLessThanOrEqual(droite + 2);
+    expect(xMax - xMin).toBeGreaterThan(3 * TUILE);
   });
 
   it('un assaut fait tomber des pros du BMX en figure, qui se posent à l’endroit', () => {

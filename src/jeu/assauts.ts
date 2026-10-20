@@ -32,7 +32,8 @@ function lanceAssaut(p: Partie, cx: number, cy: number): void {
   let lances = 0;
   ARRIVEES.forEach((a, i) => {
     const xCible = cx + a.cible;
-    const yHaut = cy - ZONE_VISIBLE.haut - 10 - (i % 2) * 24;
+    // au-dessus du bord de la vue, pour qu'on le voie tomber et tourner
+    const yHaut = cy - ZONE_VISIBLE.haut - 60 - (i % 2) * 30;
     const ySol = solSous(p, xCible, cy - 60);
     if (ySol === null || p.carte.solideEnPixel(cx + a.depart, yHaut)) return;
     p.ajoute(new Voltigeur(p, cx + a.depart, yHaut, xCible, ySol));

@@ -57,6 +57,8 @@ export interface DefNiveau {
   decor?: readonly (readonly [string, number, number])[];
   /** les colonnes où un assaut de riders tombe du ciel dès qu'un héros les franchit (voir jeu/assauts.ts) */
   assauts?: readonly number[];
+  /** les modules du niveau (colonnes de début et de fin) : les riders au repos y restent (voir jeu/chargement.ts) */
+  zones?: readonly (readonly [number, number])[];
   carte: string[];
 }
 

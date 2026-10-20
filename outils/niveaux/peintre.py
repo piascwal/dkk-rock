@@ -23,6 +23,7 @@ class Niveau:
         self.bas = hauteur - 6  # sous cette rangée : le vide
         self.vus = []  # (x, nature) pour les statistiques
         self.assauts = []  # les colonnes où des riders tombent du ciel (voir `assaut`)
+        self.zones = []  # les modules (colonnes de début et de fin) où les riders au repos roulent (voir genere-niveaux.py)
         self.decors = []  # le décor placé à la main (nom, x, rangée du sol) : voir `decor`
         self._terrain()
 

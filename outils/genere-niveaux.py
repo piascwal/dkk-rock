@@ -281,6 +281,11 @@ class Recette:
                 f'\n/** Les colonnes qui déclenchent un assaut de riders (voir jeu/assauts.ts). */\n'
                 f'export const ASSAUTS_{constante.removeprefix("CARTE_")}: number[] = [{", ".join(str(x) for x in n.assauts)}];\n'
             )
+        if n.zones:  # les modules des riders au repos (voir Niveau.zones)
+            ts += (
+                f'\n/** Les modules où les riders au repos roulent : colonnes de début et de fin (voir jeu/chargement.ts). */\n'
+                f'export const ZONES_{constante.removeprefix("CARTE_")}: [number, number][] = [{", ".join(f"[{a}, {b}]" for a, b in n.zones)}];\n'
+            )
         (CARTES / nom_fichier).write_text(ts)
         apercu(lignes, nom_fichier.replace('.ts', '.png'))
 
@@ -369,6 +374,8 @@ def fabrique(cle):
         arene_du_champion(r)
         densite(r)
         soirees(r)
+        # les modules où les riders au repos roulent : tout ce qui n'est ni un raccord, ni l'entrée, ni le plat, ni le vide
+        r.n.zones = [(x0, x1) for x0, x1, g in r.pieces if g not in ('raccord', 'entree', 'plat', 'vide')]
     if cfg.get('interieur'):
         interieur(r.n)
     r.ecrit(0, cfg['fichier'], cfg['constante'])
@@ -406,9 +413,10 @@ def arene_du_champion(r):
     n.repere(x0 + 12, '+', ymin=n.base - 6)
     n.repere(x0 + 52, '+', ymin=n.base - 6)
     n.rect(n.w - 9, 0, n.w - 7, n.h, '|')  # la barrière : le van reste bloqué tant que le Champion n'est pas battu
+    # deux estrades, à deux tuiles du sol (le saut en monte trois) ; elles s'arrêtent avant la barrière, qui ne doit pas être percée
     for a, b in ((x0 + 6, x0 + 18), (x0 + 46, x0 + 58)):
-        for x in range(a, b):
-            n.set(x, n.base - 5, '=')
+        for x in range(a, min(b, n.w - 11)):
+            n.set(x, n.base - 2, '=')
     n.repere(n.w - 5, 'F', surface=True)
 
 

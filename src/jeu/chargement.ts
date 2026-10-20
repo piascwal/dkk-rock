@@ -12,6 +12,15 @@ import { BlocTombant, Objet } from '../entites/objets';
 import { T, proprietes } from '../monde/tuiles';
 import type { Partie } from './partie';
 
+/** Le module où se trouve la colonne x (ses bornes en pixels), ou null : hors d'un module, le rider s'en tient à sa ronde. */
+function zoneDe(
+  zones: readonly (readonly [number, number])[] | undefined,
+  x: number,
+): [number, number] | null {
+  const z = zones?.find(([a, b]) => x >= a * TUILE && x < b * TUILE);
+  return z ? [z[0] * TUILE, z[1] * TUILE] : null;
+}
+
 /** Place tout ce que la carte du niveau annonce : objets, ennemis, boss, et Fadatchi le kiwi. */
 export function peuple(p: Partie): void {
   const lu = p.lu;
@@ -34,7 +43,11 @@ export function peuple(p: Partie): void {
   const depart = p.drapeau >= 0 ? lu.drapeaux[p.drapeau]!.x : -Infinity;
   for (const e of lu.ennemis) {
     const def = ENNEMIS_PAR_LETTRE[e.lettre];
-    if (def && e.x > depart) p.ajoute(new Ennemi(p, def, e.x, e.y));
+    if (def && e.x > depart) {
+      const en = new Ennemi(p, def, e.x, e.y);
+      en.zone = zoneDe(lu.def.zones, e.x);
+      p.ajoute(en);
+    }
   }
   for (const b of lu.boss)
     p.ajoute(
