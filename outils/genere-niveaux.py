@@ -16,6 +16,7 @@ from peintre import Niveau
 from plans import NIVEAUX, enchaine
 from souterrain import souterrain, tonneaux_de_surface
 from ferry import ferry
+from fise import bigair, bowl, gradins, rampes
 from hauteurs import corniches, descente, grotte, pont_de_singe, tours, vide_partout
 from signatures import falaise, glacier, parking, ponton, scene, toits
 from structures import forteresse, traversee
@@ -36,6 +37,8 @@ THEMES = {
     'port': dict(sol='D', sous='#', profond='R', mur='B', deco=['C', 'T', 'W']),
     'groix': dict(sol='#', sous='R', profond='R', mur='R', deco=['C', 'W']),
     'mer': dict(sol='D', sous='#', profond='R', mur='B', deco=['C']),
+    # le FISE : le béton des skateparks, les rampes en bois
+    'fise': dict(sol='D', sous='#', profond='R', mur='W', deco=['C', 'C', 'T']),
 }
 
 
@@ -206,6 +209,19 @@ class Recette:
 
     def p_tours(self, x0, x1, etages=3, mode='pont', lettres='a', mat=None):
         tours(self.n, x0, x1 - x0, etages, mode, lettres, mat)
+
+    # ---- le FISE (voir niveaux/fise.py)
+    def p_bowl(self, x0, x1, profondeur=4, lettres='a', butin='*'):
+        bowl(self.n, x0 + 1, x1 - x0 - 2, profondeur, lettres, butin)
+
+    def p_rampes(self, x0, x1, haut=3, lettres='a'):
+        rampes(self.n, x0 + 1, x1 - x0 - 1, haut, lettres)
+
+    def p_gradins(self, x0, x1, haut=6, lettres='a', cage=False, butin='+'):
+        gradins(self.n, x0, x1 - x0, haut, lettres, cage, butin)
+
+    def p_bigair(self, x0, x1, lettres='a'):
+        bigair(self.n, x0, x1 - x0, lettres)
 
     def p_ferry(self, x0, x1, lettres='a'):
         ferry(self.n, x0, x1 - x0, lettres)

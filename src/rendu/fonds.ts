@@ -4,6 +4,7 @@ import { Aleatoire } from '../moteur/maths';
 import { Ciel } from './ciel';
 import { arbreRond, brume, palmierPixel, sapinPixel } from './fonds-arbres';
 import { DECORS_BRETONS, type Peinture } from './fonds-bretagne';
+import { dessinePlanFise, PEINTURE_FISE } from './fonds-fise';
 import type { Decor, Theme } from './themes';
 
 const LARGEUR_BANDE = 960;
@@ -163,6 +164,7 @@ const DECORS: Record<Decor, Peinture> = {
     }
   },
   ...DECORS_BRETONS,
+  fise: PEINTURE_FISE,
 };
 
 /** Vitesse de défilement des trois plans (1 = la même que le jeu) : lointain, moyen, proche. */
@@ -239,12 +241,14 @@ export class Fond {
         if (sw > 0) ctx.drawImage(this.plans[i]!, sx, h0, sw, h1 - h0, dx + sx, y + h0, sw, h1 - h0);
       }
     });
+    // le FISE : les stands et le half-pipe, au premier arrière-plan
+    if (th.decor === 'fise') dessinePlanFise(ctx, camFond, solEcran, largeur, th.lointain);
     this.ciel.oiseaux(ctx, camFond, largeur, tick);
   }
 
   private astres(ctx: CanvasRenderingContext2D, largeur: number, tick: number): void {
     const d = this.theme.decor;
-    if (d === 'pavillons' || d === 'palmiers' || d === 'falaises') {
+    if (d === 'pavillons' || d === 'palmiers' || d === 'falaises' || d === 'fise') {
       ctx.fillStyle = d === 'pavillons' ? '#ffb36b' : '#fff3b0';
       ctx.beginPath();
       ctx.arc(largeur * 0.7, 120, 26, 0, Math.PI * 2);

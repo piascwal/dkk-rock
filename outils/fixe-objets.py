@@ -84,6 +84,14 @@ OBJETS = {
     'parasol': ([f'decor/parasol-{k}-base.png' for k in (1, 2, 3)], None, 28),
     # le transat de la plage (bois et toile bleue et blanche), en sprite fourni
     'transat': (['decor/transat-base.png'], None, 24),
+    # lot 23 : le FISE de Montpellier, au premier arrière-plan (rendu/plan-fise.ts) : les stands (BMX, skate, trottinette, la buvette,
+    # les fringues) à la même échelle, et le half-pipe, bien plus grand : il fait partie du paysage
+    'standBmx': (['decor/fise/stand-bmx-base.png'], None, 56),
+    'standSkate': (['decor/fise/stand-skate-base.png'], None, 55),
+    'standTrottinette': (['decor/fise/stand-trottinette-base.png'], None, 55),
+    'buvette': (['decor/fise/buvette-base.png'], None, 42),
+    'standFringues': (['decor/fise/stand-fringues-base.png'], None, 42),
+    'halfpipe': (['decor/fise/halfpipe-base.png'], None, 150),
     # l'enceinte basse du club, à LED rose (décor seulement : elle n'explose pas)
     'enceinteRose': (['decor/enceinte-rose-base.png'], None, 20),
     # la borne à incendie des rues (remplace le dessin en code « bouche »)

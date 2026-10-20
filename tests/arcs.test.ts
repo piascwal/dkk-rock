@@ -46,4 +46,13 @@ describe('les arcs de l’histoire', () => {
     expect(MONDE.indexOf(foret)).toBe(MONDE.indexOf(club) + 1);
     expect(suivantDansMonde(MONDE.at(-1)!)).toBeNull();
   });
+
+  it('le FISE s’ouvre après Groix, et la route y mène', () => {
+    const fise = ARCS.find((a) => a.id === 'fise')!.niveaux[0]!;
+    const groix = NIVEAUX.findIndex((n) => n.id === 'groix');
+    expect(NIVEAUX[fise]!.id).toBe('fise');
+    expect(suivantDansMonde(groix)).toBe(fise);
+    expect(niveauOuvert(fise, [])).toBe(false);
+    expect(niveauOuvert(fise, [groix])).toBe(true);
+  });
 });

@@ -1,7 +1,7 @@
 /** L'ambiance de chaque monde : couleurs du ciel, du sol, décor de fond, météo et musique. */
 
 export type NomTheme =
-  'garage' | 'montagne' | 'neige' | 'plage' | 'ville' | 'club' | 'foret' | 'port' | 'groix' | 'mer';
+  'garage' | 'montagne' | 'neige' | 'plage' | 'ville' | 'club' | 'foret' | 'port' | 'groix' | 'mer' | 'fise';
 
 export type Decor =
   | 'pavillons'
@@ -13,7 +13,8 @@ export type Decor =
   | 'sousbois'
   | 'quais'
   | 'falaises'
-  | 'large';
+  | 'large'
+  | 'fise';
 
 export interface Theme {
   /** dégradé du ciel, du haut vers l'horizon */
@@ -147,6 +148,18 @@ export const THEMES: Record<NomTheme, Theme> = {
     dessus: '#8a8a86',
     terre: '#5e5a56',
     decor: 'large',
+    meteo: null,
+    musique: 'plage',
+  },
+  // le FISE de Montpellier : plein soleil sur le béton des skateparks, au bord du Lez
+  fise: {
+    ciel: ['#3f8fe0', '#cfeeff'],
+    lointain: '#a8bccb',
+    proche: '#4f7a5a',
+    paroi: '#3a3a40',
+    dessus: '#b4b0a8',
+    terre: '#7a746c',
+    decor: 'fise',
     meteo: null,
     musique: 'plage',
   },

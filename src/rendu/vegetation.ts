@@ -28,6 +28,7 @@ const STYLES: Record<Decor, Style> = {
   sousbois: { sorte: 'liane', couleurs: ['#24402e', '#3f7a3a', '#8ad06a'], mousse: ['#3f7a3a', '#6aa84a'] },
   quais: { sorte: 'cable', couleurs: ['#3a2a1a', '#6a5a3a', '#a8946a'] },
   large: { sorte: 'cable', couleurs: ['#3a2a1a', '#6a5a3a', '#a8946a'] },
+  fise: { sorte: 'cable', couleurs: ['#3a3a40', '#6a6a72', '#a8a8b0'] },
   falaises: { sorte: 'liane', couleurs: ['#4a6a3a', '#7aa04a', '#ffd23f'], mousse: ['#7a8a4a', '#9aa85a'] },
 };
 

@@ -149,6 +149,27 @@ const casier = (p: Px, x: number, y: number) => {
   p(x + 1, y + 3, 6, 1, '#a8743a');
 };
 
+/** Une tente du festival, en goutte de couleur. */
+const tente = (p: Px, x: number, y: number, r: Aleatoire) => {
+  const c = r.choix(['#ff4f6d', '#3fa7f2', '#ffd23f', '#2f9e5a']);
+  p(x + 1, y + 3, 6, 2, c);
+  p(x + 2, y + 2, 4, 1, c);
+  p(x + 2, y + 5, 1, 2, '#3a3a40');
+  p(x + 5, y + 5, 1, 2, '#3a3a40');
+};
+
+/** Le half-pipe du FISE (2×2 tuiles) : la courbe de bois sur ses échafaudages. */
+const halfpipe = (p: Px, x: number, y: number) => {
+  p(x + 1, y + 4, 2, 10, '#8a5a2b');
+  p(x + 13, y + 4, 2, 10, '#8a5a2b');
+  p(x + 3, y + 9, 10, 3, '#d8a868');
+  p(x + 2, y + 6, 2, 5, '#d8a868');
+  p(x + 12, y + 6, 2, 5, '#d8a868');
+  p(x + 1, y + 3, 3, 1, '#5a3a1a');
+  p(x + 12, y + 3, 3, 1, '#5a3a1a');
+  p(x + 1, y + 14, 14, 1, '#3a3a40');
+};
+
 export const SOLS: Record<Decor, Sol> = {
   pavillons: {
     clair: '#5aa83f',
@@ -204,6 +225,12 @@ export const SOLS: Record<Decor, Sol> = {
     sombre: '#7e7e7a',
     petits: [casier, caillou, casier],
     grands: [chalutier, phare],
+  },
+  fise: {
+    clair: '#d8cc9a',
+    sombre: '#cfc28e',
+    petits: [tente, tente, palmier, caillou],
+    grands: [halfpipe, immeuble],
   },
   falaises: {
     clair: '#7aa04a',

@@ -1,4 +1,5 @@
 import { FIN_BRETAGNE } from '../histoire/fin-bretagne';
+import { FIN_FISE } from '../histoire/fin-fise';
 import { FIN_TOURNEE } from '../histoire/fin-tournee';
 import type { Replique } from './format';
 
@@ -35,6 +36,15 @@ export const ARCS: DefArc[] = [
     niveaux: [6, 7, 9, 8],
     apres: 5,
     fin: FIN_BRETAGNE,
+  },
+  {
+    id: 'fise',
+    titre: 'Le FISE',
+    resume:
+      'Retour sur le continent : le rendez-vous obligatoire du Festival International des Sports Extrêmes, à Montpellier.',
+    niveaux: [10],
+    apres: 8,
+    fin: FIN_FISE,
   },
 ];
 

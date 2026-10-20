@@ -252,4 +252,28 @@ NIVEAUX = {
         # le niveau n'est que le navire : les vagues d'ennemis viennent du jeu (src/jeu/traversee.ts), pas de la carte
         lieux=[('ferry', 58, dict())],
     ),
+    # le FISE de Montpellier, après Groix : un niveau plat, des modules de skatepark (voir outils/niveaux/fise.py)
+    'fise': dict(
+        nom='Le FISE', theme='fise', textes='11-fise.ts', fichier='11-fise.ts',
+        constante='CARTE_FISE', graine=111, base=30, raccord='acf', caves='acdf',
+        lieux=[
+            ('plat', 12, dict(lettres='a', deco=2)),
+            ('plat', 10, dict(lettres='af', digit='1')),  # l'entrée du festival
+            ('rampes', 26, dict(haut=3, lettres='af')),
+            ('maison', 14, dict(lettres='acf')),  # un stand en dur
+            ('bowl', 24, dict(profondeur=4, lettres='acf')),
+            ('gradins', 26, dict(haut=6, lettres='acf', cage=True)),
+            ('plat', 10, dict(lettres='acf', digit='2')),  # le big air
+            ('bigair', 30, dict(lettres='acdf')),
+            ('forteresse', 34, dict(etages=3, lettres='acdf', mat='B', cage=True)),  # le village des marques
+            ('rampes', 30, dict(haut=4, lettres='acdf')),
+            ('bowl', 28, dict(profondeur=5, lettres='acdf', butin='+')),
+            ('plat', 10, dict(lettres='acdf', digit='3', drones=2)),  # les drones des vidéastes
+            ('gradins', 30, dict(haut=7, lettres='acdf')),
+            ('echafaudage', 22, dict(niveaux=3, lettres='acdf')),  # la régie
+            ('bigair', 30, dict(lettres='acdf')),
+            ('plat', 10, dict(lettres='acdf', digit='4')),  # la finale
+            ('arene', 46, dict(lettres='acdf')),
+        ],
+    ),
 }
