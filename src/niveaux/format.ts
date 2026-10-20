@@ -8,7 +8,8 @@ import type { NomTheme } from '../rendu/themes';
  * Tuiles (voir monde/tuiles.ts) :
  *   ' ' vide   # terre   R roche   B brique   M métal   X socle (indestructible)
  *   N neige    G glace   W bois    - plateforme   H échelle   C caisse
- *   T caisson de basses (explose)   S sable   V vitre   D béton
+ *   T caisson de basses (explose)   I caisson violet (explose, en plus gros)   S sable   V vitre   D béton
+ *   | barrière du boss (s'ouvre à sa mort)
  *   E échelon scellé (échelle incassable)   = piton (plateforme incassable)
  *   O tonneau WOG (un cœur : +1 vie)   Q tonneau d'or WOG (cœur d'or : tout revient, 10 s d'invincibilité)
  *   . mur de fond (décor d'intérieur, on passe devant)
@@ -197,7 +198,7 @@ function scelleLesEchelles(tuiles: Uint8Array, largeur: number, hauteur: number)
  * voit le ciel à travers un plancher à pitons ou derrière une échelle.
  */
 /** Celles qui laissent voir le fond, et les caisses : une fois cassées, elles laissent le mur de la pièce. */
-const LEGERES = new Set<number>([...TUILES_LEGERES, T.CAISSE, T.CAISSON, T.BIDON]);
+const LEGERES = new Set<number>([...TUILES_LEGERES, T.CAISSE, T.CAISSON, T.CAISSON_ROSE, T.BIDON]);
 const PLEINES = new Set<number>([
   T.TERRE,
   T.ROCHE,

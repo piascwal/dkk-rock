@@ -18,7 +18,7 @@ from prepare_instrument import natif_et_case
 
 RACINE = pathlib.Path(__file__).resolve().parent.parent
 COTE = 96
-TUILES = ['caisse', 'caisson', 'tonneau-wog', 'tonneau-or', 'bois', 'bidon']
+TUILES = ['caisse', 'caisson', 'caisson-rose', 'tonneau-wog', 'tonneau-or', 'bois', 'bidon']
 # les tuiles qui gardent leurs proportions (un tonneau n'est pas carré) : centrées en bas de la case, et agrandies d'un
 # facteur ENTIER (3) : chaque pixel de l'artiste reste un carré net, sans les pixels inégaux d'un redimensionnement
 PROPORTIONS = {'tonneau-wog', 'tonneau-or', 'bidon'}

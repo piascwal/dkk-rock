@@ -32,6 +32,10 @@ export const T = {
   PLATEAU: 22,
   /** le contreplaqué lisse des rampes de bois du FISE (half-pipe, spine) */
   RAMPE: 23,
+  /** le caisson de basses à LED violette (les soirées du FISE) : il explose comme le bleu, en plus gros et moins méchant */
+  CAISSON_ROSE: 24,
+  /** la barrière du boss : indestructible, elle s'ouvre à la mort du boss (voir jeu/chargement.ts : ouvreBarrieres) */
+  BARRIERE: 25,
 } as const;
 
 export type Tuile = (typeof T)[keyof typeof T];
@@ -104,6 +108,14 @@ export const PROPRIETES: Record<Tuile, ProprietesTuile> = {
   [T.PARC]: base({ nom: 'revêtement de parc', car: 'L', pv: 6, debris: '#3a3a40' }),
   [T.PLATEAU]: base({ nom: 'plateau de module', car: 'U', pv: 6, debris: '#e8607a' }),
   [T.RAMPE]: base({ nom: 'rampe de bois', car: 'A', pv: 4, debris: '#d8a868' }),
+  [T.CAISSON_ROSE]: base({
+    nom: 'caisson de basses violet',
+    car: 'I',
+    pv: 2,
+    explose: true,
+    debris: '#7a2a8a',
+  }),
+  [T.BARRIERE]: base({ nom: 'barrière du boss', car: '|', pv: Infinity, debris: '#ff4fd8' }),
 };
 
 const PAR_CARACTERE = new Map<string, Tuile>(

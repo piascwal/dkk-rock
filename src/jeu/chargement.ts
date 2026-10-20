@@ -65,7 +65,12 @@ export function peuple(p: Partie): void {
  * tombent quand on leur retire le sol.
  */
 export function releveCarte(p: Partie): void {
-  for (const [quand, x, y] of p.enAttente) if (quand <= p.tick) p.explosion(x, y, 40, 5, 'tous');
+  for (const [quand, x, y, sorte] of p.enAttente)
+    if (quand <= p.tick) {
+      // le caisson violet : une explosion plus grande, mais qui fait moins de dégâts (3 contre 5)
+      if (sorte === 'rose') p.explosion(x, y, 56, 3, 'tous');
+      else p.explosion(x, y, 40, 5, 'tous');
+    }
   p.enAttente = p.enAttente.filter(([quand]) => quand > p.tick);
 
   for (const m of p.carte.releveModifications()) {
@@ -74,6 +79,7 @@ export function releveCarte(p: Partie): void {
     const cx = (m.x + 0.5) * TUILE;
     const cy = (m.y + 0.5) * TUILE;
     if (m.avant === T.CAISSON) p.enAttente.push([p.tick + 5, cx, cy]);
+    if (m.avant === T.CAISSON_ROSE) p.enAttente.push([p.tick + 5, cx, cy, 'rose']);
     // un tonneau WOG cassé libère un cœur, un tonneau d'or WOG un cœur d'or
     if (m.avant === T.TONNEAU_WOG) p.ajoute(new Objet(p, 'coeur', m.x * TUILE, m.y * TUILE));
     if (m.avant === T.TONNEAU_OR) p.ajoute(new Objet(p, 'coeurOr', m.x * TUILE, m.y * TUILE));
@@ -88,5 +94,24 @@ export function releveCarte(p: Partie): void {
       p.carte.pose(m.x, m.y - 1, T.VIDE);
       p.ajoute(new BlocTombant(p, dessus, m.x, m.y - 1));
     }
+  }
+}
+
+/** À la mort d'un boss qui garde le van (le Yéti Alpha, le Champion du FISE) : ses barrières s'ouvrent, le van est libre. */
+export function ouvreBarrieres(p: Partie): void {
+  let ouvertes = 0;
+  for (let y = 0; y < p.carte.hauteur; y++)
+    for (let x = 0; x < p.carte.largeur; x++)
+      if (p.carte.get(x, y) === T.BARRIERE) {
+        p.carte.pose(x, y, T.VIDE);
+        ouvertes++;
+      }
+  if (ouvertes) {
+    p.evenement({
+      k: 'bulle',
+      qui: 'NARRATEUR',
+      texte: 'La barrière s’ouvre : le camping-car vous attend !',
+    });
+    p.son('liberation', p.carte.largeur * 8, 0);
   }
 }

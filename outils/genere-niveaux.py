@@ -16,7 +16,7 @@ from peintre import Niveau
 from plans import NIVEAUX, enchaine
 from souterrain import souterrain, tonneaux_de_surface
 from ferry import ferry
-from fise import bigair, breakdance, entree, flat_bmx, food_court, gradins, halfpipe_bois, parc_street, spine, village
+from fise import bigair, breakdance, entree, flat_bmx, food_court, gradins, halfpipe_bois, parc_street, soirees, spine, village
 from hauteurs import corniches, descente, grotte, pont_de_singe, tours, vide_partout
 from signatures import falaise, glacier, parking, ponton, scene, toits
 from structures import forteresse, traversee
@@ -284,7 +284,7 @@ COULEURS = {
     ' ': (30, 20, 40), '.': (60, 50, 70), '#': (122, 74, 42), 'R': (109, 109, 120), 'B': (156, 59, 46), 'M': (138, 150, 163),
     'X': (20, 20, 20), 'N': (230, 240, 251), 'G': (143, 208, 238), 'W': (168, 116, 58), '-': (210, 154, 85), 'H': (196, 154, 90),
     'E': (255, 255, 255), '=': (190, 200, 210), 'C': (176, 125, 60), 'T': (60, 60, 60), 'S': (232, 207, 138), 'V': (191, 233, 255),
-    'D': (154, 154, 146), 'L': (44, 44, 49), 'U': (232, 96, 122), 'A': (216, 168, 104), '(': (255, 0, 255), ')': (255, 0, 255),
+    'D': (154, 154, 146), 'L': (44, 44, 49), 'U': (232, 96, 122), 'A': (216, 168, 104), 'I': (170, 80, 220), '|': (255, 79, 216), '(': (255, 0, 255), ')': (255, 0, 255),
 }
 
 
@@ -362,6 +362,7 @@ def fabrique(cle):
         arene_du_dj(r)
     if cle == 'fise':
         arene_du_champion(r)
+        soirees(r)
     if cfg.get('interieur'):
         interieur(r.n)
     r.ecrit(0, cfg['fichier'], cfg['constante'])
@@ -376,6 +377,7 @@ def arene_du_yeti(r):
     n.repere(x0 + 30, 'Y', surface=True)
     n.repere(x0 + 14, '+', surface=True)
     n.repere(x0 + 50, '+', surface=True)
+    n.rect(n.w - 9, 0, n.w - 7, n.h, '|')  # la barrière : le van reste bloqué tant que le Yéti n'est pas battu
     n.rect(x0 + 8, n.base - 9, x0 + 22, n.base - 8, 'G')
     n.rect(x0 + 38, n.base - 9, x0 + 52, n.base - 8, 'G')
     n.repere(n.w - 5, 'F', surface=True)
@@ -397,6 +399,7 @@ def arene_du_champion(r):
     n.repere(x0 + 32, 'P', surface=True)
     n.repere(x0 + 12, '+', ymin=n.base - 6)
     n.repere(x0 + 52, '+', ymin=n.base - 6)
+    n.rect(n.w - 9, 0, n.w - 7, n.h, '|')  # la barrière : le van reste bloqué tant que le Champion n'est pas battu
     for a, b in ((x0 + 6, x0 + 18), (x0 + 46, x0 + 58)):
         for x in range(a, b):
             n.set(x, n.base - 5, '=')

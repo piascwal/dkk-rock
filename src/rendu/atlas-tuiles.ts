@@ -170,6 +170,27 @@ const PEINTRES: Partial<Record<number, Peintre>> = {
     moucheture(c, v, '#cc9a5c', 5, 5);
     for (const x of [2, 13]) for (const y of [3, 12]) px(c, x, y, 1, 1, '#8a6a3a');
   },
+  // le caisson de basses à LED violette (repli du sprite) : comme le bleu, mais violet
+  [T.CAISSON_ROSE]: (c) => {
+    px(c, 0, 0, 16, 16, '#151515');
+    px(c, 1, 1, 14, 14, '#2b2236');
+    c.fillStyle = '#111';
+    c.beginPath();
+    c.arc(8, 9, 5, 0, Math.PI * 2);
+    c.fill();
+    c.fillStyle = '#6a3a7a';
+    c.beginPath();
+    c.arc(8, 9, 2, 0, Math.PI * 2);
+    c.fill();
+    px(c, 3, 2, 10, 1, '#c84fff');
+  },
+  // la barrière du boss : des montants noirs, trois lasers roses entre eux ; elle s'ouvre à la mort du boss
+  [T.BARRIERE]: (c) => {
+    px(c, 0, 0, 16, 16, '#12121a');
+    px(c, 0, 0, 2, 16, '#3a3a46');
+    px(c, 14, 0, 2, 16, '#3a3a46');
+    for (const y of [2, 7, 12]) px(c, 2, y, 12, 2, '#ff4fd8');
+  },
   // le plateau rose des modules (box jump, spine, haut des quarters) : rose sur le dessus, noir dessous
   [T.PLATEAU]: (c, v) => {
     px(c, 0, 0, 16, 16, '#232327');
@@ -187,6 +208,7 @@ const IMAGES_TUILES: Partial<Record<number, string>> = {
   [T.TONNEAU_OR]: 'tuile-tonneau-or.png',
   [T.BIDON]: 'tuile-bidon.png',
   [T.BOIS]: 'tuile-bois.png',
+  [T.CAISSON_ROSE]: 'tuile-caisson-rose.png',
 };
 const imagesTuiles = new Map<number, HTMLImageElement>();
 

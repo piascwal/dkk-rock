@@ -21,14 +21,14 @@ import { pagesDe } from '../histoire/pages';
 import type { Camp, Cible, Contexte, EntiteSimulee, Tyrolienne } from './contexte';
 import { explose } from './explosions';
 import { zoneVisible } from './zone-visible';
-import { peuple, releveCarte } from './chargement';
+import { ouvreBarrieres, peuple, releveCarte } from './chargement';
 import { changePhase } from './phases';
 import { majTraversee, prepareTraversee, type Traversee } from './traversee';
 import { interactions, membreLibre } from './interactions';
 import type { Progression } from './sauvegarde';
 import { CACHE_VIDE, calculeCibles, type CacheCibles } from './cibles';
 import { construitVue } from './vue-partie';
-import { DUREE_CARTE, GENRES_CONVERTIS, type EtatVue, type Evenement, type Phase } from './vue';
+import { DUREE_CARTE, G, GENRES_CONVERTIS, type EtatVue, type Evenement, type Phase } from './vue';
 
 /**
  * La partie : toute la simulation, sur l'appareil hôte (ou seul). Elle reçoit
@@ -60,7 +60,8 @@ export class Partie implements Contexte {
   /** colonnes de dialogue déjà déclenchées */
   dejaDit = new Set<number>();
   /** explosions de caissons en attente : [tick, x, y] */
-  enAttente: [number, number, number][] = [];
+  /** les explosions de caissons en attente : (image, x, y, sorte : « rose » pour le caisson violet) */
+  enAttente: [number, number, number, string?][] = [];
   finDans = -1;
   /** le van qui part, et le nombre de ticks avant le bilan (-1 : il n'est pas parti) */
   private van: Objet | null = null;
@@ -130,6 +131,7 @@ export class Partie implements Contexte {
     if (i >= 0) this.convertis[i] = Math.min(255, this.convertis[i]! + 1);
     this.evenements.push({ k: 'confettis', x, y });
     this.texte(x, y - 10, `+${points}`, '#ffd23f');
+    if (genre === G.YETI_ALPHA || genre === G.CHAMPION) ouvreBarrieres(this); // le van est libre
   }
 
   // ——— joueurs ———

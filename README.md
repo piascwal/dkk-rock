@@ -201,6 +201,12 @@ validé.
   parcours à leur place : l'Hôtel de Ville au départ, l'Arbre Blanc au milieu, l'Hôtel de Région à la finale. Les logos
   officiels (`assets-sources/decor/fise/logo-fise-*.png`) habillent l'arche, les bâches des barrières et la carte d'intro
   (`outils/fise-logos.py`). Les riders (lot 24) foncent sur le héros et reviennent ; le pro du BMX saute en figure.
+  Le breakdance et le flat ont de petites plateformes à deux étages et beaucoup de _caissons de basses_ explosifs : le bleu
+  (tuile `T`, 5 de dégâts) et le violet (tuile `I`, la LED violette du club : il explose plus large, 56 px au lieu de 40, mais
+  fait moins mal, 3 de dégâts). Sous le food court, le flat et le village, l'envers du décor : trois _soirées_ souterraines,
+  des complexes de métal façon boîte de nuit (`soirees` dans `fise.py`), qu'on atteint par une échelle.
+  **La barrière du boss** (tuile `|`, indestructible) garde le van du Yéti Alpha et du Champion : elle ne s'ouvre qu'à leur
+  mort (`ouvreBarrieres` dans `jeu/chargement.ts`) ; le test d'accessibilité la compte comme ouverte.
 - **Un ennemi :** une définition dans `entites/ennemis/definitions.ts` (lettre de carte), un
   comportement dans `comportements.ts`, un dessin dans `rendu/dessins-ennemis.ts`.
 - **Une arme :** un tir dans `entites/projectiles-defs.ts`, une entrée dans `entites/armes.ts`,

@@ -18,19 +18,30 @@ Tout module surélevé a une échelle au départ (`_echelle`) : on ne grimpe pas
 """
 import math
 
+from structures import complexe
+
 PARC, PLATEAU, RAMPE = 'L', 'U', 'A'
 
 
+def _libre3(n, x, y):
+    """Les neuf cases qu'occupe un décor posé en (x, y) : une de part et d'autre, trois au-dessus du sol de rangée y."""
+    return all(n.get(x + dx, y - dy) in ' .' for dx in (-1, 0, 1) for dy in (1, 2, 3))
+
+
 def _pose(n, x, nom, y=None, ecart=3):
-    """Le décor à la main, mais jamais devant une échelle (deux tuiles de part et d'autre, cinq au-dessus) ni sur un autre décor."""
+    """Le décor à la main, mais jamais devant une échelle (deux tuiles de part et d'autre, cinq au-dessus), jamais sur une tuile,
+    ni sur un autre décor. Renvoie True s'il est posé."""
     y = n.base if y is None else y
     for dx in range(-2, 3):
         for dy in range(1, 6):
             if n.get(x + dx, y - dy) == 'H':
-                return
+                return False
+    if not _libre3(n, x, y):
+        return False
     if any(abs(x - xx) < ecart and yy == y for _, xx, yy in n.decors):
-        return
+        return False
     n.decor(x, nom, y)
+    return True
 
 
 def _colonne(n, x, h, mat, dessus=None):
@@ -43,6 +54,35 @@ def _echelle(n, x, haut):
     """Une échelle de `haut` tuiles, posée sur la colonne libre x, au pied du module : on monte jusqu'à son plateau."""
     for k in range(1, haut + 1):
         n.set(x, n.base - k, 'H')
+
+
+def _caissons(n, xs, piso, haut=1):
+    """Des caissons de basses explosifs posés sur le sol de rangée `piso`, un tous les x de `xs`, un bleu puis un violet : les
+    bleus font 5 de dégâts, les violets explosent plus large mais moins fort (3). Deux tuiles de haut au plus : on saute dessus."""
+    for i, x in enumerate(xs):
+        for k in range(haut if i % 3 else 1):
+            n.set(x, piso - 1 - k, 'I' if i % 2 else 'T')
+
+
+def _plateformes(n, x0, x1, piso, lettres, evite=()):
+    """De petites plateformes à deux étages au-dessus du sol de rangée `piso` (on monte de deux tuiles à chaque fois, le saut du
+    héros), des caissons explosifs dessus et un ennemi sur chaque planche. `evite` : des x à ne pas encombrer (portiques, jury)."""
+    y1, y2 = piso - 2, piso - 4
+    x, k = x0, 0
+    while x + 8 < x1:
+        if any(abs(x + 3 - e) < 9 for e in evite):
+            x += 4
+            continue
+        for xx in range(x, x + 6):
+            n.set(xx, y1, '-')
+        n.ennemis(x, x + 6, lettres, 1, ymin=y1 - 2)
+        n.set(x + 2, y1 - 1, 'T' if k % 2 else 'I')
+        if k % 2 == 0:  # un second étage une planche sur deux
+            for xx in range(x + 1, x + 5):
+                n.set(xx, y2, '-')
+            n.set(x + 3, y2 - 1, 'I' if k % 4 == 0 else 'T')
+        x += 10
+        k += 1
 
 
 def _courbe(haut, longueur):
@@ -171,6 +211,9 @@ def breakdance(n, x0, largeur, lettres='k'):
     _pose(n, a + 1 + (c - a) // 4, 'danseurFise', top)  # des danseurs de décor, entre les portiques et le jury
     _pose(n, c + 3 + (b - c) // 4, 'danseurFise', top)
     n.ennemis(a + 2, b - 2, lettres, max(4, largeur // 10), ymin=top - 3)
+    evite = [x for _, x, y in n.decors if y == top]
+    _plateformes(n, a + 4, b - 4, top, lettres, evite)
+    _caissons(n, [x for x in range(a + 8, b - 6, 9) if all(abs(x - e) > 4 for e in evite)], top)
 
 
 def flat_bmx(n, x0, largeur, lettres='px'):
@@ -181,6 +224,9 @@ def flat_bmx(n, x0, largeur, lettres='px'):
     _pose(n, x0 + largeur // 2, 'portiqueFlat')
     _pose(n, x0 + largeur - 3, 'barriere')
     n.ennemis(x0 + 3, x0 + largeur - 3, lettres, 3)
+    evite = [x for _, x, y in n.decors if y == n.base and x0 <= x < x0 + largeur]
+    _plateformes(n, x0 + 4, x0 + largeur - 4, n.base, lettres, evite)
+    _caissons(n, [x for x in range(x0 + 5, x0 + largeur - 5, 6) if all(abs(x - e) > 4 for e in evite)], n.base)
 
 
 def village(n, x0, largeur, lettres='fs'):
@@ -236,3 +282,44 @@ def bigair(n, x0, largeur, lettres='a'):
     n.ennemis(p0 + 1, p1 - 2, lettres, 2, ymin=base)
     n.tyro(x0 + 9, ys[-1] - 1, p1 + 3, base - 2)
     n.ennemis(p1 + 2, x0 + largeur, lettres, 1)
+
+
+def soirees(r, lettres='sotx'):
+    """L'envers du décor : trois soirées du FISE sous la surface, sous les zones plates (le food court, le flat, le village). Chacune
+    est un complexe à deux étages, en murs de métal comme une boîte de nuit : enceintes, projecteurs, des caissons explosifs, un
+    escadron par étage, et une cage ou un médiator au fond. On y descend par une échelle depuis la surface ; ce sont des
+    culs-de-sac (avec leur butin) : pas de galerie d'un bout à l'autre du niveau."""
+    n, yg = r.n, r.n.yg
+    mur = n.t['mur']
+    n.t['mur'] = 'M'
+    sites = [(x0, x1) for x0, x1, g in r.pieces if g in ('food_court', 'flat_bmx', 'village')]
+    for k, (x0, x1) in enumerate(sites):
+        x = x0 + 4
+        butin = 'K' if k != 1 else '*'
+        complexe(n, x, 28, lettres * 2, 5 + k, butin)
+        n.puits(x + 8, None, yg - 4)
+        for gx in (x - 9, x + 28):  # deux courtes galeries de gardes, qui finissent en cul-de-sac avec un médiator
+            n.galerie(gx, gx + 9, alcoves=0)
+            n.ennemis(gx, gx + 9, lettres, 1, ymin=yg - 1)
+        n.repere(x - 7, '+', ymin=yg - 1)
+        milieu = yg - 4
+        # le décor de la soirée : pour chacun, la première position libre parmi les candidates (les échelles, les cloisons et les
+        # fenêtres des salles en occupent une partie)
+        for nom, etage, candidats in (
+            ('projecteur', yg + 1, (13, 11, 20, 3)),
+            ('enceinteRose', yg + 1, (20, 25, 13, 3)),
+            ('lampadaireNeon', yg + 1, (25, 24, 3, 22)),
+            ('projecteur', milieu, (3, 19, 24, 22)),
+            ('enceinteRose', milieu, (19, 24, 3, 11)),
+            ('lampadaireNeon', milieu, (24, 3, 19, 22)),
+        ):
+            for dx in candidats:
+                if _pose(n, x + dx, nom, etage):
+                    break
+        # des enceintes explosives sur chaque plancher, là où aucun décor ne les masque
+        for etage, xs in ((yg + 1, (16, 23, 9, 12)), (milieu, (11, 22, 26, 17))):
+            for i, dx in enumerate(xs):
+                px = x + dx
+                if n.get(px, etage - 1) in ' .' and not any(abs(px - xx) <= 2 and yy == etage for _, xx, yy in n.decors):
+                    n.set(px, etage - 1, 'I' if i % 2 else 'T')
+    n.t['mur'] = mur

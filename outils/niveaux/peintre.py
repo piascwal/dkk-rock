@@ -7,9 +7,9 @@ variantes ou des récompenses.
 """
 import random
 
-SOLIDES = set('#RBMNGWSDVCTOQ=-XLUA')
+SOLIDES = set('#RBMNGWSDVCTOQ=-XLUAI|')
 # quelles tuiles servent de sol à un ennemi ou à un objet posé
-SOL_ENNEMI = set('#RBMNGWSDVCTOQ=-XLUA')
+SOL_ENNEMI = set('#RBMNGWSDVCTOQ=-XLUAI|')
 
 
 class Niveau:
