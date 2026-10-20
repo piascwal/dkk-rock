@@ -83,8 +83,6 @@ export const DECOR_FISE: [string, number, number][] = [
   ['portiqueBreak', 218, 28],
   ['enceinte34', 209, 28],
   ['enceinte34', 226, 28],
-  ['bgirl', 213, 28],
-  ['bgirl', 222, 28],
   ['barriere', 240, 30],
   ['barriere', 252, 30],
   ['barriere', 263, 30],

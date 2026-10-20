@@ -143,7 +143,7 @@ def spine(n, x0, largeur, haut=3, lettres='so'):
 
 
 def scene_breaking(n, x0, largeur, lettres='k'):
-    """L'estrade noire du breaking : une marche de chaque côté, le portique au fond, deux enceintes, les b-boys dessus."""
+    """L'estrade noire du breaking : une marche de chaque côté, le portique au fond, deux enceintes, les danseurs ennemis dessus."""
     a, b = x0 + 3, x0 + largeur - 3
     for x in range(a, b):
         h = 1 if x in (a, b - 1) else 2
@@ -152,8 +152,6 @@ def scene_breaking(n, x0, largeur, lettres='k'):
     _pose(n, (a + b) // 2, 'portiqueBreak', top)
     _pose(n, a + 3, 'enceinte34', top)
     _pose(n, b - 4, 'enceinte34', top)
-    _pose(n, a + 7, 'bgirl', top)  # des danseuses sur l'estrade : du décor, pas des ennemis
-    _pose(n, b - 8, 'bgirl', top)
     n.ennemis(a + 2, b - 2, lettres, 3, ymin=top - 3)
 
 

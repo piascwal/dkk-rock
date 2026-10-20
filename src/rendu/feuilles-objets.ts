@@ -155,7 +155,6 @@ export const FEUILLES_DECOR: Record<string, Feuille> = {
     densite: 6,
     pied: 216,
   },
-  bgirl: { fichier: 'bgirl.png', w: 114, h: 213, images: [1], rythme: 1, densite: 6, pied: 57 },
   foodDuke: { fichier: 'foodDuke.png', w: 276, h: 261, images: [1], rythme: 1, densite: 6, pied: 138 },
   foodRougail: { fichier: 'foodRougail.png', w: 276, h: 261, images: [1], rythme: 1, densite: 6, pied: 138 },
   foodCroque: { fichier: 'foodCroque.png', w: 276, h: 261, images: [1], rythme: 1, densite: 6, pied: 138 },
