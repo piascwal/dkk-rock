@@ -26,6 +26,8 @@ export interface Sauvegarde {
   son: boolean;
   musique: boolean;
   qualite: Qualite;
+  /** le record du concours de drift du pré du Clos : la plus grande part de pelouse saccagée (0 à 100) */
+  recordDrift: number;
 }
 
 const CLE = 'dkk-rock.sauvegarde';
@@ -39,6 +41,7 @@ export const SAUVEGARDE_VIDE: Sauvegarde = {
   son: true,
   musique: true,
   qualite: 'auto',
+  recordDrift: 0,
 };
 
 const entier = (v: unknown, min: number, max: number, defaut: number): number =>
@@ -77,6 +80,8 @@ export function valideSauvegarde(brut: unknown, nbNiveaux: number): Sauvegarde {
     son: o.son !== false,
     musique: o.musique !== false,
     qualite: o.qualite === 'max' || o.qualite === 'eco' ? o.qualite : 'auto',
+    recordDrift:
+      typeof o.recordDrift === 'number' && o.recordDrift >= 0 && o.recordDrift <= 100 ? o.recordDrift : 0,
   };
 }
 
@@ -95,4 +100,12 @@ export function enregistre(s: Sauvegarde): void {
   } catch {
     /* navigation privée : tant pis, on joue sans sauvegarde */
   }
+}
+
+/** Garde le meilleur score du concours de drift comme record du pré du Clos. Vrai s'il est battu (à enregistrer). */
+export function retiensRecordDrift(s: Sauvegarde, scores: readonly ({ pourcent: number } | null)[]): boolean {
+  const meilleur = Math.max(0, ...scores.map((x) => x?.pourcent ?? 0));
+  if (meilleur <= s.recordDrift + 0.01) return false;
+  s.recordDrift = meilleur;
+  return true;
 }

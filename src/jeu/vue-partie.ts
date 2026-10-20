@@ -69,5 +69,6 @@ export function construitVue(p: Partie): EtatVue {
     navire: p.traversee ? p.traversee.code : 0,
     joueurs,
     entites,
+    ...(p.phase === 'drift' && p.drift ? { drift: p.drift.vue() } : {}),
   };
 }

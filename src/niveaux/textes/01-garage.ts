@@ -72,5 +72,18 @@ export const GARAGE: Omit<DefNiveau, 'carte'> = {
       qui: 'JBM',
       texte: 'Réussie quand même. Direction les Alpes : un festival de « chill lounge » y endort les vaches.',
     },
+    {
+      qui: 'TOM',
+      texte: 'Avant de partir pour de bon… un dernier petit kiff ? Le pré du Clos est fraîchement tondu.',
+    },
+    {
+      qui: 'JBT',
+      texte:
+        'Mes parents ont dit qu’on pouvait répéter si on ne touchait à rien. Rien, ça inclut la pelouse.',
+    },
+    {
+      qui: 'MAT',
+      texte: 'Concours de drift. Une minute chacun. Celui qui saccage le plus de pelouse a gagné.',
+    },
   ],
 };

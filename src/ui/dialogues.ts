@@ -100,7 +100,7 @@ export class Histoire {
   }
 
   maj(v: EtatVue): void {
-    if (v.phase === 'jeu') {
+    if (v.phase === 'jeu' || v.phase === 'drift') {
       this.element.hidden = true;
       this.cle = '';
       this.convertis.arrete();

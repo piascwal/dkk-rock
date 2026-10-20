@@ -23,6 +23,16 @@ const avance = (p: Partie, n: number, bits = 0) => {
   }
 };
 
+/** Du bilan au niveau suivant : les pages, le concours de drift (après le garage, terminé d'office) et la carte du monde. */
+function entreDeuxNiveaux(p: Partie): void {
+  while (p.phase === 'convertis' || p.phase === 'bilan' || p.phase === 'carte' || p.phase === 'drift') {
+    if (p.phase === 'drift') {
+      p.drift!.fini = true;
+      p.avance();
+    } else p.suivant();
+  }
+}
+
 describe('la partie', () => {
   it.each(NIVEAUX.map((n, i) => [n.id, i] as const))('%s : 3 000 pas de jeu agité sans erreur', (_id, i) => {
     const p = nouvelle(i);
@@ -227,7 +237,7 @@ describe('la partie', () => {
     avance(p, 200);
     expect(p.phase).toBe('convertis'); // l'écran des ennemis convertis, avant le récit
     expect(sauvegardes).toEqual([1]);
-    while (p.phase === 'convertis' || p.phase === 'bilan' || p.phase === 'carte') p.suivant();
+    entreDeuxNiveaux(p);
     expect(p.phase).toBe('histoire');
     expect(p.niveau).toBe(1);
   });
@@ -240,7 +250,7 @@ describe('la partie', () => {
       // les héros se trouvent loin, comme à la fin d'un niveau long
       for (const j of p.joueurs) if (j) Object.assign(j.corps, { x: 190 * TUILE, y: 5 * TUILE });
       p.termineNiveau();
-      while (p.phase === 'convertis' || p.phase === 'bilan' || p.phase === 'carte') p.suivant();
+      entreDeuxNiveaux(p);
       expect(p.niveau).toBe(n);
       for (const j of p.joueurs) {
         if (!j) continue;
@@ -308,6 +318,10 @@ describe('la partie', () => {
     const p = nouvelle();
     p.termineNiveau();
     while (p.phase === 'convertis' || p.phase === 'bilan') p.suivant();
+    // après le garage, le concours de drift du pré du Clos ; puis la route
+    expect(p.phase).toBe('drift');
+    p.drift!.fini = true;
+    p.avance();
     expect(p.phase).toBe('carte');
     expect(p.niveau).toBe(0);
     avance(p, DUREE_CARTE + 1);

@@ -7,8 +7,9 @@ import { Clavier, commandesManette } from './entrees/clavier';
 import { Tactile } from './entrees/tactile';
 import { iconeDeLArme } from './ui/icones-hud';
 import { C } from './jeu/commandes';
+import { nouveauConcours } from './jeu/drift-partie';
 import { Partie } from './jeu/partie';
-import { charge, enregistre, type Progression, type Sauvegarde } from './jeu/sauvegarde';
+import { charge, enregistre, retiensRecordDrift, type Progression, type Sauvegarde } from './jeu/sauvegarde';
 import type { EtatVue, Evenement } from './jeu/vue';
 import { NIVEAUX } from './niveaux';
 import type { AnnonceDkk } from './reseau/annonce';
@@ -24,9 +25,12 @@ import { Bulles, Histoire } from './ui/dialogues';
 import { Hud } from './ui/hud';
 import { afficheNouvelleVersion } from './ui/maj';
 import { Menus, type Actions } from './ui/menus';
+import { pleinEcran } from './ui/plein-ecran';
 import { verifieVersion } from './version';
 
 const PAS_MS = 1000 / 60;
+/** Les phases où SAUT et TIR servent au jeu (le concours de drift passe ses écrans lui-même) : ils ne tournent pas les pages. */
+const EN_ACTION: ReadonlySet<string> = new Set(['jeu', 'drift']);
 const $ = (id: string) => document.getElementById(id)!;
 
 /**
@@ -87,7 +91,7 @@ export class App implements Actions {
     window.addEventListener('orientationchange', recalibre);
     window.visualViewport?.addEventListener('resize', recalibre);
     window.addEventListener('keydown', (e) => {
-      if (e.code === 'Enter' && this.derniereVue && this.derniereVue.phase !== 'jeu') this.suivant();
+      if (e.code === 'Enter' && this.derniereVue && !EN_ACTION.has(this.derniereVue.phase)) this.suivant();
     });
     document.addEventListener('visibilitychange', () => {
       // en arrière-plan : plus de son (téléphone : écran verrouillé, autre appli) ; au retour, il reprend
@@ -154,6 +158,13 @@ export class App implements Actions {
     this.entreEnJeu();
   }
 
+  lanceMiniJeu(): void {
+    this.arreteTout();
+    this.membreVu = null;
+    this.partie = nouveauConcours(this.sauvegarde.membre);
+    this.entreEnJeu();
+  }
+
   async rejoins(r: Recherche, a: Annonce<AnnonceDkk>, pseudo: string, membre: number): Promise<void> {
     const c = await Client.rejoins(r, a, pseudo, membre);
     this.arreteTout();
@@ -217,14 +228,7 @@ export class App implements Actions {
     $('bouton-pause').hidden = false;
     this.tactile.montre(matchMedia('(pointer: coarse)').matches);
     // en plein écran et en paysage sur téléphone, si le navigateur le permet
-    if (matchMedia('(pointer: coarse)').matches && !document.fullscreenElement) {
-      void document.documentElement
-        .requestFullscreen?.()
-        .then(() =>
-          (screen.orientation as unknown as { lock?: (o: string) => Promise<void> }).lock?.('landscape'),
-        )
-        .catch(() => {});
-    }
+    if (matchMedia('(pointer: coarse)').matches) pleinEcran();
   }
 
   private arreteTout(): void {
@@ -255,7 +259,8 @@ export class App implements Actions {
     const bits = this.commandes();
     const appui = bits & ~this.bitsAvant;
     this.bitsAvant = bits;
-    if (this.derniereVue && this.derniereVue.phase !== 'jeu' && appui & (C.SAUT | C.TIR)) this.suivant();
+    if (this.derniereVue && !EN_ACTION.has(this.derniereVue.phase) && appui & (C.SAUT | C.TIR))
+      this.suivant();
 
     if (this.partie) {
       const solo = !this.multijoueur;
@@ -334,6 +339,9 @@ export class App implements Actions {
       noms[0] = this.sauvegarde.pseudo || 'DKK';
       for (const d of this.hote.distants.values()) noms[d.siege] = d.nom;
     }
+    // pendant le concours de drift, le chrono et le score sont dans le canvas : pas de HUD des héros
+    $('hud').hidden = v.phase === 'drift';
+    if (v.drift && retiensRecordDrift(this.sauvegarde, v.drift.scores)) this.enregistre();
     this.hud.maj(v, siege, noms);
     const moi = v.joueurs[siege];
     this.tactile.arme(moi?.present && moi.arme ? iconeDeLArme(moi.arme, 34) : null, moi?.munitions ?? 0);

@@ -141,9 +141,47 @@ export interface JoueurVue {
 }
 
 /** `carte` : entre deux niveaux, le van roule sur la carte du monde (`page` compte alors les ticks du trajet). */
-export type Phase = 'histoire' | 'jeu' | 'convertis' | 'bilan' | 'fin' | 'perdu' | 'carte';
+export type Phase = 'histoire' | 'jeu' | 'convertis' | 'bilan' | 'fin' | 'perdu' | 'carte' | 'drift';
 
-export const PHASES: readonly Phase[] = ['histoire', 'jeu', 'bilan', 'fin', 'perdu', 'carte', 'convertis'];
+export const PHASES: readonly Phase[] = [
+  'histoire',
+  'jeu',
+  'bilan',
+  'fin',
+  'perdu',
+  'carte',
+  'convertis',
+  'drift',
+];
+
+/** Les étapes du concours de drift (`VueDrift.etape`) : le choix du pilote, le compte à rebours, la minute, le score, le podium. */
+export const ETAPES_DRIFT = ['choix', 'compte', 'course', 'resultat', 'podium'] as const;
+export type EtapeDrift = (typeof ETAPES_DRIFT)[number];
+
+/** Le concours de drift du pré du Clos, tel qu'on le voit (voir jeu/drift.ts). */
+export interface VueDrift {
+  etape: EtapeDrift;
+  /** le siège du joueur qui conduit (ou qui choisit son pilote) */
+  siege: number;
+  /** son pilote : 0 Tom (la Renault 11), 1 Matt (l'Opel Corsa) */
+  pilote: number;
+  /** le numéro du tour : il change à chaque nouvelle minute (le rendu repart alors d'une pelouse neuve) */
+  manche: number;
+  /** lancé depuis le menu des mini-jeux (on rejoue) plutôt que dans l'histoire (on repart en tournée) */
+  miniJeu: boolean;
+  /** les ticks qui restent à l'étape (compte à rebours, minute de course, écran du score) */
+  minuteur: number;
+  /** la voiture : son centre en mètres, son cap en radians, sa vitesse en m/s, ce que ses roues font à la pelouse (0 à 3) */
+  x: number;
+  y: number;
+  cap: number;
+  vitesse: number;
+  griffe: number;
+  /** la part du pré saccagée pendant ce tour, de 0 à 100 */
+  pourcent: number;
+  /** le score de chaque siège (pilote et pourcentage), ou null s'il n'a pas encore conduit */
+  scores: ({ pilote: number; pourcent: number } | null)[];
+}
 
 /**
  * Les ennemis qu'on décompte dans l'écran des « convertis au rock » (fin de niveau) : l'ordre des compteurs de `EtatVue.convertis`.
@@ -197,6 +235,8 @@ export interface EtatVue {
   navire: number;
   joueurs: JoueurVue[];
   entites: EntiteVue[];
+  /** le concours de drift, pendant la phase `drift` */
+  drift?: VueDrift;
 }
 
 /** Ce qui se passe une fois (son, explosion, texte flottant, dialogue) : envoyé de façon fiable. */

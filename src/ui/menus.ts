@@ -3,6 +3,7 @@ import { HEROS } from '../entites/heros';
 import type { Progression, Sauvegarde } from '../jeu/sauvegarde';
 import { NIVEAUX } from '../niveaux';
 import { ARCS, niveauOuvert } from '../niveaux/arcs';
+import { DRIFT_APRES } from '../jeu/drift';
 import type { AnnonceDkk } from '../reseau/annonce';
 import { Recherche } from '../reseau/client';
 import type { Hote } from '../reseau/hote';
@@ -18,6 +19,8 @@ export interface Actions {
   readonly sauvegarde: Sauvegarde;
   enregistre(): void;
   lance(niveau: number, membre: number, reprise: Progression | null): void;
+  /** lance le concours de drift du pré du Clos, hors de l'histoire (on rejoue au podium) */
+  lanceMiniJeu(): void;
   rejoins(r: Recherche, a: Annonce<AnnonceDkk>, pseudo: string, membre: number): Promise<void>;
   reprend(): void;
   /** refait le niveau en cours (hôte seulement) : du départ, ou du dernier drapeau */
@@ -66,6 +69,7 @@ export class Menus {
     boutons.append(
       bouton('Continuer', () => this.carte(), 'principal'),
       bouton('Rejoindre des amis', () => this.rejoindre()),
+      bouton('Mini-jeux', () => this.miniJeux()),
       bouton('Options', () => this.options()),
     );
     if (peutInstaller())
@@ -96,6 +100,26 @@ export class Menus {
       depart,
       (n) => this.lanceNiveau(n, s.enCours?.niveau === n ? s.enCours : null),
       () => this.titre(),
+    );
+  }
+
+  /** Les mini-jeux croisés en chemin, à rejouer : chacun s'ouvre quand on l'a rencontré dans l'histoire. */
+  miniJeux(): void {
+    const s = this.a.sauvegarde;
+    const drift = s.faits.includes(DRIFT_APRES);
+    const record = `Record du pré : ${s.recordDrift.toFixed(1).replace('.', ',')} % de pelouse saccagée.`;
+    this.montre(
+      el('h2', 'Mini-jeux'),
+      el(
+        'p',
+        'Les mini-jeux croisés en chemin, à rejouer seul ou à plusieurs (Pause → Inviter des amis).',
+        'aide',
+      ),
+      drift
+        ? bouton('Concours de drift — le pré du Clos', () => this.a.lanceMiniJeu(), 'principal')
+        : el('p', 'Concours de drift : se débloque après le Garage.', 'aide'),
+      drift && s.recordDrift > 0 ? el('p', record, 'aide') : el('span'),
+      bouton('Retour', () => this.titre()),
     );
   }
 

@@ -78,6 +78,22 @@ spécial, Échap pause ; manette standard.
 - **Échelons et pitons :** les échelles gardent un barreau sur deux (et leur sommet) incassable, les plateformes
   « pitons » sont scellées : on peut tout détruire autour sans se couper la route.
 
+## Les mini-jeux
+
+Entre certains niveaux, l'histoire fait une pause pour un mini-jeu ; une fois rencontré, il se rejoue depuis le menu
+**Mini-jeux** de l'écran titre (seul, ou à plusieurs : Pause → Inviter des amis).
+
+**Le concours de drift du pré du Clos** (après le Garage, avant de partir pour de bon) : vue de derrière la voiture, chaque
+joueur choisit son pilote — **Tom** et sa Renault 11, ou **Matt** et son Opel Corsa — et a **une minute** pour saccager le
+plus de pelouse possible. Gaz : HAUT ou SAUT ; frein et marche arrière : BAS ; volant : GAUCHE / DROITE ; frein à main :
+TIR. Les roues qui glissent arrachent l'herbe, puis la terre, puis font de la boue ; le score est la part du pré qui n'est
+plus de la pelouse. À plusieurs, chacun conduit à son tour, puis le podium ; le record reste dans la sauvegarde.
+
+Côté code : la simulation est dans `src/jeu/drift*.ts` (la pelouse, la voiture, le concours, la phase `drift` de la
+Partie), le rendu en vue arrière (sol projeté comme en « mode 7 », panorama à 360°, voitures, écrans) dans
+`src/rendu/drift*.ts` ; les sprites des voitures sortent de `outils/fixe-voitures.py` (sources dans
+`assets-sources/drift/`).
+
 ## À plusieurs
 
 Grâce à [lan-kit](https://github.com/piascwal/lan-kit) (figé sur `v0.2.0`), **sans serveur** :

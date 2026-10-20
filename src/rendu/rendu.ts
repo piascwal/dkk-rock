@@ -21,6 +21,7 @@ import { RockersRestes } from './rockers-convertis';
 import { THEMES, type Theme } from './themes';
 import { TraitsPersos } from './traits-persos';
 import { RenduNavire } from './navire';
+import { RenduDrift } from './drift';
 import { CABRE, flammeReacteur, TUYERE } from './reacteur';
 import { geometrieNavire } from '../niveaux/navire';
 
@@ -39,6 +40,8 @@ export class Rendu {
   private readonly restes = new RockersRestes();
   private readonly braises = new Braises();
   private readonly traits = new TraitsPersos();
+  /** le concours de drift du pré du Clos (phase `drift`) */
+  private readonly drift = new RenduDrift();
   /** largeur de la vue en pixels du jeu (la hauteur est fixe, la largeur suit la forme de l'écran) */
   largeur = 480;
   theme: Theme = THEMES.garage;
@@ -184,6 +187,10 @@ export class Rendu {
       ctx.scale(k, k);
       dessineCarteMonde(ctx, Math.round(this.largeur / k), vue.niveau, vue.page, this.tick);
       ctx.restore();
+      return;
+    }
+    if (vue.phase === 'drift' && vue.drift) {
+      this.drift.dessine(ctx, vue.drift, this.largeur, this.tick);
       return;
     }
     this.prepareNiveau(vue.niveau);

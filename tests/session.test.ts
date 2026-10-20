@@ -105,8 +105,13 @@ describe('une session à plusieurs', () => {
     await pas(partie, hote, 2);
     expect(client.carte.get(20, 18)).toBe(T.VIDE);
     partie.termineNiveau();
-    while (partie.phase === 'convertis' || partie.phase === 'bilan' || partie.phase === 'carte')
-      partie.suivant();
+    while (['convertis', 'bilan', 'carte', 'drift'].includes(partie.phase)) {
+      // après le garage, le concours de drift : on le termine d'office
+      if (partie.phase === 'drift') {
+        partie.drift!.fini = true;
+        partie.avance();
+      } else partie.suivant();
+    }
     await pas(partie, hote, 2);
     expect(client.niveau).toBe(1);
     expect(client.carte.largeur).toBe(partie.carte.largeur);
