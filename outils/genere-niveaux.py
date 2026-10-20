@@ -391,8 +391,9 @@ def arene_du_yeti(r):
     n.repere(x0 + 14, '+', surface=True)
     n.repere(x0 + 50, '+', surface=True)
     n.rect(n.w - 9, 0, n.w - 7, n.h, '|')  # la barrière : le van reste bloqué tant que le Yéti n'est pas battu
-    n.rect(x0 + 8, n.base - 9, x0 + 22, n.base - 8, 'G')
-    n.rect(x0 + 38, n.base - 9, x0 + 52, n.base - 8, 'G')
+    # deux estrades, à deux tuiles du sol (le saut en monte trois)
+    n.rect(x0 + 8, n.base - 2, x0 + 22, n.base - 1, 'G')
+    n.rect(x0 + 38, n.base - 2, x0 + 52, n.base - 1, 'G')
     n.repere(n.w - 5, 'F', surface=True)
 
 
@@ -432,10 +433,10 @@ def arene_du_dj(r):
     n.rect(x0 + 28, n.base, x0 + 45, n.base + 4, 'X')  # le sol de la scène, incassable
     n.repere(x0 + 36, 'Z', surface=True)
     for a, b, y, butin in (
-        (x0 + 6, x0 + 16, n.base - 5, True),
-        (x0 + 20, x0 + 27, n.base - 4, False),
-        (x0 + 47, x0 + 54, n.base - 4, False),
-        (x0 + 58, x0 + 64, n.base - 5, True),
+        (x0 + 6, x0 + 16, n.base - 2, True),
+        (x0 + 20, x0 + 27, n.base - 2, False),
+        (x0 + 47, x0 + 54, n.base - 2, False),
+        (x0 + 58, x0 + 64, n.base - 2, True),
     ):
         for x in range(a, b):
             n.set(x, y, '=')
