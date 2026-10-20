@@ -8,11 +8,15 @@ hasard ; ce dont on n'a pas encore le sprite est un carré d'attente (voir decor
 - `halfpipe_bois` : le Freestyle Park de bois : un deck où l'on monte par une échelle, la descente en courbe, le plat, la
   remontée, l'autre deck.
 - `spine` : le mini spine de bois, deux courbes dos à dos.
-- `scene_breaking` : l'estrade noire du breaking, son portique, ses enceintes, les b-boys (k).
-- `flat_bmx` : la piste de flat, sol noir lisse entre deux barrières, les pros du BMX.
+- `scene_breaking` : l'estrade noire du breaking (le BREAK), son portique, ses enceintes et ses danseurs ennemis (k).
+- `jury_plat` : la plateforme continue entre le breaking et le flat, avec la table du jury du breakdance.
+- `scene_dance` : la même estrade, pour la danse (le DANCE), avec ses propres danseurs.
+- `flat_bmx` : la piste de flat, sol noir lisse, son panneau FLAT, les pros du BMX.
 - `village` : les stands des marques (BMX, skate, trottinette, buvette, fringues) et des pissotières.
 - `gradins` : une tribune qu'on gravit marche après marche ; une salle dessous (cage ou butin).
 - `bigair` : la tour du big air, le bac à mousse au pied, la tyrolienne jusqu'à la piste d'arrivée.
+
+Tout module surélevé a une échelle au départ (`_echelle`) : on ne grimpe pas une rampe ou une estrade autrement.
 """
 import math
 
@@ -37,6 +41,12 @@ def _colonne(n, x, h, mat, dessus=None):
         n.set(x, n.base - 1 - k, dessus if (dessus and k == h - 1) else mat)
 
 
+def _echelle(n, x, haut):
+    """Une échelle de `haut` tuiles, posée sur la colonne libre x, au pied du module : on monte jusqu'à son plateau."""
+    for k in range(1, haut + 1):
+        n.set(x, n.base - k, 'H')
+
+
 def _courbe(haut, longueur):
     """Les hauteurs d'une courbe de rampe qui descend de `haut` à 0 sur `longueur` colonnes (un quart de cercle)."""
     return [round(haut * (1 - math.sin(math.pi / 2 * (i + 1) / longueur))) for i in range(longueur)]
@@ -55,6 +65,7 @@ def parc_street(n, x0, largeur, lettres='sot'):
     qui monte à un plateau rose et retombe d'un mur à pic."""
     for x in range(x0, x0 + largeur):
         n.set(x, n.base, PARC)
+    _echelle(n, x0 + 1, 3)  # l'échelle du box jump
     x = x0 + 2
     for h in (1, 2, 3):  # le box jump
         _colonne(n, x, h, PARC)
@@ -72,6 +83,7 @@ def parc_street(n, x0, largeur, lettres='sot'):
         x += 1
     x += 3
     n.ennemis(x - 3, x, lettres, 1)
+    _echelle(n, x - 2, 5)  # l'échelle du quarter
     for h in (1, 2, 3, 4, 5):  # le quarter et son plateau, puis le mur
         _colonne(n, x, h, PARC)
         x += 1
@@ -126,6 +138,7 @@ def halfpipe_bois(n, x0, largeur, haut=5, lettres='sotx'):
     for _ in range(deck):
         _colonne(n, x, haut, RAMPE)
         x += 1
+    _echelle(n, x, haut)  # l'échelle du deck de droite
     n.ennemis(x0 + 2, x0 + 2 + deck, lettres, 1, ymin=n.base - haut - 3)
     n.ennemis(x - deck, x, lettres, 1, ymin=n.base - haut - 3)
     n.repere(x - 2, '*', ymin=n.base - haut - 3)
@@ -135,6 +148,7 @@ def spine(n, x0, largeur, haut=3, lettres='so'):
     """Le mini spine de bois : une courbe qui monte, l'arête (des pitons : on ne la casse pas), une courbe qui redescend."""
     courbe = list(reversed(_courbe(haut, haut + 1)))
     x = x0 + (largeur - 2 * len(courbe) - 2) // 2
+    _echelle(n, x - 1, haut)  # l'échelle du spine
     for h in courbe + [haut, haut] + list(reversed(courbe)):
         if h:
             _colonne(n, x, h, RAMPE, '=' if h == haut else None)
@@ -142,25 +156,45 @@ def spine(n, x0, largeur, haut=3, lettres='so'):
     n.ennemis(x0, x0 + largeur, lettres, 1)
 
 
-def scene_breaking(n, x0, largeur, lettres='k'):
-    """L'estrade noire du breaking : une marche de chaque côté, le portique au fond, deux enceintes, les danseurs ennemis dessus."""
+def _estrade(n, x0, largeur, lettres, portique, texte):
+    """Une estrade noire, une marche de chaque côté, une échelle à gauche, le portique au centre (`texte` : sa bannière), deux
+    enceintes, et des danseurs ennemis dessus (un tous les dix tuiles)."""
     a, b = x0 + 3, x0 + largeur - 3
     for x in range(a, b):
         h = 1 if x in (a, b - 1) else 2
         _colonne(n, x, h, PARC)
+    _echelle(n, a - 1, 2)
     top = n.base - 2
-    _pose(n, (a + b) // 2, 'portiqueBreak', top)
+    _pose(n, (a + b) // 2, portique, top)
     _pose(n, a + 3, 'enceinte34', top)
     _pose(n, b - 4, 'enceinte34', top)
-    n.ennemis(a + 2, b - 2, lettres, 3, ymin=top - 3)
+    n.ennemis(a + 2, b - 2, lettres, max(3, largeur // 10), ymin=top - 3)
+
+
+def scene_breaking(n, x0, largeur, lettres='k'):
+    """La scène de breaking, au bord du Lez : le BREAK."""
+    _estrade(n, x0, largeur, lettres, 'portiqueBreak', 'BREAK')
+
+
+def scene_dance(n, x0, largeur, lettres='k'):
+    """La scène de danse : la même estrade, le DANCE, pour la suite du spectacle (après le breaking)."""
+    _estrade(n, x0, largeur, lettres, 'portiqueDance', 'DANCE')
+
+
+def jury_plat(n, x0, largeur, lettres='k'):
+    """La plateforme continue entre le breaking et le flat : le sol noir, la table du jury au milieu, quelques danseurs."""
+    for x in range(x0 + 1, x0 + largeur - 1):
+        n.set(x, n.base, PARC)
+    _pose(n, x0 + largeur // 2, 'juryBreak')
+    n.ennemis(x0 + 2, x0 + largeur - 2, lettres, 1)
 
 
 def flat_bmx(n, x0, largeur, lettres='px'):
-    """La piste de flat : un sol noir lisse, une barrière à chaque bout, les pros du BMX qui y tournent."""
+    """La piste de flat : un sol noir lisse, une barrière à chaque bout, le panneau FLAT au milieu, les pros du BMX qui y tournent."""
     for x in range(x0 + 1, x0 + largeur - 1):
         n.set(x, n.base, PARC)
     _pose(n, x0 + 2, 'barriere')
-    _pose(n, x0 + largeur // 2, 'barriere')
+    _pose(n, x0 + largeur // 2, 'portiqueFlat')
     _pose(n, x0 + largeur - 3, 'barriere')
     n.ennemis(x0 + 3, x0 + largeur - 3, lettres, 3)
 
@@ -184,6 +218,7 @@ def gradins(n, x0, largeur, haut=6, lettres='a', cage=False, butin='+', mat=None
     salle de trois tuiles de haut, ouverte par une porte dans le dos de la tribune."""
     mat = mat or n.t['mur']
     base = n.base
+    _echelle(n, x0, haut)  # l'échelle de la tribune
     xd = x0 + 1 + 2 * haut + 4  # le dos de la tribune (exclu)
     for x in range(x0 + 1, xd):
         h = min(haut, (x - x0 - 1) // 2 + 1)

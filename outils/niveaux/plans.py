@@ -264,9 +264,12 @@ NIVEAUX = {
             ('food_court', 44, dict(lettres='fs', digit='2')),  # l'ombre des platanes, les food trucks, les pissotières
             ('halfpipe_bois', 36, dict(haut=5, lettres='sotx', digit='3')),  # le Freestyle Park de bois
             ('spine', 18, dict(haut=3, lettres='so')),
-            ('scene_breaking', 30, dict(lettres='k', digit='4')),  # la scène de breaking, au bord du Lez
-            ('flat_bmx', 28, dict(lettres='px', digit='5')),  # le flat BMX
+            ('scene_breaking', 60, dict(lettres='k', digit='4')),  # la scène de breaking, au bord du Lez
+            ('jury_plat', 28, dict(lettres='k')),  # la plateforme continue, le jury du breakdance
+            ('flat_bmx', 40, dict(lettres='px', digit='5')),  # le flat BMX, son panneau FLAT
+            ('scene_dance', 60, dict(lettres='k')),  # la scène de danse, après le flat
             ('gradins', 26, dict(haut=6, lettres='sotx', cage=True, mat='M')),  # les tribunes du parc
+            ('parc_street', 48, dict(lettres='sot')),  # un second grand parc, pour les figures
             ('bigair', 30, dict(lettres='sotxp', digit='6')),  # le big air
             ('village', 56, dict(lettres='fs', digit='7')),  # le village des marques, devant l'Arbre Blanc
             ('halfpipe_bois', 40, dict(haut=6, lettres='sotxp')),
