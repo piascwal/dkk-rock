@@ -219,6 +219,7 @@ export const ACCESSOIRES_SUPPLEMENTAIRES = {
   danseurFise: carre('#c8322a', 23, 36),
   bboyAccroupi: carre('#c8322a', 17, 20),
   danseuseCasquette: carre('#c8322a', 11, 22),
+  danseurVeste: carre('#2f8f4a', 12, 22),
   archeFise: carre('#ff4f6d', 80, 46),
   platane,
   platane2: platane,

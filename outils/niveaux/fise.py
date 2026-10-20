@@ -86,6 +86,15 @@ def _plateformes(n, x0, x1, piso, lettres, evite=()):
         k += 1
 
 
+def _foule(n, x0, x1, y=None, pas=6):
+    """Du monde de décor, tous les `pas` tuiles de x0 à x1 : les quatre personnages à tour de rôle, là où la place est libre."""
+    noms = ['danseurVeste', 'danseurFise', 'bboyAccroupi', 'danseuseCasquette']
+    for k, x in enumerate(range(x0, x1, pas)):
+        for d in (0, 1, -1, 2, -2):
+            if _pose(n, x + d, noms[k % 4], y, ecart=4):
+                break
+
+
 def _courbe(haut, longueur):
     """Les hauteurs d'une courbe de rampe qui descend de `haut` à 0 sur `longueur` colonnes (un quart de cercle)."""
     return [round(haut * (1 - math.sin(math.pi / 2 * (i + 1) / longueur))) for i in range(longueur)]
@@ -211,6 +220,7 @@ def breakdance(n, x0, largeur, lettres='k'):
     _pose(n, c + 3 + (b - c) // 4, 'danseurFise', top)
     _pose(n, a + 1 + 3 * (c - a) // 4, 'bboyAccroupi', top)  # un b-boy accroupi et une danseuse, du décor aussi
     _pose(n, c + 3 + 3 * (b - c) // 4, 'danseuseCasquette', top)
+    _foule(n, a + 2, b - 2, top)
     n.ennemis(a + 2, b - 2, lettres, max(4, largeur // 10), ymin=top - 3)
     evite = [x for _, x, y in n.decors if y == top]
     _plateformes(n, a + 4, b - 4, top, lettres, evite)
@@ -227,6 +237,7 @@ def flat_bmx(n, x0, largeur, lettres='px'):
     n.ennemis(x0 + 3, x0 + largeur - 3, lettres, 3)
     _pose(n, x0 + 9, 'bboyAccroupi')  # des spectateurs du flat : du décor, pas des ennemis
     _pose(n, x0 + largeur - 10, 'danseuseCasquette')
+    _foule(n, x0 + 5, x0 + largeur - 5)
     evite = [x for _, x, y in n.decors if y == n.base and x0 <= x < x0 + largeur]
     _plateformes(n, x0 + 4, x0 + largeur - 4, n.base, lettres, evite)
     _caissons(n, [x for x in range(x0 + 5, x0 + largeur - 5, 6) if all(abs(x - e) > 4 for e in evite)], n.base)

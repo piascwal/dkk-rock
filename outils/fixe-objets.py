@@ -108,6 +108,7 @@ OBJETS = {
     # deux autres personnages de décor, pour le breakdance et le flat : un b-boy accroupi, une danseuse en casquette
     'bboyAccroupi': (['decor/fise/bboy-accroupi-base.png'], None, 17),
     'danseuseCasquette': (['decor/fise/danseuse-casquette-base.png'], None, 11),
+    'danseurVeste': (['decor/fise/danseur-veste-base.png'], None, 12),  # un danseur en veste verte, du décor
     # lot 25-26 : les quatre food trucks du FISE (DUKE, ROUGAIL, CROQUE, GLACE) et les toilettes de chantier (rouge : la pissotière ;
     # grise : les toilettes) ; même largeur en jeu pour les quatre trucks
     'foodDuke': (['decor/fise/food-duke-base.png'], None, 46),
