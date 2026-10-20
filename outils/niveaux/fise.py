@@ -8,9 +8,7 @@ hasard ; ce dont on n'a pas encore le sprite est un carré d'attente (voir decor
 - `halfpipe_bois` : le Freestyle Park de bois : un deck où l'on monte par une échelle, la descente en courbe, le plat, la
   remontée, l'autre deck.
 - `spine` : le mini spine de bois, deux courbes dos à dos.
-- `scene_breaking` : l'estrade noire du breaking (le BREAK), son portique, ses enceintes et ses danseurs ennemis (k).
-- `jury_plat` : la plateforme continue entre le breaking et le flat, avec la table du jury du breakdance.
-- `scene_dance` : la même estrade, pour la danse (le DANCE), avec ses propres danseurs.
+- `breakdance` : une seule plateforme : le BREAK, le jury au centre, le DANCE ; ses danseurs ennemis (k).
 - `flat_bmx` : la piste de flat, sol noir lisse, son panneau FLAT, les pros du BMX.
 - `village` : les stands des marques (BMX, skate, trottinette, buvette, fringues) et des pissotières.
 - `gradins` : une tribune qu'on gravit marche après marche ; une salle dessous (cage ou butin).
@@ -83,7 +81,7 @@ def parc_street(n, x0, largeur, lettres='sot'):
         x += 1
     x += 3
     n.ennemis(x - 3, x, lettres, 1)
-    _echelle(n, x - 2, 5)  # l'échelle du quarter
+    _echelle(n, x - 1, 5)  # l'échelle du quarter, collée à la rampe
     for h in (1, 2, 3, 4, 5):  # le quarter et son plateau, puis le mur
         _colonne(n, x, h, PARC)
         x += 1
@@ -156,38 +154,23 @@ def spine(n, x0, largeur, haut=3, lettres='so'):
     n.ennemis(x0, x0 + largeur, lettres, 1)
 
 
-def _estrade(n, x0, largeur, lettres, portique, texte):
-    """Une estrade noire, une marche de chaque côté, une échelle à gauche, le portique au centre (`texte` : sa bannière), deux
-    enceintes, et des danseurs ennemis dessus (un tous les dix tuiles)."""
+def breakdance(n, x0, largeur, lettres='k'):
+    """La plateforme du breakdance, une seule estrade noire d'un bout à l'autre : le portique BREAK à gauche, le jury au centre,
+    le portique DANCE à droite ; une échelle au pied de la paroi gauche ; des danseurs de décor entre les portiques, et les
+    danseurs ennemis (un tous les dix tuiles) sur toute la longueur."""
     a, b = x0 + 3, x0 + largeur - 3
     for x in range(a, b):
         h = 1 if x in (a, b - 1) else 2
         _colonne(n, x, h, PARC)
-    _echelle(n, a - 1, 2)
+    _echelle(n, a - 1, 2)  # l'échelle, collée à la paroi
     top = n.base - 2
-    _pose(n, (a + b) // 2, portique, top)
-    _pose(n, a + 3, 'enceinte34', top)
-    _pose(n, b - 4, 'enceinte34', top)
-    _pose(n, a + 7, 'danseurFise', top)  # un danseur de décor, sur l'estrade (pas un ennemi)
-    n.ennemis(a + 2, b - 2, lettres, max(3, largeur // 10), ymin=top - 3)
-
-
-def scene_breaking(n, x0, largeur, lettres='k'):
-    """La scène de breaking, au bord du Lez : le BREAK."""
-    _estrade(n, x0, largeur, lettres, 'portiqueBreak', 'BREAK')
-
-
-def scene_dance(n, x0, largeur, lettres='k'):
-    """La scène de danse : la même estrade, le DANCE, pour la suite du spectacle (après le breaking)."""
-    _estrade(n, x0, largeur, lettres, 'portiqueDance', 'DANCE')
-
-
-def jury_plat(n, x0, largeur, lettres='k'):
-    """La plateforme continue entre le breaking et le flat : le sol noir, la table du jury au milieu, quelques danseurs."""
-    for x in range(x0 + 1, x0 + largeur - 1):
-        n.set(x, n.base, PARC)
-    _pose(n, x0 + largeur // 2, 'juryBreak')
-    n.ennemis(x0 + 2, x0 + largeur - 2, lettres, 1)
+    c = (a + b) // 2
+    _pose(n, a + (c - a) // 2, 'portiqueBreak', top)
+    _pose(n, c, 'juryBreak', top)
+    _pose(n, c + (b - c) // 2, 'portiqueDance', top)
+    _pose(n, a + 1 + (c - a) // 4, 'danseurFise', top)  # des danseurs de décor, entre les portiques et le jury
+    _pose(n, c + 3 + (b - c) // 4, 'danseurFise', top)
+    n.ennemis(a + 2, b - 2, lettres, max(4, largeur // 10), ymin=top - 3)
 
 
 def flat_bmx(n, x0, largeur, lettres='px'):

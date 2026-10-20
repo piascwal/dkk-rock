@@ -16,7 +16,7 @@ from peintre import Niveau
 from plans import NIVEAUX, enchaine
 from souterrain import souterrain, tonneaux_de_surface
 from ferry import ferry
-from fise import bigair, entree, flat_bmx, food_court, gradins, halfpipe_bois, jury_plat, parc_street, scene_breaking, scene_dance, spine, village
+from fise import bigair, breakdance, entree, flat_bmx, food_court, gradins, halfpipe_bois, parc_street, spine, village
 from hauteurs import corniches, descente, grotte, pont_de_singe, tours, vide_partout
 from signatures import falaise, glacier, parking, ponton, scene, toits
 from structures import forteresse, traversee
@@ -226,14 +226,8 @@ class Recette:
     def p_spine(self, x0, x1, haut=3, lettres='so'):
         spine(self.n, x0, x1 - x0, haut, lettres)
 
-    def p_scene_breaking(self, x0, x1, lettres='k'):
-        scene_breaking(self.n, x0, x1 - x0, lettres)
-
-    def p_jury_plat(self, x0, x1, lettres='k'):
-        jury_plat(self.n, x0, x1 - x0, lettres)
-
-    def p_scene_dance(self, x0, x1, lettres='k'):
-        scene_dance(self.n, x0, x1 - x0, lettres)
+    def p_breakdance(self, x0, x1, lettres='k'):
+        breakdance(self.n, x0, x1 - x0, lettres)
 
     def p_flat_bmx(self, x0, x1, lettres='px'):
         flat_bmx(self.n, x0, x1 - x0, lettres)

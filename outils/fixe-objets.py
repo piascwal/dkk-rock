@@ -104,7 +104,7 @@ OBJETS = {
     # le jury du breakdance : la table et ses trois juges (décor, posé sur la plateforme)
     'juryBreak': (['decor/fise/jury-base.png'], None, 40),
     # un danseur de décor (pas un ennemi) : il danse sur les estrades du breaking et de la danse
-    'danseurFise': (['decor/fise/danseur-decor-base.png'], None, 23),
+    'danseurFise': (['decor/fise/danseur-decor-base.png'], None, 12),
     # lot 25-26 : les quatre food trucks du FISE (DUKE, ROUGAIL, CROQUE, GLACE) et les toilettes de chantier (rouge : la pissotière ;
     # grise : les toilettes) ; même largeur en jeu pour les quatre trucks
     'foodDuke': (['decor/fise/food-duke-base.png'], None, 46),
