@@ -14,7 +14,8 @@ hasard ; ce dont on n'a pas encore le sprite est un carré d'attente (voir decor
 - `gradins` : une tribune qu'on gravit marche après marche ; une salle dessous (cage ou butin).
 - `bigair` : la tour du big air, le bac à mousse au pied, la tyrolienne jusqu'à la piste d'arrivée.
 
-Tout module surélevé a une échelle au départ (`_echelle`) : on ne grimpe pas une rampe ou une estrade autrement.
+Une échelle (`_echelle`) n'est jamais dans une rampe : toujours dehors, collée à une paroi à pic (quarter, estrade, tribune,
+deck du half-pipe). Les rampes en marches se montent à pied.
 """
 import math
 
@@ -103,7 +104,6 @@ def parc_street(n, x0, largeur, lettres='sot'):
     qui monte à un plateau rose et retombe d'un mur à pic."""
     for x in range(x0, x0 + largeur):
         n.set(x, n.base, PARC)
-    _echelle(n, x0 + 1, 3)  # l'échelle du box jump
     x = x0 + 2
     for h in (1, 2, 3):  # le box jump
         _colonne(n, x, h, PARC)
@@ -121,13 +121,13 @@ def parc_street(n, x0, largeur, lettres='sot'):
         x += 1
     x += 3
     n.ennemis(x - 3, x, lettres, 1)
-    _echelle(n, x - 1, 5)  # l'échelle du quarter, collée à la rampe
     for h in (1, 2, 3, 4, 5):  # le quarter et son plateau, puis le mur
         _colonne(n, x, h, PARC)
         x += 1
     for _ in range(4):
         _colonne(n, x, 5, PARC, PLATEAU)
         x += 1
+    _echelle(n, x, 5)  # l'échelle du quarter, dehors, collée à la paroi à pic
     n.ennemis(x - 4, x, lettres, 1, ymin=n.base - 8)
     n.ennemis(x + 1, x0 + largeur, lettres, 1)
     _pose(n, x0 + 1, 'barriere')
@@ -186,7 +186,6 @@ def spine(n, x0, largeur, haut=3, lettres='so'):
     """Le mini spine de bois : une courbe qui monte, l'arête (des pitons : on ne la casse pas), une courbe qui redescend."""
     courbe = list(reversed(_courbe(haut, haut + 1)))
     x = x0 + (largeur - 2 * len(courbe) - 2) // 2
-    _echelle(n, x - 1, haut)  # l'échelle du spine
     for h in courbe + [haut, haut] + list(reversed(courbe)):
         if h:
             _colonne(n, x, h, RAMPE, '=' if h == haut else None)
@@ -200,9 +199,9 @@ def breakdance(n, x0, largeur, lettres='k'):
     danseurs ennemis (un tous les dix tuiles) sur toute la longueur."""
     a, b = x0 + 3, x0 + largeur - 3
     for x in range(a, b):
-        h = 1 if x in (a, b - 1) else 2
-        _colonne(n, x, h, PARC)
-    _echelle(n, a - 1, 2)  # l'échelle, collée à la paroi
+        _colonne(n, x, 2, PARC)
+    _echelle(n, a - 1, 2)  # les échelles, dehors, collées aux parois à pic
+    _echelle(n, b, 2)
     top = n.base - 2
     c = (a + b) // 2
     _pose(n, a + (c - a) // 2, 'portiqueBreak', top)
@@ -252,7 +251,6 @@ def gradins(n, x0, largeur, haut=6, lettres='a', cage=False, butin='+', mat=None
     salle de trois tuiles de haut, ouverte par une porte dans le dos de la tribune."""
     mat = mat or n.t['mur']
     base = n.base
-    _echelle(n, x0, haut)  # l'échelle de la tribune
     xd = x0 + 1 + 2 * haut + 4  # le dos de la tribune (exclu)
     for x in range(x0 + 1, xd):
         h = min(haut, (x - x0 - 1) // 2 + 1)
@@ -267,7 +265,8 @@ def gradins(n, x0, largeur, haut=6, lettres='a', cage=False, butin='+', mat=None
     for k in range(haut):  # des spectateurs sur les marches
         if k % 2:
             n.ennemis(x0 + 1 + 2 * k, x0 + 3 + 2 * k, lettres, 1, ymin=base - haut - 3)
-    n.ennemis(xd, x0 + largeur, lettres, 1)
+    _echelle(n, xd, haut)  # l'échelle de la tribune, dehors, collée au dos à pic
+    n.ennemis(xd + 1, x0 + largeur, lettres, 1)
 
 
 def bigair(n, x0, largeur, lettres='a'):
@@ -286,6 +285,16 @@ def bigair(n, x0, largeur, lettres='a'):
     n.ennemis(p0 + 1, p1 - 2, lettres, 2, ymin=base)
     n.tyro(x0 + 9, ys[-1] - 1, p1 + 3, base - 2)
     n.ennemis(p1 + 2, x0 + largeur, lettres, 1)
+
+
+def densite(r, lettres='sotx'):
+    """Renforce le niveau en surface : un ennemi de plus tous les douze tuiles de chaque pièce (hors entrée et piste du Champion)."""
+    n = r.n
+    for x0, x1, g in r.pieces:
+        if g in ('entree', 'plat', 'vide'):
+            continue
+        k = 'k' if g == 'breakdance' else 'px' if g == 'flat_bmx' else lettres
+        n.ennemis(x0 + 3, x1 - 2, k, (x1 - x0) // 12)
 
 
 def soirees(r, lettres='sotx'):

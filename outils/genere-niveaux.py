@@ -16,7 +16,7 @@ from peintre import Niveau
 from plans import NIVEAUX, enchaine
 from souterrain import souterrain, tonneaux_de_surface
 from ferry import ferry
-from fise import bigair, breakdance, entree, flat_bmx, food_court, gradins, halfpipe_bois, parc_street, soirees, spine, village
+from fise import bigair, breakdance, densite, entree, flat_bmx, food_court, gradins, halfpipe_bois, parc_street, soirees, spine, village
 from hauteurs import corniches, descente, grotte, pont_de_singe, tours, vide_partout
 from signatures import falaise, glacier, parking, ponton, scene, toits
 from structures import forteresse, traversee
@@ -362,6 +362,7 @@ def fabrique(cle):
         arene_du_dj(r)
     if cle == 'fise':
         arene_du_champion(r)
+        densite(r)
         soirees(r)
     if cfg.get('interieur'):
         interieur(r.n)
