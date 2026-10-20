@@ -103,8 +103,8 @@ OBJETS = {
     'foodRougail': (['decor/fise/food-rougail-base.png'], None, 46),
     'foodCroque': (['decor/fise/food-croque-base.png'], None, 46),
     'foodGlace': (['decor/fise/food-glace-base.png'], None, 46),
-    'pissotiere': (['decor/fise/pissotiere-base.png'], None, 14),
-    'toilettes': (['decor/fise/toilettes-base.png'], None, 14),
+    'pissotiere': (['decor/fise/pissotiere-base.png'], None, 31),
+    'toilettes': (['decor/fise/toilettes-base.png'], None, 31),
     # lot 27 : les platanes du food court, en deux versions (couronne ronde ; branches étalées), alternées le long des berges
     'platane': (['decor/fise/platane-1-base.png'], None, 50),
     'platane2': (['decor/fise/platane-2-base.png'], None, 50),
