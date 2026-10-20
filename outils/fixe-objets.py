@@ -82,6 +82,8 @@ OBJETS = {
     # lot 18 : douze rockers (un par fan converti au rock), debout, que le jeu tire au sort pour remplacer l'ennemi vaincu
     'rocker': ([f'ennemis/rocker-{k}-base.png' for k in range(1, 13)], None, 13),
     'parasol': ([f'decor/parasol-{k}-base.png' for k in (1, 2, 3)], None, 28),
+    # le transat de la plage (bois et toile bleue et blanche), en sprite fourni
+    'transat': (['decor/transat-base.png'], None, 24),
     # la borne à incendie des rues (remplace le dessin en code « bouche »)
     'borne': (['decor/borne-base.png'], None, 15),
     # les pneus empilés (garage, ville) ; le bidon d'essence est une tuile (outils/fixe-tuiles.py)

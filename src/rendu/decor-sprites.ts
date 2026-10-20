@@ -33,6 +33,7 @@ export type Sprite =
   | 'rocher'
   | 'rocherNeige'
   | 'parasol'
+  | 'transat'
   | 'borne'
   | 'pneus'
   | 'fougere'
@@ -64,6 +65,7 @@ export const SPRITES: ReadonlySet<string> = new Set<Sprite>([
   'rocher',
   'rocherNeige',
   'parasol',
+  'transat',
   'borne',
   'pneus',
   'fougere',
