@@ -210,6 +210,8 @@ def breakdance(n, x0, largeur, lettres='k'):
     _pose(n, c + (b - c) // 2, 'portiqueDance', top)
     _pose(n, a + 1 + (c - a) // 4, 'danseurFise', top)  # des danseurs de décor, entre les portiques et le jury
     _pose(n, c + 3 + (b - c) // 4, 'danseurFise', top)
+    _pose(n, a + 1 + 3 * (c - a) // 4, 'bboyAccroupi', top)  # un b-boy accroupi et une danseuse, du décor aussi
+    _pose(n, c + 3 + 3 * (b - c) // 4, 'danseuseCasquette', top)
     n.ennemis(a + 2, b - 2, lettres, max(4, largeur // 10), ymin=top - 3)
     evite = [x for _, x, y in n.decors if y == top]
     _plateformes(n, a + 4, b - 4, top, lettres, evite)
@@ -224,6 +226,8 @@ def flat_bmx(n, x0, largeur, lettres='px'):
     _pose(n, x0 + largeur // 2, 'portiqueFlat')
     _pose(n, x0 + largeur - 3, 'barriere')
     n.ennemis(x0 + 3, x0 + largeur - 3, lettres, 3)
+    _pose(n, x0 + 9, 'bboyAccroupi')  # des spectateurs du flat : du décor, pas des ennemis
+    _pose(n, x0 + largeur - 10, 'danseuseCasquette')
     evite = [x for _, x, y in n.decors if y == n.base and x0 <= x < x0 + largeur]
     _plateformes(n, x0 + 4, x0 + largeur - 4, n.base, lettres, evite)
     _caissons(n, [x for x in range(x0 + 5, x0 + largeur - 5, 6) if all(abs(x - e) > 4 for e in evite)], n.base)

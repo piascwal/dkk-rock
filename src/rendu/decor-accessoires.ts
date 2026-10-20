@@ -217,6 +217,8 @@ export const ACCESSOIRES_SUPPLEMENTAIRES = {
   portiqueDance: carre('#2a2a30', 72, 44),
   juryBreak: carre('#2f6fd0', 40, 26),
   danseurFise: carre('#c8322a', 23, 36),
+  bboyAccroupi: carre('#c8322a', 17, 20),
+  danseuseCasquette: carre('#c8322a', 11, 22),
   archeFise: carre('#ff4f6d', 80, 46),
   platane,
   platane2: platane,
