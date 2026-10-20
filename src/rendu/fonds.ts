@@ -240,7 +240,6 @@ export class Fond {
       }
     });
     this.ciel.oiseaux(ctx, camFond, largeur, tick);
-    if (th.decor === 'club') this.lasers(ctx, largeur, tick);
   }
 
   private astres(ctx: CanvasRenderingContext2D, largeur: number, tick: number): void {
@@ -261,21 +260,5 @@ export class Fond {
       ctx.arc(largeur * 0.2, 50, 12, 0, Math.PI * 2);
       ctx.fill();
     }
-  }
-
-  private lasers(ctx: CanvasRenderingContext2D, largeur: number, tick: number): void {
-    ctx.globalAlpha = 0.25;
-    const couleurs = ['#ff4fd8', '#3fe0ff', '#7cfc7c'];
-    for (let i = 0; i < 6; i++) {
-      const a = Math.sin(tick / 40 + i) * 0.8 + Math.PI / 2;
-      const ox = (largeur / 6) * i + 40;
-      ctx.strokeStyle = couleurs[i % 3]!;
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(ox, 0);
-      ctx.lineTo(ox + Math.cos(a) * 400, Math.sin(a) * 400);
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
   }
 }

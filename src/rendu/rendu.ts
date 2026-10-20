@@ -13,6 +13,7 @@ import { dessineDecor, semeDecor, type CoucheDecor } from './decor';
 import { dessineTuiles, dessineTyroliennes } from './dessin-tuiles';
 import { Emojis } from './emojis';
 import { Fond } from './fonds';
+import { dessineLumieresClub } from './lumieres-club';
 import { Braises } from './flammes';
 import { dessineIndicateurs } from './indicateurs';
 import { Particules } from './particules';
@@ -241,6 +242,8 @@ export class Rendu {
     dessineTuiles(ctx, carte, this.atlas, camX, camY, this.largeur, this.tick);
     navire?.navire(ctx, camX, camY, vue.navire, this.tick);
     decore('interieur');
+    // les projecteurs du club éclairent les murs, sous les personnages
+    if (this.theme.decor === 'club') dessineLumieresClub(ctx, camX, this.largeur, this.tick);
     dessineTyroliennes(ctx, niveauLu(vue.niveau).tyroliennes, carte, camX, camY);
     this.particules.meteo(this.theme.meteo, camX, camY, this.largeur);
     this.particules.maj(carte);
