@@ -39,6 +39,10 @@ export class Ennemi implements Cible, EntiteSimulee {
   memoire = 0;
   /** délai avant un nouveau demi-tour : évite de pivoter à chaque pas contre un obstacle */
   virage = 0;
+  /** là où il rôde (x, en pixels) : un rider ne s'en éloigne pas trop au repos (voir `errance`) */
+  foyer: number;
+  /** sa rotation en figure, de 0 à 255 (un tour = 256) : 0 en roulant ; le pro du BMX tourne sur lui-même en l'air */
+  salto = 0;
   private flash = 0;
   /** ticks restants pendant lesquels sa barre de vie reste affichée après un coup */
   private barre = 0;
@@ -59,6 +63,7 @@ export class Ennemi implements Cible, EntiteSimulee {
     this.pv = def.pv;
     this.corps = nouveauCorps(x + (TUILE - def.w) / 2, y + TUILE - def.h, def.w, def.h);
     this.dir = ctx.rng.suivant() < 0.5 ? -1 : 1;
+    this.foyer = this.corps.x + def.w / 2;
   }
 
   get x(): number {
@@ -235,6 +240,10 @@ export class Ennemi implements Cible, EntiteSimulee {
    * choisir la vitesse, sur la géométrie d'ici et maintenant, et pas plus d'une fois toutes les 30 images.
    */
   patrouille(ctx: Contexte): void {
+    if (this.def.errance) {
+      this.def.errance(this, ctx);
+      return;
+    }
     const c = this.corps;
     if (this.virage > 0) this.virage--;
     const bloque = this.murDevant(ctx) || (!this.def.vole && c.auSol && !this.solDevant(ctx));
@@ -254,10 +263,16 @@ export class Ennemi implements Cible, EntiteSimulee {
     }
   }
 
-  solDevant(ctx: Contexte): boolean {
+  /** Du sol devant lui, à moins de `tuiles` tuiles sous ses pieds (un rider descend les marches d'une rampe, pas un à-pic). */
+  solDevant(ctx: Contexte, tuiles = 1): boolean {
     const px = this.dir > 0 ? this.corps.x + this.corps.w + 2 : this.corps.x - 2;
-    return ctx.carte.props(Math.floor(px / TUILE), Math.floor((this.corps.y + this.corps.h + 2) / TUILE))
-      .solide;
+    for (let k = 0; k < tuiles; k++)
+      if (
+        ctx.carte.props(Math.floor(px / TUILE), Math.floor((this.corps.y + this.corps.h + 2) / TUILE) + k)
+          .solide
+      )
+        return true;
+    return false;
   }
 
   /** Un mur plein juste devant, au niveau des pieds, du torse ou de la tête (un ennemi peut être grand). */
@@ -281,7 +296,8 @@ export class Ennemi implements Cible, EntiteSimulee {
       return;
     }
     this.dir = dx > 0 ? 1 : -1;
-    this.corps.vx = this.corps.auSol && !this.solDevant(ctx) ? 0 : this.dir * vitesse;
+    this.corps.vx =
+      this.corps.auSol && !this.solDevant(ctx, this.def.errance ? 3 : 1) ? 0 : this.dir * vitesse;
   }
 
   private contact(ctx: Contexte): void {
@@ -334,7 +350,8 @@ export class Ennemi implements Cible, EntiteSimulee {
               (this.def.vole ? this.memoire > 0 : this.recharge > 0 && this.def.cadence - this.recharge < 8)
             ? ANIM.ATTAQUE
             : e,
-      f: this.anim & 255,
+      // le pro du BMX en l'air : son angle de figure (0 : à l'endroit) ; les autres, leur compteur d'animation
+      f: this.def.figure ? (this.corps.auSol ? 0 : this.salto) : this.anim & 255,
     };
   }
 }

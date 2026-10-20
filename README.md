@@ -205,6 +205,9 @@ validé.
   (tuile `T`, 5 de dégâts) et le violet (tuile `I`, la LED violette du club : il explose plus large, 56 px au lieu de 40, mais
   fait moins mal, 3 de dégâts). Sous le food court, le flat et le village, l'envers du décor : trois _soirées_ souterraines,
   des complexes de métal façon boîte de nuit (`soirees` dans `fise.py`), qu'on atteint par une échelle.
+  Au repos, les riders rôdent dans leur module (ils montent et descendent les rampes, sautent : `roule` dans
+  `comportements-riders.ts`) ; trois assauts (`Niveau.assaut`, `src/jeu/assauts.ts`) font tomber du haut de l'écran des pros du
+  BMX en figure (`Voltigeur`), qui se posent sur leurs roues.
   **La barrière du boss** (tuile `|`, indestructible) garde le van du Yéti Alpha et du Champion : elle ne s'ouvre qu'à leur
   mort (`ouvreBarrieres` dans `jeu/chargement.ts`) ; le test d'accessibilité la compte comme ouverte.
 - **Un ennemi :** une définition dans `entites/ennemis/definitions.ts` (lettre de carte), un

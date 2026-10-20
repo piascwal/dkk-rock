@@ -8,7 +8,7 @@ import { CARTE_FORET } from './cartes/07-foret';
 import { CARTE_PORT } from './cartes/08-port';
 import { CARTE_GROIX } from './cartes/09-groix';
 import { CARTE_FERRY } from './cartes/10-ferry';
-import { CARTE_FISE, DECOR_FISE } from './cartes/11-fise';
+import { ASSAUTS_FISE, CARTE_FISE, DECOR_FISE } from './cartes/11-fise';
 import { litNiveau, type DefNiveau, type NiveauLu } from './format';
 import { GARAGE } from './textes/01-garage';
 import { ALPAGES } from './textes/02-alpages';
@@ -37,7 +37,7 @@ export const NIVEAUX: DefNiveau[] = [
   // ajouté après coup : il vient avant Groix dans son arc (voir arcs.ts), mais garde la fin de la liste pour ne pas décaler les sauvegardes
   { ...FERRY, carte: CARTE_FERRY },
   // le FISE de Montpellier, après Groix (son propre arc)
-  { ...FISE, carte: CARTE_FISE, decor: DECOR_FISE },
+  { ...FISE, carte: CARTE_FISE, decor: DECOR_FISE, assauts: ASSAUTS_FISE },
 ];
 
 const lus = new Map<number, NiveauLu>();

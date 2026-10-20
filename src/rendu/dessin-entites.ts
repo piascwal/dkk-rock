@@ -136,6 +136,13 @@ export function dessineEntite(
     ctx.rotate(VOLANTS.has(v.g) ? -0.4 : -Math.PI / 2);
   }
   if (v.aura && heros) dessineAura(ctx, performance.now());
+  // le pro du BMX en figure : `f` est son angle (un tour = 256), 0 à l'endroit ; il tourne autour du milieu de son corps
+  const salto = v.g === G.BMX_PRO && v.e === ANIM.ATTAQUE ? (v.f / 256) * 2 * Math.PI : 0;
+  if (salto) {
+    ctx.translate(0, -10);
+    ctx.rotate(salto);
+    ctx.translate(0, 10);
+  }
   const p = pinceau(ctx);
   const blanc = v.clignote && !heros && !estTir;
   const pb = blanc ? (x0: number, y0: number, w: number, h: number) => p(x0, y0, w, h, '#ffffff') : p;
@@ -189,6 +196,11 @@ export function dessineEntite(
     }
   }
   if (flashe) ctx.filter = 'none';
+  if (salto) {
+    ctx.translate(0, -10);
+    ctx.rotate(-salto);
+    ctx.translate(0, 10);
+  }
   if (v.vie && !heros) dessineBarreDeVie(p, v.g, v.vie);
   dessineBulle(ctx, v.g, performance.now());
   ctx.restore();

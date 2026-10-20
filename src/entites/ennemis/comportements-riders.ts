@@ -1,4 +1,7 @@
+import { TUILE } from '../../config';
+import type { Contexte } from '../../jeu/contexte';
 import type { Comportement } from './comportements';
+import type { Ennemi } from './ennemi';
 
 /** De combien le rider dépasse le héros avant de faire demi-tour (px), et le saut d'un obstacle. */
 const DEPASSE = 60;
@@ -43,3 +46,34 @@ export const bmxPro: Comportement = (e, ctx, cible) => {
   if (!c.auSol) return; // en l'air, il garde son élan
   rider(e, ctx, cible);
 };
+
+/** Jusqu'où un rider rôde de son point de départ (px), et la plus grande marche qu'il saute (en tuiles). */
+const RONDE = 7 * TUILE;
+const MARCHE_MAX = 3;
+
+/**
+ * Au repos, un rider roule dans son module : il monte et descend les rampes (il saute les marches, et ça lui arrive sans raison),
+ * fait demi-tour devant un à-pic, une paroi trop haute, ou quand il s'est trop éloigné de son point de départ.
+ */
+export function roule(e: Ennemi, ctx: Contexte): void {
+  const c = e.corps;
+  if (e.virage > 0) e.virage--;
+  if (c.auSol) {
+    const px = e.dir > 0 ? c.x + c.w + 4 : c.x - 4;
+    const paroi = e.murDevant(ctx);
+    const trop = ctx.carte.solideEnPixel(px, c.y + c.h - MARCHE_MAX * TUILE);
+    const vide = !e.solDevant(ctx, 3);
+    const loin = (e.cx - e.foyer) * e.dir > RONDE;
+    if (paroi && !trop && e.recharge === 0) {
+      c.vy = SAUT;
+      e.recharge = 30;
+    } else if ((paroi || vide || loin) && e.virage === 0) {
+      e.dir = -e.dir as 1 | -1;
+      e.virage = 30;
+    } else if (e.recharge === 0 && ctx.rng.suivant() < 0.012) {
+      c.vy = SAUT; // un saut pour le plaisir
+      e.recharge = 40;
+    }
+  }
+  c.vx = e.dir * e.def.vitesse * 0.7;
+}

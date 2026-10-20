@@ -13,6 +13,8 @@ import {
   yeti,
   type Comportement,
 } from './comportements';
+import type { Contexte } from '../../jeu/contexte';
+import type { Ennemi } from './ennemi';
 import { RIDERS } from './definitions-riders';
 
 export interface DefEnnemi {
@@ -33,6 +35,8 @@ export interface DefEnnemi {
   vole?: boolean;
   /** en l'air, il montre son image d'attaque (le pro du BMX en figure) */
   figure?: boolean;
+  /** au repos, il rôde à sa façon (un rider roule dans son module) au lieu de la patrouille ordinaire */
+  errance?: (e: Ennemi, ctx: Contexte) => void;
   explose?: { rayon: number; degats: number };
   /** ce qu'il crie quand il vous repère */
   cris: string[];

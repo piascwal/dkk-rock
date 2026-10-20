@@ -55,6 +55,8 @@ export interface DefNiveau {
   envol?: boolean;
   /** le décor placé à la main (nom d'accessoire, colonne, rangée du sol) : il remplace le décor semé au hasard */
   decor?: readonly (readonly [string, number, number])[];
+  /** les colonnes où un assaut de riders tombe du ciel dès qu'un héros les franchit (voir jeu/assauts.ts) */
+  assauts?: readonly number[];
   carte: string[];
 }
 

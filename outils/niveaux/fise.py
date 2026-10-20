@@ -155,6 +155,7 @@ def food_court(n, x0, largeur, lettres='f'):
         _pose(n, x + 2, ['tablePique', 'tableSkate', 'tableBmx', 'tableFamille'][k % 4])
     _pose(n, x0 + largeur - 6, 'pissotiere')
     _pose(n, x0 + largeur - 2, 'pissotiere')
+    n.assaut(x0 + 6)
     n.ennemis(x0 + 2, x0 + largeur - 2, lettres, 2)
 
 
@@ -231,6 +232,7 @@ def flat_bmx(n, x0, largeur, lettres='px'):
     """La piste de flat : un sol noir lisse, une barrière à chaque bout, le panneau FLAT au milieu, les pros du BMX qui y tournent."""
     for x in range(x0 + 1, x0 + largeur - 1):
         n.set(x, n.base, PARC)
+    n.assaut(x0 + 4)  # des pros du BMX tombent du ciel sur la piste
     _pose(n, x0 + 2, 'barriere')
     _pose(n, x0 + largeur // 2, 'portiqueFlat')
     _pose(n, x0 + largeur - 3, 'barriere')
@@ -245,6 +247,7 @@ def flat_bmx(n, x0, largeur, lettres='px'):
 
 def village(n, x0, largeur, lettres='fs'):
     """Le village des marques : les stands (BMX, skate, trottinette, buvette, fringues), et deux pissotières au bout."""
+    n.assaut(x0 + 3)
     stands = [('standBmx', 6), ('buvette', 5), ('standSkate', 6), ('standFringues', 5), ('standTrottinette', 6)]
     x = x0 + 4
     for nom, w in stands:

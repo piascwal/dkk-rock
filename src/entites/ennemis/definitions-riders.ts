@@ -1,6 +1,6 @@
 import { G } from '../../jeu/vue';
 import { marin } from './comportements';
-import { bmxPro, rider } from './comportements-riders';
+import { bmxPro, rider, roule } from './comportements-riders';
 import type { DefEnnemi } from './definitions';
 
 /**
@@ -22,6 +22,7 @@ export const RIDERS: Record<string, DefEnnemi> = {
     cadence: 0,
     points: 150,
     comportement: rider,
+    errance: roule,
     contact: 1,
     cris: ['Ollie !', 'Attention, ça glisse !', 'Tu coupes ma ligne !'],
   },
@@ -37,6 +38,7 @@ export const RIDERS: Record<string, DefEnnemi> = {
     cadence: 0,
     points: 150,
     comportement: rider,
+    errance: roule,
     contact: 1,
     cris: ['Place, place !', 'Je freine pas !', 'Huit roues, zéro frein !'],
   },
@@ -52,6 +54,7 @@ export const RIDERS: Record<string, DefEnnemi> = {
     cadence: 0,
     points: 150,
     comportement: rider,
+    errance: roule,
     contact: 1,
     cris: ['Tailwhip !', 'C’est un sport, la trottinette !', 'Bouge !'],
   },
@@ -67,6 +70,7 @@ export const RIDERS: Record<string, DefEnnemi> = {
     cadence: 0,
     points: 180,
     comportement: rider,
+    errance: roule,
     contact: 1,
     cris: ['Regarde, sans les mains !', 'Maman, filme-moi !', 'Bunny hop !'],
   },
@@ -82,6 +86,7 @@ export const RIDERS: Record<string, DefEnnemi> = {
     cadence: 0,
     points: 260,
     comportement: bmxPro,
+    errance: roule,
     contact: 1,
     figure: true,
     cris: ['No foot !', 'Barspin !', 'Je te passe au-dessus !'],

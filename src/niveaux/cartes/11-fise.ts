@@ -128,3 +128,6 @@ export const DECOR_FISE: [string, number, number][] = [
   ['lampadaireNeon', 497, 43],
   ['enceinteRose', 483, 38],
 ];
+
+/** Les colonnes qui déclenchent un assaut de riders (voir jeu/assauts.ts). */
+export const ASSAUTS_FISE: number[] = [97, 308, 471];

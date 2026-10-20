@@ -276,6 +276,11 @@ class Recette:
                 + ''.join(f"  ['{d}', {x}, {y}],\n" for d, x, y in n.decors)
                 + '];\n'
             )
+        if n.assauts:  # les assauts de riders (voir Niveau.assaut) : les colonnes qui les déclenchent
+            ts += (
+                f'\n/** Les colonnes qui déclenchent un assaut de riders (voir jeu/assauts.ts). */\n'
+                f'export const ASSAUTS_{constante.removeprefix("CARTE_")}: number[] = [{", ".join(str(x) for x in n.assauts)}];\n'
+            )
         (CARTES / nom_fichier).write_text(ts)
         apercu(lignes, nom_fichier.replace('.ts', '.png'))
 

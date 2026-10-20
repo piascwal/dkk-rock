@@ -21,6 +21,7 @@ import { pagesDe } from '../histoire/pages';
 import type { Camp, Cible, Contexte, EntiteSimulee, Tyrolienne } from './contexte';
 import { explose } from './explosions';
 import { zoneVisible } from './zone-visible';
+import { declencheAssauts } from './assauts';
 import { ouvreBarrieres, peuple, releveCarte } from './chargement';
 import { changePhase } from './phases';
 import { majTraversee, prepareTraversee, type Traversee } from './traversee';
@@ -59,6 +60,8 @@ export class Partie implements Contexte {
   secousse = 0;
   /** colonnes de dialogue déjà déclenchées */
   dejaDit = new Set<number>();
+  /** les assauts de riders déjà déclenchés (colonnes) */
+  assautsFaits = new Set<number>();
   /** explosions de caissons en attente : [tick, x, y] */
   /** les explosions de caissons en attente : (image, x, y, sorte : « rose » pour le caisson violet) */
   enAttente: [number, number, number, string?][] = [];
@@ -202,6 +205,7 @@ export class Partie implements Contexte {
     this.departDans = -1;
     this.van = null;
     this.dejaDit = new Set();
+    this.assautsFaits = new Set();
     peuple(this);
     prepareTraversee(this);
     // un nouveau niveau, ou une reprise : tout le monde repart du départ, pas de là où il était
@@ -247,6 +251,7 @@ export class Partie implements Contexte {
       if (j.mort) this.gereMort(j);
     }
     this.recalculeCibles();
+    declencheAssauts(this);
     const actifs = this.joueurs.filter((j): j is Joueur => !!j && !j.mort);
     for (const e of this.entites) {
       if (e.fini) continue;

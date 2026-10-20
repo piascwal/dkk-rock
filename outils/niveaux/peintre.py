@@ -22,6 +22,7 @@ class Niveau:
         self.haut = [base] * largeur  # la rangée du terrain de chaque colonne
         self.bas = hauteur - 6  # sous cette rangée : le vide
         self.vus = []  # (x, nature) pour les statistiques
+        self.assauts = []  # les colonnes où des riders tombent du ciel (voir `assaut`)
         self.decors = []  # le décor placé à la main (nom, x, rangée du sol) : voir `decor`
         self._terrain()
 
@@ -32,6 +33,10 @@ class Niveau:
         if y is None:
             y = next((yy for yy in range(self.h) if self.get(x, yy) in SOLIDES), self.base)
         self.decors.append((nom, x, y))
+
+    def assaut(self, x):
+        """Un assaut de riders (pros du BMX en figure, tombés du haut de l'écran) dès qu'un héros franchit la colonne x."""
+        self.assauts.append(x)
 
     def set(self, x, y, c):
         if 0 <= x < self.w and 0 <= y < self.h:
