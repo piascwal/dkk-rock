@@ -159,6 +159,24 @@ const PEINTRES: Partial<Record<number, Peintre>> = {
     px(c, 0, 15, 16, 1, '#6a6a64');
     px(c, 15, 0, 1, 16, '#6a6a64');
   },
+  // le revêtement noir mat des modules du FISE (en attendant sa planche) : une masse lisse, à peine mouchetée
+  [T.PARC]: (c, v) => {
+    px(c, 0, 0, 16, 16, '#26262b');
+    moucheture(c, v, '#2c2c31', 7, 7);
+  },
+  // le contreplaqué lisse des rampes de bois (half-pipe, spine), en attendant sa planche : des lés clairs, des vis en ligne
+  [T.RAMPE]: (c, v) => {
+    px(c, 0, 0, 16, 16, '#d8a868');
+    moucheture(c, v, '#cc9a5c', 5, 5);
+    for (const x of [2, 13]) for (const y of [3, 12]) px(c, x, y, 1, 1, '#8a6a3a');
+  },
+  // le plateau rose des modules (box jump, spine, haut des quarters) : rose sur le dessus, noir dessous
+  [T.PLATEAU]: (c, v) => {
+    px(c, 0, 0, 16, 16, '#232327');
+    px(c, 0, 0, 16, 6, '#e8607a');
+    moucheture(c, v, '#d8506a', 6, 3);
+    px(c, 0, 6, 16, 1, '#d8d8d8');
+  },
 };
 
 /** Les tuiles fournies en sprite (outils/fixe-tuiles.py), 96 × 96 : elles remplacent le dessin en code dès qu'elles sont chargées. */

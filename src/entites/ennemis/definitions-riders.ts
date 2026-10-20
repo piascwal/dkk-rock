@@ -1,11 +1,13 @@
 import { G } from '../../jeu/vue';
+import { marin } from './comportements';
 import { bmxPro, rider } from './comportements-riders';
 import type { DefEnnemi } from './definitions';
 
 /**
  * Les riders du FISE (lot 24) : ils ne tirent pas, ils foncent. Chacun prend une ligne vers le héros, le traverse en le
  * blessant, file encore un peu et revient (voir comportements-riders.ts). s skateur, o roller, t trottinette, x gamin en BMX,
- * p pro du BMX (il saute sur le héros, en figure).
+ * p pro du BMX (il saute sur le héros, en figure). Et k, le b-boy de la scène de breaking : il marche sur le héros et part en
+ * coupole (un élan court) pour le frapper.
  */
 export const RIDERS: Record<string, DefEnnemi> = {
   s: {
@@ -83,5 +85,20 @@ export const RIDERS: Record<string, DefEnnemi> = {
     contact: 1,
     figure: true,
     cris: ['No foot !', 'Barspin !', 'Je te passe au-dessus !'],
+  },
+  k: {
+    nom: 'B-boy',
+    genre: G.BREAKER,
+    pv: 3,
+    w: 10,
+    h: 20,
+    vitesse: 1,
+    vision: 150,
+    visionVerticale: 50,
+    cadence: 0,
+    points: 200,
+    comportement: marin,
+    contact: 1,
+    cris: ['Battle !', 'Coupole !', 'Freeze !', 'Top rock !'],
   },
 };

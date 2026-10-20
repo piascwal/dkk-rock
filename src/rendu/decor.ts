@@ -58,8 +58,25 @@ const ECHELLE_ACCESSOIRES = 1.4;
  * à casque... semés au chargement du niveau, toujours au même endroit pour une même carte.
  * Chaque accessoire reste tant que le sol dessous existe : détruisez-le, il tombe du décor.
  */
-export function semeDecor(carte: Carte, theme: NomTheme, graine: number): Pose[] {
+export function semeDecor(
+  carte: Carte,
+  theme: NomTheme,
+  graine: number,
+  /** le décor placé à la main par le générateur (voir DefNiveau.decor) : il remplace le semis */
+  fixe?: readonly (readonly [string, number, number])[],
+): Pose[] {
   const rng = new Aleatoire(graine);
+  if (fixe)
+    return fixe
+      .filter(([quoi]) => quoi in ACCESSOIRES)
+      .map(([quoi, tx, ty]) => ({
+        tx,
+        ty,
+        quoi: quoi as NomAccessoire,
+        v: rng.entier(0, 255),
+        devant: false,
+        dedans: carte.aFond(tx, ty - 1),
+      }));
   const semis = SEMIS[theme];
   const poses: Pose[] = [];
   // chaque rangée garde son propre espacement : des accessoires sur le sol, sur les passerelles, sur les toits

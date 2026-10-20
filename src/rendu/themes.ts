@@ -154,8 +154,8 @@ export const THEMES: Record<NomTheme, Theme> = {
   // le FISE de Montpellier : plein soleil sur le béton des skateparks, au bord du Lez
   fise: {
     ciel: ['#3f8fe0', '#cfeeff'],
-    lointain: '#a8bccb',
-    proche: '#4f7a5a',
+    lointain: '#dccfb2',
+    proche: '#3fb0a8',
     paroi: '#3a3a40',
     dessus: '#b4b0a8',
     terre: '#7a746c',

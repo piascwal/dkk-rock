@@ -41,6 +41,8 @@ export type Sprite =
   | 'buvette'
   | 'standFringues'
   | 'halfpipe'
+  | 'barriere'
+  | 'archeFise'
   | 'borne'
   | 'pneus'
   | 'fougere'
@@ -80,6 +82,8 @@ export const SPRITES: ReadonlySet<string> = new Set<Sprite>([
   'buvette',
   'standFringues',
   'halfpipe',
+  'barriere',
+  'archeFise',
   'borne',
   'pneus',
   'fougere',
@@ -87,7 +91,7 @@ export const SPRITES: ReadonlySet<string> = new Set<Sprite>([
 ]);
 
 /** Les accessoires dessinés par une planche fournie (apparence tirée au sort selon `v`, tournée d'un côté ou de l'autre). */
-/** Les stands et le half-pipe du FISE : chacun a sa planche, du même nom. */
+/** Les stands, le half-pipe, la barrière et l'arche du FISE : chacun a sa planche, du même nom. */
 const FISE = new Set<string>([
   'standBmx',
   'standSkate',
@@ -95,6 +99,8 @@ const FISE = new Set<string>([
   'buvette',
   'standFringues',
   'halfpipe',
+  'barriere',
+  'archeFise',
 ]);
 
 /**

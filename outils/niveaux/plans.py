@@ -252,28 +252,26 @@ NIVEAUX = {
         # le niveau n'est que le navire : les vagues d'ennemis viennent du jeu (src/jeu/traversee.ts), pas de la carte
         lieux=[('ferry', 58, dict())],
     ),
-    # le FISE de Montpellier, après Groix : un niveau plat, des modules de skatepark (voir outils/niveaux/fise.py)
+    # le FISE de Montpellier, après Groix : les berges du Lez, de l'Hôtel de Ville à l'Hôtel de Région, une zone du festival
+    # après l'autre (voir outils/niveaux/fise.py) ; le décor y est placé à la main, rien au hasard ; pas de caves sous le quai
     'fise': dict(
         nom='Le FISE', theme='fise', textes='11-fise.ts', fichier='11-fise.ts',
-        constante='CARTE_FISE', graine=111, base=30, raccord='sotx', caves='sotx',
+        constante='CARTE_FISE', graine=111, base=30, raccord='sot', caves='sot', sans_caves=True,
         lieux=[
-            ('plat', 12, dict(lettres='s', deco=2)),
-            ('plat', 10, dict(lettres='so', digit='1')),  # l'entrée du festival
-            ('rampes', 26, dict(haut=3, lettres='so')),
-            ('maison', 14, dict(lettres='sotx')),  # un stand en dur
-            ('bowl', 24, dict(profondeur=4, lettres='sotx')),
-            ('gradins', 26, dict(haut=6, lettres='sotx', cage=True)),
-            ('plat', 10, dict(lettres='sotx', digit='2')),  # le big air
-            ('bigair', 30, dict(lettres='sotxp')),
-            ('forteresse', 34, dict(etages=3, lettres='sotxpf', mat='B', cage=True)),  # le village des marques (et ses influenceurs)
-            ('rampes', 30, dict(haut=4, lettres='sotxp')),
-            ('bowl', 28, dict(profondeur=5, lettres='sotxp', butin='+')),
-            ('plat', 10, dict(lettres='sotxp', digit='3', drones=2)),  # les drones des vidéastes
-            ('gradins', 30, dict(haut=7, lettres='sotxp')),
-            ('echafaudage', 22, dict(niveaux=3, lettres='sotxp')),  # la régie
-            ('bigair', 30, dict(lettres='sotxp')),
-            ('plat', 10, dict(lettres='sotxp', digit='4')),  # la finale
-            ('vide', 64, dict()),  # la piste du Champion (outils/genere-niveaux.py : arene_du_champion)
+            ('plat', 10, dict(lettres='s', deco=0)),
+            ('entree', 18, dict(lettres='s', digit='1')),  # l'arche du festival, devant l'Hôtel de Ville
+            ('parc_street', 48, dict(lettres='sot')),  # le grand parc noir à plateaux roses
+            ('food_court', 44, dict(lettres='fs', digit='2')),  # l'ombre des platanes, les food trucks, les pissotières
+            ('halfpipe_bois', 36, dict(haut=5, lettres='sotx', digit='3')),  # le Freestyle Park de bois
+            ('spine', 18, dict(haut=3, lettres='so')),
+            ('scene_breaking', 30, dict(lettres='k', digit='4')),  # la scène de breaking, au bord du Lez
+            ('flat_bmx', 28, dict(lettres='px', digit='5')),  # le flat BMX
+            ('gradins', 26, dict(haut=6, lettres='sotx', cage=True, mat='M')),  # les tribunes du parc
+            ('bigair', 30, dict(lettres='sotxp', digit='6')),  # le big air
+            ('village', 56, dict(lettres='fs', digit='7')),  # le village des marques, devant l'Arbre Blanc
+            ('halfpipe_bois', 40, dict(haut=6, lettres='sotxp')),
+            ('plat', 8, dict(lettres='sotxp', deco=0, digit='8')),  # la finale
+            ('vide', 64, dict()),  # la piste du Champion, devant l'Hôtel de Région (outils/genere-niveaux.py : arene_du_champion)
         ],
     ),
 }

@@ -144,6 +144,8 @@ export const FEUILLES_DECOR: Record<string, Feuille> = {
     pied: 126,
   },
   halfpipe: { fichier: 'halfpipe.png', w: 900, h: 404, images: [1], rythme: 1, densite: 6, pied: 450 },
+  barriere: { fichier: 'barriere.png', w: 132, h: 64, images: [1], rythme: 1, densite: 6, pied: 66 },
+  archeFise: { fichier: 'archeFise.png', w: 600, h: 361, images: [1], rythme: 1, densite: 6, pied: 300 },
   enceinteRose: { fichier: 'enceinteRose.png', w: 120, h: 126, images: [1], rythme: 1, densite: 6, pied: 60 },
   borne: { fichier: 'borne.png', w: 120, h: 155, images: [1], rythme: 1, densite: 8, pied: 60 },
   pneus: { fichier: 'pneus.png', w: 112, h: 141, images: [1], rythme: 1, densite: 8, pied: 56 },

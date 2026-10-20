@@ -16,7 +16,7 @@ from peintre import Niveau
 from plans import NIVEAUX, enchaine
 from souterrain import souterrain, tonneaux_de_surface
 from ferry import ferry
-from fise import bigair, bowl, gradins, rampes
+from fise import bigair, entree, flat_bmx, food_court, gradins, halfpipe_bois, parc_street, scene_breaking, spine, village
 from hauteurs import corniches, descente, grotte, pont_de_singe, tours, vide_partout
 from signatures import falaise, glacier, parking, ponton, scene, toits
 from structures import forteresse, traversee
@@ -38,7 +38,7 @@ THEMES = {
     'groix': dict(sol='#', sous='R', profond='R', mur='R', deco=['C', 'W']),
     'mer': dict(sol='D', sous='#', profond='R', mur='B', deco=['C']),
     # le FISE : le béton des skateparks, les rampes en bois
-    'fise': dict(sol='D', sous='#', profond='R', mur='W', deco=['C', 'C', 'T']),
+    'fise': dict(sol='D', sous='#', profond='R', mur='W', deco=[]),
 }
 
 
@@ -210,15 +210,33 @@ class Recette:
     def p_tours(self, x0, x1, etages=3, mode='pont', lettres='a', mat=None):
         tours(self.n, x0, x1 - x0, etages, mode, lettres, mat)
 
-    # ---- le FISE (voir niveaux/fise.py)
-    def p_bowl(self, x0, x1, profondeur=4, lettres='a', butin='*'):
-        bowl(self.n, x0 + 1, x1 - x0 - 2, profondeur, lettres, butin)
+    # ---- le FISE (voir niveaux/fise.py) : chaque zone du festival, son décor placé à la main
+    def p_entree(self, x0, x1, lettres='s'):
+        entree(self.n, x0, x1 - x0, lettres)
 
-    def p_rampes(self, x0, x1, haut=3, lettres='a'):
-        rampes(self.n, x0 + 1, x1 - x0 - 1, haut, lettres)
+    def p_parc_street(self, x0, x1, lettres='sot'):
+        parc_street(self.n, x0, x1 - x0, lettres)
 
-    def p_gradins(self, x0, x1, haut=6, lettres='a', cage=False, butin='+'):
-        gradins(self.n, x0, x1 - x0, haut, lettres, cage, butin)
+    def p_food_court(self, x0, x1, lettres='f'):
+        food_court(self.n, x0, x1 - x0, lettres)
+
+    def p_halfpipe_bois(self, x0, x1, haut=5, lettres='sotx'):
+        halfpipe_bois(self.n, x0, x1 - x0, haut, lettres)
+
+    def p_spine(self, x0, x1, haut=3, lettres='so'):
+        spine(self.n, x0, x1 - x0, haut, lettres)
+
+    def p_scene_breaking(self, x0, x1, lettres='k'):
+        scene_breaking(self.n, x0, x1 - x0, lettres)
+
+    def p_flat_bmx(self, x0, x1, lettres='px'):
+        flat_bmx(self.n, x0, x1 - x0, lettres)
+
+    def p_village(self, x0, x1, lettres='fs'):
+        village(self.n, x0, x1 - x0, lettres)
+
+    def p_gradins(self, x0, x1, haut=6, lettres='a', cage=False, butin='+', mat=None):
+        gradins(self.n, x0, x1 - x0, haut, lettres, cage, butin, mat)
 
     def p_bigair(self, x0, x1, lettres='a'):
         bigair(self.n, x0, x1 - x0, lettres)
@@ -251,6 +269,13 @@ class Recette:
             f'// Légende dans ../format.ts. Une ligne par rangée de tuiles de 16 px ; sous la dernière rangée de terre, le vide.\n'
             f'export const {constante}: string[] = [\n' + ''.join(f"  '{l}',\n" for l in lignes) + '];\n'
         )
+        if n.decors:  # le décor placé à la main (voir Niveau.decor) : [nom, colonne, rangée du sol]
+            ts += (
+                f'\n/** Le décor du niveau, placé à la main par le générateur (pas de décor semé au hasard) : [nom, colonne, rangée du sol]. */\n'
+                f'export const DECOR_{constante.removeprefix("CARTE_")}: [string, number, number][] = [\n'
+                + ''.join(f"  ['{d}', {x}, {y}],\n" for d, x, y in n.decors)
+                + '];\n'
+            )
         (CARTES / nom_fichier).write_text(ts)
         apercu(lignes, nom_fichier.replace('.ts', '.png'))
 
@@ -259,7 +284,7 @@ COULEURS = {
     ' ': (30, 20, 40), '.': (60, 50, 70), '#': (122, 74, 42), 'R': (109, 109, 120), 'B': (156, 59, 46), 'M': (138, 150, 163),
     'X': (20, 20, 20), 'N': (230, 240, 251), 'G': (143, 208, 238), 'W': (168, 116, 58), '-': (210, 154, 85), 'H': (196, 154, 90),
     'E': (255, 255, 255), '=': (190, 200, 210), 'C': (176, 125, 60), 'T': (60, 60, 60), 'S': (232, 207, 138), 'V': (191, 233, 255),
-    'D': (154, 154, 146), '(': (255, 0, 255), ')': (255, 0, 255),
+    'D': (154, 154, 146), 'L': (44, 44, 49), 'U': (232, 96, 122), 'A': (216, 168, 104), '(': (255, 0, 255), ')': (255, 0, 255),
 }
 
 
@@ -357,14 +382,18 @@ def arene_du_yeti(r):
 
 
 def arene_du_champion(r):
-    """La piste de la finale du FISE : plate, avec deux estrades de pitons pour esquiver les élans du Champion et un médiator sur
-    chacune ; le Champion au milieu, le van tout au bout (comme chez le Yéti Alpha)."""
+    """La finale du FISE, sur la main stage : le sol noir du grand parc entre deux barrières, deux estrades de pitons pour esquiver
+    les élans du Champion et un médiator sur chacune ; le Champion au milieu, le van tout au bout (comme chez le Yéti Alpha)."""
     n = r.n
     x0 = n.w - 64
     n.niveler(x0, n.w)
     for x in range(x0, n.w):  # pas de cave sous la piste : le sol est plein (un puits d'échelle y débouchait)
         for y in range(n.base, n.h - 6):
             n.set(x, y, n.t['sol'] if y == n.base else n.t['sous'])
+    for x in range(x0 + 2, n.w - 9):  # la main stage : le sol noir du grand parc, entre deux barrières
+        n.set(x, n.base, 'L')
+    n.decor(x0 + 2, 'barriere', n.base)
+    n.decor(n.w - 10, 'barriere', n.base)
     n.repere(x0 + 32, 'P', surface=True)
     n.repere(x0 + 12, '+', ymin=n.base - 6)
     n.repere(x0 + 52, '+', ymin=n.base - 6)

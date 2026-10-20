@@ -196,6 +196,7 @@ export class Rendu {
 
     // en traversée, le ferry avance : le fond défile en plus de la caméra
     const decalage = Math.max(0, vue.traversee) * VITESSE_FERRY;
+    this.fond.largeurNiveau = niveauLu(vue.niveau).largeur * TUILE;
     this.fond.dessine(
       ctx,
       camX,
@@ -213,6 +214,7 @@ export class Rendu {
         new Carte(lu.largeur, lu.hauteur, lu.tuiles, lu.fond),
         NIVEAUX[vue.niveau]!.theme,
         11 + vue.niveau,
+        NIVEAUX[vue.niveau]!.decor,
       );
       this.braises.regle(this.decor);
       this.decorParTuile = new Map();

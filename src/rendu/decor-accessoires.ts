@@ -5,6 +5,26 @@ import type { Accessoire } from './decor-objets';
  * les niveaux. Même convention que decor-objets.ts : autour du milieu de la base (0, 0), la base en bas.
  */
 
+/**
+ * Un carré d'attente : un élément du FISE dont le sprite n'est pas encore fourni. Un aplat de sa couleur, cerné, une bande
+ * claire en haut ; ses dimensions sont celles de l'élément (unités des accessoires : un héros en fait 28 de haut).
+ */
+const carre =
+  (couleur: string, w: number, h: number): Accessoire =>
+  (p) => {
+    const x = -Math.floor(w / 2);
+    p(x, -h, w, h, '#1a1a1a');
+    p(x + 1, -h + 1, w - 2, h - 2, couleur);
+    p(x + 1, -h + 1, w - 2, 2, 'rgba(255,255,255,0.35)');
+  };
+
+/** Un platane (carré d'attente) : le tronc clair tacheté, le houppier large qui fait l'ombre du food court. */
+const platane: Accessoire = (p, v) => {
+  p(-3, -34, 6, 34, '#b8a88a');
+  p(-2, -26 + (v % 5), 3, 3, '#8a7a5a');
+  carre('#4f7a3a', 56, 30)((x, y, w, h, c) => p(x, y - 30, w, h, c), v);
+};
+
 /** Un stand du festival : une toile de couleur sur quatre montants, un comptoir (repli des stands du FISE). */
 const stand =
   (toile: string): Accessoire =>
@@ -183,6 +203,17 @@ export const ACCESSOIRES_SUPPLEMENTAIRES = {
   torche,
   flambeau: torche,
   feuDeCamp,
+  // le FISE, en carrés d'attente (le sprite viendra) : les food trucks, les pissotières, les barrières, la table du food court,
+  // le portique de la scène de breaking, l'arche de l'entrée, le platane
+  foodTruck: carre('#e8862a', 44, 30),
+  foodTruckBleu: carre('#2f6fd0', 44, 30),
+  foodTruckVert: carre('#3f9a5a', 40, 28),
+  pissotiere: carre('#3f8a4a', 12, 22),
+  barriere: carre('#9aa4ac', 20, 10),
+  tableFoodCourt: carre('#a8743a', 16, 8),
+  porticoBreaking: carre('#2a2a30', 70, 44),
+  archeFise: carre('#ff4f6d', 80, 46),
+  platane,
   standBmx: stand('#e8a020'),
   standSkate: stand('#2f5fb0'),
   standTrottinette: stand('#2f8a4a'),

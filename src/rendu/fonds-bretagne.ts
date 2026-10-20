@@ -7,7 +7,8 @@ import type { Theme } from './themes';
  * pierres levées dans la brume), les quais du port (maisons de granit, mâts, le phare au loin), les falaises de l'île
  * (la mer, la lande d'ajoncs et de bruyère, le phare). Peints sur une bande de 960 × 270, le sol vers y = 238.
  */
-export type Peinture = (c: CanvasRenderingContext2D, r: Aleatoire, th: Theme, plan: 0 | 1) => void;
+/** `plan` : 0 le lointain, 1 le milieu, 2 le proche (assombri ensuite) ; la plupart des décors peignent le milieu et le proche pareil. */
+export type Peinture = (c: CanvasRenderingContext2D, r: Aleatoire, th: Theme, plan: 0 | 1 | 2) => void;
 
 type Ctx = CanvasRenderingContext2D;
 

@@ -7,9 +7,9 @@ variantes ou des récompenses.
 """
 import random
 
-SOLIDES = set('#RBMNGWSDVCTOQ=-X')
+SOLIDES = set('#RBMNGWSDVCTOQ=-XLUA')
 # quelles tuiles servent de sol à un ennemi ou à un objet posé
-SOL_ENNEMI = set('#RBMNGWSDVCTOQ=-X')
+SOL_ENNEMI = set('#RBMNGWSDVCTOQ=-XLUA')
 
 
 class Niveau:
@@ -22,9 +22,17 @@ class Niveau:
         self.haut = [base] * largeur  # la rangée du terrain de chaque colonne
         self.bas = hauteur - 6  # sous cette rangée : le vide
         self.vus = []  # (x, nature) pour les statistiques
+        self.decors = []  # le décor placé à la main (nom, x, rangée du sol) : voir `decor`
         self._terrain()
 
     # ---- outils de base
+    def decor(self, x, nom, y=None):
+        """Place un élément de décor (un nom d'accessoire du jeu, voir decor-objets.ts) sur la colonne x, posé sur la rangée de sol `y`
+        (par défaut le premier sol depuis le ciel). Un niveau qui en place n'a plus de décor semé au hasard."""
+        if y is None:
+            y = next((yy for yy in range(self.h) if self.get(x, yy) in SOLIDES), self.base)
+        self.decors.append((nom, x, y))
+
     def set(self, x, y, c):
         if 0 <= x < self.w and 0 <= y < self.h:
             self.g[y][x] = c

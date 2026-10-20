@@ -52,6 +52,8 @@ export interface DefNiveau {
   outro: Replique[];
   /** le van décolle à la fin du niveau, à la force de son réacteur, au lieu de partir sur la route (un sommet) */
   envol?: boolean;
+  /** le décor placé à la main (nom d'accessoire, colonne, rangée du sol) : il remplace le décor semé au hasard */
+  decor?: readonly (readonly [string, number, number])[];
   carte: string[];
 }
 

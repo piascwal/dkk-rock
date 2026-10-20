@@ -26,6 +26,12 @@ export const T = {
   TONNEAU_WOG: 18,
   TONNEAU_OR: 19,
   BIDON: 20,
+  /** la matière des parcs du FISE : un revêtement noir mat, fait exprès pour rouler (rampes, curbs, funbox) */
+  PARC: 21,
+  /** le plateau rose des modules du parc (box jump, spine, haut des quarters) */
+  PLATEAU: 22,
+  /** le contreplaqué lisse des rampes de bois du FISE (half-pipe, spine) */
+  RAMPE: 23,
 } as const;
 
 export type Tuile = (typeof T)[keyof typeof T];
@@ -95,6 +101,9 @@ export const PROPRIETES: Record<Tuile, ProprietesTuile> = {
   [T.TONNEAU_OR]: base({ nom: 'tonneau d’or WOG', car: 'Q', pv: 6, tombe: true, debris: '#ffd23f' }),
   // un bidon d'essence : comme une caisse, on monte dessus, et il arrête le héros qui le rencontre
   [T.BIDON]: base({ nom: 'bidon d’essence', car: 'J', pv: 2, tombe: true, debris: '#c1121f' }),
+  [T.PARC]: base({ nom: 'revêtement de parc', car: 'L', pv: 6, debris: '#3a3a40' }),
+  [T.PLATEAU]: base({ nom: 'plateau de module', car: 'U', pv: 6, debris: '#e8607a' }),
+  [T.RAMPE]: base({ nom: 'rampe de bois', car: 'A', pv: 4, debris: '#d8a868' }),
 };
 
 const PAR_CARACTERE = new Map<string, Tuile>(

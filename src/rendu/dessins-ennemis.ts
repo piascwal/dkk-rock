@@ -7,6 +7,16 @@ const pasDe = (e: number, f: number) => (e === ANIM.COURT ? Math.floor(f / 5) % 
 
 /** Les ennemis ordinaires, par genre. */
 export const DESSINS_ENNEMIS: Partial<Record<number, Dessin>> = {
+  // le b-boy du FISE, en attendant son sprite : survêtement, casquette ; en élan, il tourne (bras levés)
+  [G.BREAKER]: (p, e, f) => {
+    const yt = humain(
+      p,
+      { peau: '#c68a5a', haut: '#e8607a', bas: '#232327', chaussures: '#ffffff' },
+      { pas: pasDe(e, f), brasLeves: e === ANIM.COURT && Math.floor(f / 4) % 2 === 0 },
+    );
+    p(-3, yt - 1, 7, 2, '#232327');
+    p(3, yt, 2, 1, '#232327');
+  },
   [G.DANSEUR]: (p, e, f) => {
     const danse = Math.floor(f / 8) % 2 === 0;
     const yt = humain(

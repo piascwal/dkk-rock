@@ -17,6 +17,8 @@ export const G = {
   CHAUFFAGE: 6,
   /** le Champion du FISE : le boss de la finale à Montpellier */
   CHAMPION: 7,
+  /** le b-boy de la scène de breaking du FISE : il fonce en coupole sur le héros */
+  BREAKER: 8,
   FETARD: 10,
   VIDEUR: 11,
   DANSEUR: 12,
@@ -160,6 +162,7 @@ export const GENRES_CONVERTIS: readonly number[] = [
   G.TROTTINETTE,
   G.BMX,
   G.BMX_PRO,
+  G.BREAKER,
   G.INFLUENCEUR,
   G.YETI,
   G.ROBOT,

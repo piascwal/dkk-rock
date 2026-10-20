@@ -189,21 +189,18 @@ validé.
   échelle depuis la surface et qui sont des impasses gardées (butin, arme ou cage +1 vie). Le monde est peu profond :
   24 rangées sous la surface, puis le vide.
 - **Un arc de l'histoire :** les niveaux d'un arc s'enchaînent, avec leur épilogue ; l'arc principal est « La tournée ».
-  Viennent ensuite le « Breizh Tour » (la forêt, le port, la traversée, Groix) puis « Le FISE » : le Festival International
-  des Sports Extrêmes, à Montpellier, un niveau plat fait de modules de skatepark (`outils/niveaux/fise.py` : bowl, funbox et
-  rail, tribune avec sa salle dessous, tour du big air et bac à mousse). Ses stands et son half-pipe (lot 23) forment le
-  premier arrière-plan : ils se posent en file, uniquement sur le sol principal du niveau, plat et à ciel ouvert sur toute
-  leur largeur (`LARGES` dans `rendu/decor-sol.ts`), jamais en l'air ni sur un toit. Ses ennemis sont les riders (lot 24,
-  `entites/ennemis/definitions-riders.ts`) : skateur, roller, trottinette, gamin en BMX, qui foncent sur le héros, le
-  traversent et reviennent ; et le pro du BMX, qui lui saute dessus en figure.
-  La finale a son boss : le Champion du FISE (`P` sur la carte, `entites/ennemis/champion.ts`), sur sa piste plate
-  (`arene_du_champion`) : il s'élance sur le héros au premier temps, saute en figure au troisième (deux ondes au sol à
-  l'atterrissage) et appelle des riders à deux tiers puis à un tiers de sa vie. Son sprite est provisoire (le pro du BMX
-  agrandi). Les arbres et drapeaux du fond y suivent exactement le sol (`PARALLAXE_VERTICALE_FISE` dans `rendu/fonds.ts`).
-  Pour un autre (un voyage en Jamaïque, par exemple) : ajouter ses niveaux à la fin de `NIVEAUX`, puis une entrée dans
-  `ARCS` (`niveaux/arcs.ts`) avec son titre, son résumé, son épilogue et, si on veut, `apres` (le niveau à terminer pour
-  l'ouvrir). Le menu « Choisir un niveau » les liste par arc. Entre deux niveaux, la carte du monde de l'arc montre le van
-  qui roule vers le suivant (`rendu/carte-monde.ts`) : un nouveau thème doit y avoir sa région.
+  Viennent ensuite le « Breizh Tour » (la forêt, le port, la traversée, Groix) puis « Le FISE ».
+  **Le FISE** (Montpellier, sur les berges du Lez) est fait à la main, zone par zone (`outils/niveaux/fise.py`) : l'entrée
+  (l'arche et le logo officiel), le grand parc noir à plateaux roses (tuiles `L` et `U`), le food court à l'ombre des platanes
+  et ses pissotières, le Freestyle Park de bois (half-pipe : descente, plat, remontée ; mini spine ; tuile `A`), la scène de
+  breaking et ses b-boys (`k`), le flat BMX, les tribunes, le big air, le village des marques, puis la finale sur la main
+  stage avec le Champion (`P`). Son décor n'est jamais semé au hasard : le générateur le place et l'écrit avec la carte
+  (`DECOR_FISE`, voir `DefNiveau.decor`) ; ce dont on n'a pas encore le sprite est un carré d'attente
+  (`decor-accessoires.ts`). Au fond (`rendu/fonds-fise.ts`) : la ville beige, le Lez turquoise et sa berge en pente où le
+  public s'assoit, les pins parasols, le tram (ligne 1 aux hirondelles, ligne 3 aux motifs marins), et les trois bâtiments du
+  parcours à leur place : l'Hôtel de Ville au départ, l'Arbre Blanc au milieu, l'Hôtel de Région à la finale. Les logos
+  officiels (`assets-sources/decor/fise/logo-fise-*.png`) habillent l'arche, les bâches des barrières et la carte d'intro
+  (`outils/fise-logos.py`). Les riders (lot 24) foncent sur le héros et reviennent ; le pro du BMX saute en figure.
 - **Un ennemi :** une définition dans `entites/ennemis/definitions.ts` (lettre de carte), un
   comportement dans `comportements.ts`, un dessin dans `rendu/dessins-ennemis.ts`.
 - **Une arme :** un tir dans `entites/projectiles-defs.ts`, une entrée dans `entites/armes.ts`,
