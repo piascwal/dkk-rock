@@ -86,11 +86,11 @@ def parc_street(n, x0, largeur, lettres='sot'):
 
 def food_court(n, x0, largeur, lettres='f'):
     """L'ombre des platanes : des food trucks dessous, des tables devant ; au bout, les pissotières."""
-    trucks = ['foodTruck', 'foodTruckBleu', 'foodTruckVert']
+    trucks = ['foodDuke', 'foodRougail', 'foodCroque', 'foodGlace']
     k = 0
     for x in range(x0 + 3, x0 + largeur - 8, 9):
         _pose(n, x, 'platane')
-        _pose(n, x + 4, trucks[k % 3])
+        _pose(n, x + 4, trucks[k % 4])
         k += 1
     for x in range(x0 + 6, x0 + largeur - 10, 9):
         _pose(n, x + 2, 'tableFoodCourt')

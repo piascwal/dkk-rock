@@ -26,7 +26,7 @@ SAUTS = tuple(f'{h}-saut' for h in ECHELLES)
 # des planches plus fines que 6 pixels par pixel du jeu, et réduites avec lissage (au lieu d'un agrandissement entier, qui donne des
 # pixels inégaux quand l'écran n'est pas un multiple de la planche) : le DJ, très détaillé, plus grand que le reste
 DENSITES = {'dj': 8, 'robot': 8, 'borne': 8, 'pneus': 8, 'baril': 8, 'fougere': 8, 'menhir': 8, **{f'{h}-echelle': 6 for h in ECHELLES}, **{n: 6 for n in SAUTS}}
-LISSES = {'barriere', 'archeFise', 'dj', 'voiture', 'rocker', 'robot', 'borne', 'pneus', 'baril', 'fougere', 'menhir', *(f'{h}-echelle' for h in ECHELLES), *SAUTS}
+LISSES = {'barriere', 'archeFise', 'foodDuke', 'foodRougail', 'foodCroque', 'foodGlace', 'pissotiere', 'toilettes', 'dj', 'voiture', 'rocker', 'robot', 'borne', 'pneus', 'baril', 'fougere', 'menhir', *(f'{h}-echelle' for h in ECHELLES), *SAUTS}
 # celles de ces planches qu'on réduit à 256 couleurs (le DJ, les voitures) ; les rockers en ont trop : douze personnages différents sur une planche
 QUANTIFIEES = {'dj', 'voiture'}
 # objet : (fichiers sources, un par état (une ligne de la planche chacun), genre dans jeu/vue.ts, largeur en jeu en pixels)
@@ -97,6 +97,14 @@ OBJETS = {
     # l'arche d'entrée et sa bannière ; réduits avec lissage pour que le logo reste lisible
     'barriere': (['decor/fise/barriere-base.png'], None, 22),
     'archeFise': (['decor/fise/arche-base.png'], None, 100),
+    # lot 25-26 : les quatre food trucks du FISE (DUKE, ROUGAIL, CROQUE, GLACE) et les toilettes de chantier (rouge : la pissotière ;
+    # grise : les toilettes) ; même largeur en jeu pour les quatre trucks
+    'foodDuke': (['decor/fise/food-duke-base.png'], None, 46),
+    'foodRougail': (['decor/fise/food-rougail-base.png'], None, 46),
+    'foodCroque': (['decor/fise/food-croque-base.png'], None, 46),
+    'foodGlace': (['decor/fise/food-glace-base.png'], None, 46),
+    'pissotiere': (['decor/fise/pissotiere-base.png'], None, 14),
+    'toilettes': (['decor/fise/toilettes-base.png'], None, 14),
     # l'enceinte basse du club, à LED rose (décor seulement : elle n'explose pas)
     'enceinteRose': (['decor/enceinte-rose-base.png'], None, 20),
     # la borne à incendie des rues (remplace le dessin en code « bouche »)

@@ -43,6 +43,12 @@ export type Sprite =
   | 'halfpipe'
   | 'barriere'
   | 'archeFise'
+  | 'foodDuke'
+  | 'foodRougail'
+  | 'foodCroque'
+  | 'foodGlace'
+  | 'pissotiere'
+  | 'toilettes'
   | 'borne'
   | 'pneus'
   | 'fougere'
@@ -84,6 +90,12 @@ export const SPRITES: ReadonlySet<string> = new Set<Sprite>([
   'halfpipe',
   'barriere',
   'archeFise',
+  'foodDuke',
+  'foodRougail',
+  'foodCroque',
+  'foodGlace',
+  'pissotiere',
+  'toilettes',
   'borne',
   'pneus',
   'fougere',
@@ -101,6 +113,12 @@ const FISE = new Set<string>([
   'halfpipe',
   'barriere',
   'archeFise',
+  'foodDuke',
+  'foodRougail',
+  'foodCroque',
+  'foodGlace',
+  'pissotiere',
+  'toilettes',
 ]);
 
 /**
