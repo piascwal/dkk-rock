@@ -71,7 +71,7 @@ def _plateformes(n, x0, x1, piso, lettres, evite=()):
     y1, y2 = piso - 2, piso - 4
     x, k = x0, 0
     while x + 8 < x1:
-        if any(abs(x + 3 - e) < 9 for e in evite):
+        if any(abs(x + 3 - e) < 9 for e in evite) or any(n.get(xx, y1) != ' ' for xx in range(x, x + 6)):
             x += 4
             continue
         for xx in range(x, x + 6):
@@ -208,8 +208,10 @@ def breakdance(n, x0, largeur, lettres='k'):
     le portique DANCE à droite ; une échelle au pied de la paroi gauche ; des danseurs de décor entre les portiques, et les
     danseurs ennemis (un tous les dix tuiles) sur toute la longueur."""
     a, b = x0 + 3, x0 + largeur - 3
+    n.assaut(a + 3)  # des pros du BMX tombent du ciel sur la scène, comme sur le flat
     for x in range(a, b):
         _colonne(n, x, 2, PARC)
+    _monticules(n, a + 4, b - 4, n.base - 2)
     _echelle(n, a - 1, 2)  # les échelles, dehors, collées aux parois à pic
     _echelle(n, b, 2)
     top = n.base - 2
@@ -228,10 +230,35 @@ def breakdance(n, x0, largeur, lettres='k'):
     _caissons(n, [x for x in range(a + 8, b - 6, 9) if all(abs(x - e) > 4 for e in evite)], top)
 
 
+def _monticule(n, x, sol):
+    """Un monticule de cinq tuiles de large et trois de haut, posé sur la rangée `sol` : des caisses en bas et en haut, un caisson
+    de basses (ou une caisse) au milieu, et un tonneau d'essence (%) au sommet, une fois sur deux. Rien n'est posé sur ce qui est
+    déjà là (un ennemi, une plateforme, du décor) : le monticule s'arrête si la place manque."""
+    profil = (1, 2, 3, 2, 1)
+    cases = [(x - 2 + k, sol - 1 - j) for k, h in enumerate(profil) for j in range(h)]
+    if any(n.get(xx, yy) != ' ' for xx, yy in cases):
+        return
+    if any(abs(dx - x) < 5 and dy == sol for _, dx, dy in n.decors):
+        return
+    milieu = 'T' if n.rng.random() < 0.5 else 'C'
+    for xx, yy in cases:
+        j = sol - 1 - yy
+        n.set(xx, yy, milieu if j == 1 else 'C')
+    if n.rng.random() < 0.5 and n.get(x, sol - 4) == ' ':
+        n.set(x, sol - 4, '%')  # le tonneau d'essence, au sommet
+
+
+def _monticules(n, x0, x1, sol, pas=14):
+    """Des monticules de caisses, de caissons et de tonneaux, espacés de `pas` tuiles, pour casser les longues lignes droites."""
+    for x in range(x0 + 4, x1 - 4, pas):
+        _monticule(n, x + n.rng.randrange(0, 6), sol)
+
+
 def flat_bmx(n, x0, largeur, lettres='px'):
     """La piste de flat : un sol noir lisse, une barrière à chaque bout, le panneau FLAT au milieu, les pros du BMX qui y tournent."""
     for x in range(x0 + 1, x0 + largeur - 1):
         n.set(x, n.base, PARC)
+    _monticules(n, x0 + 4, x0 + largeur - 4, n.base)
     n.assaut(x0 + 4)  # des pros du BMX tombent du ciel sur la piste
     _pose(n, x0 + 2, 'barriere')
     _pose(n, x0 + largeur // 2, 'portiqueFlat')

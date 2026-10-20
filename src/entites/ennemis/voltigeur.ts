@@ -1,4 +1,4 @@
-import { TUILE } from '../../config';
+import { CHUTE_MAX, GRAVITE, TUILE } from '../../config';
 import type { Contexte } from '../../jeu/contexte';
 import { appliqueGravite, deplace } from '../../monde/physique';
 import { ENNEMIS_PAR_LETTRE } from './definitions';
@@ -6,6 +6,8 @@ import { Ennemi } from './ennemi';
 
 /** Les tours qu'il fait sur lui-même entre le haut de l'écran et la piste : deux, assez lents pour se voir. */
 const TOURS = 2;
+/** Une chute lente, pour voir les tours : la gravité est au dixième de la normale. */
+const LENTEUR = 0.1;
 
 /**
  * Un pro du BMX qui arrive d'en haut de l'écran en figure (un tour sur lui-même, en avant ou en arrière) et se pose sur ses
@@ -28,7 +30,7 @@ export class Voltigeur extends Ennemi {
     let y = c.y + c.h;
     let t = 0;
     while (y < ySol && t < 600) {
-      vy = Math.min(vy + 0.32, 6.5);
+      vy = Math.min(vy + GRAVITE * LENTEUR, CHUTE_MAX);
       y += vy;
       t++;
     }
@@ -47,7 +49,7 @@ export class Voltigeur extends Ennemi {
     }
     const c = this.corps;
     this.anim++;
-    appliqueGravite(c);
+    appliqueGravite(c, LENTEUR);
     deplace(c, ctx.carte);
     const avance = (c.y + c.h - this.yDepart) / Math.max(1, this.yArrivee - this.yDepart);
     this.salto = Math.round(this.sens * TOURS * Math.min(0.97, Math.max(0, avance)) * 256) & 255;

@@ -207,8 +207,10 @@ validé.
   des complexes de métal façon boîte de nuit (`soirees` dans `fise.py`), qu'on atteint par une échelle.
   Au repos, les riders parcourent tout leur module (bornes `zones` dans la carte, `roule` dans
   `comportements-riders.ts`) : ils descendent les bords, montent les marches, font de petits sauts à des hauteurs variées ;
-  trois assauts (`Niveau.assaut`, `src/jeu/assauts.ts`) font tomber du haut de l'écran des pros du BMX en figure (`Voltigeur`),
-  qui se posent sur leurs roues. La barrière de la finale ne doit jamais être percée : `tests/fise-boss.test.ts`.
+  un assaut sur chaque grande scène (flat, breakdance, food court, village ; `Niveau.assaut`,
+  `src/jeu/assauts.ts`) fait tomber du haut de l'écran des pros du BMX en figure (`Voltigeur`), lentement, pour qu'on voit
+  leurs tours avant qu'ils se posent sur leurs roues. Le flat et le breakdance sont coupés de monticules de caisses, de caissons
+  et de tonneaux d'essence (`_monticules` dans `fise.py`). La barrière de la finale ne doit jamais être percée : `tests/fise-boss.test.ts`.
   **La barrière du boss** (tuile `|`, indestructible) garde le van du Yéti Alpha et du Champion : elle ne s'ouvre qu'à leur
   mort (`ouvreBarrieres` dans `jeu/chargement.ts`) ; le test d'accessibilité la compte comme ouverte.
 - **Un ennemi :** une définition dans `entites/ennemis/definitions.ts` (lettre de carte), un
