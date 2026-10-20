@@ -149,9 +149,11 @@ def scene_breaking(n, x0, largeur, lettres='k'):
         h = 1 if x in (a, b - 1) else 2
         _colonne(n, x, h, PARC)
     top = n.base - 2
-    _pose(n, (a + b) // 2, 'porticoBreaking', top)
+    _pose(n, (a + b) // 2, 'portiqueBreak', top)
     _pose(n, a + 3, 'enceinte34', top)
     _pose(n, b - 4, 'enceinte34', top)
+    _pose(n, a + 7, 'bgirl', top)  # des danseuses sur l'estrade : du décor, pas des ennemis
+    _pose(n, b - 8, 'bgirl', top)
     n.ennemis(a + 2, b - 2, lettres, 3, ymin=top - 3)
 
 

@@ -56,9 +56,24 @@ def arche():
     return im
 
 
+def portique_break():
+    """Le portique de la scène de breaking : l'arche du festival, la même charpente, avec une bannière « BREAK » à la place du logo."""
+    from PIL import ImageFont
+
+    im = arche()
+    d = ImageDraw.Draw(im)
+    d.rectangle([0, 8, 599, 111], fill=(28, 28, 32, 255))  # on efface le logo de la bannière
+    police = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 74)
+    texte = 'BREAK'
+    x0, y0, x1, y1 = d.textbbox((0, 0), texte, font=police)
+    d.text(((600 - (x1 - x0)) // 2 - x0, (120 - (y1 - y0)) // 2 - y0), texte, font=police, fill=(255, 210, 63, 255))
+    return im
+
+
 def main():
     barriere().save(FISE / 'barriere-base.png')
     arche().save(FISE / 'arche-base.png')
+    portique_break().save(FISE / 'portique-break-base.png')
     l = logo('couleur', 256)
     l.save(RACINE / 'public' / 'sprites' / 'logo-fise.png')
     print('barriere-base.png, arche-base.png, public/sprites/logo-fise.png')
