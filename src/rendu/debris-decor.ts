@@ -17,6 +17,8 @@ const MATIERES: Partial<Record<string, { couleurs: string[]; haut: number }>> = 
   sacs: { couleurs: ['#c9b27a', '#a58d57', '#e3d2a0'], haut: 12 },
   enceinte34: { couleurs: ['#1a1a1a', '#3a3a44', '#8a8a96', ...NEON.slice(0, 1)], haut: 30 },
   enceinteDeco: { couleurs: ['#1a1a1a', '#3a3a44', '#8a8a96', ...NEON.slice(0, 1)], haut: 30 },
+  enceinteRose: { couleurs: ['#1a1a1a', '#3a3a44', '#8a8a96', ...NEON.slice(0, 1)], haut: 21 },
+  transat: { couleurs: [...BOIS, '#3fa7f2', '#ffffff'], haut: 12 },
   projecteur: { couleurs: [...METAL, '#fff3b0'], haut: 24 },
   lampadaire: { couleurs: [...METAL, '#ffd56b'], haut: 40 },
   lampadaireNeon: { couleurs: [...METAL, ...NEON], haut: 40 },

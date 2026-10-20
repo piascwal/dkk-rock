@@ -84,6 +84,8 @@ OBJETS = {
     'parasol': ([f'decor/parasol-{k}-base.png' for k in (1, 2, 3)], None, 28),
     # le transat de la plage (bois et toile bleue et blanche), en sprite fourni
     'transat': (['decor/transat-base.png'], None, 24),
+    # l'enceinte basse du club, à LED rose (décor seulement : elle n'explose pas)
+    'enceinteRose': (['decor/enceinte-rose-base.png'], None, 20),
     # la borne à incendie des rues (remplace le dessin en code « bouche »)
     'borne': (['decor/borne-base.png'], None, 15),
     # les pneus empilés (garage, ville) ; le bidon d'essence est une tuile (outils/fixe-tuiles.py)

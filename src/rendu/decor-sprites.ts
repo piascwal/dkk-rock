@@ -34,6 +34,7 @@ export type Sprite =
   | 'rocherNeige'
   | 'parasol'
   | 'transat'
+  | 'enceinteRose'
   | 'borne'
   | 'pneus'
   | 'fougere'
@@ -66,6 +67,7 @@ export const SPRITES: ReadonlySet<string> = new Set<Sprite>([
   'rocherNeige',
   'parasol',
   'transat',
+  'enceinteRose',
   'borne',
   'pneus',
   'fougere',
@@ -116,6 +118,11 @@ export function dessineSprite(
   if (quoi === 'torche') return dessineDecorFeuille(ctx, 'torche', v % 3, voile);
   if (quoi === 'flambeau') return dessineDecorFeuille(ctx, 'flambeau', 0, voile);
   if (quoi === 'parasol') return dessineDecorFeuille(ctx, 'parasol', v % 3, voile);
+  if (quoi === 'transat') return dessineDecorFeuille(ctx, 'transat', 0, voile);
+  if (quoi === 'enceinteRose') {
+    if (v & 1) ctx.scale(-1, 1);
+    return dessineDecorFeuille(ctx, 'enceinteRose', 0, voile);
+  }
   if (quoi === 'borne') return dessineDecorFeuille(ctx, 'borne', 0, voile);
   if (quoi === 'pneus') return dessineDecorFeuille(ctx, 'pneus', 0, voile);
   if (quoi === 'fougere') return dessineDecorFeuille(ctx, 'fougere', 0, voile);

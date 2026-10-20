@@ -122,6 +122,7 @@ export const FEUILLES_DECOR: Record<string, Feuille> = {
   },
   parasol: { fichier: 'parasol.png', w: 168, h: 168, images: [1, 1, 1], rythme: 1, densite: 6, pied: 84 },
   transat: { fichier: 'transat.png', w: 144, h: 83, images: [1], rythme: 1, densite: 6, pied: 72 },
+  enceinteRose: { fichier: 'enceinteRose.png', w: 120, h: 126, images: [1], rythme: 1, densite: 6, pied: 60 },
   borne: { fichier: 'borne.png', w: 120, h: 155, images: [1], rythme: 1, densite: 8, pied: 60 },
   pneus: { fichier: 'pneus.png', w: 112, h: 141, images: [1], rythme: 1, densite: 8, pied: 56 },
   'tom-echelle': {

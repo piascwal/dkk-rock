@@ -229,6 +229,8 @@ export const ACCESSOIRES = {
   enceinteDeco,
   // repli en code de l'enceinte de 3/4 (planche enceinte-34.png, voir decor.ts)
   enceinte34: enceinteDeco,
+  // repli en code de l'enceinte rose du club (planche enceinte-rose.png, voir decor-sprites.ts)
+  enceinteRose: enceinteDeco,
   projecteur,
   plante,
   caisseDeco,
