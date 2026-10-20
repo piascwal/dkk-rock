@@ -838,6 +838,13 @@ h2 {
   font-size: 1.3rem;
 }
 
+/* au concours de drift : « GAZ » et « FREIN À MAIN », sur deux lignes dans le bouton rouge */
+.tactile.drift .bouton.tir {
+  font-size: 0.62rem;
+  line-height: 1.15;
+  padding: 0 6px;
+}
+
 /* ——— version et mise à jour ——— */
 .version {
   font-size: 0.8rem;

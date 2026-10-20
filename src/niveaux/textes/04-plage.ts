@@ -3,7 +3,7 @@ import type { DefNiveau } from '../format';
 export const PLAGE: Omit<DefNiveau, 'carte'> = {
   id: 'plage',
   titre: 'La Plage du Tube de l’Été',
-  sousTitre: 'Niveau 4 — À gauche, à droite',
+  sousTitre: 'Niveau 5 — À gauche, à droite',
   theme: 'plage',
   intro: [
     {

@@ -14,6 +14,8 @@ export interface DefArc {
   resume: string;
   /** les niveaux de l'arc, dans l'ordre (indices dans NIVEAUX) */
   niveaux: number[];
+  /** les niveaux qu'on peut laisser de côté (un mini-jeu) : celui qui les suit s'ouvre aussi quand le précédent est fait */
+  facultatifs?: number[];
   /** niveau (indice dans NIVEAUX) à terminer pour ouvrir l'arc ; absent : ouvert d'emblée */
   apres?: number;
   /** les répliques après le dernier niveau de l'arc */
@@ -25,7 +27,9 @@ export const ARCS: DefArc[] = [
     id: 'tournee',
     titre: 'La tournée',
     resume: 'Du garage au Club Infini : débrancher DJ Boucle.',
-    niveaux: [0, 1, 2, 3, 4, 5],
+    // le garage, le pré du Clos (le concours de drift, niveau 11 de la liste, ajouté après coup), puis la route des Alpes
+    niveaux: [0, 11, 1, 2, 3, 4, 5],
+    facultatifs: [11],
     fin: FIN_TOURNEE,
   },
   {
@@ -68,10 +72,15 @@ export const arcOuvertPar = (niveau: number): number | null =>
 export const suivantDansMonde = (niveau: number): number | null =>
   suivantDansArc(niveau) ?? arcOuvertPar(niveau);
 
-/** Un niveau est ouvert si c'est le premier de son arc (arc ouvert) ou si le précédent est terminé. */
+/** Un niveau est ouvert si c'est le premier de son arc (arc ouvert) ou si le précédent est terminé (voir `facultatifs`). */
 export function niveauOuvert(niveau: number, faits: readonly number[]): boolean {
   const a = arcDe(niveau);
   if (a.apres !== undefined && !faits.includes(a.apres)) return false;
-  const pos = a.niveaux.indexOf(niveau);
-  return pos <= 0 || faits.includes(a.niveaux[pos - 1]!);
+  // le précédent fait ; un niveau facultatif juste avant (un mini-jeu) ne bloque pas : celui d'avant lui suffit
+  for (let k = a.niveaux.indexOf(niveau) - 1; k >= 0; k--) {
+    const avant = a.niveaux[k]!;
+    if (faits.includes(avant)) return true;
+    if (!a.facultatifs?.includes(avant)) return false;
+  }
+  return true;
 }

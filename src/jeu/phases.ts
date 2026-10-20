@@ -1,6 +1,5 @@
 import { VIES_DEPART } from '../config';
 import { arcOuvertPar, suivantDansArc } from '../niveaux/arcs';
-import { DRIFT_APRES } from './drift';
 import { lanceDrift } from './drift-partie';
 import type { Partie } from './partie';
 
@@ -9,13 +8,12 @@ import type { Partie } from './partie';
  * à la carte du monde ou à l'épilogue, l'épilogue à la carte de l'arc suivant ; après une défaite, on reprend au drapeau).
  */
 export function changePhase(p: Partie): void {
-  if (p.phase === 'histoire') p.phase = 'jeu';
+  // un mini-jeu (le pré du Clos) : son intro lue, il commence à la place du niveau
+  if (p.phase === 'histoire' && p.lu.def.miniJeu === 'drift') lanceDrift(p, false);
+  else if (p.phase === 'histoire') p.phase = 'jeu';
   else if (p.phase === 'convertis')
     p.phase = 'bilan'; // l'écran des convertis passé, place au récit
-  else if (p.phase === 'bilan' && p.niveau === DRIFT_APRES) {
-    // avant de partir pour de bon : un dernier petit kiff, le concours de drift dans le pré du Clos
-    lanceDrift(p, false);
-  } else if (p.phase === 'bilan') {
+  else if (p.phase === 'bilan') {
     if (suivantDansArc(p.niveau) !== null) {
       // le van roule vers le niveau suivant sur la carte du monde
       p.phase = 'carte';

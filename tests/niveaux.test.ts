@@ -7,9 +7,11 @@ import { casesAccessibles } from './accessibilite';
 describe('les niveaux', () => {
   it.each(NIVEAUX.map((n, i) => [n.id, i] as const))('%s se lit sans erreur', (_id, i) => {
     const lu = niveauLu(i);
-    expect(lu.largeur).toBeGreaterThan(60);
     for (const e of lu.ennemis) expect(ENNEMIS_PAR_LETTRE[e.lettre], `ennemi ${e.lettre}`).toBeDefined();
     expect(lu.def.intro.length).toBeGreaterThan(0);
+    // un mini-jeu (le pré du Clos) n'a ni niveau de plateforme à parcourir ni bilan
+    if (lu.def.miniJeu) return;
+    expect(lu.largeur).toBeGreaterThan(60);
     expect(lu.def.outro.length).toBeGreaterThan(0);
   });
 

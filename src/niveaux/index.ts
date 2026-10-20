@@ -8,6 +8,7 @@ import { CARTE_FORET } from './cartes/07-foret';
 import { CARTE_PORT } from './cartes/08-port';
 import { CARTE_GROIX } from './cartes/09-groix';
 import { CARTE_FERRY } from './cartes/10-ferry';
+import { CARTE_PRE_DU_CLOS } from './cartes/12-pre-du-clos';
 import { ASSAUTS_FISE, CARTE_FISE, DECOR_FISE, ZONES_FISE } from './cartes/11-fise';
 import { litNiveau, type DefNiveau, type NiveauLu } from './format';
 import { GARAGE } from './textes/01-garage';
@@ -21,6 +22,7 @@ import { PORT } from './textes/08-port';
 import { GROIX } from './textes/09-groix';
 import { FERRY } from './textes/10-ferry';
 import { FISE } from './textes/11-fise';
+import { PRE_DU_CLOS } from './textes/12-pre-du-clos';
 
 /** Les niveaux, arc après arc (voir arcs.ts). Pour en ajouter un : un texte, une carte, une ligne ici. */
 export const NIVEAUX: DefNiveau[] = [
@@ -38,6 +40,8 @@ export const NIVEAUX: DefNiveau[] = [
   { ...FERRY, carte: CARTE_FERRY },
   // le FISE de Montpellier, après Groix (son propre arc)
   { ...FISE, carte: CARTE_FISE, decor: DECOR_FISE, assauts: ASSAUTS_FISE, zones: ZONES_FISE },
+  // le concours de drift du pré du Clos (un mini-jeu), ajouté après coup : il vient juste après le garage dans la tournée
+  { ...PRE_DU_CLOS, carte: CARTE_PRE_DU_CLOS },
 ];
 
 const lus = new Map<number, NiveauLu>();

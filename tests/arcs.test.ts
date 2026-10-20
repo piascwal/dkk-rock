@@ -17,11 +17,24 @@ describe('les arcs de l’histoire', () => {
   });
 
   it('un niveau s’ouvre quand le précédent de son arc est fait', () => {
-    const [a, b, c] = ARCS[0]!.niveaux;
+    const tournee = ARCS[0]!;
+    const [a, b, c] = tournee.niveaux.filter((n) => !tournee.facultatifs?.includes(n));
     expect(niveauOuvert(a!, [])).toBe(true);
     expect(niveauOuvert(b!, [])).toBe(false);
     expect(niveauOuvert(b!, [a!])).toBe(true);
     expect(niveauOuvert(c!, [a!])).toBe(false);
+  });
+
+  it('le pré du Clos (un mini-jeu) suit le garage, sans bloquer la route des Alpes', () => {
+    const clos = NIVEAUX.findIndex((n) => n.id === 'clos');
+    const alpages = NIVEAUX.findIndex((n) => n.id === 'alpages');
+    expect(NIVEAUX[clos]!.miniJeu).toBe('drift');
+    expect(suivantDansMonde(0)).toBe(clos);
+    expect(MONDE.indexOf(clos)).toBe(1);
+    expect(niveauOuvert(clos, [])).toBe(false);
+    expect(niveauOuvert(clos, [0])).toBe(true);
+    expect(niveauOuvert(alpages, [0])).toBe(true); // facultatif : on peut le laisser de côté
+    expect(niveauOuvert(alpages, [0, clos])).toBe(true);
   });
 
   it('l’arc breton s’ouvre une fois la tournée finie', () => {

@@ -1,6 +1,7 @@
 import { Pelouse, marqueVoiture, type Pose } from '../jeu/drift-pelouse';
 import type { VueDrift } from '../jeu/vue';
 import { dessineEcranDrift } from './drift-ecrans';
+import { borneCamera } from './drift-lisiere';
 import { SolDrift, type Regard } from './drift-sol';
 import { Mottes, dessineVoiture } from './drift-voitures';
 
@@ -65,10 +66,7 @@ export class RenduDrift {
     const cap = this.cap ?? cible;
     const ecart = Math.atan2(Math.sin(cible - cap), Math.cos(cible - cap));
     this.cap = cap + ecart * (v.etape === 'choix' ? 0.2 : 0.08);
-    return {
-      x: pose.x - Math.cos(this.cap) * RECUL,
-      y: pose.y - Math.sin(this.cap) * RECUL,
-      cap: this.cap,
-    };
+    const [x, y] = borneCamera(pose.x - Math.cos(this.cap) * RECUL, pose.y - Math.sin(this.cap) * RECUL);
+    return { x, y, cap: this.cap };
   }
 }

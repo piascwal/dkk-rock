@@ -37,8 +37,8 @@ export function projette(
 }
 
 /**
- * Dessine la voiture du pilote : de dos, ou de trois quarts quand elle part en travers par rapport à la caméra (le nez à gauche ;
- * le nez à droite, la vue dédiée ou, à défaut, la même retournée). `secoue` : elle tressaute (elle laboure la pelouse).
+ * Dessine la voiture du pilote : de dos, ou de trois quarts quand elle part en travers par rapport à la caméra (la vue dédiée à
+ * ce côté ou, à défaut, celle de l'autre côté retournée). `secoue` : elle tressaute (elle laboure la pelouse).
  */
 export function dessineVoiture(
   ctx: CanvasRenderingContext2D,
@@ -54,15 +54,14 @@ export function dessineVoiture(
   const nom = NOMS[pilote] ?? 'tom';
   let ecart = voiture.cap - regard.cap;
   ecart = Math.atan2(Math.sin(ecart), Math.cos(ecart));
-  let img = images.get(`${nom}-dos`);
+  // la vue de trois quarts selon l'écart : `biais-droite` quand la voiture pivote vers la gauche de la caméra, `biais` vers la
+  // droite ; une vue qui manque est l'autre, retournée
+  const vue = ecart > DE_DOS ? 'biais-droite' : ecart < -DE_DOS ? 'biais' : 'dos';
+  let img = images.get(`${nom}-${vue}`);
   let retourne = false;
-  if (ecart > DE_DOS) img = images.get(`${nom}-biais`);
-  else if (ecart < -DE_DOS) {
-    img = images.get(`${nom}-biais-droite`);
-    if (!img) {
-      img = images.get(`${nom}-biais`);
-      retourne = true;
-    }
+  if (!img && vue !== 'dos') {
+    img = images.get(`${nom}-${vue === 'biais' ? 'biais-droite' : 'biais'}`);
+    retourne = true;
   }
   const k = echelle / p.z;
   const y = Math.round(p.sy + 3 * k + (secoue ? Math.round(Math.random()) : 0));

@@ -4,8 +4,8 @@ import { Pelouse, marqueVoiture } from './drift-pelouse';
 import { Voiture } from './drift-voiture';
 import type { EtapeDrift, VueDrift } from './vue';
 
-/** Le concours de drift a lieu après ce niveau (le garage), avant de partir pour de bon en tournée. */
-export const DRIFT_APRES = 0;
+/** Le pré du Clos, le niveau du concours de drift (indice dans NIVEAUX) : juste après le garage, avant la route des Alpes. */
+export const NIVEAU_DRIFT = 11;
 /** Les pilotes : Tom et sa Renault 11, Matt et son Opel Corsa (l'ordre est celui de `VueDrift.pilote`). */
 export const PILOTES = ['Tom', 'Matt'] as const;
 

@@ -3,7 +3,7 @@ import { HEROS } from '../entites/heros';
 import type { Progression, Sauvegarde } from '../jeu/sauvegarde';
 import { NIVEAUX } from '../niveaux';
 import { ARCS, niveauOuvert } from '../niveaux/arcs';
-import { DRIFT_APRES } from '../jeu/drift';
+import { NIVEAU_DRIFT } from '../jeu/drift';
 import type { AnnonceDkk } from '../reseau/annonce';
 import { Recherche } from '../reseau/client';
 import type { Hote } from '../reseau/hote';
@@ -106,7 +106,7 @@ export class Menus {
   /** Les mini-jeux croisés en chemin, à rejouer : chacun s'ouvre quand on l'a rencontré dans l'histoire. */
   miniJeux(): void {
     const s = this.a.sauvegarde;
-    const drift = s.faits.includes(DRIFT_APRES);
+    const drift = niveauOuvert(NIVEAU_DRIFT, s.faits);
     const record = `Record du pré : ${s.recordDrift.toFixed(1).replace('.', ',')} % de pelouse saccagée.`;
     this.montre(
       el('h2', 'Mini-jeux'),

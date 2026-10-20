@@ -7,7 +7,7 @@
  */
 
 /** Le pré, en mètres : sa largeur (x) et sa profondeur (y). */
-export const PRE = { largeur: 56, profondeur: 40 };
+export const PRE = { largeur: 64, profondeur: 46 };
 /** La taille d'une case, en mètres. */
 export const CASE = 0.5;
 /** Le rayon de la trace d'une roue, en mètres. */

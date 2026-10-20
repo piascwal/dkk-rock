@@ -53,6 +53,8 @@ export interface DefNiveau {
   outro: Replique[];
   /** le van décolle à la fin du niveau, à la force de son réacteur, au lieu de partir sur la route (un sommet) */
   envol?: boolean;
+  /** un mini-jeu à la place du niveau de plateforme (l'intro lue, il commence ; voir jeu/drift.ts) */
+  miniJeu?: 'drift';
   /** le décor placé à la main (nom d'accessoire, colonne, rangée du sol) : il remplace le décor semé au hasard */
   decor?: readonly (readonly [string, number, number])[];
   /** les colonnes où un assaut de riders tombe du ciel dès qu'un héros les franchit (voir jeu/assauts.ts) */

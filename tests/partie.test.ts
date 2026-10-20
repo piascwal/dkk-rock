@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { DUREE_INVINCIBLE, PV_HEROS, TUILE, VIES_DEPART, VIES_MAX } from '../src/config';
 import { C } from '../src/jeu/commandes';
+import { NIVEAU_DRIFT } from '../src/jeu/drift';
 import { Partie } from '../src/jeu/partie';
 import { DUREE_CARTE, G, GENRES_CONVERTIS } from '../src/jeu/vue';
 import { Objet } from '../src/entites/objets';
@@ -23,9 +24,10 @@ const avance = (p: Partie, n: number, bits = 0) => {
   }
 };
 
-/** Du bilan au niveau suivant : les pages, le concours de drift (après le garage, terminé d'office) et la carte du monde. */
+/** Du bilan au niveau suivant : les pages, la carte du monde, et le pré du Clos (après le garage : son concours, terminé d'office). */
 function entreDeuxNiveaux(p: Partie): void {
-  while (p.phase === 'convertis' || p.phase === 'bilan' || p.phase === 'carte' || p.phase === 'drift') {
+  const miniJeu = () => p.phase === 'histoire' && p.lu.def.miniJeu !== undefined;
+  while (['convertis', 'bilan', 'carte', 'drift'].includes(p.phase) || miniJeu()) {
     if (p.phase === 'drift') {
       p.drift!.fini = true;
       p.avance();
@@ -236,7 +238,7 @@ describe('la partie', () => {
     expect(p.phase).toBe('jeu'); // le van doit d'abord partir
     avance(p, 200);
     expect(p.phase).toBe('convertis'); // l'écran des ennemis convertis, avant le récit
-    expect(sauvegardes).toEqual([1]);
+    expect(sauvegardes).toEqual([NIVEAU_DRIFT]); // après le garage, le pré du Clos (le concours de drift)
     entreDeuxNiveaux(p);
     expect(p.phase).toBe('histoire');
     expect(p.niveau).toBe(1);
@@ -318,14 +320,11 @@ describe('la partie', () => {
     const p = nouvelle();
     p.termineNiveau();
     while (p.phase === 'convertis' || p.phase === 'bilan') p.suivant();
-    // après le garage, le concours de drift du pré du Clos ; puis la route
-    expect(p.phase).toBe('drift');
-    p.drift!.fini = true;
-    p.avance();
     expect(p.phase).toBe('carte');
     expect(p.niveau).toBe(0);
     avance(p, DUREE_CARTE + 1);
+    // après le garage, le pré du Clos (le concours de drift)
     expect(p.phase).toBe('histoire');
-    expect(p.niveau).toBe(1);
+    expect(p.niveau).toBe(NIVEAU_DRIFT);
   });
 });

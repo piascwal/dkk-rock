@@ -339,11 +339,10 @@ export class App implements Actions {
       noms[0] = this.sauvegarde.pseudo || 'DKK';
       for (const d of this.hote.distants.values()) noms[d.siege] = d.nom;
     }
-    // pendant le concours de drift, le chrono et le score sont dans le canvas : pas de HUD des héros
-    $('hud').hidden = v.phase === 'drift';
     if (v.drift && retiensRecordDrift(this.sauvegarde, v.drift.scores)) this.enregistre();
     this.hud.maj(v, siege, noms);
     const moi = v.joueurs[siege];
+    this.tactile.pilote(v.phase === 'drift');
     this.tactile.arme(moi?.present && moi.arme ? iconeDeLArme(moi.arme, 34) : null, moi?.munitions ?? 0);
     this.histoire.maj(v);
     const theme = this.rendu.theme.musique;

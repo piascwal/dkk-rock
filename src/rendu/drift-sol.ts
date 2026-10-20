@@ -1,5 +1,6 @@
 import { HAUTEUR_VUE } from '../config';
 import { PRE, type Pelouse } from '../jeu/drift-pelouse';
+import { Lisiere } from './drift-lisiere';
 
 /**
  * Le pré du Clos vu de derrière la voiture : le sol est projeté rangée par rangée (comme le « mode 7 » des vieilles consoles)
@@ -46,6 +47,7 @@ export class SolDrift {
   private toile: HTMLCanvasElement | null = null;
   private image: ImageData | null = null;
   private panorama: HTMLCanvasElement | null = null;
+  private readonly lisiere = new Lisiere();
 
   /** Le ciel, le panorama, puis le sol, sur toute la largeur de la vue. */
   dessine(ctx: CanvasRenderingContext2D, largeur: number, regard: Regard, pelouse: Pelouse): void {
@@ -68,41 +70,47 @@ export class SolDrift {
   }
 
   private dessineSol(ctx: CanvasRenderingContext2D, largeur: number, regard: Regard, pelouse: Pelouse): void {
-    const hauteur = HAUTEUR_VUE - HORIZON;
+    // toute la vue : le sol sous l'horizon, la lisière par-dessus ; le reste, transparent, laisse voir le ciel
     if (!this.toile || this.toile.width !== largeur) {
       this.toile = document.createElement('canvas');
       this.toile.width = largeur;
-      this.toile.height = hauteur;
-      this.image = this.toile.getContext('2d')!.createImageData(largeur, hauteur);
+      this.toile.height = HAUTEUR_VUE;
+      this.image = this.toile.getContext('2d')!.createImageData(largeur, HAUTEUR_VUE);
     }
     const img = this.image!;
     const px = new Uint32Array(img.data.buffer);
+    px.fill(0, 0, HORIZON * largeur);
     const dx = Math.cos(regard.cap);
     const dy = Math.sin(regard.cap);
     // la droite de la caméra : son cap tourné d'un quart de tour dans le sens indirect
     const rx = dy;
     const ry = -dx;
-    for (let r = 0; r < hauteur; r++) {
+    for (let r = 0; r < HAUTEUR_VUE - HORIZON; r++) {
       const z = (HAUTEUR * FOCALE) / (r + 0.5);
-      const brume = Math.min(0.8, Math.max(0, (z - 22) / 90));
+      const brume = brumeA(z);
       const cx = regard.x + dx * z;
       const cy = regard.y + dy * z;
       const pas = z / FOCALE;
+      const k = 1 - brume;
+      const ligne = (HORIZON + r) * largeur;
       for (let s = 0; s < largeur; s++) {
         const lat = (s + 0.5 - largeur / 2) * pas;
         const c = couleur(cx + rx * lat, cy + ry * lat, pelouse);
-        const k = 1 - brume;
-        px[r * largeur + s] =
+        px[ligne + s] =
           0xff000000 |
           (Math.round(c[2] * k + BRUME[2] * brume) << 16) |
           (Math.round(c[1] * k + BRUME[1] * brume) << 8) |
           Math.round(c[0] * k + BRUME[0] * brume);
       }
     }
+    this.lisiere.dessine(px, largeur, regard, brumeA, BRUME);
     this.toile!.getContext('2d')!.putImageData(img, 0, 0);
-    ctx.drawImage(this.toile!, 0, HORIZON);
+    ctx.drawImage(this.toile!, 0, 0);
   }
 }
+
+/** La brume du lointain, selon la profondeur (m) : rien de près, jusqu'aux quatre cinquièmes au loin. */
+const brumeA = (z: number): number => Math.min(0.8, Math.max(0, (z - 26) / 100));
 
 /** La couleur du sol en (x, y), en mètres. */
 function couleur(x: number, y: number, pelouse: Pelouse): Rvb {
@@ -129,8 +137,8 @@ const nuance = (c: Rvb, b: number): Rvb => {
 };
 
 /**
- * Le panorama, peint une fois : un tour complet (2π × focale pixels de large), des collines au loin, une rangée d'arbres, de
- * grands peupliers, des nuages, et la maison du Clos (pierre et tuiles rouges) devant, un peu à gauche du départ.
+ * Le panorama, peint une fois : un tour complet (2π × focale pixels de large), des nuages et des collines au loin. Les arbres et
+ * la maison du Clos sont plus près, sur la lisière du pré (voir drift-lisiere.ts).
  */
 function peinsPanorama(): HTMLCanvasElement {
   const tour = Math.round(2 * Math.PI * FOCALE);
@@ -157,30 +165,5 @@ function peinsPanorama(): HTMLCanvasElement {
     const h = 8 + Math.sin(x / 70) * 4 + Math.sin(x / 23) * 2;
     rect(x, haut - h - 10, 2, h + 10, '#8fbfa6');
   }
-  // la rangée d'arbres : des houppiers ronds, deux verts, un tronc
-  for (let x = 0; x < tour; x += 7 + Math.floor(hasard() * 6)) {
-    const h = 12 + hasard() * 14;
-    const l = 9 + Math.floor(hasard() * 8);
-    const vert = hasard() < 0.5 ? '#2f6b2a' : '#3c7d31';
-    rect(x + l / 2 - 1, haut - 5, 2, 5, '#4a3320');
-    rect(x, haut - h, l, h - 3, vert);
-    rect(x + 2, haut - h - 2, l - 4, 3, vert);
-    rect(x + 2, haut - h + 1, 3, 3, '#4f9a3c');
-  }
-  // de grands peupliers, ici et là
-  for (let i = 0; i < 6; i++) {
-    const x = hasard() * tour;
-    rect(x, haut - 40, 5, 37, '#2a5e27');
-    rect(x + 1, haut - 44, 3, 4, '#2a5e27');
-    rect(x + 2, haut - 3, 1, 3, '#4a3320');
-  }
-  // la maison du Clos : murs de pierre, toit de tuiles, une porte et deux fenêtres
-  const m = (((-(Math.PI / 2 + 0.45) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)) * FOCALE;
-  rect(m, haut - 22, 30, 22, '#b9a582');
-  for (let i = 0; i < 18; i++) rect(m + 1 + hasard() * 27, haut - 21 + hasard() * 20, 3, 2, '#9c8a6b');
-  for (let k = 0; k < 9; k++) rect(m - 2 + k, haut - 22 - k, 34 - 2 * k, 1, k % 2 ? '#a63c26' : '#b8492e');
-  rect(m + 13, haut - 9, 5, 9, '#5b3a22');
-  rect(m + 4, haut - 17, 5, 5, '#3b4a5a');
-  rect(m + 21, haut - 17, 5, 5, '#3b4a5a');
   return c;
 }

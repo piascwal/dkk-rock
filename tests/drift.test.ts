@@ -1,21 +1,20 @@
 import { describe, expect, it } from 'vitest';
 import { VIES_DEPART } from '../src/config';
 import { C } from '../src/jeu/commandes';
-import { DRIFT_APRES } from '../src/jeu/drift';
+import { NIVEAU_DRIFT } from '../src/jeu/drift';
 import { lanceDrift } from '../src/jeu/drift-partie';
 import { Pelouse, marqueVoiture } from '../src/jeu/drift-pelouse';
 import { Voiture } from '../src/jeu/drift-voiture';
 import { Partie } from '../src/jeu/partie';
-import { changePhase } from '../src/jeu/phases';
+import { suivantDansMonde } from '../src/niveaux/arcs';
 import { decodeEtat, encodeEtat } from '../src/reseau/protocole';
 
-/** Une partie au bilan du garage, deux joueurs. */
-function finDuGarage(): Partie {
-  const p = new Partie({ niveau: DRIFT_APRES, drapeau: -1, vies: VIES_DEPART, score: 0 });
+/** Une partie au pré du Clos, deux joueurs, son intro lue : le concours commence. */
+function auPreDuClos(): Partie {
+  const p = new Partie({ niveau: NIVEAU_DRIFT, drapeau: -1, vies: VIES_DEPART, score: 0 });
   p.ajouteJoueur(0, 0);
   p.ajouteJoueur(1, 1);
-  p.phase = 'bilan';
-  changePhase(p);
+  while (p.phase === 'histoire') p.suivant();
   return p;
 }
 
@@ -54,8 +53,15 @@ describe('le concours de drift du pré du Clos', () => {
     expect(pelouse.pourcent).toBeGreaterThan(depart + 0.3);
   });
 
-  it('suit le bilan du garage : chaque joueur conduit une minute, puis le podium, puis la route', () => {
-    const p = finDuGarage();
+  it('vient juste après le garage, avant la route des Alpes', () => {
+    expect(suivantDansMonde(0)).toBe(NIVEAU_DRIFT);
+    expect(suivantDansMonde(NIVEAU_DRIFT)).toBe(1);
+  });
+
+  it('au pré du Clos : chaque joueur conduit une minute, puis le podium ; le niveau est fait, en route', () => {
+    const p = auPreDuClos();
+    const progres: [number, boolean, number | undefined][] = [];
+    p.onProgression = (prog, fini, niveauFini) => progres.push([prog.niveau, fini, niveauFini]);
     expect(p.phase).toBe('drift');
     expect(p.vue().drift?.etape).toBe('choix');
     // le premier joueur prend Matt et part
@@ -84,10 +90,11 @@ describe('le concours de drift du pré du Clos', () => {
     appuie(p, 1, C.TIR);
     expect(p.phase).toBe('carte');
     expect(p.drift).toBeNull();
+    expect(progres).toEqual([[1, true, NIVEAU_DRIFT]]);
   });
 
   it('lancé depuis le menu des mini-jeux, le podium relance un concours', () => {
-    const p = new Partie({ niveau: 0, drapeau: -1, vies: VIES_DEPART, score: 0 });
+    const p = new Partie({ niveau: NIVEAU_DRIFT, drapeau: -1, vies: VIES_DEPART, score: 0 });
     p.ajouteJoueur(0, 0);
     lanceDrift(p, true);
     appuie(p, 0, C.SAUT);
@@ -100,7 +107,7 @@ describe('le concours de drift du pré du Clos', () => {
   });
 
   it('le concours traverse le réseau', () => {
-    const p = finDuGarage();
+    const p = auPreDuClos();
     appuie(p, 0, C.SAUT);
     pas(p, 180);
     for (let t = 0; t < 200; t++) pas(p, 1, 0, C.HAUT | C.GAUCHE | C.TIR);
