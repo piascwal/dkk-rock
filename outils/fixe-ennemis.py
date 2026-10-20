@@ -57,11 +57,13 @@ TYPES = {
     'trottinette': ('TROTTINETTE', 22),
     'bmx': ('BMX', 21),
     'bmxpro': ('BMX_PRO', 21),
+    # le Champion du FISE (boss) : le pro du BMX en deux fois plus grand, en attendant son propre sprite (roule, puis figure)
+    'champion': ('CHAMPION', 40),
 }
 
 # les lignes de la planche par état d'animation (ANIM dans jeu/vue.ts) : le vol au repos (0), le piqué en attaque (10).
 # Une planche à lignes : chaque apparence va dans sa ligne, les autres lignes restent vides.
-ETATS = {'goeland': (0, 10), 'bmxpro': (0, 10)}
+ETATS = {'goeland': (0, 10), 'bmxpro': (0, 10), 'champion': (0, 10)}
 
 
 def natif(chemin):

@@ -335,6 +335,8 @@ def fabrique(cle):
         arene_du_yeti(r)
     if cle == 'club':
         arene_du_dj(r)
+    if cle == 'fise':
+        arene_du_champion(r)
     if cfg.get('interieur'):
         interieur(r.n)
     r.ecrit(0, cfg['fichier'], cfg['constante'])
@@ -351,6 +353,24 @@ def arene_du_yeti(r):
     n.repere(x0 + 50, '+', surface=True)
     n.rect(x0 + 8, n.base - 9, x0 + 22, n.base - 8, 'G')
     n.rect(x0 + 38, n.base - 9, x0 + 52, n.base - 8, 'G')
+    n.repere(n.w - 5, 'F', surface=True)
+
+
+def arene_du_champion(r):
+    """La piste de la finale du FISE : plate, avec deux estrades de pitons pour esquiver les élans du Champion et un médiator sur
+    chacune ; le Champion au milieu, le van tout au bout (comme chez le Yéti Alpha)."""
+    n = r.n
+    x0 = n.w - 64
+    n.niveler(x0, n.w)
+    for x in range(x0, n.w):  # pas de cave sous la piste : le sol est plein (un puits d'échelle y débouchait)
+        for y in range(n.base, n.h - 6):
+            n.set(x, y, n.t['sol'] if y == n.base else n.t['sous'])
+    n.repere(x0 + 32, 'P', surface=True)
+    n.repere(x0 + 12, '+', ymin=n.base - 6)
+    n.repere(x0 + 52, '+', ymin=n.base - 6)
+    for a, b in ((x0 + 6, x0 + 18), (x0 + 46, x0 + 58)):
+        for x in range(a, b):
+            n.set(x, n.base - 5, '=')
     n.repere(n.w - 5, 'F', surface=True)
 
 

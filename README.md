@@ -196,6 +196,10 @@ validé.
   leur largeur (`LARGES` dans `rendu/decor-sol.ts`), jamais en l'air ni sur un toit. Ses ennemis sont les riders (lot 24,
   `entites/ennemis/definitions-riders.ts`) : skateur, roller, trottinette, gamin en BMX, qui foncent sur le héros, le
   traversent et reviennent ; et le pro du BMX, qui lui saute dessus en figure.
+  La finale a son boss : le Champion du FISE (`P` sur la carte, `entites/ennemis/champion.ts`), sur sa piste plate
+  (`arene_du_champion`) : il s'élance sur le héros au premier temps, saute en figure au troisième (deux ondes au sol à
+  l'atterrissage) et appelle des riders à deux tiers puis à un tiers de sa vie. Son sprite est provisoire (le pro du BMX
+  agrandi). Les arbres et drapeaux du fond y suivent exactement le sol (`PARALLAXE_VERTICALE_FISE` dans `rendu/fonds.ts`).
   Pour un autre (un voyage en Jamaïque, par exemple) : ajouter ses niveaux à la fin de `NIVEAUX`, puis une entrée dans
   `ARCS` (`niveaux/arcs.ts`) avec son titre, son résumé, son épilogue et, si on veut, `apres` (le niveau à terminer pour
   l'ouvrir). Le menu « Choisir un niveau » les liste par arc. Entre deux niveaux, la carte du monde de l'arc montre le van

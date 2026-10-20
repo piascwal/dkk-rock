@@ -273,7 +273,7 @@ NIVEAUX = {
             ('echafaudage', 22, dict(niveaux=3, lettres='sotxp')),  # la régie
             ('bigair', 30, dict(lettres='sotxp')),
             ('plat', 10, dict(lettres='sotxp', digit='4')),  # la finale
-            ('arene', 46, dict(lettres='sotxp')),
+            ('vide', 64, dict()),  # la piste du Champion (outils/genere-niveaux.py : arene_du_champion)
         ],
     ),
 }

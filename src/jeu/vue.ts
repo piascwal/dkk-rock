@@ -15,6 +15,8 @@ export const G = {
   KIWI: 5,
   /** le chauffage soufflant : l'arme qui accompagne le héros à la place de Fadatchi */
   CHAUFFAGE: 6,
+  /** le Champion du FISE : le boss de la finale à Montpellier */
+  CHAMPION: 7,
   FETARD: 10,
   VIDEUR: 11,
   DANSEUR: 12,
@@ -162,6 +164,7 @@ export const GENRES_CONVERTIS: readonly number[] = [
   G.YETI,
   G.ROBOT,
   G.YETI_ALPHA,
+  G.CHAMPION,
   G.DJ,
 ];
 

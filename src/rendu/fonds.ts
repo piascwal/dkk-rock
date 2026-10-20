@@ -171,6 +171,8 @@ const DECORS: Record<Decor, Peinture> = {
 const PARALLAXE = [0.12, 0.3, 0.55];
 /** Et le défilement vertical des plans, quand la caméra monte ou descend. */
 const PARALLAXE_VERTICALE = [0.2, 0.45, 0.75];
+/** Le FISE : ses arbres et ses drapeaux sont posés sur le sol, ils le suivent exactement (seule la ville, au loin, flotte). */
+const PARALLAXE_VERTICALE_FISE = [0.2, 1, 1];
 /** Où se trouve le sol à l'écran quand le héros marche dessus, et où il se pose dans la bande d'un plan de décor. */
 const HORIZON = Math.round(HAUTEUR_VUE * POSITION_HEROS) + 8;
 const PIED_DE_BANDE = 238;
@@ -222,7 +224,8 @@ export class Fond {
     const solEcran = surface - camY;
     PARALLAXE.forEach((f, i) => {
       const x = -((camFond * f) % LARGEUR_BANDE);
-      const pied = HORIZON + (solEcran - HORIZON) * PARALLAXE_VERTICALE[i]!;
+      const verticale = th.decor === 'fise' ? PARALLAXE_VERTICALE_FISE : PARALLAXE_VERTICALE;
+      const pied = HORIZON + (solEcran - HORIZON) * verticale[i]!;
       const y = Math.round(pied) - PIED_DE_BANDE;
       // sous la bande : de la couleur du plan, seulement là où l'écran existe
       const dessous = Math.max(0, y + HAUTEUR_BANDE - 1);

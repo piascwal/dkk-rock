@@ -10,7 +10,11 @@ import { el } from './elements';
  * L'écran de fin de niveau, façon Broforce : la liste des ennemis « convertis au rock », avec leur compteur. Selon les DKK, du
  * moins : les intéressés n'ont pas été consultés. Il vient de la vue (`EtatVue.convertis`), donc chez tous les joueurs.
  */
-const NOMS_BOSS: Record<number, string> = { [G.YETI_ALPHA]: 'Yéti Alpha', [G.DJ]: 'DJ Boucle' };
+const NOMS_BOSS: Record<number, string> = {
+  [G.YETI_ALPHA]: 'Yéti Alpha',
+  [G.CHAMPION]: 'Le Champion',
+  [G.DJ]: 'DJ Boucle',
+};
 const nomDe = (genre: number): string =>
   NOMS_BOSS[genre] ?? Object.values(ENNEMIS_PAR_LETTRE).find((d) => d.genre === genre)?.nom ?? '?';
 

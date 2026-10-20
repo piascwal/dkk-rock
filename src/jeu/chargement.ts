@@ -2,6 +2,7 @@ import { TUILE } from '../config';
 import { ARMES_RAMASSABLES } from '../entites/armes';
 import { Baril } from '../entites/baril';
 import { Chauffage } from '../entites/chauffage';
+import { Champion } from '../entites/ennemis/champion';
 import { DjBoucle } from '../entites/ennemis/dj';
 import { ENNEMIS_PAR_LETTRE } from '../entites/ennemis/definitions';
 import { Ennemi } from '../entites/ennemis/ennemi';
@@ -36,7 +37,13 @@ export function peuple(p: Partie): void {
     if (def && e.x > depart) p.ajoute(new Ennemi(p, def, e.x, e.y));
   }
   for (const b of lu.boss)
-    p.ajoute(b.lettre === 'Y' ? new YetiAlpha(p, b.x, b.y) : new DjBoucle(p, b.x, b.y));
+    p.ajoute(
+      b.lettre === 'Y'
+        ? new YetiAlpha(p, b.x, b.y)
+        : b.lettre === 'P'
+          ? new Champion(p, b.x, b.y)
+          : new DjBoucle(p, b.x, b.y),
+    );
   const r = p.drapeau >= 0 ? lu.drapeaux[p.drapeau]! : lu.depart;
   p.ajoute(
     new Kiwi(

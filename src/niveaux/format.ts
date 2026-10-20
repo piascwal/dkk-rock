@@ -21,7 +21,7 @@ import type { NomTheme } from '../rendu/themes';
  *   ( et ) : extrémités d'une tyrolienne ; chaque ( est reliée à la ) la plus proche à sa droite
  *   1 à 9 : déclencheurs de dialogue (quand un joueur franchit la colonne)
  *   a..z : ennemis, voir ENNEMIS_PAR_LETTRE dans entites/ennemis/definitions.ts
- *   Y : le Yéti Alpha   Z : DJ Boucle (boss final)
+ *   Y : le Yéti Alpha   P : le Champion du FISE   Z : DJ Boucle (boss final)
  */
 
 export type Qui = 'JBT' | 'JBM' | 'JBG' | 'MAT' | 'TOM' | 'FADATCHI' | 'NARRATEUR' | 'YETI' | 'DJ' | 'RADIO';
@@ -82,7 +82,7 @@ export interface NiveauLu {
   armes: Repere[];
   soins: Repere[];
   ennemis: (Repere & { lettre: string })[];
-  boss: (Repere & { lettre: 'Y' | 'Z' })[];
+  boss: (Repere & { lettre: 'Y' | 'Z' | 'P' })[];
   tyroliennes: { x1: number; y1: number; x2: number; y2: number }[];
   declencheurs: (Repere & { cle: string })[];
 }
@@ -145,7 +145,7 @@ export function litNiveau(def: DefNiveau): NiveauLu {
       else if (c === '+') lu.soins.push(r);
       else if (c === '(') debuts.push(r);
       else if (c === ')') bouts.push(r);
-      else if (c === 'Y' || c === 'Z') lu.boss.push({ ...r, lettre: c });
+      else if (c === 'Y' || c === 'Z' || c === 'P') lu.boss.push({ ...r, lettre: c });
       else if (/[1-9]/.test(c)) lu.declencheurs.push({ ...r, cle: c });
       else if (/[a-z]/.test(c)) lu.ennemis.push({ ...r, lettre: c });
       else throw new ErreurNiveau(`${def.id} : caractère inconnu « ${c} » en ${tx},${ty}`);
