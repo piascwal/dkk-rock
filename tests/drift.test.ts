@@ -54,11 +54,11 @@ describe('le concours de drift du pré du Clos', () => {
     expect(pelouse.pourcent).toBeGreaterThan(depart + 0.3);
   });
 
-  it('vient après le pont des Tuves, avant la route des Alpes', () => {
+  it('vient après Saint-Cézaire, avant le pont des Tuves', () => {
     const tuves = NIVEAUX.findIndex((n) => n.id === 'tuves');
-    expect(suivantDansMonde(0)).toBe(tuves);
-    expect(suivantDansMonde(tuves)).toBe(NIVEAU_DRIFT);
-    expect(suivantDansMonde(NIVEAU_DRIFT)).toBe(1);
+    expect(suivantDansMonde(0)).toBe(NIVEAU_DRIFT);
+    expect(suivantDansMonde(NIVEAU_DRIFT)).toBe(tuves);
+    expect(suivantDansMonde(tuves)).toBe(1);
   });
 
   it('au pré du Clos : chaque joueur conduit une minute, puis le podium ; le niveau est fait, en route', () => {
@@ -93,7 +93,7 @@ describe('le concours de drift du pré du Clos', () => {
     appuie(p, 1, C.TIR);
     expect(p.phase).toBe('carte');
     expect(p.drift).toBeNull();
-    expect(progres).toEqual([[1, true, NIVEAU_DRIFT]]);
+    expect(progres).toEqual([[NIVEAUX.findIndex((n) => n.id === 'tuves'), true, NIVEAU_DRIFT]]);
   });
 
   it('lancé depuis le menu des mini-jeux, le podium relance un concours', () => {

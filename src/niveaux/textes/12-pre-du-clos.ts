@@ -1,16 +1,16 @@
 import type { DefNiveau } from '../format';
 
-/** Le Pré du Clos : le concours de drift, au Clos, à Saint-Cézaire, avant de partir pour de bon en tournée (un mini-jeu). */
+/** Le Pré du Clos : le concours de drift, au Clos, à Saint-Cézaire, avant de descendre au pont des Tuves (un mini-jeu). */
 export const PRE_DU_CLOS: Omit<DefNiveau, 'carte'> = {
   id: 'clos',
   titre: 'Le Pré du Clos',
-  sousTitre: 'Niveau 3 — Concours de drift',
+  sousTitre: 'Niveau 2 — Concours de drift',
   theme: 'stc',
   miniJeu: 'drift',
   intro: [
     {
       qui: 'TOM',
-      texte: 'Avant de partir pour de bon… un dernier petit kiff ? Le pré du Clos est fraîchement tondu.',
+      texte: 'Avant de descendre à la Siagne… un dernier petit kiff ? Le pré du Clos est fraîchement tondu.',
     },
     {
       qui: 'JBT',

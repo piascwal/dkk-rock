@@ -4,7 +4,7 @@ import type { DefNiveau } from '../format';
 export const TUVES: Omit<DefNiveau, 'carte'> = {
   id: 'tuves',
   titre: 'Le Pont des Tuves',
-  sousTitre: 'Niveau 2 — Descente aux gorges',
+  sousTitre: 'Niveau 3 — Descente aux gorges',
   theme: 'tuves',
   // le décor posé à la main (balise, figuiers, roseaux) s'ajoute à la végétation semée
   semis: true,
@@ -57,6 +57,6 @@ export const TUVES: Omit<DefNiveau, 'carte'> = {
   outro: [
     { qui: 'JBM', texte: 'La Siagne est libérée. Le Viet Cong glaireux a capitulé.' },
     { qui: 'MAT', texte: 'J’ai des cloques jusque dans les oreilles.' },
-    { qui: 'JBG', texte: 'On remonte au Clos. Avant de partir pour de bon, il reste un dernier petit kiff…' },
+    { qui: 'JBG', texte: 'On remonte vers les Alpes. La tournée continue, et DJ Boucle nous attend.' },
   ],
 };

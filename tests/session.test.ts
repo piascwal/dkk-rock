@@ -107,14 +107,14 @@ describe('une session à plusieurs', () => {
     partie.termineNiveau();
     const miniJeu = () => partie.phase === 'histoire' && partie.lu.def.miniJeu !== undefined;
     while (['convertis', 'bilan', 'carte', 'drift'].includes(partie.phase) || miniJeu()) {
-      // après le garage, le pré du Clos et son concours de drift : on le termine d'office
+      // après Saint-Cézaire, le pré du Clos et son concours de drift : on le termine d'office
       if (partie.phase === 'drift') {
         partie.drift!.fini = true;
         partie.avance();
       } else partie.suivant();
     }
     await pas(partie, hote, 2);
-    expect(client.niveau).toBe(partie.niveau); // après Saint-Cézaire, le pont des Tuves
+    expect(client.niveau).toBe(partie.niveau); // après Saint-Cézaire et le pré du Clos, le pont des Tuves
     expect(client.carte.largeur).toBe(partie.carte.largeur);
   });
 

@@ -73,7 +73,7 @@ export const STC: Omit<DefNiveau, 'carte'> = {
     {
       qui: 'JBG',
       texte:
-        'Avant de partir, on descend au pont des Tuves. À pied, par le sentier, comme quand on avait quinze ans.',
+        'Avant de partir, le pré du Clos, puis on descend au pont des Tuves. À pied, par le sentier, comme quand on avait quinze ans.',
     },
   ],
 };

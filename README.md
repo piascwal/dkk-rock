@@ -27,8 +27,8 @@ Tout au long de la tournée, les héros découvrent la richesse des autres musiq
 techno de Detroit, musette, cumbia, yodel, Kraftwerk...)... et refusent de l'admettre.
 
 **La tournée :** Saint-Cézaire (STC, le village perché au-dessus de la Siagne, où tout commence au
-Clos) → le Pont des Tuves (la descente à pied aux gorges de la Siagne, le pont de 1802, et la bataille de figues du Viet Cong
-glaireux) → le pré du Clos (le concours de drift) → les Alpages Lounge → Gréau (yétis fans de techno
+Clos) → le pré du Clos (le concours de drift, facultatif) → le Pont des Tuves (la descente à pied aux gorges de la Siagne, le
+pont de 1802, et la bataille de figues du Viet Cong glaireux) → les Alpages Lounge → Gréau (yétis fans de techno
 minimale, et le Yéti Alpha) → les Plages Électroniques de Cannes (on arrive en plein jour, la nuit tombe à mesure qu'on avance : coucher de soleil dans la
 mer, puis le festival, sa foule, ses lasers, ses stroboscopes et sa grande scène ; `src/rendu/festival.ts`, `outils/niveaux/plage.py`) → la Ville Autotunée → le Club Infini
 (DJ Boucle).
@@ -86,7 +86,7 @@ spécial, Échap pause ; manette standard.
 Entre certains niveaux, l'histoire fait une pause pour un mini-jeu ; une fois rencontré, il se rejoue depuis le menu
 **Mini-jeux** de l'écran titre (seul, ou à plusieurs : Pause → Inviter des amis).
 
-**Le concours de drift du pré du Clos** (au Clos, à Saint-Cézaire, avant de partir pour de bon) : vue de derrière la voiture, chaque
+**Le concours de drift du pré du Clos** (au Clos, à Saint-Cézaire, juste après le village, avant la descente aux Tuves) : vue de derrière la voiture, chaque
 joueur choisit son pilote — **Tom** et sa Renault 11, ou **Matt** et son Opel Corsa — et a **une minute** pour saccager le
 plus de pelouse possible. Gaz : HAUT ou SAUT ; frein et marche arrière : BAS ; volant : GAUCHE / DROITE ; frein à main :
 TIR. Les roues qui glissent arrachent l'herbe, puis la terre, puis font de la boue ; le score est la part du pré qui n'est

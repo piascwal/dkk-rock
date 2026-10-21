@@ -24,7 +24,7 @@ const avance = (p: Partie, n: number, bits = 0) => {
   }
 };
 
-/** Du bilan au niveau suivant : les pages, la carte du monde, et le pré du Clos (après le garage : son concours, terminé d'office). */
+/** Du bilan au niveau suivant : les pages, la carte du monde, et le pré du Clos (après Saint-Cézaire : son concours, terminé d'office). */
 function entreDeuxNiveaux(p: Partie): void {
   const miniJeu = () => p.phase === 'histoire' && p.lu.def.miniJeu !== undefined;
   while (['convertis', 'bilan', 'carte', 'drift'].includes(p.phase) || miniJeu()) {
@@ -238,10 +238,10 @@ describe('la partie', () => {
     expect(p.phase).toBe('jeu'); // le van doit d'abord partir
     avance(p, 200);
     expect(p.phase).toBe('convertis'); // l'écran des ennemis convertis, avant le récit
-    expect(sauvegardes).toEqual([suivantDansMonde(0)]); // après Saint-Cézaire, le pont des Tuves
+    expect(sauvegardes).toEqual([suivantDansMonde(0)]); // après Saint-Cézaire, le pré du Clos
     entreDeuxNiveaux(p);
     expect(p.phase).toBe('histoire');
-    expect(p.niveau).toBe(suivantDansMonde(0));
+    expect(p.niveau).toBe(suivantDansMonde(suivantDansMonde(0)!)); // le pré du Clos est passé : le pont des Tuves
   });
 
   // chaque niveau de la tournée et son suivant (le pré du Clos, un mini-jeu, est passé d'office par entreDeuxNiveaux)
@@ -325,7 +325,7 @@ describe('la partie', () => {
     expect(p.phase).toBe('carte');
     expect(p.niveau).toBe(0);
     avance(p, DUREE_CARTE + 1);
-    // après Saint-Cézaire, le pont des Tuves
+    // après Saint-Cézaire, le pré du Clos (un mini-jeu, passé d'office par entreDeuxNiveaux)
     expect(p.phase).toBe('histoire');
     expect(p.niveau).toBe(suivantDansMonde(0));
   });
