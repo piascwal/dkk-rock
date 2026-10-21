@@ -3,6 +3,8 @@ import { POSITION_HEROS } from './camera';
 import { Aleatoire } from '../moteur/maths';
 import { Ciel } from './ciel';
 import { arbreRond, brume, palmierPixel, sapinPixel } from './fonds-arbres';
+import { astresDuSoir, cielDuSoir, fouleAuLoin, lasersAuLoin, nuitSurLaPlage, nuitTombee } from './festival';
+import { dessineLumieresClub } from './lumieres-club';
 import { DECORS_BRETONS, type Peinture } from './fonds-bretagne';
 import { batimentsFise, PEINTURE_FISE, QUAI_FISE, tramFise } from './fonds-fise';
 import { PEINTURE_STC, PEINTURE_TUVES } from './fonds-provence';
@@ -181,6 +183,8 @@ const SUIT_LE_CHEMIN: ReadonlySet<Decor> = new Set<Decor>(['tuves']);
 /** Où se trouve le sol à l'écran quand le héros marche dessus, et où il se pose dans la bande d'un plan de décor. */
 const HORIZON = Math.round(HAUTEUR_VUE * POSITION_HEROS) + 8;
 const PIED_DE_BANDE = 238;
+/** La mer des palmiers commence à cette rangée de sa bande (le soleil s'y couche). */
+const MER_PALMIERS = 190;
 
 /** Le fond d'un monde : un ciel en dégradé et trois plans de décor qui défilent moins vite que le jeu. */
 export class Fond {
@@ -188,6 +192,7 @@ export class Fond {
   /** la longueur du niveau, en pixels (le FISE y place ses bâtiments) */
   largeurNiveau = 0;
   private readonly ciel: Ciel;
+  private plansNuit: HTMLCanvasElement[] = [];
 
   constructor(private readonly theme: Theme) {
     this.ciel = new Ciel(theme.decor);
@@ -205,6 +210,19 @@ export class Fond {
       }
       return toile;
     });
+    // les Plages Électroniques : la même bande, de nuit, qu'on fond sur celle du jour à mesure que la nuit tombe
+    if (theme.decor === 'palmiers')
+      this.plansNuit = this.plans.map((jour) => {
+        const toile = document.createElement('canvas');
+        toile.width = LARGEUR_BANDE;
+        toile.height = HAUTEUR_BANDE;
+        const c = toile.getContext('2d')!;
+        c.drawImage(jour, 0, 0);
+        c.globalCompositeOperation = 'source-atop';
+        c.fillStyle = 'rgba(14,6,40,0.78)';
+        c.fillRect(0, 0, LARGEUR_BANDE, HAUTEUR_BANDE);
+        return toile;
+      });
   }
 
   dessine(
@@ -219,13 +237,14 @@ export class Fond {
   ): void {
     const th = this.theme;
     const camFond = camX + decalage;
+    // les Plages Électroniques : la nuit tombe à mesure qu'on avance (voir festival.ts)
+    const nuit = th.decor === 'palmiers' ? nuitTombee(camX, largeur, this.largeurNiveau) : -1;
+    const [haut, bas] = nuit >= 0 ? cielDuSoir(nuit) : th.ciel;
     const g = ctx.createLinearGradient(0, 0, 0, HAUTEUR_VUE);
-    g.addColorStop(0, th.ciel[0]);
-    g.addColorStop(1, th.ciel[1]);
+    g.addColorStop(0, haut);
+    g.addColorStop(1, bas);
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, largeur, HAUTEUR_VUE);
-    this.astres(ctx, largeur, tick);
-    this.ciel.dessine(ctx, camFond, largeur, tick);
     // chaque plan est posé sur l'horizon : le pied de ses arbres suit le sol quand on marche, et glisse moins vite que lui
     // quand on monte ou descend (plus le plan est loin, moins il bouge) : de la profondeur, et des forêts visibles
     // un niveau qui descend tout du long (le sentier des Tuves) garde son fond à hauteur du chemin : la rivière reste derrière
@@ -233,6 +252,13 @@ export class Fond {
     const solEcran = SUIT_LE_CHEMIN.has(th.decor) ? HORIZON + 10 : surface - camY;
     const verticale = th.decor === 'fise' ? PARALLAXE_VERTICALE_FISE : PARALLAXE_VERTICALE;
     const hautDe = (i: number) => Math.round(HORIZON + (solEcran - HORIZON) * verticale[i]!) - PIED_DE_BANDE;
+    if (nuit >= 0) astresDuSoir(ctx, largeur, nuit, hautDe(0) + MER_PALMIERS, tick);
+    else this.astres(ctx, largeur, tick);
+    // la nuit, les nuages s'effacent (on ne les voit plus sur le ciel noir)
+    ctx.globalAlpha = nuit > 0 ? 1 - nuit * 0.85 : 1;
+    this.ciel.dessine(ctx, camFond, largeur, tick);
+    ctx.globalAlpha = 1;
+    if (nuit >= 0) lasersAuLoin(ctx, camFond, largeur, nuit, hautDe(1) + PIED_DE_BANDE, tick);
     PARALLAXE.forEach((f, i) => {
       const x = -((camFond * f) % LARGEUR_BANDE);
       const y = hautDe(i);
@@ -245,6 +271,10 @@ export class Fond {
       if (dessous < HAUTEUR_VUE) {
         ctx.fillStyle = i === 0 ? th.lointain : th.proche;
         ctx.fillRect(0, dessous, largeur, HAUTEUR_VUE - dessous);
+        if (nuit > 0) {
+          ctx.fillStyle = `rgba(14,6,40,${(nuit * 0.78).toFixed(3)})`;
+          ctx.fillRect(0, dessous, largeur, HAUTEUR_VUE - dessous);
+        }
       }
       // et de la bande, seulement la part visible (trois images de 960 × 270 en entier, à chaque image, coûtaient cher)
       const h0 = Math.max(0, -y);
@@ -254,10 +284,24 @@ export class Fond {
         const dx = Math.round(x + k * LARGEUR_BANDE);
         const sx = Math.max(0, -dx);
         const sw = Math.min(LARGEUR_BANDE, largeur - dx) - sx;
-        if (sw > 0) ctx.drawImage(this.plans[i]!, sx, h0, sw, h1 - h0, dx + sx, y + h0, sw, h1 - h0);
+        if (sw <= 0) continue;
+        ctx.drawImage(this.plans[i]!, sx, h0, sw, h1 - h0, dx + sx, y + h0, sw, h1 - h0);
+        if (nuit <= 0 || !this.plansNuit[i]) continue;
+        ctx.globalAlpha = nuit;
+        ctx.drawImage(this.plansNuit[i]!, sx, h0, sw, h1 - h0, dx + sx, y + h0, sw, h1 - h0);
+        ctx.globalAlpha = 1;
       }
     });
-    this.ciel.oiseaux(ctx, camFond, largeur, tick);
+    if (nuit >= 0) fouleAuLoin(ctx, camFond, largeur, nuit, hautDe(2) + PIED_DE_BANDE + 6, tick);
+    if (nuit < 0.5) this.ciel.oiseaux(ctx, camFond, largeur, tick);
+  }
+
+  /** Après les tuiles, sous les personnages : les projecteurs du club, la nuit et le festival des Plages Électroniques. */
+  lumieres(ctx: CanvasRenderingContext2D, camX: number, largeur: number, tick: number): void {
+    const d = this.theme.decor;
+    if (d === 'club') dessineLumieresClub(ctx, camX, largeur, tick);
+    if (d === 'palmiers')
+      nuitSurLaPlage(ctx, camX, largeur, nuitTombee(camX, largeur, this.largeurNiveau), tick);
   }
 
   private astres(ctx: CanvasRenderingContext2D, largeur: number, tick: number): void {

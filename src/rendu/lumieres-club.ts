@@ -15,6 +15,8 @@ export function dessineLumieresClub(
   camX: number,
   largeur: number,
   tick: number,
+  /** de 0 à 1 : la nuit qui tombe sur les Plages Électroniques allume les projecteurs peu à peu */
+  force = 1,
 ): void {
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
@@ -28,7 +30,7 @@ export function dessineLumieresClub(
     const degrade = ctx.createLinearGradient(x, 0, x + Math.cos(a) * PORTEE, Math.sin(a) * PORTEE);
     degrade.addColorStop(0, couleur);
     degrade.addColorStop(1, 'transparent');
-    ctx.globalAlpha = 0.28;
+    ctx.globalAlpha = 0.28 * force;
     ctx.fillStyle = degrade;
     ctx.beginPath();
     ctx.moveTo(x, 0);
@@ -37,7 +39,7 @@ export function dessineLumieresClub(
     ctx.closePath();
     ctx.fill();
     // la lampe elle-même, au point d'attache
-    ctx.globalAlpha = 0.9;
+    ctx.globalAlpha = 0.9 * force;
     ctx.fillStyle = couleur;
     ctx.fillRect(x - 3, 0, 6, 3);
   }

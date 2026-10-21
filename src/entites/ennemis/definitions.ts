@@ -74,7 +74,7 @@ export const ENNEMIS_PAR_LETTRE: Record<string, DefEnnemi> = {
     cris: ['Pas de baskets.', 'T’es pas sur la liste.', 'Pas ce soir.'],
   },
   c: {
-    nom: 'Danseur du tube de l’été',
+    nom: 'Teufeur des Plages Électroniques',
     genre: G.DANSEUR,
     pv: 1,
     w: 8,

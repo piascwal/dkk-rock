@@ -1,7 +1,7 @@
 import { CARTE_STC, DECOR_STC } from './cartes/01-stc';
 import { CARTE_ALPAGES } from './cartes/02-alpages';
 import { CARTE_CIMES } from './cartes/03-cimes';
-import { CARTE_PLAGE } from './cartes/04-plage';
+import { CARTE_PLAGE, DECOR_PLAGE } from './cartes/04-plage';
 import { CARTE_VILLE } from './cartes/05-ville';
 import { CARTE_CLUB } from './cartes/06-club';
 import { CARTE_FORET } from './cartes/07-foret';
@@ -31,7 +31,7 @@ export const NIVEAUX: DefNiveau[] = [
   { ...STC, carte: CARTE_STC, decor: DECOR_STC },
   { ...ALPAGES, carte: CARTE_ALPAGES },
   { ...CIMES, carte: CARTE_CIMES },
-  { ...PLAGE, carte: CARTE_PLAGE },
+  { ...PLAGE, carte: CARTE_PLAGE, decor: DECOR_PLAGE },
   { ...VILLE, carte: CARTE_VILLE },
   { ...CLUB, carte: CARTE_CLUB },
   // l'arc breton

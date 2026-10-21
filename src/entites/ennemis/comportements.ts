@@ -83,7 +83,7 @@ export const marin: Comportement = (e, ctx, cible) => {
   e.marcheVers(ctx, cible.x + cible.w / 2, e.def.vitesse * (elan ? 3 : 1.2));
 };
 
-/** Danseur du tube de l'été : court vers vous en dansant, et explose. */
+/** Teufeur des Plages Électroniques : court vers vous en dansant, et explose. */
 export const kamikaze: Comportement = (e, ctx, cible) => {
   e.marcheVers(ctx, cible.x + cible.w / 2, e.def.vitesse * 2);
   if (e.corps.mur && e.corps.auSol) e.corps.vy = -5;

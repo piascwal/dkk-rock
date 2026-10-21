@@ -148,11 +148,13 @@ NIVEAUX = {
             ('forteresse', 38, dict(etages=4, lettres='acdf', mat='W', cage=True)),
             ('mur', 18, dict(haut=6, lettres='cdf')),
             ('traversee', 36, dict(lettres='cdf', mode='pont')),
-            ('plat', 10, dict(lettres='acdf', digit='3')),  # reggae, cumbia, raï...
+            ('plat', 10, dict(lettres='acdf', digit='3')),  # le soleil se couche
             ('tour', 20, dict(etages=3, lettres='acdf')),
             ('ponton', 42, dict(lettres='cdf')),
             ('barrage', 20, dict(haut=16, lettres='cdf', tyro=11, butin='+')),
+            ('festival', 60, dict(lettres='acdf', digit='4')),  # la nuit : le festival, la foule, la grande scène
             ('gouffre', 20, dict(lettres='cdb', nb=5)),
+            ('festival', 48, dict(lettres='acdfb')),
             ('arene', 44, dict(lettres='acdbf')),
         ],
     ),

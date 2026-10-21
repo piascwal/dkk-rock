@@ -17,6 +17,7 @@ from plans import NIVEAUX, enchaine
 from souterrain import souterrain, tonneaux_de_surface
 from ferry import ferry
 from fise import bigair, breakdance, densite, entree, flat_bmx, food_court, gradins, halfpipe_bois, parc_street, soirees, spine, village
+from plage import festival
 from stc import calade, chapelle, clos, place, remparts, restanques
 from tuves import canal, figuiers, lacets, pont_des_tuves, riviere, sentier
 from hauteurs import corniches, descente, grotte, pont_de_singe, tours, vide_partout
@@ -196,6 +197,9 @@ class Recette:
 
     def p_scene(self, x0, x1, lettres='a'):
         scene(self.n, x0, x1 - x0, lettres, 'D')
+
+    def p_festival(self, x0, x1, lettres='acdf'):
+        festival(self.n, x0, x1 - x0, lettres)
 
     def p_toits(self, x0, x1, lettres='a'):
         toits(self.n, x0, x1 - x0, lettres, self.n.t['mur'])
