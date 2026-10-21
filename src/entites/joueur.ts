@@ -1,6 +1,7 @@
 import { TUILE } from '../config';
 import { borne } from '../moteur/maths';
 import { appliqueGravite, deplace, toucheMur } from '../monde/physique';
+import { T } from '../monde/tuiles';
 import { C, inverse, type Commandes } from '../jeu/commandes';
 import type { Contexte } from '../jeu/contexte';
 import { ANIM, type EntiteVue } from '../jeu/vue';
@@ -10,6 +11,8 @@ import { JoueurBase } from './joueur-base';
 import { SOLO } from './projectiles-defs';
 
 const VITESSE = 1.75;
+/** La part de la vitesse qui reste, les pieds dans l'eau. */
+const DANS_L_EAU = 0.6;
 const SAUT = 5.5;
 const SAUT_MUR = 5;
 const VITESSE_ECHELLE = 1.4;
@@ -62,7 +65,9 @@ export class Joueur extends JoueurBase {
     if (this.verrouHorizontal > 0) this.verrouHorizontal--;
     else {
       const accel = c.auSol ? (c.surGlace ? 0.05 : 0.4) : 0.22;
-      c.vx += borne(h * VITESSE - c.vx, -accel, accel);
+      // les pieds dans l'eau (la Siagne, son canal) : on avance moins vite
+      const pieds = ctx.carte.get(Math.floor((c.x + c.w / 2) / TUILE), Math.floor((c.y + c.h - 2) / TUILE));
+      c.vx += borne(h * VITESSE * (pieds === T.EAU ? DANS_L_EAU : 1) - c.vx, -accel, accel);
     }
     if (c.auSol) {
       this.coyote = 6;

@@ -7,6 +7,24 @@ const pasDe = (e: number, f: number) => (e === ANIM.COURT ? Math.floor(f / 5) % 
 
 /** Les ennemis ordinaires, par genre. */
 export const DESSINS_ENNEMIS: Partial<Record<number, Dessin>> = {
+  // le Viet Cong glaireux : torse nu couvert de boue, short vert, un bandeau de feuilles de figuier ; en attaque, une figue au poing
+  [G.GLAIREUX]: (p, e, f) => {
+    const lance = e === ANIM.ATTAQUE;
+    const yt = humain(
+      p,
+      { peau: '#a8784a', haut: '#7a5a38', bas: '#3f5a2a', chaussures: '#4a3424' },
+      { pas: pasDe(e, f), brasLeves: lance },
+    );
+    p(-2, yt + 6, 2, 2, '#5a4028'); // de la boue
+    p(1, yt + 9, 3, 1, '#5a4028');
+    p(-4, yt - 1, 8, 2, '#2f5a2a'); // le bandeau de feuilles
+    p(-5, yt - 2, 2, 2, '#4f8a3a');
+    p(3, yt - 2, 2, 2, '#4f8a3a');
+    if (lance) {
+      p(3, yt - 5, 3, 3, '#5a2a5a');
+      p(4, yt - 6, 1, 1, '#4f8a3a');
+    }
+  },
   // le b-boy du FISE, en attendant son sprite : survêtement, casquette ; en élan, il tourne (bras levés)
   [G.BREAKER]: (p, e, f) => {
     const yt = humain(

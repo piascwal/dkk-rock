@@ -2,7 +2,15 @@ import { GRAVITE } from '../../config';
 import type { Cible, Contexte } from '../../jeu/contexte';
 import { Projectile } from '../projectile';
 import type { DefProjectile } from '../projectiles-defs';
-import { BOMBE_DRONE, BOULE_NEIGE, DROP, FLASH_SELFIE, LASER, NOTE_AUTOTUNE } from '../projectiles-ennemis';
+import {
+  BOMBE_DRONE,
+  BOULE_NEIGE,
+  DROP,
+  FIGUE,
+  FLASH_SELFIE,
+  LASER,
+  NOTE_AUTOTUNE,
+} from '../projectiles-ennemis';
 import type { Ennemi } from './ennemi';
 
 /** Ce que fait un ennemi en attaque, à chaque pas. */
@@ -202,4 +210,18 @@ export const robot: Comportement = (e, ctx, cible) => {
     e.memoire = (e.memoire + 1) % 3;
     e.recharge = e.memoire ? 8 : e.def.cadence;
   }
+};
+
+/**
+ * Le Viet Cong glaireux, dans la boue sous les figuiers : il garde ses distances et lance des figues en cloche, deux par deux ;
+ * parfois, un cri de guerre.
+ */
+export const figueur: Comportement = (e, ctx, cible) => {
+  gardeDistance(e, ctx, cible, 50, 120);
+  if (e.recharge > 0 || !e.peutTirer(cible, ctx)) return;
+  lobeVers(e, ctx, FIGUE, cible, 36);
+  e.memoire++;
+  e.recharge = e.memoire % 2 ? 16 : e.def.cadence;
+  ctx.son('rebond', e.cx, e.cy);
+  if (ctx.rng.suivant() < 0.15) ctx.texte(e.cx, e.corps.y - 12, 'À LA FIGUE !', '#c86ad8');
 };

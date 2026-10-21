@@ -6,6 +6,7 @@ import { lanceDrift } from '../src/jeu/drift-partie';
 import { Pelouse, marqueVoiture } from '../src/jeu/drift-pelouse';
 import { Voiture } from '../src/jeu/drift-voiture';
 import { Partie } from '../src/jeu/partie';
+import { NIVEAUX } from '../src/niveaux';
 import { suivantDansMonde } from '../src/niveaux/arcs';
 import { decodeEtat, encodeEtat } from '../src/reseau/protocole';
 
@@ -53,8 +54,10 @@ describe('le concours de drift du pré du Clos', () => {
     expect(pelouse.pourcent).toBeGreaterThan(depart + 0.3);
   });
 
-  it('vient juste après le garage, avant la route des Alpes', () => {
-    expect(suivantDansMonde(0)).toBe(NIVEAU_DRIFT);
+  it('vient après le pont des Tuves, avant la route des Alpes', () => {
+    const tuves = NIVEAUX.findIndex((n) => n.id === 'tuves');
+    expect(suivantDansMonde(0)).toBe(tuves);
+    expect(suivantDansMonde(tuves)).toBe(NIVEAU_DRIFT);
     expect(suivantDansMonde(NIVEAU_DRIFT)).toBe(1);
   });
 

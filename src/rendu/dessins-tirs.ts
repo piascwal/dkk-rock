@@ -27,6 +27,14 @@ const tourne = (f: number, n: number) => Math.floor(f / 3) % n;
 
 export const DESSINS_TIRS: Partial<Record<number, Dessin>> = {
   ...DESSINS_TIRS_ARMES,
+  // la figue du Viet Cong glaireux : violette, sa queue verte, et le lait blanc qui en goutte
+  [G.P_FIGUE]: (p, f) => {
+    p(-2, -2, 5, 4, '#5a2a5a');
+    p(-1, -3, 3, 1, '#6a3a6a');
+    p(0, -4, 1, 1, '#4f8a3a');
+    p(-1, -1, 1, 1, '#8a5a8a');
+    p(f % 4 < 2 ? -1 : 1, 2, 1, 2, '#f4f0e0');
+  },
   [G.P_BAGUETTE]: (p, f) => {
     const r = tourne(f, 4);
     if (r % 2) p(-1, -3, 1, 6, '#d9a066');

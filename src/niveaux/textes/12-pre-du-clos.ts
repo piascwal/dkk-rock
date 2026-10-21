@@ -4,7 +4,7 @@ import type { DefNiveau } from '../format';
 export const PRE_DU_CLOS: Omit<DefNiveau, 'carte'> = {
   id: 'clos',
   titre: 'Le Pré du Clos',
-  sousTitre: 'Niveau 2 — Concours de drift',
+  sousTitre: 'Niveau 3 — Concours de drift',
   theme: 'stc',
   miniJeu: 'drift',
   intro: [

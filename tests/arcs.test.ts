@@ -25,16 +25,21 @@ describe('les arcs de l’histoire', () => {
     expect(niveauOuvert(c!, [a!])).toBe(false);
   });
 
-  it('le pré du Clos (un mini-jeu) suit le garage, sans bloquer la route des Alpes', () => {
+  it('Saint-Cézaire, le pont des Tuves, puis le pré du Clos (un mini-jeu) qui ne bloque pas la route des Alpes', () => {
+    const tuves = NIVEAUX.findIndex((n) => n.id === 'tuves');
     const clos = NIVEAUX.findIndex((n) => n.id === 'clos');
     const alpages = NIVEAUX.findIndex((n) => n.id === 'alpages');
+    expect(NIVEAUX[0]!.id).toBe('stc');
     expect(NIVEAUX[clos]!.miniJeu).toBe('drift');
-    expect(suivantDansMonde(0)).toBe(clos);
-    expect(MONDE.indexOf(clos)).toBe(1);
-    expect(niveauOuvert(clos, [])).toBe(false);
-    expect(niveauOuvert(clos, [0])).toBe(true);
-    expect(niveauOuvert(alpages, [0])).toBe(true); // facultatif : on peut le laisser de côté
-    expect(niveauOuvert(alpages, [0, clos])).toBe(true);
+    expect(suivantDansMonde(0)).toBe(tuves);
+    expect(suivantDansMonde(tuves)).toBe(clos);
+    expect(MONDE.indexOf(tuves)).toBe(1);
+    expect(MONDE.indexOf(clos)).toBe(2);
+    expect(niveauOuvert(tuves, [0])).toBe(true);
+    expect(niveauOuvert(clos, [0])).toBe(false);
+    expect(niveauOuvert(clos, [0, tuves])).toBe(true);
+    expect(niveauOuvert(alpages, [0, tuves])).toBe(true); // facultatif : on peut le laisser de côté
+    expect(niveauOuvert(alpages, [0, tuves, clos])).toBe(true);
   });
 
   it('l’arc breton s’ouvre une fois la tournée finie', () => {

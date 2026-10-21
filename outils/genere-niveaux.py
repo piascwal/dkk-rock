@@ -18,6 +18,7 @@ from souterrain import souterrain, tonneaux_de_surface
 from ferry import ferry
 from fise import bigair, breakdance, densite, entree, flat_bmx, food_court, gradins, halfpipe_bois, parc_street, soirees, spine, village
 from stc import calade, chapelle, clos, place, remparts, restanques
+from tuves import canal, figuiers, lacets, pont_des_tuves, riviere, sentier
 from hauteurs import corniches, descente, grotte, pont_de_singe, tours, vide_partout
 from signatures import falaise, glacier, parking, ponton, scene, toits
 from structures import forteresse, traversee
@@ -59,9 +60,10 @@ def declencheurs(fichier):
 class Recette:
     """Pose les pièces les unes après les autres, de gauche à droite, et le butin."""
 
-    def __init__(self, nom, theme, fichier_textes, largeur=430, base=30, graine=1):
-        # peu de profondeur : 30 rangées sous la surface, dont 6 de vide ; le monde finit vite, on tombe vite
-        self.nom, self.n = nom, Niveau(largeur, base + 30, base, graine, THEMES[theme])
+    def __init__(self, nom, theme, fichier_textes, largeur=430, base=30, graine=1, profondeur=30):
+        # peu de profondeur : 30 rangées sous la surface, dont 6 de vide ; le monde finit vite, on tombe vite (un niveau qui
+        # descend, comme le sentier du pont des Tuves, en demande plus : `profondeur` dans son plan)
+        self.nom, self.n = nom, Niveau(largeur, base + profondeur, base, graine, THEMES[theme])
         # l'arc breton a son goéland (g) à la place du drone (e) : les autres niveaux gardent le drone
         self.volant = 'g' if theme in BRETON else 'e'
         self.x = 6
@@ -233,6 +235,25 @@ class Recette:
     def p_chapelle(self, x0, x1, lettres='a', cage=True):
         chapelle(self.n, x0, x1 - x0, lettres, cage)
 
+    # ---- le pont des Tuves (voir niveaux/tuves.py) : le sentier qui descend aux gorges, le canal, le pont, la rivière, les figuiers
+    def p_sentier(self, x0, x1, lettres='a'):
+        sentier(self.n, x0, x1 - x0, lettres)
+
+    def p_lacets(self, x0, x1, chute=6, lettres='a'):
+        lacets(self.n, x0, x1 - x0, chute, lettres)
+
+    def p_canal(self, x0, x1, lettres='a'):
+        canal(self.n, x0, x1 - x0, lettres)
+
+    def p_pont_des_tuves(self, x0, x1, lettres='a'):
+        pont_des_tuves(self.n, x0, x1 - x0, lettres)
+
+    def p_riviere(self, x0, x1, lettres='a', chute=4):
+        riviere(self.n, x0, x1 - x0, lettres, chute)
+
+    def p_figuiers(self, x0, x1, lettres='v'):
+        figuiers(self.n, x0, x1 - x0, lettres)
+
     # ---- le FISE (voir niveaux/fise.py) : chaque zone du festival, son décor placé à la main
     def p_entree(self, x0, x1, lettres='s'):
         entree(self.n, x0, x1 - x0, lettres)
@@ -342,9 +363,9 @@ def apercu(lignes, nom, z=3):
 # Les recettes. Chaque recette : une liste de pièces (genre, largeur, options), puis les galeries et le butin.
 
 
-def construit(nom, theme, textes, plan, fichier, constante, graine, base=30, van=True, altitude=False):  # fichier et constante : inutilisés ici
+def construit(nom, theme, textes, plan, fichier, constante, graine, base=30, van=True, altitude=False, profondeur=30):  # fichier et constante : inutilisés ici
     total = 12 + sum(p[1] for p in plan)
-    r = Recette(nom, theme, textes, largeur=total, graine=graine, base=base)
+    r = Recette(nom, theme, textes, largeur=total, graine=graine, base=base, profondeur=profondeur)
     n = r.n
     if altitude:
         # un niveau en hauteur : tout est vide, chaque pièce pose son massif (voir niveaux/hauteurs.py) ; le départ a le sien
@@ -370,7 +391,9 @@ def construit(nom, theme, textes, plan, fichier, constante, graine, base=30, van
     for x0, x1, g in r.pieces:
         if g in ('arene', 'vide') and x1 - x0 >= 40:
             r.drapeau(x0 + 3)
-    if altitude:  # le bout du niveau, après la dernière pièce : un replat pour le van
+    # le bout du niveau, après la dernière pièce : un replat pour le van, à la hauteur où l'on est arrivé (un niveau en altitude,
+    # ou qui descend comme le sentier du pont des Tuves)
+    if altitude or n.base != base:
         n.niveler(r.x, total)
     # le van, au bout (le club n'en a pas : le niveau finit avec le DJ)
     if van:
@@ -384,7 +407,7 @@ def fabrique(cle):
     plan = enchaine(cfg['lieux'], cfg['graine'], cfg['raccord'])
     r = construit(
         cfg['nom'], cfg['theme'], cfg['textes'], plan, '', '', cfg['graine'], base=cfg['base'], van=cfg.get('van', True),
-        altitude=cfg.get('altitude', False),
+        altitude=cfg.get('altitude', False), profondeur=cfg.get('profondeur', 30),
     )
     if not cfg.get('sans_caves'):  # le ferry est un petit niveau : rien sous le quai
         souterrain(r, cfg['caves'])

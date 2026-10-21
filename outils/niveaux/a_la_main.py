@@ -3,8 +3,9 @@ a la place, monter une colonne ou une échelle, couvrir une maison d'un toit de 
 
 
 def libre3(n, x, y):
-    """Les neuf cases qu'occupe un décor posé en (x, y) : une de part et d'autre, trois au-dessus du sol de rangée y."""
-    return all(n.get(x + dx, y - dy) in ' .' for dx in (-1, 0, 1) for dy in (1, 2, 3))
+    """Les neuf cases qu'occupe un décor posé en (x, y) : une de part et d'autre, trois au-dessus du sol de rangée y (l'eau
+    compte comme libre : des roseaux, un figuier les pieds dans la rivière, se voient à travers)."""
+    return all(n.get(x + dx, y - dy) in ' .~' for dx in (-1, 0, 1) for dy in (1, 2, 3))
 
 
 def pose(n, x, nom, y=None, ecart=3):

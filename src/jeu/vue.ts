@@ -19,6 +19,8 @@ export const G = {
   CHAMPION: 7,
   /** le b-boy de la scène de breaking du FISE : il fonce en coupole sur le héros */
   BREAKER: 8,
+  /** le combattant du « Viet Cong glaireux », dans la boue des figuiers de la Siagne : il lance des figues */
+  GLAIREUX: 9,
   FETARD: 10,
   VIDEUR: 11,
   DANSEUR: 12,
@@ -85,9 +87,14 @@ export const G = {
   COEUR_OR: 67,
   /** le van à réacteur : celui des niveaux qui finissent au sommet, d’où il décolle */
   VAN_REACTEUR: 68,
+  /** la figue du Viet Cong glaireux : un tir, hors de la plage des tirs (pleine) ; voir `estUnTir` */
+  P_FIGUE: 69,
 } as const;
 
 export type Genre = (typeof G)[keyof typeof G];
+
+/** Un tir (les instruments et les tirs ennemis) : la plage des tirs, plus ceux venus après qu'elle fut pleine (la figue). */
+export const estUnTir = (g: number): boolean => (g >= G.P_BAGUETTE && g < G.CAGE) || g === G.P_FIGUE;
 
 /** États d'animation des héros (champ `e`). */
 export const ANIM = {
@@ -201,6 +208,7 @@ export const GENRES_CONVERTIS: readonly number[] = [
   G.BMX,
   G.BMX_PRO,
   G.BREAKER,
+  G.GLAIREUX,
   G.INFLUENCEUR,
   G.YETI,
   G.ROBOT,

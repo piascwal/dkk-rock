@@ -1,6 +1,6 @@
 import { DENSITE_MAX, DENSITE_MIN, HAUTEUR_CARTE, HAUTEUR_VUE, TUILE } from '../config';
 import type { Qualite } from '../jeu/sauvegarde';
-import { ANIM, G, type EntiteVue, type EtatVue, type Evenement } from '../jeu/vue';
+import { ANIM, G, estUnTir, type EntiteVue, type EtatVue, type Evenement } from '../jeu/vue';
 import { Carte } from '../monde/carte';
 import { proprietes } from '../monde/tuiles';
 import { NIVEAUX, niveauLu } from '../niveaux';
@@ -260,7 +260,7 @@ export class Rendu {
 
     // les objets derrière, puis les personnages, puis les tirs
     const tri = (v: EntiteVue) =>
-      v.g >= G.CAGE || (v.g < G.P_BAGUETTE && v.e === ANIM.TERRASSE) ? 0 : v.g >= G.P_BAGUETTE ? 2 : 1;
+      estUnTir(v.g) ? 2 : v.g >= G.CAGE || (v.g < G.P_BAGUETTE && v.e === ANIM.TERRASSE) ? 0 : 1;
     this.restes.dessine(ctx, this.restes.maj(vue), camX, camY, this.largeur);
     for (const passe of [0, 1, 2])
       for (const v of vue.entites)

@@ -95,3 +95,18 @@ export const ONDE_SOL = P({
   perce: true,
   lourd: true,
 });
+
+/**
+ * La figue du Viet Cong glaireux, lancée en cloche : son lait brûle ce qu'il touche. Elle traverse ce qu'elle détruit (planches,
+ * caisses, boue, échelles : `creuse`) et s'arrête sur la terre et la pierre, qu'elle abîme.
+ */
+export const FIGUE = P({
+  genre: G.P_FIGUE,
+  vitesse: 3.4,
+  gravite: 0.75,
+  degats: 1,
+  degatsTuile: 2,
+  creuse: true,
+  duree: 90,
+  taille: 5,
+});

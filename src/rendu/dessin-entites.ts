@@ -1,7 +1,7 @@
 import { TUILE } from '../config';
 import { ARME_CHAUFFAGE, armeRamassee } from '../entites/armes';
 import { herosDuGenre } from '../entites/heros';
-import { ANIM, G, VOLANTS, type EntiteVue, type Genre } from '../jeu/vue';
+import { ANIM, G, VOLANTS, estUnTir, type EntiteVue, type Genre } from '../jeu/vue';
 import type { AtlasTuiles } from './atlas-tuiles';
 import { dessineAura } from './aura';
 import { dessineBulle, hauteurBulle } from './bulle-bonus';
@@ -99,7 +99,7 @@ export function dessineEntite(
   let y = Math.round((v.y - Math.round(camY)) * d) / d;
   // le van qui démarre tressaute sur ses amortisseurs
   if (v.g === G.VAN && (v.e === 2 || v.e === 3)) y -= (Math.floor(performance.now() / 45) % 2) * 0.5;
-  const estTir = v.g >= G.P_BAGUETTE && v.g < G.CAGE;
+  const estTir = estUnTir(v.g);
   if (estTir) y -= DEMI_TAILLE[v.g] ?? 2;
 
   if (v.g === G.BLOC) {

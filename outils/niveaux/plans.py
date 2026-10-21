@@ -55,6 +55,30 @@ NIVEAUX = {
             ('arene', 40, dict(lettres='ac')),
         ],
     ),
+    # le pont des Tuves (voir niveaux/tuves.py) : de Saint-Cézaire, on descend à pied jusqu'à la Siagne ; le sol baisse au fil
+    # du niveau (il est plus profond que les autres), puis la rivière et les figuiers du Viet Cong glaireux (v)
+    'tuves': dict(
+        nom='Le Pont des Tuves', theme='tuves', textes='13-tuves.ts', fichier='13-tuves.ts', constante='CARTE_TUVES',
+        graine=13, base=30, profondeur=64, raccord='a', caves='a', sans_caves=True,
+        lieux=[
+            ('sentier', 22, dict(lettres='a', digit='1')),  # le départ du sentier, sa balise
+            ('lacets', 30, dict(chute=6, lettres='a')),
+            ('forteresse', 32, dict(etages=3, lettres='ac', cage=True)),  # un fort, sur le chemin
+            ('lacets', 26, dict(chute=6, lettres='ac', digit='2')),
+            ('canal', 34, dict(lettres='ac', digit='3')),  # le canal de la Siagne
+            ('pont_singe', 18, dict(lettres='ac')),
+            ('lacets', 28, dict(chute=6, lettres='ac')),
+            ('forteresse', 36, dict(etages=3, lettres='ac', cage=True)),
+            ('descente', 24, dict(chute=6, lettres='ac')),  # une tyrolienne jusqu'au fond des gorges
+            ('pont_des_tuves', 62, dict(lettres='ac', digit='4')),  # le pont de 1802, la rivière dessous
+            ('riviere', 40, dict(lettres='av')),
+            ('figuiers', 56, dict(lettres='v', digit='5')),  # le Viet Cong glaireux
+            ('gouffre', 18, dict(lettres='v', nb=4)),
+            ('figuiers', 60, dict(lettres='vv', digit='6')),
+            ('riviere', 30, dict(lettres='v', chute=0)),
+            ('arene', 40, dict(lettres='av')),
+        ],
+    ),
     'alpages': dict(
         nom='Les Alpages Lounge', theme='alpages', textes='02-alpages.ts', fichier='02-alpages.ts',
         constante='CARTE_ALPAGES', graine=22, base=34, raccord='ad', caves='ad',

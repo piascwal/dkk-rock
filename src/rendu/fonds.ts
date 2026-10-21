@@ -176,6 +176,8 @@ const PARALLAXE = [0.12, 0.3, 0.55];
 const PARALLAXE_VERTICALE = [0.2, 0.45, 0.75];
 /** Le FISE : la ville, le Lez et ses berges, les barrières sont posés sur le sol du quai, ils le suivent exactement. */
 const PARALLAXE_VERTICALE_FISE = [1, 1, 1];
+/** Les décors posés à hauteur du chemin plutôt que du départ (voir `Fond.dessine`). */
+const SUIT_LE_CHEMIN: ReadonlySet<Decor> = new Set<Decor>(['tuves']);
 /** Où se trouve le sol à l'écran quand le héros marche dessus, et où il se pose dans la bande d'un plan de décor. */
 const HORIZON = Math.round(HAUTEUR_VUE * POSITION_HEROS) + 8;
 const PIED_DE_BANDE = 238;
@@ -226,7 +228,9 @@ export class Fond {
     this.ciel.dessine(ctx, camFond, largeur, tick);
     // chaque plan est posé sur l'horizon : le pied de ses arbres suit le sol quand on marche, et glisse moins vite que lui
     // quand on monte ou descend (plus le plan est loin, moins il bouge) : de la profondeur, et des forêts visibles
-    const solEcran = surface - camY;
+    // un niveau qui descend tout du long (le sentier des Tuves) garde son fond à hauteur du chemin : la rivière reste derrière
+    // le héros, du village jusqu'au fond des gorges
+    const solEcran = SUIT_LE_CHEMIN.has(th.decor) ? HORIZON + 10 : surface - camY;
     const verticale = th.decor === 'fise' ? PARALLAXE_VERTICALE_FISE : PARALLAXE_VERTICALE;
     const hautDe = (i: number) => Math.round(HORIZON + (solEcran - HORIZON) * verticale[i]!) - PIED_DE_BANDE;
     PARALLAXE.forEach((f, i) => {

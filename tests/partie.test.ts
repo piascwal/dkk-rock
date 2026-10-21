@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { DUREE_INVINCIBLE, PV_HEROS, TUILE, VIES_DEPART, VIES_MAX } from '../src/config';
 import { C } from '../src/jeu/commandes';
-import { NIVEAU_DRIFT } from '../src/jeu/drift';
 import { Partie } from '../src/jeu/partie';
+import { ARCS, suivantDansMonde } from '../src/niveaux/arcs';
 import { DUREE_CARTE, G, GENRES_CONVERTIS } from '../src/jeu/vue';
 import { Objet } from '../src/entites/objets';
 import { NIVEAUX } from '../src/niveaux';
@@ -238,16 +238,18 @@ describe('la partie', () => {
     expect(p.phase).toBe('jeu'); // le van doit d'abord partir
     avance(p, 200);
     expect(p.phase).toBe('convertis'); // l'écran des ennemis convertis, avant le récit
-    expect(sauvegardes).toEqual([NIVEAU_DRIFT]); // après le garage, le pré du Clos (le concours de drift)
+    expect(sauvegardes).toEqual([suivantDansMonde(0)]); // après Saint-Cézaire, le pont des Tuves
     entreDeuxNiveaux(p);
     expect(p.phase).toBe('histoire');
-    expect(p.niveau).toBe(1);
+    expect(p.niveau).toBe(suivantDansMonde(0));
   });
 
-  it.each([1, 2, 3, 4, 5])(
+  // chaque niveau de la tournée et son suivant (le pré du Clos, un mini-jeu, est passé d'office par entreDeuxNiveaux)
+  const tournee = ARCS[0]!.niveaux.filter((n) => !NIVEAUX[n]!.miniJeu);
+  it.each(tournee.slice(1).map((n, i) => [n, tournee[i]!] as const))(
     'au niveau %i, le groupe démarre au départ, pas à la fin du niveau précédent',
-    (n) => {
-      const p = nouvelle(n - 1);
+    (n, avant) => {
+      const p = nouvelle(avant);
       p.ajouteJoueur(1, 2);
       // les héros se trouvent loin, comme à la fin d'un niveau long
       for (const j of p.joueurs) if (j) Object.assign(j.corps, { x: 190 * TUILE, y: 5 * TUILE });
@@ -323,8 +325,8 @@ describe('la partie', () => {
     expect(p.phase).toBe('carte');
     expect(p.niveau).toBe(0);
     avance(p, DUREE_CARTE + 1);
-    // après le garage, le pré du Clos (le concours de drift)
+    // après Saint-Cézaire, le pont des Tuves
     expect(p.phase).toBe('histoire');
-    expect(p.niveau).toBe(NIVEAU_DRIFT);
+    expect(p.niveau).toBe(suivantDansMonde(0));
   });
 });

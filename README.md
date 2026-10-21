@@ -27,7 +27,8 @@ Tout au long de la tournée, les héros découvrent la richesse des autres musiq
 techno de Detroit, musette, cumbia, yodel, Kraftwerk...)... et refusent de l'admettre.
 
 **La tournée :** Saint-Cézaire (STC, le village perché au-dessus de la Siagne, où tout commence au
-Clos) → le pré du Clos (le concours de drift) → les Alpages Lounge → Gréau (yétis fans de techno
+Clos) → le Pont des Tuves (la descente à pied aux gorges de la Siagne, le pont de 1802, et la bataille de figues du Viet Cong
+glaireux) → le pré du Clos (le concours de drift) → les Alpages Lounge → Gréau (yétis fans de techno
 minimale, et le Yéti Alpha) → les Plages Électroniques de Cannes → la Ville Autotunée → le Club Infini
 (DJ Boucle).
 
@@ -185,7 +186,12 @@ validé.
   joueurs ; un premier toucher termine le comptage, le suivant passe au récit.
   **Chaque monde a sa géométrie** (`outils/niveaux/signatures.py`) : Saint-Cézaire ses lieux à lui (`outils/niveaux/stc.py` : le
   Clos, les restanques d'oliviers, les remparts, la place de la fontaine des Mulets et sa mairie, les calades sous leurs passages
-  voûtés, la chapelle Notre-Dame de Sardaigne), en pierre calcaire (`{`) sous des toits de tuiles (`^`) ; le _parking à étages_
+  voûtés, la chapelle Notre-Dame de Sardaigne), en pierre calcaire (`{`) sous des toits de tuiles (`^`) ; le Pont des Tuves
+  (`outils/niveaux/tuves.py`) descend : le sentier, ses lacets de corniches, le canal de la Siagne (l'eau `~`, qu'on traverse
+  et qui ralentit), le pont de pierre au-dessus des gorges, le lit de la rivière (la boue `;`), puis les figuiers du Viet Cong
+  glaireux (ennemi `v`) qui lancent des figues : leur lait brûle tout ce qu'il traverse (planches, caisses, boue) et ne
+  s'arrête que sur la terre ou la pierre ; le niveau est plus profond que les autres (`profondeur` dans son plan) et son fond
+  suit le chemin (la rivière reste derrière, à toutes les hauteurs) ; le _parking à étages_
   (rampes en escalier, local dessous, niveau de pitons dessus) attend un nouveau monde, les alpages leur _falaise à corniches_ (échelles en zigzag, grotte à mi-hauteur), les cimes
   leur _glacier_ (bosses de glace qui glisse, crevasses, igloo à traverser), la plage son _ponton_ de planches sur pilotis et son
   phare, la ville ses _toits sur pilotis_ (on saute de toit en toit). Les pièces communes varient aussi : la traversée de gouffre

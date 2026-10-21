@@ -114,7 +114,7 @@ describe('une session à plusieurs', () => {
       } else partie.suivant();
     }
     await pas(partie, hote, 2);
-    expect(client.niveau).toBe(1);
+    expect(client.niveau).toBe(partie.niveau); // après Saint-Cézaire, le pont des Tuves
     expect(client.carte.largeur).toBe(partie.carte.largeur);
   });
 

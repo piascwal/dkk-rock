@@ -2,6 +2,7 @@ import { G, type Genre } from '../../jeu/vue';
 import {
   bigoudene,
   charge,
+  figueur,
   drone,
   goeland,
   influenceur,
@@ -177,6 +178,26 @@ export const ENNEMIS_PAR_LETTRE: Record<string, DefEnnemi> = {
     points: 100,
     comportement: influenceur,
     cris: ['Abonnez-vous !', 'Code promo ROCK10', 'Story !'],
+  },
+  // le pont des Tuves : sous les figuiers, les pieds dans la boue, le « Viet Cong glaireux » lance des figues dont le lait brûle
+  v: {
+    nom: 'Viet Cong glaireux',
+    genre: G.GLAIREUX,
+    pv: 2,
+    w: 10,
+    h: 20,
+    vitesse: 1.1,
+    vision: 190,
+    visionVerticale: 80,
+    cadence: 70,
+    points: 140,
+    comportement: figueur,
+    cris: [
+      'À la figue !',
+      'Demain, t’as des cloques partout !',
+      'Viet Cong glaireux !',
+      'Le lait, ça brûle !',
+    ],
   },
   y: {
     nom: 'Yéti minimal',

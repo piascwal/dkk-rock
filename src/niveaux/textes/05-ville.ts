@@ -3,7 +3,7 @@ import type { DefNiveau } from '../format';
 export const VILLE: Omit<DefNiveau, 'carte'> = {
   id: 'ville',
   titre: 'La Ville Autotunée',
-  sousTitre: 'Niveau 6 — Même le métro chante juste',
+  sousTitre: 'Niveau 7 — Même le métro chante juste',
   theme: 'ville',
   intro: [
     {
