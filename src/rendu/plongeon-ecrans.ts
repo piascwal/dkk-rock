@@ -1,9 +1,9 @@
 import { HAUTEUR_VUE } from '../config';
-import { ENTREE, ZONE } from '../jeu/plongeon';
+import { DUREE_SURVOL, ENTREE, HAUTEUR, ZONE } from '../jeu/plongeon';
 import type { VuePlongeon } from '../jeu/vue';
 import { ecrit, ecritCentre, largeurTexte } from './police';
 
-/** Les écrans du concours de plongeon, par-dessus la rivière : la visée, la chute, l'arrivée, la note, le podium. */
+/** Les écrans du concours de plongeon, par-dessus les gorges : le survol, le parapet, la chute, l'arrivée, la note, le podium. */
 
 const BLANC = '#ffffff';
 const JAUNE = '#ffd23f';
@@ -24,12 +24,15 @@ function recit(v: VuePlongeon): [string, string] {
     return ['SUR LA BERGE ! PLANTÉ COMME UN PIQUET.', 'LES POMPIERS DE SAINT-CÉZAIRE SONT EN ROUTE.'];
   if (v.zone === ZONE.BAS)
     return ['PEU PROFOND : GENOUX RÂPÉS SUR LES GALETS (-10).', 'IL BOITERA JUSQU’AUX ALPES.'];
-  return [v.score >= 95 ? 'PILE DANS LE TROU D’EAU !' : 'DANS LE TROU D’EAU.', 'LES GORGES APPLAUDISSENT.'];
+  return [
+    v.score >= 95 ? 'PILE DANS LE TROU D’EAU !' : 'DANS LE TROU D’EAU.',
+    'LE GROUPE APPLAUDIT DEPUIS LA BERGE.',
+  ];
 }
 
 function entree(v: VuePlongeon): [string, string] {
   if (v.entree === ENTREE.PARFAITE) return ['ENTRÉE PARFAITE, BRAS TENDUS (+10)', VERT];
-  if (v.entree === ENTREE.PLAT) return ['À PLAT ! ÇA CLAQUE (-20)', ROUGE];
+  if (v.entree === ENTREE.PLAT) return ['À PLAT ! ÇA CLAQUE (-25)', ROUGE];
   if (v.entree === ENTREE.GAINEE) return ['BRAS TENDUS TROP TÔT', BLANC];
   return ['', BLANC];
 }
@@ -38,7 +41,6 @@ export function dessineEcranPlongeon(
   ctx: CanvasRenderingContext2D,
   largeur: number,
   v: VuePlongeon,
-  hauteur: number,
   tick: number,
 ): void {
   const m = largeur / 2;
@@ -47,18 +49,22 @@ export function dessineEcranPlongeon(
       bandeau(ctx, largeur, 0, 26);
       ecritCentre(ctx, 'LE SAUT DU PONT DES TUVES', m, 3, JAUNE, 2);
       ecritCentre(ctx, `${joueur(v.siege)} - TOM`, m, 17, ROSE);
+      if (v.vise < DUREE_SURVOL) {
+        bandeau(ctx, largeur, HAUTEUR_VUE - 12, 12);
+        ecritCentre(ctx, 'LE TROU D’EAU EST LÀ. RETIENS BIEN OÙ.', m, HAUTEUR_VUE - 10, BLANC);
+        return;
+      }
       bandeau(ctx, largeur, 26, 12);
-      ecritCentre(ctx, 'VISE LE TROU D’EAU, LE BLEU LE PLUS FONCÉ', m, 28, BLANC);
-      if (tick % 50 < 36) ecritCentre(ctx, 'SAUT : SAUTER', m, HAUTEUR_VUE - 12, JAUNE);
+      ecritCentre(ctx, '< > SE PLACER   SAUT : SAUTER (L’ÉLAN AU MILIEU)', m, 28, BLANC);
       return;
     case 'chute': {
-      ecrit(ctx, `${Math.round(hauteur)} M`, 4, 14, BLANC, 2);
-      if (Math.abs(v.vent) > 0.15) {
-        const texte = v.vent > 0 ? 'VENT >' : '< VENT';
-        ecrit(ctx, texte, largeur - 4 - largeurTexte(texte), 14, JAUNE);
+      ecrit(ctx, `${Math.max(0, Math.round(HAUTEUR - v.y))} M`, 4, 14, BLANC, 2);
+      if (v.eraflures) {
+        const texte = `ÉRAFLURES ${v.eraflures}`;
+        ecrit(ctx, texte, largeur - 4 - largeurTexte(texte), 14, ROUGE);
       }
-      const aide = v.bras ? 'BRAS TENDUS !' : '< > SE DIRIGER   SAUT : TENDRE LES BRAS';
       bandeau(ctx, largeur, HAUTEUR_VUE - 12, 12);
+      const aide = v.bras ? 'BRAS TENDUS !' : '< > SE DIRIGER   SAUT : TENDRE LES BRAS';
       ecritCentre(ctx, aide, m, HAUTEUR_VUE - 10, v.bras ? VERT : BLANC);
       return;
     }
@@ -75,10 +81,18 @@ export function dessineEcranPlongeon(
     case 'resultat': {
       const [ou, suite] = recit(v);
       const [e, couleur] = entree(v);
-      bandeau(ctx, largeur, 26, 70);
-      ecritCentre(ctx, `PRÉCISION ${v.score} %`, m, 30, JAUNE, 2);
-      ecritCentre(ctx, ou, m, 50, v.zone === ZONE.PROFOND ? VERT : ROUGE);
-      if (e) ecritCentre(ctx, e, m, 62, couleur);
+      bandeau(ctx, largeur, 14, 80);
+      ecritCentre(ctx, `PRÉCISION ${v.score} %`, m, 18, JAUNE, 2);
+      ecritCentre(ctx, ou, m, 38, v.zone === ZONE.PROFOND ? VERT : ROUGE);
+      if (e) ecritCentre(ctx, e, m, 50, couleur);
+      if (v.eraflures)
+        ecritCentre(
+          ctx,
+          `${v.eraflures} BRANCHE${v.eraflures > 1 ? 'S' : ''} (-${5 * v.eraflures})`,
+          m,
+          62,
+          ROUGE,
+        );
       ecritCentre(ctx, suite, m, 78, ROSE);
       return;
     }

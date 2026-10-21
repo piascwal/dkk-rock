@@ -4,9 +4,12 @@ import { C } from '../src/jeu/commandes';
 import { Partie } from '../src/jeu/partie';
 import {
   ConcoursPlongeon,
-  DUREE_CHUTE,
+  DUREE_SURVOL,
   EAU,
   ENTREE,
+  GORGE,
+  HAUTEUR,
+  jaugeDe,
   NIVEAU_PLONGEON,
   note,
   PROFOND,
@@ -18,54 +21,60 @@ import { niveauOuvert, suivantDansMonde } from '../src/niveaux/arcs';
 import { decodeEtat, encodeEtat } from '../src/reseau/protocole';
 
 const pas = (c: ConcoursPlongeon, bits = 0) => c.maj([bits, 0, 0, 0], [0], () => {});
-const appuie = (c: ConcoursPlongeon, bits = C.SAUT) => {
-  pas(c, bits);
+const appuie = (c: ConcoursPlongeon) => {
+  pas(c, C.SAUT);
   pas(c, 0);
 };
 
-/** Vise jusqu'à ce que le curseur passe à moins de 0,3 m de `cible`, puis saute. */
-function sauteVers(c: ConcoursPlongeon, cible: number): void {
-  for (let t = 0; t < 600 && Math.abs(c.visee - cible) > 0.3; t++) pas(c);
+/** Le survol passé, Tom se place au-dessus de `x`, attend que la jauge d'élan soit au milieu, et saute. */
+function saute(c: ConcoursPlongeon, x: number): void {
+  while (c.vise < DUREE_SURVOL) pas(c);
+  for (let t = 0; t < 2000 && Math.abs(c.x - x) > 0.06; t++) pas(c, c.x < x ? C.DROITE : C.GAUCHE);
+  for (let t = 0; t < 200 && Math.abs(jaugeDe(c.vise)) > 0.06; t++) pas(c);
   pas(c, C.SAUT);
+  pas(c, 0);
 }
 
 describe('le concours de plongeon du pont des Tuves', () => {
-  it('la note : le milieu du trou d’eau vaut 100, son bord 70 ; l’eau peu profonde blesse, la berge vaut zéro', () => {
+  it('la note : 100 au milieu du trou d’eau, 70 à son bord ; l’eau peu profonde blesse, la berge vaut zéro', () => {
     expect(note(2, 2, ENTREE.GAINEE)).toEqual({ zone: ZONE.PROFOND, score: 100 });
     expect(note(2 + PROFOND, 2, ENTREE.GAINEE)).toEqual({ zone: ZONE.PROFOND, score: 70 });
-    // deux mètres au-delà du trou : l'eau baisse (−14) et les galets coûtent 10 points
-    expect(note(2 + PROFOND + 2, 2, ENTREE.GAINEE)).toEqual({ zone: ZONE.BAS, score: 46 });
-    expect(note(EAU + 1, 2, ENTREE.PARFAITE)).toEqual({ zone: ZONE.BERGE, score: 0 });
-    // l'entrée : bras tendus au dernier moment, +10 ; à plat, −20
+    // deux mètres au-delà du trou : l'eau baisse vite (−24) et les galets coûtent 10 points
+    expect(note(PROFOND + 2, 0, ENTREE.GAINEE)).toEqual({ zone: ZONE.BAS, score: 36 });
+    expect(note(EAU + 0.5, 2, ENTREE.PARFAITE)).toEqual({ zone: ZONE.BERGE, score: 0 });
+    // l'entrée : bras tendus au dernier moment +10, à plat −25 ; chaque branche heurtée −5
     expect(note(2 + PROFOND, 2, ENTREE.PARFAITE).score).toBe(80);
-    expect(note(2 + PROFOND, 2, ENTREE.PLAT).score).toBe(50);
-    expect(note(2, 2, ENTREE.PARFAITE).score).toBe(100); // pas plus de 100
+    expect(note(2 + PROFOND, 2, ENTREE.PLAT).score).toBe(45);
+    expect(note(2, 2, ENTREE.PARFAITE, 3).score).toBe(95);
   });
 
-  it('la rivière de chaque saut est tirée d’après son numéro : la même pour l’hôte et pour l’écran', () => {
+  it('les gorges de chaque saut sont tirées d’après son numéro : beaucoup de branches, trois hirondelles, trois couloirs de vent', () => {
     for (let m = 1; m < 60; m++) {
       const t = tirage(m);
       expect(t).toEqual(tirage(m));
       expect(Math.abs(t.fosse) + PROFOND).toBeLessThan(EAU); // le trou d'eau est dans l'eau
-      expect(Math.abs(t.oiseau.x - t.fosse)).toBeLessThanOrEqual(2); // l'hirondelle passe au-dessus du trou
-      expect(t.rafales).toHaveLength(2);
+      expect(t.branches.length).toBeGreaterThanOrEqual(8);
+      for (const b of t.branches) {
+        expect(b.y).toBeGreaterThan(5);
+        expect(b.y).toBeLessThan(HAUTEUR - 4);
+        expect(b.longueur).toBeLessThan(GORGE - 2); // il reste toujours un passage
+      }
+      expect(t.oiseaux).toHaveLength(3);
+      expect(t.vents).toHaveLength(3);
     }
   });
 
-  it('un saut : on vise, on tombe en 3,4 s, on tend les bras au dernier moment, on touche l’eau, puis le podium', () => {
+  it('un saut : le survol, la place sur le parapet, l’élan, la chute, les bras tendus au dernier moment, l’eau, le podium', () => {
     const c = new ConcoursPlongeon([0], false);
     expect(c.etape).toBe('visee');
-    const { fosse } = tirage(c.manche);
-    sauteVers(c, fosse);
+    saute(c, c.fosse);
     expect(c.etape).toBe('chute');
-    expect(Math.abs(c.x - fosse)).toBeLessThan(0.4);
-    for (let t = 0; t < DUREE_CHUTE - 10; t++) pas(c);
-    expect(c.hauteur).toBeGreaterThan(0);
-    appuie(c); // les bras tendus, à quelques images de l'eau
+    expect(Math.abs(c.vx)).toBeLessThan(0.3); // l'élan pris au milieu de la jauge : on tombe droit
+    while (c.y < HAUTEUR - 5) pas(c);
+    appuie(c);
     while (c.etape === 'chute') pas(c);
     expect(c.etape).toBe('impact');
-    expect(c.entree).toBe(ENTREE.PARFAITE);
-    expect(c.zone).not.toBe(ZONE.BERGE);
+    if (c.zone !== ZONE.BERGE) expect(c.entree).toBe(ENTREE.PARFAITE);
     expect(c.scores[0]).toBe(c.score);
     while (c.etape === 'impact' || c.etape === 'resultat') pas(c);
     expect(c.etape).toBe('podium');
@@ -74,27 +83,31 @@ describe('le concours de plongeon du pont des Tuves', () => {
     expect(c.fini).toBe(true);
   });
 
-  it('sans tendre les bras, c’est un plat ; visé sur la berge, Tom s’y plante', () => {
-    const plat = new ConcoursPlongeon([0], false);
-    sauteVers(plat, tirage(plat.manche).fosse);
-    while (plat.etape === 'chute') pas(plat);
-    if (plat.zone !== ZONE.BERGE) expect(plat.entree).toBe(ENTREE.PLAT);
-    const berge = new ConcoursPlongeon([0], false);
-    sauteVers(berge, 14.8);
-    while (berge.etape === 'chute') pas(berge);
-    expect(berge.zone).toBe(ZONE.BERGE);
-    expect(berge.score).toBe(0);
+  it('une branche heurtée : on y laisse sa vitesse et cinq points', () => {
+    const c = new ConcoursPlongeon([0], false);
+    saute(c, 0);
+    const b = tirage(c.manche).branches[2]!;
+    Object.assign(c, { x: b.cote * (GORGE - b.longueur / 2), y: b.y - 0.05, vx: 0, vy: 11 });
+    pas(c);
+    expect(c.eraflures).toBe(1);
+    expect(c.vy).toBeLessThan(5);
   });
 
-  it('en l’air, on se dirige : le joystick déplace le point de chute', () => {
-    const tombe = (bits: number) => {
+  it('en l’air, on se dirige ; tendre les bras trop tôt fait perdre le contrôle et l’entrée parfaite', () => {
+    const tombe = (bits: number, brasTot = false) => {
       const c = new ConcoursPlongeon([0], false);
-      sauteVers(c, 0);
+      saute(c, 0);
+      if (brasTot) appuie(c);
       while (c.etape === 'chute') pas(c, bits);
-      return c.x;
+      return c;
     };
-    expect(tombe(C.DROITE) - tombe(0)).toBeGreaterThan(5);
-    expect(tombe(C.GAUCHE) - tombe(0)).toBeLessThan(-5);
+    // sans rien toucher, le vent et les branches emportent Tom : il faut piloter pour revenir
+    const rien = tombe(0).x;
+    expect(tombe(C.DROITE).x - rien).toBeGreaterThan(2);
+    expect(tombe(C.GAUCHE).x).toBeLessThan(rien);
+    const tot = tombe(0, true);
+    if (tot.zone !== ZONE.BERGE) expect(tot.entree).toBe(ENTREE.GAINEE);
+    expect(tombe(C.DROITE, true).x - tot.x).toBeLessThan(tombe(C.DROITE).x - rien);
   });
 
   it('vient juste après le pont des Tuves, se laisse de côté, et passe par le réseau', () => {
@@ -105,20 +118,24 @@ describe('le concours de plongeon du pont des Tuves', () => {
     expect(suivantDansMonde(NIVEAU_PLONGEON)).toBe(alpages);
     expect(niveauOuvert(alpages, [0, tuves])).toBe(true); // facultatif : on peut le laisser de côté
 
-    // dans l'histoire : son intro lue, le concours commence ; sa vue fait l'aller-retour par le réseau
     const p = new Partie({ niveau: NIVEAU_PLONGEON, drapeau: -1, vies: VIES_DEPART, score: 0 });
     p.ajouteJoueur(0, 0);
     while (p.phase === 'histoire') p.suivant();
     expect(p.phase).toBe('plongeon');
-    for (let t = 0; t < 40; t++) p.avance();
-    p.commande(0, C.SAUT);
-    p.avance();
-    p.commande(0, 0);
+    for (const bits of [C.SAUT, 0, C.SAUT, 0]) {
+      p.commande(0, bits); // le premier appui passe le survol, le second fait sauter
+      p.avance();
+    }
     for (let t = 0; t < 30; t++) p.avance();
     const v = p.vue();
     expect(v.plongeon?.etape).toBe('chute');
     const d = decodeEtat(encodeEtat(v))!;
-    expect(d.plongeon).toMatchObject({ etape: 'chute', manche: v.plongeon!.manche, siege: 0 });
-    expect(d.plongeon!.x).toBeCloseTo(v.plongeon!.x, 1);
+    expect(d.plongeon).toMatchObject({
+      etape: 'chute',
+      manche: v.plongeon!.manche,
+      siege: 0,
+      temps: v.plongeon!.temps,
+    });
+    expect(d.plongeon!.y).toBeCloseTo(v.plongeon!.y, 1);
   });
 });

@@ -99,15 +99,17 @@ Partie), le rendu en vue arrière (sol projeté comme en « mode 7 », panorama 
 `src/rendu/drift*.ts` ; les sprites des voitures sortent de `outils/fixe-voitures.py` (sources dans
 `assets-sources/drift/`).
 
-**Le saut du pont des Tuves** (juste après le pont) : vu du haut du pont, la Siagne tout en bas (le pont est exagérément haut :
-60 m). Tom, en jean sur le parapet, vise le trou d'eau (le bleu le plus foncé) : un viseur balaie la rivière, berges comprises,
-et SAUT le fait sauter là où il est. Dans la chute (3,4 s), Tom est en slip de bain, la caméra tombe avec lui et la rivière grandit
-jusqu'à remplir l'écran ; GAUCHE / DROITE le dirigent, des rafales de vent le poussent, une hirondelle passe au-dessus du trou
-d'eau et le bouscule s'il est sur son chemin ; SAUT tend les bras. La note est la précision : 100 au milieu du trou d'eau, 70 à
-son bord ; en eau peu profonde, les galets coûtent 10 points (genoux râpés) ; sur la berge, zéro, et Tom s'y plante la tête la
-première dans un nuage de terre. L'entrée compte : bras tendus au dernier moment (moins de 0,6 s de l'eau), +10 ; jamais tendus,
-un plat, −20. À plusieurs, chacun saute à son tour (la rivière change à chaque saut), puis le podium ; le record reste dans la
-sauvegarde. La simulation est dans `src/jeu/plongeon*.ts` (aiguillée avec le drift par `jeu/mini-jeux.ts`), le rendu dans
+**Le saut du pont des Tuves** (juste après le pont) : vu de face, façon Doodle Jump mais en chute. Les gorges de la Siagne
+sous le pont de 1802 (exagérément haut : 60 m), Saint-Cézaire perché sur la falaise, le fond en calcaire qui verdit en descendant.
+D'abord un survol montre la rivière et son trou d'eau (à retenir : on ne le revoit plus avant l'arrivée ; un appui le passe).
+Tom, en jean, se place sur le parapet (GAUCHE / DROITE) puis saute avec SAUT : une jauge d'élan oscille, au milieu il tombe droit,
+sur les bords il part de travers. Dans la chute, Tom est en slip de bain et la caméra le suit : GAUCHE / DROITE le dirigent
+(il garde son élan), des branches de figuier sortent des falaises (une branche heurtée l'arrête, le sonne et coûte 5 points),
+des couloirs de vent le déportent, trois hirondelles le bousculent ; SAUT tend les bras, mais on ne se dirige presque plus.
+La note est la précision : 100 au milieu du trou d'eau, 70 à son bord ; en eau peu profonde, elle chute vite et les galets coûtent
+10 points (genoux râpés) ; sur la berge, zéro, et Tom s'y plante la tête la première dans un nuage de terre. L'entrée compte : bras
+tendus au dernier moment (moins de 0,4 s de l'eau), +10 ; jamais tendus, un plat, −25. À plusieurs, chacun saute à son tour (les
+gorges changent à chaque saut), puis le podium ; le record reste dans la sauvegarde. La simulation est dans `src/jeu/plongeon*.ts` (aiguillée avec le drift par `jeu/mini-jeux.ts`), le rendu dans
 `src/rendu/plongeon*.ts`, les deux sprites de Tom sortent de `outils/fixe-plongeon.py` (sources dans `assets-sources/plongeon/`).
 
 ## À plusieurs

@@ -196,21 +196,26 @@ export interface VueDrift {
 export const ETAPES_PLONGEON = ['visee', 'chute', 'impact', 'resultat', 'podium'] as const;
 export type EtapePlongeon = (typeof ETAPES_PLONGEON)[number];
 
-/** Le concours de plongeon du pont des Tuves, tel qu'on le voit (voir jeu/plongeon.ts ; la rivière vient de `tirage(manche)`). */
+/** Le concours de plongeon du pont des Tuves, vu de face, tel qu'on le voit (voir jeu/plongeon.ts ; les gorges viennent de `tirage(manche)`). */
 export interface VuePlongeon {
   etape: EtapePlongeon;
   /** le siège du joueur qui saute */
   siege: number;
-  /** le numéro du saut : il fixe la rivière (le trou d'eau, les rafales, l'hirondelle) */
+  /** le numéro du saut : il fixe les gorges (le trou d'eau, les branches, les hirondelles, le vent) */
   manche: number;
   miniJeu: boolean;
   minuteur: number;
-  /** où est le plongeur (m, en travers de la rivière), où vise le curseur, le vent (-1 à 1) */
+  /** les ticks passés sur le parapet (le survol, puis la jauge d'élan), et ceux depuis le saut */
+  vise: number;
+  temps: number;
+  /** Tom : en travers (m, 0 sous la clé de l'arche), sous le tablier (m, la rivière à HAUTEUR), sa vitesse en travers (m/s) */
   x: number;
-  visee: number;
-  vent: number;
+  y: number;
+  vx: number;
   /** les bras tendus (l'entrée dans l'eau) */
   bras: boolean;
+  /** les branches heurtées (−5 chacune) */
+  eraflures: number;
   /** le résultat du saut : la zone touchée et l'entrée (voir ZONE, ENTREE), la note sur 100 */
   zone: number;
   entree: number;
