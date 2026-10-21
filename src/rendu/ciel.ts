@@ -134,3 +134,30 @@ export class Ciel {
     }
   }
 }
+
+/** Le soleil des mondes de plein jour ; la lune et les étoiles des mondes de nuit. */
+export function astres(ctx: CanvasRenderingContext2D, d: Decor, largeur: number, tick: number): void {
+  if (
+    d === 'pavillons' ||
+    d === 'palmiers' ||
+    d === 'falaises' ||
+    d === 'fise' ||
+    d === 'stc' ||
+    d === 'tuves'
+  ) {
+    ctx.fillStyle = d === 'pavillons' ? '#ffb36b' : '#fff3b0';
+    ctx.beginPath();
+    ctx.arc(largeur * 0.7, 120, 26, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (d === 'pics' || d === 'immeubles') {
+    ctx.fillStyle = '#ffffff';
+    for (let i = 0; i < 40; i++) {
+      if ((i * 7 + Math.floor(tick / 20)) % 13 === 0) continue;
+      ctx.fillRect((i * 97) % largeur, (i * 53) % 140, 1, 1);
+    }
+    ctx.fillStyle = '#f4f1d0';
+    ctx.beginPath();
+    ctx.arc(largeur * 0.2, 50, 12, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}

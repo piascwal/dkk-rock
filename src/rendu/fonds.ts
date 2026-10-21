@@ -1,13 +1,22 @@
 import { HAUTEUR_VUE } from '../config';
 import { POSITION_HEROS } from './camera';
 import { Aleatoire } from '../moteur/maths';
-import { Ciel } from './ciel';
+import { astres, Ciel } from './ciel';
 import { arbreRond, brume, palmierPixel, sapinPixel } from './fonds-arbres';
-import { astresDuSoir, cielDuSoir, fouleAuLoin, lasersAuLoin, nuitSurLaPlage, nuitTombee } from './festival';
+import {
+  astresDuSoir,
+  cielDuSoir,
+  deNuit,
+  fouleAuLoin,
+  lasersAuLoin,
+  nuitSurLaPlage,
+  nuitTombee,
+} from './festival';
 import { dessineLumieresClub } from './lumieres-club';
 import { DECORS_BRETONS, type Peinture } from './fonds-bretagne';
 import { batimentsFise, PEINTURE_FISE, QUAI_FISE, tramFise } from './fonds-fise';
 import { PEINTURE_STC, PEINTURE_TUVES } from './fonds-provence';
+import { PremierPlan } from './premier-plan';
 import type { Decor, Theme } from './themes';
 
 const LARGEUR_BANDE = 960;
@@ -179,6 +188,13 @@ const PARALLAXE_VERTICALE = [0.2, 0.45, 0.75];
 /** Le FISE : la ville, le Lez et ses berges, les barrières sont posés sur le sol du quai, ils le suivent exactement. */
 const PARALLAXE_VERTICALE_FISE = [1, 1, 1];
 /** Les décors posés à hauteur du chemin plutôt que du départ (voir `Fond.dessine`). */
+/** Le fond sous le chemin des gorges : la couleur du plan proche, qui plonge dans l'ombre vingt-quatre pixels plus bas. */
+function profondeur(ctx: CanvasRenderingContext2D, couleur: string, haut: number): CanvasGradient {
+  const g = ctx.createLinearGradient(0, haut, 0, haut + 24);
+  g.addColorStop(0, couleur);
+  g.addColorStop(1, '#08100a');
+  return g;
+}
 const SUIT_LE_CHEMIN: ReadonlySet<Decor> = new Set<Decor>(['tuves']);
 /** Où se trouve le sol à l'écran quand le héros marche dessus, et où il se pose dans la bande d'un plan de décor. */
 const HORIZON = Math.round(HAUTEUR_VUE * POSITION_HEROS) + 8;
@@ -193,9 +209,11 @@ export class Fond {
   largeurNiveau = 0;
   private readonly ciel: Ciel;
   private plansNuit: HTMLCanvasElement[] = [];
+  private readonly premier: PremierPlan;
 
   constructor(private readonly theme: Theme) {
     this.ciel = new Ciel(theme.decor);
+    this.premier = new PremierPlan(theme.decor);
     // le plan proche reprend le dessin du plan moyen, autre graine, assombri : plus près, plus sombre
     this.plans = ([0, 1, 2] as const).map((plan, i) => {
       const toile = document.createElement('canvas');
@@ -211,18 +229,7 @@ export class Fond {
       return toile;
     });
     // les Plages Électroniques : la même bande, de nuit, qu'on fond sur celle du jour à mesure que la nuit tombe
-    if (theme.decor === 'palmiers')
-      this.plansNuit = this.plans.map((jour) => {
-        const toile = document.createElement('canvas');
-        toile.width = LARGEUR_BANDE;
-        toile.height = HAUTEUR_BANDE;
-        const c = toile.getContext('2d')!;
-        c.drawImage(jour, 0, 0);
-        c.globalCompositeOperation = 'source-atop';
-        c.fillStyle = 'rgba(14,6,40,0.78)';
-        c.fillRect(0, 0, LARGEUR_BANDE, HAUTEUR_BANDE);
-        return toile;
-      });
+    if (theme.decor === 'palmiers') this.plansNuit = this.plans.map(deNuit);
   }
 
   dessine(
@@ -253,7 +260,7 @@ export class Fond {
     const verticale = th.decor === 'fise' ? PARALLAXE_VERTICALE_FISE : PARALLAXE_VERTICALE;
     const hautDe = (i: number) => Math.round(HORIZON + (solEcran - HORIZON) * verticale[i]!) - PIED_DE_BANDE;
     if (nuit >= 0) astresDuSoir(ctx, largeur, nuit, hautDe(0) + MER_PALMIERS, tick);
-    else this.astres(ctx, largeur, tick);
+    else astres(ctx, th.decor, largeur, tick);
     // la nuit, les nuages s'effacent (on ne les voit plus sur le ciel noir)
     ctx.globalAlpha = nuit > 0 ? 1 - nuit * 0.85 : 1;
     this.ciel.dessine(ctx, camFond, largeur, tick);
@@ -266,10 +273,12 @@ export class Fond {
       if (th.decor === 'fise' && i === 1)
         batimentsFise(ctx, camFond, largeur, this.largeurNiveau, y + QUAI_FISE);
       if (th.decor === 'fise' && i === 2) tramFise(ctx, largeur, hautDe(1) + QUAI_FISE, tick);
-      // sous la bande : de la couleur du plan, seulement là où l'écran existe
+      // sous la bande : de la couleur du plan, seulement là où l'écran existe ; sous le chemin qui descend (les gorges), elle
+      // s'assombrit vers le bas : sous le pont, on voit la profondeur
       const dessous = Math.max(0, y + HAUTEUR_BANDE - 1);
       if (dessous < HAUTEUR_VUE) {
         ctx.fillStyle = i === 0 ? th.lointain : th.proche;
+        if (i === 2 && SUIT_LE_CHEMIN.has(th.decor)) ctx.fillStyle = profondeur(ctx, th.proche, dessous);
         ctx.fillRect(0, dessous, largeur, HAUTEUR_VUE - dessous);
         if (nuit > 0) {
           ctx.fillStyle = `rgba(14,6,40,${(nuit * 0.78).toFixed(3)})`;
@@ -296,38 +305,16 @@ export class Fond {
     if (nuit < 0.5) this.ciel.oiseaux(ctx, camFond, largeur, tick);
   }
 
+  /** Devant tout le jeu (voir premier-plan.ts) : le feuillage, les gouttes... des mondes qui en ont un. */
+  premierPlan(ctx: CanvasRenderingContext2D, camX: number, largeur: number, tick: number): void {
+    this.premier.dessine(ctx, camX, largeur, tick);
+  }
+
   /** Après les tuiles, sous les personnages : les projecteurs du club, la nuit et le festival des Plages Électroniques. */
   lumieres(ctx: CanvasRenderingContext2D, camX: number, largeur: number, tick: number): void {
     const d = this.theme.decor;
     if (d === 'club') dessineLumieresClub(ctx, camX, largeur, tick);
     if (d === 'palmiers')
       nuitSurLaPlage(ctx, camX, largeur, nuitTombee(camX, largeur, this.largeurNiveau), tick);
-  }
-
-  private astres(ctx: CanvasRenderingContext2D, largeur: number, tick: number): void {
-    const d = this.theme.decor;
-    if (
-      d === 'pavillons' ||
-      d === 'palmiers' ||
-      d === 'falaises' ||
-      d === 'fise' ||
-      d === 'stc' ||
-      d === 'tuves'
-    ) {
-      ctx.fillStyle = d === 'pavillons' ? '#ffb36b' : '#fff3b0';
-      ctx.beginPath();
-      ctx.arc(largeur * 0.7, 120, 26, 0, Math.PI * 2);
-      ctx.fill();
-    } else if (d === 'pics' || d === 'immeubles') {
-      ctx.fillStyle = '#ffffff';
-      for (let i = 0; i < 40; i++) {
-        if ((i * 7 + Math.floor(tick / 20)) % 13 === 0) continue;
-        ctx.fillRect((i * 97) % largeur, (i * 53) % 140, 1, 1);
-      }
-      ctx.fillStyle = '#f4f1d0';
-      ctx.beginPath();
-      ctx.arc(largeur * 0.2, 50, 12, 0, Math.PI * 2);
-      ctx.fill();
-    }
   }
 }

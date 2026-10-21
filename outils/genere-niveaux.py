@@ -382,8 +382,8 @@ def construit(nom, theme, textes, plan, fichier, constante, graine, base=30, van
         c = kw.pop('digit', None)
         x0 = r.x
         r.suite(genre, w, **kw)
-        if c:
-            n.repere(x0 + 1, c, surface=True)
+        if c:  # le déclencheur du dialogue, au début du lieu : sur la première colonne libre (l'eau, un ennemi l'occupent parfois)
+            any(n.repere(x, c, surface=True) for x in range(x0 + 1, x0 + 9))
         if kw.get('flag'):
             pass
     # drapeaux : après chaque lieu important (un par 50 colonnes au moins), et juste avant chaque boss

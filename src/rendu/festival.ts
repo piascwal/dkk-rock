@@ -165,3 +165,16 @@ export function nuitSurLaPlage(
     ctx.fillRect(0, 0, largeur, HAUTEUR_VUE);
   }
 }
+
+/** La même bande de décor, de nuit : on la fond sur celle du jour à mesure que la nuit tombe (voir fonds.ts). */
+export function deNuit(jour: HTMLCanvasElement): HTMLCanvasElement {
+  const toile = document.createElement('canvas');
+  toile.width = jour.width;
+  toile.height = jour.height;
+  const c = toile.getContext('2d')!;
+  c.drawImage(jour, 0, 0);
+  c.globalCompositeOperation = 'source-atop';
+  c.fillStyle = 'rgba(14,6,40,0.78)';
+  c.fillRect(0, 0, toile.width, toile.height);
+  return toile;
+}

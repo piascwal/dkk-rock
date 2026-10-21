@@ -285,6 +285,7 @@ export class Rendu {
       this.braises.maj();
       this.braises.dessine(ctx, camX, camY);
     }
+    this.fond.premierPlan(ctx, camX, this.largeur, this.tick);
     this.traits.maj(vue, this.decor, carte, { emojis: this.emojis });
     this.emojis.accompagne(vue.entites);
     this.emojis.maj();

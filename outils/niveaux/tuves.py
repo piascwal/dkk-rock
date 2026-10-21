@@ -61,39 +61,57 @@ def canal(n, x0, largeur, lettres='a'):
     n.ennemis(x0, xa - 1, lettres, 1)
 
 
-def pont_des_tuves(n, x0, largeur, lettres='a', prof=9):
-    """Le pont des Tuves : les gorges s'ouvrent sous le chemin, la Siagne coule au fond (quatre tuiles d'eau sur un lit de boue,
-    des rochers qui en sortent) ; le pont de pierre les enjambe, une arche dont l'intrados remonte jusqu'au tablier au milieu.
-    Une échelle, contre la rive droite, remonte de la rivière. Des ennemis sur le pont et sur les rives."""
+def pont_des_tuves(n, x0, largeur, lettres='a', prof=9, haut=8):
+    """Le pont des Tuves : on arrive sur la rive plate, on gravit la culée par des marches de pierre de deux tuiles, et on passe
+    tout en haut, sur le tablier : dessous, l'arche, et le vide des gorges jusqu'à la Siagne (quatre tuiles d'eau sur un lit
+    de boue, des rochers qui en sortent). De l'autre côté, on redescend les marches. Une échelle, contre la culée de droite,
+    remonte de la rivière jusqu'au tablier. Des ennemis sur le pont, sur les rives et dans la rivière."""
     base = n.base
-    g0, g1 = x0 + 4, x0 + largeur - 4
+    marches = haut // 2
+    yd = base - haut  # le tablier : on marche dessus en rangée yd - 1
+    xa = x0 + 4  # la première marche de la culée de gauche
+    g0 = xa + 2 * marches  # les gorges, entre les deux culées
+    g1 = x0 + largeur - 4 - 2 * marches
+    fond = base + prof
+    # les gorges : creusées jusqu'au lit de boue, l'eau dedans, des parois de roche de part et d'autre
+    for x in range(g0, g1):
+        for y in range(base, fond):
+            n.set(x, y, EAU if y >= fond - 4 else ' ')
+        n.set(x, fond, BOUE)
+        n.haut[x] = fond
+    for x in (g0 - 1, g1):
+        for y in range(base, fond + 1):
+            n.set(x, y, ROCHE)
+    # les culées : des marches de deux tuiles qui montent au tablier, à gauche ; qui en redescendent, à droite
+    for k in range(marches):
+        h = 2 * (k + 1)
+        for dx in range(2):
+            for y in range(base - h, base):
+                n.set(xa + 2 * k + dx, y, PIERRE)
+                n.set(g1 + 2 * (marches - 1 - k) + dx, y, PIERRE)
+    # le pont : un tablier d'une rangée, et dessous l'arche, un anneau de pierre de deux tuiles qui prend appui sur les parois
+    # des gorges, deux tuiles sous les rives, et touche le tablier en son milieu ; entre les deux, des piliers tous les cinq
+    # pas, et le vide : depuis le tablier, on voit qu'on est tout en haut
     c = (g0 + g1) / 2
     demi = (g1 - g0) / 2
-    for x in range(g0, g1):
-        for y in range(base, base + prof):
-            n.set(x, y, ' ')
-        for y in range(base + prof - 4, base + prof):
-            n.set(x, y, EAU)
-        n.set(x, base + prof, BOUE)
-        n.haut[x] = base + prof
-    # les rives : des parois de roche
-    for x in (g0 - 1, g1):
-        for y in range(base, base + prof + 1):
-            n.set(x, y, ROCHE)
-    # le pont : le tablier, et la maçonnerie jusqu'à l'intrados de l'arche (un arc de cercle)
+    naissance = base + 2
     for x in range(g0, g1):
         d = min(1.0, abs(x + 0.5 - c) / demi)
-        intrados = base + 1 + round((prof - 3) * (1 - (1 - d * d) ** 0.5))
-        for y in range(base, intrados):
-            n.set(x, y, PIERRE)
+        intrados = naissance - round((naissance - yd - 1) * (1 - d * d) ** 0.5)
+        plein = x < g0 + 2 or x >= g1 - 2 or (x - g0) % 5 == 2  # contre les culées, et les piliers
+        for y in range(yd, intrados):
+            if y == yd or y >= intrados - 2 or plein:
+                n.set(x, y, PIERRE)
     # des rochers dans le courant
     for x in range(g0 + 3, g1 - 3, 7):
-        n.set(x, base + prof - 1, ROCHE)
-        n.set(x + 1, base + prof - 1, ROCHE)
-    echelle(n, g1 - 1, prof, sol=base + prof)
-    n.ennemis(g0 + 2, g1 - 2, lettres, 2, ymin=base - 3)
+        n.set(x, fond - 1, ROCHE)
+        n.set(x + 1, fond - 1, ROCHE)
+    # remonter de la rivière : une échelle contre la paroi de droite, à travers la maçonnerie, jusqu'au tablier
+    echelle(n, g1 - 1, fond - yd, sol=fond)
+    n.ennemis(g0 + 2, g1 - 2, lettres, 2, ymin=yd - 3)
     n.ennemis(g0 + 2, g1 - 2, lettres, 1, ymin=base + 1)
-    n.ennemis(g1 + 1, x0 + largeur, lettres, 1)
+    n.ennemis(x0, xa - 1, lettres, 1)
+    n.ennemis(g1 + 2 * marches, x0 + largeur, lettres, 1)
 
 
 def riviere(n, x0, largeur, lettres='a', chute=4):

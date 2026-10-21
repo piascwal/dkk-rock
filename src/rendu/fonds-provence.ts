@@ -127,15 +127,52 @@ function village(c: Ctx, r: Aleatoire): void {
   }
 }
 
-/** Les falaises de calcaire des gorges, au loin, et les forêts qui les coiffent. */
+/** Une ligne de crêtes douce : la rangée du sommet pour chaque colonne de la bande. */
+function cretes(r: Aleatoire, base: number, ampl: number, pas: number): number[] {
+  const points: number[] = [];
+  let y = base - ampl / 2;
+  for (let x = 0; x <= L + pas; x += pas) {
+    y = Math.max(base - ampl, Math.min(base, y + r.entre(-ampl / 3, ampl / 3)));
+    points.push(y);
+  }
+  return Array.from({ length: L }, (_, x) => {
+    const k = Math.floor(x / pas);
+    const f = (x % pas) / pas;
+    return Math.round(points[k]! * (1 - f) + points[k + 1]! * f);
+  });
+}
+
+/** Une montagne couverte de forêt : la pente remplie, puis des arbres serrés de la crête jusqu'en bas. */
+function montagneBoisee(
+  c: Ctx,
+  r: Aleatoire,
+  haut: number[],
+  fond: string,
+  verts: string[],
+  taille: [number, number],
+): void {
+  c.fillStyle = fond;
+  for (let x = 0; x < L; x++) c.fillRect(x, haut[x]!, 1, 270 - haut[x]!);
+  for (let x = 0; x < L; x += r.entier(3, 6))
+    for (let y = haut[x]! + 2; y < 250; y += r.entier(taille[0] - 2, taille[1]))
+      arbreRond(c, x + r.entier(-2, 2), y + taille[0], r.entier(taille[0], taille[1]), r.choix(verts));
+}
+
+/** Les montagnes au-dessus des gorges, couvertes de forêt : la chaîne du fond, bleutée par l'air ; devant, les pentes vertes
+ *  des gorges. */
 function gorges(c: Ctx, r: Aleatoire): void {
-  relief(c, r, 186, 40, 24, '#c8bea4');
-  c.fillStyle = 'rgba(150,140,120,0.35)';
-  for (let i = 0; i < 60; i++)
-    rect(c, r.entier(0, L), r.entier(160, 230), 1, r.entier(6, 20), 'rgba(150,140,120,0.35)');
-  for (let x = 0; x < L; x += r.entier(5, 10))
-    arbreRond(c, x, 176 + r.entier(0, 14), r.entier(8, 13), r.choix(['#3f6a32', '#4a7a3a']));
-  brume(c, L, 170, 240, 'rgba(230,245,235,0.25)');
+  // les crêtes se découpent sur le ciel, dans le haut de l'écran (la bande du lointain y commence vers sa rangée 135)
+  montagneBoisee(c, r, cretes(r, 172, 34, 70), '#6f9a82', ['#5f8f74', '#6a9a7c', '#7aa88a'], [6, 9]);
+  brume(c, L, 140, 210, 'rgba(225,240,240,0.22)');
+  montagneBoisee(
+    c,
+    r,
+    cretes(r, 196, 26, 40),
+    '#3f6a32',
+    ['#3f7a32', '#4a8a3a', '#2f6a2a', '#5a9a40'],
+    [8, 13],
+  );
+  brume(c, L, 200, 250, 'rgba(230,245,235,0.18)');
 }
 
 /** La Siagne, toujours là : l'autre rive luxuriante, l'eau turquoise, ses rochers blancs, ses rapides et ses cascades. */

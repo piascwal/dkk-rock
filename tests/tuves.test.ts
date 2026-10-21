@@ -36,6 +36,20 @@ describe('le pont des Tuves', () => {
     expect(lu.tuiles.includes(T.PIERRE)).toBe(true);
   });
 
+  it('le pont se gravit : depuis le tablier, dix rangées de vide au moins jusqu’à la Siagne', () => {
+    const lu = niveauLu(TUVES);
+    const t = (x: number, y: number) => lu.tuiles[y * lu.largeur + x];
+    let vide = 0;
+    for (let x = 0; x < lu.largeur; x++)
+      for (let y = 1; y < lu.hauteur; y++) {
+        if (t(x, y) !== T.PIERRE || t(x, y - 1) !== T.VIDE) continue;
+        let k = y + 1;
+        while (k < lu.hauteur && t(x, k) === T.VIDE) k++;
+        if (t(x, k) === T.EAU) vide = Math.max(vide, k - y - 1);
+      }
+    expect(vide).toBeGreaterThanOrEqual(10);
+  });
+
   it('la figue brûle les planches qu’elle traverse, mais s’arrête sur la pierre', () => {
     const p = partie();
     const [px, py] = trouve(T.PLATEFORME, Math.floor(niveauLu(TUVES).largeur / 2));

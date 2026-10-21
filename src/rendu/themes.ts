@@ -192,7 +192,7 @@ export const THEMES: Record<NomTheme, Theme> = {
   // le pont des Tuves, au fond des gorges de la Siagne : l'ombre verte, l'eau fraîche, la boue des figuiers
   tuves: {
     ciel: ['#5aa8d8', '#d8f0e8'],
-    lointain: '#c8bea4',
+    lointain: '#3f6a32',
     proche: '#2f5a2a',
     paroi: '#4a4234',
     dessus: '#4f9a3a',
