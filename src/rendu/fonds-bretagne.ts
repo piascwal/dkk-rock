@@ -30,7 +30,7 @@ function ondule(c: Ctx, r: Aleatoire, base: number, ampl: number, pas: number): 
 }
 
 /** Un vieux chêne : un tronc épais et tordu, deux branches, une couronne en boules ; de la mousse côté gauche. */
-function chene(
+export function chene(
   c: Ctx,
   r: Aleatoire,
   x: number,

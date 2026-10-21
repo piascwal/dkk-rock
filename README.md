@@ -206,7 +206,8 @@ validé.
   tombe : leur pied ne se voit jamais. Aux Tuves : de grands arbres feuillus (le tronc plonge jusqu'au fond, avec leur branche
   et leurs lianes), des mottes d'herbe et de fougères sur un sol sombre, des cascades qui tombent d'un rocher du ciel
   (`premier-plan-tuves.ts`). Pour en donner un à un autre monde : une définition de plus dans `PREMIERS_PLANS`
-  (les sortes d'éléments, et où les poser) ; le _parking à étages_
+  (les sortes d'éléments, et où les poser) ; la forêt bretonne a aussi le sien (`premier-plan-foret.ts`) : ses vieux chênes
+  du fond, plus grands et plus sombres, translucides, au tronc qui plonge jusqu'au fond du niveau ; le _parking à étages_
   (rampes en escalier, local dessous, niveau de pitons dessus) attend un nouveau monde, les alpages leur _falaise à corniches_ (échelles en zigzag, grotte à mi-hauteur), les cimes
   leur _glacier_ (bosses de glace qui glisse, crevasses, igloo à traverser), la plage son _ponton_ de planches sur pilotis et son
   phare, la ville ses _toits sur pilotis_ (on saute de toit en toit). Les pièces communes varient aussi : la traversée de gouffre

@@ -2,6 +2,7 @@ import { HAUTEUR_VUE, TUILE } from '../config';
 import { Aleatoire } from '../moteur/maths';
 import { T } from '../monde/tuiles';
 import type { NiveauLu } from '../niveaux/format';
+import { PREMIER_PLAN_FORET } from './premier-plan-foret';
 import { PREMIER_PLAN_TUVES } from './premier-plan-tuves';
 import type { Decor } from './themes';
 
@@ -23,6 +24,8 @@ export interface Sorte {
   pied: { x: number; y: number };
   /** la dernière rangée de l'image est étirée vers le bas jusqu'au fond du niveau (un tronc, un sol) */
   prolonge?: boolean;
+  /** de 0 à 1 : l'élément est translucide (on voit un peu le jeu à travers) ; absent : 1 */
+  opacite?: number;
   /** ce qui bouge à chaque image ; (x, y) : le coin haut gauche de l'image à l'écran */
   anime?: (ctx: CanvasRenderingContext2D, x: number, y: number, tick: number) => void;
 }
@@ -51,6 +54,7 @@ export interface DefPremierPlan {
 
 const PREMIERS_PLANS: Partial<Record<Decor, DefPremierPlan>> = {
   tuves: PREMIER_PLAN_TUVES,
+  sousbois: PREMIER_PLAN_FORET,
 };
 
 /** Une image vide, pour y peindre une sorte. */
@@ -101,10 +105,12 @@ export class PremierPlan {
       const y = Math.round(o.y - camY - s.pied.y);
       const bas = s.prolonge ? Math.min(HAUTEUR_VUE, Math.round(this.fond - camY)) : y + s.toile.height;
       if (x + s.toile.width < 0 || x > largeur || y + s.toile.height < 0 || y > HAUTEUR_VUE) continue;
+      ctx.globalAlpha = s.opacite ?? 1;
       ctx.drawImage(s.toile, x, y);
       const h = s.toile.height;
       if (s.prolonge && bas > y + h)
         ctx.drawImage(s.toile, 0, h - 1, s.toile.width, 1, x, y + h, s.toile.width, bas - y - h);
+      ctx.globalAlpha = 1;
       s.anime?.(ctx, x, y, tick);
     }
   }
