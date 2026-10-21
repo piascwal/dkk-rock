@@ -38,6 +38,17 @@ describe('le protocole réseau', () => {
     expect(d.entites[0]).toMatchObject({ id: e.id, g: e.g, x: Math.round(e.x), gauche: e.gauche });
   });
 
+  it('le temps de la run court avec le jeu, traverse le réseau, et repart de zéro quand le niveau est refait', () => {
+    const p = new Partie({ niveau: 0, drapeau: -1, vies: 5, score: 0 });
+    p.ajouteJoueur(0, 0);
+    while (p.phase === 'histoire') p.suivant();
+    for (let t = 0; t < 60 * 7 + 30; t++) p.avance();
+    expect(p.vue().temps).toBe(7);
+    expect(decodeEtat(encodeEtat(p.vue()))!.temps).toBe(7);
+    p.recommence(true);
+    expect(p.vue().temps).toBe(0);
+  });
+
   it('les compteurs de convertis traversent le réseau', () => {
     const p = new Partie({ niveau: 0, drapeau: -1, vies: 5, score: 0 });
     p.ajouteJoueur(0, 0);

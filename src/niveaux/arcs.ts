@@ -73,6 +73,21 @@ export const arcOuvertPar = (niveau: number): number | null =>
 export const suivantDansMonde = (niveau: number): number | null =>
   suivantDansArc(niveau) ?? arcOuvertPar(niveau);
 
+/**
+ * Les étapes de la carte du monde pendant le trajet du niveau fini (`niveau`) au suivant (`suivant`) : celles jusqu'au niveau fini
+ * et celles déjà terminées un jour (`faits`) sont faites, la destination est la cible, le reste est sous le brouillard. Ainsi,
+ * en rejouant un niveau précédent, le brouillard ne revient pas sur ce qu'on a déjà vu.
+ */
+export function etatsDuTrajet(
+  niveau: number,
+  suivant: number | null,
+  faits: readonly number[],
+): ('faite' | 'cible' | 'fermee')[] {
+  const i = MONDE.indexOf(niveau);
+  const j = suivant === null ? i : MONDE.indexOf(suivant);
+  return MONDE.map((n, k) => (k <= i ? 'faite' : k === j ? 'cible' : faits.includes(n) ? 'faite' : 'fermee'));
+}
+
 /** Un niveau est ouvert si c'est le premier de son arc (arc ouvert) ou si le précédent est terminé (voir `facultatifs`). */
 export function niveauOuvert(niveau: number, faits: readonly number[]): boolean {
   const a = arcDe(niveau);

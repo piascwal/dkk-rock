@@ -13,23 +13,21 @@ const TRAINEE = 0.35;
 const BRAQUAGE = 2.1;
 /**
  * L'adhérence latérale, par seconde : la part du glissement de côté qu'elle reprend. Sur l'herbe elle est faible ; en virage
- * appuyé et pied au plancher, plus faible encore (la voiture décroche) ; au frein à main, presque nulle.
+ * appuyé et pied au plancher, plus faible encore (la voiture décroche).
  */
 const ADHERENCE = 8;
 const ADHERENCE_DECROCHE = 2.6;
-const ADHERENCE_FREIN_A_MAIN = 1.4;
 /** Le pare-chocs contre la clôture : la marge (m) et ce qui reste de la vitesse au rebond. */
 const MARGE = 1.2;
 /** La part du glissement repris par l'adhérence qui relance la voiture dans son axe. */
 const RELANCE = 0.7;
 const REBOND = 0.35;
 
-/** Ce que le pilote fait de ses commandes à ce pas : gaz, frein, volant (-1 à gauche, +1 à droite), frein à main. */
+/** Ce que le pilote fait de ses commandes à ce pas : gaz, frein, volant (-1 à gauche, +1 à droite). */
 export interface Pilotage {
   gaz: boolean;
   frein: boolean;
   volant: number;
-  freinAMain: boolean;
 }
 
 /**
@@ -66,16 +64,15 @@ export class Voiture implements Pose {
     if (p.gaz) avant += ACCELERATION * DT * (1 - Math.max(0, avant) / POINTE);
     if (p.frein)
       avant = avant > 0.5 ? avant - FREINAGE * DT : Math.max(-RECUL, avant - ACCELERATION * 0.5 * DT);
-    if (p.freinAMain) avant -= Math.sign(avant) * Math.min(Math.abs(avant), 4 * DT);
     avant -= avant * TRAINEE * DT;
 
     const decroche = p.gaz && Math.abs(p.volant) > 0 && Math.abs(avant) > 12;
-    const adherence = p.freinAMain ? ADHERENCE_FREIN_A_MAIN : decroche ? ADHERENCE_DECROCHE : ADHERENCE;
+    const adherence = decroche ? ADHERENCE_DECROCHE : ADHERENCE;
     // ce que l'adhérence reprend au glissement n'est pas tout perdu : une part relance la voiture dans son axe (elle sort du
     // virage en gardant de l'élan, comme en drift)
     const repris = cote * (1 - Math.exp(-adherence * DT));
     cote -= repris;
-    if (!p.freinAMain) avant += Math.sign(avant || 1) * Math.abs(repris) * RELANCE;
+    avant += Math.sign(avant || 1) * Math.abs(repris) * RELANCE;
 
     // le volant : sans vitesse, il ne fait rien ; en marche arrière, il tourne à l'envers ; en travers, la voiture pivote mieux
     const enTravers = Math.abs(cote) > 2;
@@ -90,14 +87,7 @@ export class Voiture implements Pose {
 
     const glisse = Math.abs(cote);
     const patine = p.gaz && Math.abs(avant) < 4;
-    this.griffe =
-      glisse > 7 || (p.freinAMain && Math.abs(avant) > 8)
-        ? 3
-        : glisse > 4
-          ? 2
-          : glisse > 1.5 || patine || (p.freinAMain && Math.abs(avant) > 2)
-            ? 1
-            : 0;
+    this.griffe = glisse > 7 ? 3 : glisse > 4 ? 2 : glisse > 1.5 || patine ? 1 : 0;
   }
 
   /** La clôture du pré : la voiture rebondit dessus. Vrai si elle l'a touchée. */

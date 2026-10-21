@@ -1,6 +1,6 @@
 import { MAX_JOUEURS } from '../config';
+import { decodeDrift, encodeDrift, OCTETS_DRIFT } from './protocole-drift';
 import {
-  ETAPES_DRIFT,
   GENRES_CONVERTIS,
   PHASES,
   type EntiteVue,
@@ -8,7 +8,6 @@ import {
   type Evenement,
   type Genre,
   type JoueurVue,
-  type VueDrift,
 } from '../jeu/vue';
 
 /**
@@ -22,16 +21,14 @@ import {
  *
  * Changer ce fichier de façon incompatible : augmenter VERSION_PROTOCOLE.
  */
-export const VERSION_PROTOCOLE = 21;
+export const VERSION_PROTOCOLE = 22;
 export const APP_DKK = { id: 'dkk-rock', version: VERSION_PROTOCOLE };
 
 const TYPE_ETAT = 1;
 const TYPE_COMMANDES = 2;
-const OCTETS_ENTETE = 18 + GENRES_CONVERTIS.length;
+const OCTETS_ENTETE = 20 + GENRES_CONVERTIS.length;
 const OCTETS_JOUEUR = 10;
 const OCTETS_ENTITE = 10;
-/** le concours de drift, à la suite des entités pendant la phase `drift` (voir encodeDrift) */
-const OCTETS_DRIFT = 17 + MAX_JOUEURS * 3;
 
 export function encodeEtat(v: EtatVue): ArrayBuffer {
   const n = v.entites.length;
@@ -61,6 +58,8 @@ export function encodeEtat(v: EtatVue): ArrayBuffer {
   o += 2;
   u8(v.navire);
   for (let i = 0; i < GENRES_CONVERTIS.length; i++) u8(v.convertis[i] ?? 0);
+  d.setUint16(o, Math.min(0xffff, v.temps));
+  o += 2;
   for (let s = 0; s < MAX_JOUEURS; s++) {
     const j = v.joueurs[s]!;
     u8((j.present ? 1 : 0) | (j.mort ? 2 : 0));
@@ -86,73 +85,6 @@ export function encodeEtat(v: EtatVue): ArrayBuffer {
   }
   if (drift) encodeDrift(d, o, drift);
   return buf;
-}
-
-const u16 = (x: number) => Math.max(0, Math.min(65535, Math.round(x)));
-const TOUR = 2 * Math.PI;
-
-/** Le concours de drift : positions au centimètre, cap sur deux octets, pourcentages au centième. */
-function encodeDrift(d: DataView, o: number, v: VueDrift): void {
-  d.setUint8(o++, ETAPES_DRIFT.indexOf(v.etape));
-  d.setUint8(o++, v.siege);
-  d.setUint8(o++, v.pilote);
-  d.setUint8(o++, v.manche & 255);
-  d.setUint8(o++, v.miniJeu ? 1 : 0);
-  for (const x of [v.minuteur, v.x * 100, v.y * 100, (((v.cap % TOUR) + TOUR) % TOUR) * (65536 / TOUR)]) {
-    d.setUint16(o, u16(x) & 0xffff);
-    o += 2;
-  }
-  d.setUint8(o++, Math.min(255, Math.round(v.vitesse * 10)));
-  d.setUint8(o++, v.griffe);
-  d.setUint16(o, u16(v.pourcent * 100));
-  o += 2;
-  for (let s = 0; s < MAX_JOUEURS; s++) {
-    const sc = v.scores[s];
-    d.setUint8(o++, sc ? sc.pilote : 255);
-    d.setUint16(o, sc ? u16(sc.pourcent * 100) : 0);
-    o += 2;
-  }
-}
-
-function decodeDrift(d: DataView, o: number): VueDrift | null {
-  const etape = ETAPES_DRIFT[d.getUint8(o++)];
-  if (!etape) return null;
-  const siege = d.getUint8(o++) % MAX_JOUEURS;
-  const pilote = d.getUint8(o++) % 2;
-  const manche = d.getUint8(o++);
-  const miniJeu = d.getUint8(o++) === 1;
-  const lus: number[] = [];
-  for (let k = 0; k < 4; k++) {
-    lus.push(d.getUint16(o));
-    o += 2;
-  }
-  const vitesse = d.getUint8(o++) / 10;
-  const griffe = d.getUint8(o++) % 4;
-  const pourcent = d.getUint16(o) / 100;
-  o += 2;
-  const scores: VueDrift['scores'] = [];
-  for (let s = 0; s < MAX_JOUEURS; s++) {
-    const p = d.getUint8(o++);
-    const pc = d.getUint16(o) / 100;
-    o += 2;
-    scores.push(p === 255 ? null : { pilote: p % 2, pourcent: pc });
-  }
-  const [minuteur, x, y, cap] = lus as [number, number, number, number];
-  return {
-    etape,
-    siege,
-    pilote,
-    manche,
-    miniJeu,
-    minuteur,
-    x: x / 100,
-    y: y / 100,
-    cap: (cap / 65536) * TOUR,
-    vitesse,
-    griffe,
-    pourcent,
-    scores,
-  };
 }
 
 /** Relit un instantané ; null s'il est tronqué ou incohérent (tout ce qui vient du réseau est suspect). */
@@ -182,6 +114,8 @@ export function decodeEtat(buf: ArrayBuffer): EtatVue | null {
   o += 2;
   const navire = u8();
   const convertis = GENRES_CONVERTIS.map(() => u8());
+  const temps = d.getUint16(o);
+  o += 2;
   const joueurs: JoueurVue[] = [];
   for (let s = 0; s < MAX_JOUEURS; s++) {
     const fl = u8();
@@ -238,6 +172,7 @@ export function decodeEtat(buf: ArrayBuffer): EtatVue | null {
     traversee: sillage === 0xffff ? -1 : sillage,
     navire,
     convertis,
+    temps,
     joueurs,
     entites,
     ...(drift ? { drift } : {}),

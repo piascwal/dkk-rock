@@ -58,7 +58,7 @@ function choix(ctx: CanvasRenderingContext2D, largeur: number, v: VueDrift, tick
     ecritCentre(ctx, PILOTES[p]!, x, 113, choisi ? COULEURS_PILOTES[p]! : '#8a8a8a', choisi ? 2 : 1);
   }
   ecritCentre(ctx, 'GAUCHE / DROITE : CHOISIR    SAUT : C’EST PARTI', m, 130, BLANC);
-  ecritCentre(ctx, 'GAZ : HAUT OU SAUT   FREIN : BAS   FREIN À MAIN : TIR', m, 142, '#9fd3ff');
+  ecritCentre(ctx, 'GAZ : HAUT OU SAUT   FREIN : BAS   VOLANT : GAUCHE / DROITE', m, 142, '#9fd3ff');
 }
 
 function compte(ctx: CanvasRenderingContext2D, largeur: number, v: VueDrift): void {

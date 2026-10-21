@@ -68,7 +68,11 @@ export class Rendu {
   /** la taille d'écran lue au dernier calibrage : si elle change sans évènement (iPad), on recalibre */
   private tailleVue = '';
 
-  constructor(private readonly toile: HTMLCanvasElement) {
+  /** `faits` : les niveaux déjà terminés un jour (la sauvegarde) : la carte du monde n'y remet pas le brouillard */
+  constructor(
+    private readonly toile: HTMLCanvasElement,
+    private readonly faits: () => readonly number[] = () => [],
+  ) {
     this.ctx = toile.getContext('2d', { alpha: false })!;
     this.redimensionne();
   }
@@ -188,7 +192,7 @@ export class Rendu {
       const k = HAUTEUR_VUE / HAUTEUR_CARTE;
       ctx.save();
       ctx.scale(k, k);
-      dessineCarteMonde(ctx, Math.round(this.largeur / k), vue.niveau, vue.page, this.tick);
+      dessineCarteMonde(ctx, Math.round(this.largeur / k), vue.niveau, vue.page, this.tick, this.faits());
       ctx.restore();
       return;
     }

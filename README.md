@@ -65,7 +65,8 @@ mer, puis le festival, sa foule, ses lasers, ses stroboscopes et sa grande scèn
   de Fadatchi en avançant par petits bonds, passe devant lui quand il tire et crache un gros jet de flammes par le centre du
   cercle de sa grille ; quand les munitions s'épuisent (ou que le héros change d'arme ou tombe), il s'en va et le kiwi revient.
   Sa planche (`public/sprites/chauffage.png`) vient de `outils/fixe-chauffage.py`.
-- **Drapeaux** : point de reprise et sauvegarde. « Continuer » reprend au dernier drapeau.
+- **Drapeaux** : point de reprise et sauvegarde (en jeu : réapparition au dernier drapeau, ou « Recommencer au drapeau » dans la pause).
+  « Continuer », depuis le menu, repart du début du niveau en cours, avec ses vies et son score.
 - Ennemis : fêtards autotunés, videurs costauds, danseurs du tube de l'été (kamikazes),
   lanceurs de drops, drones à LED, influenceurs (le flash éblouit), yétis (n'attaquent que sur
   le temps), robots vocodeurs ; boss : Yéti Alpha, DJ Boucle et ses enceintes (son anneau
@@ -88,8 +89,9 @@ Entre certains niveaux, l'histoire fait une pause pour un mini-jeu ; une fois re
 
 **Le concours de drift du pré du Clos** (au Clos, à Saint-Cézaire, juste après le village, avant la descente aux Tuves) : vue de derrière la voiture, chaque
 joueur choisit son pilote — **Tom** et sa Renault 11, ou **Matt** et son Opel Corsa — et a **une minute** pour saccager le
-plus de pelouse possible. Gaz : HAUT ou SAUT ; frein et marche arrière : BAS ; volant : GAUCHE / DROITE ; frein à main :
-TIR. Les roues qui glissent arrachent l'herbe, puis la terre, puis font de la boue ; le score est la part du pré qui n'est
+plus de pelouse possible. Gaz : HAUT ou SAUT ; frein et marche arrière : BAS ; volant : GAUCHE / DROITE (pas de frein à main : gaz et
+volant à pleine vitesse suffisent à partir en travers ; sur téléphone, le joystick reste affiché, son manche qui se balance, et
+seul le bouton GAZ reste à droite). Les roues qui glissent arrachent l'herbe, puis la terre, puis font de la boue ; le score est la part du pré qui n'est
 plus de la pelouse. À plusieurs, chacun conduit à son tour, puis le podium ; le record reste dans la sauvegarde.
 
 Côté code : la simulation est dans `src/jeu/drift*.ts` (la pelouse, la voiture, le concours, la phase `drift` de la
@@ -182,9 +184,12 @@ validé.
   **Les forteresses ne se grimpent pas par la façade** : à chaque étage, un balcon de quatre tuiles à gauche (un ennemi dessus : on
   se cogne dessous en sautant de mur en mur) et une annexe fermée à droite ; chacun a sa porte sur l'étage, il faut passer par
   l'intérieur (`_avancees` dans `outils/niveaux/structures.py`).
-  **Fin de niveau :** quand le camping-car a disparu, l'écran des _convertis au rock_ (`ui/convertis.ts`) liste les ennemis vaincus
-  par type, avec leurs compteurs (« selon les DKK ») ; il vient de la vue (`EtatVue.convertis`, protocole v5), donc chez tous les
-  joueurs ; un premier toucher termine le comptage, le suivant passe au récit.
+  **Fin de niveau :** quand le camping-car a disparu, l'écran des _convertis au rock_ (`ui/convertis.ts`) empile en ligne les sprites des
+  ennemis convertis, chevauchés de moitié (une autre ligne passe devant quand elle est pleine ; `ui/pile-convertis.ts`), qui
+  apparaissent l'un après l'autre à toute vitesse avec un éclat chacun ; en dessous, le temps de la run, le score et le total
+  (« selon les DKK »). Tout vient de la vue (`EtatVue.convertis`, `temps` : protocole v22), donc chez tous les joueurs ; un
+  premier toucher finit la pile, le suivant passe au récit. La carte du monde entre deux niveaux ne remet pas le brouillard sur
+  les niveaux déjà faits un jour (`etatsDuTrajet`, `niveaux/arcs.ts`).
   **Chaque monde a sa géométrie** (`outils/niveaux/signatures.py`) : Saint-Cézaire ses lieux à lui (`outils/niveaux/stc.py` : le
   Clos, les restanques d'oliviers, les remparts, la place de la fontaine des Mulets et sa mairie, les calades sous leurs passages
   voûtés, la chapelle Notre-Dame de Sardaigne), en pierre calcaire (`{`) sous des toits de tuiles (`^`) ; le Pont des Tuves

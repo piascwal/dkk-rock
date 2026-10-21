@@ -7,7 +7,7 @@ import { NIVEAU_DRIFT } from '../jeu/drift';
 import type { AnnonceDkk } from '../reseau/annonce';
 import { Recherche } from '../reseau/client';
 import type { Hote } from '../reseau/hote';
-import { bouton, el } from './elements';
+import { ajusteColonnes, bouton, el } from './elements';
 import { ecranInviter, ecranRejoindre } from './menus-reseau';
 import { texteVersion } from '../version';
 import { estInstallee, installe, peutInstaller, surIPhone } from './installation';
@@ -41,12 +41,15 @@ export class Menus {
   constructor(
     private readonly ecran: HTMLElement,
     private readonly a: Actions,
-  ) {}
+  ) {
+    window.addEventListener('resize', () => ajusteColonnes(this.ecran));
+  }
 
   montre(...enfants: HTMLElement[]): void {
     if (this.minuteur) clearInterval(this.minuteur);
     this.minuteur = null;
     this.ecran.replaceChildren(...enfants);
+    ajusteColonnes(this.ecran); // des boutons en colonne, en plusieurs colonnes si l'écran est trop bas
   }
 
   /** Rafraîchit l'écran courant chaque seconde (jusqu'au prochain écran). */
@@ -98,7 +101,8 @@ export class Menus {
       (...enfants) => this.montre(...enfants),
       s.faits,
       depart,
-      (n) => this.lanceNiveau(n, s.enCours?.niveau === n ? s.enCours : null),
+      // depuis le menu, on repart du début du niveau (les vies et le score restent) ; le dernier drapeau sert à la pause
+      (n) => this.lanceNiveau(n, s.enCours?.niveau === n ? { ...s.enCours, drapeau: -1 } : null),
       () => this.titre(),
     );
   }

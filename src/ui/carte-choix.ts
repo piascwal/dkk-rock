@@ -6,7 +6,8 @@ import { bouton, el } from './elements';
 
 /**
  * L'écran « Continuer » : la carte du monde, le van posé sur le dernier niveau débloqué. On choisit un niveau ouvert
- * (du doigt, ou avec les flèches), puis « Jouer ». La partie en cours, s'il y en a une, reprend à son dernier drapeau.
+ * (du doigt, ou avec les flèches), puis « Jouer ». La partie en cours, s'il y en a une, repart du début de son niveau (avec ses vies
+ * et son score).
  */
 export function ecranCarte(
   conteneur: (...enfants: HTMLElement[]) => void,

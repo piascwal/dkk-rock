@@ -44,7 +44,7 @@ export class App implements Actions {
   private readonly synthe = new Synthe();
   private readonly bruitages = new Bruitages(this.synthe);
   private readonly musique = new Musique(this.synthe);
-  private readonly rendu = new Rendu($('toile') as HTMLCanvasElement);
+  private readonly rendu = new Rendu($('toile') as HTMLCanvasElement, () => this.sauvegarde.faits);
   private readonly hud = new Hud($('hud'));
   private readonly bulles = new Bulles($('bulle'));
   private readonly histoire = new Histoire(

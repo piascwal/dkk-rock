@@ -2,7 +2,7 @@ import { HAUTEUR_CARTE } from '../config';
 import { DUREE_CARTE, G } from '../jeu/vue';
 import { Aleatoire, borne } from '../moteur/maths';
 import { NIVEAUX } from '../niveaux';
-import { arcDe, MONDE, suivantDansMonde } from '../niveaux/arcs';
+import { arcDe, etatsDuTrajet, MONDE, suivantDansMonde } from '../niveaux/arcs';
 import { C, SOLS, mer, type Px } from './carte-monde-decor';
 import { brouillard } from './carte-brouillard';
 import { dessineRoute, detroit, longueur, surRoute } from './carte-route';
@@ -282,13 +282,17 @@ export function dessineCarte(
   }
 }
 
-/** Entre deux niveaux : `niveau` est celui qu'on vient de finir, `page` les ticks du trajet vers le suivant. */
+/**
+ * Entre deux niveaux : `niveau` est celui qu'on vient de finir, `page` les ticks du trajet vers le suivant, `faits` les niveaux
+ * déjà terminés un jour (la sauvegarde) : en rejouant un niveau précédent, le brouillard ne revient pas sur ce qu'on a déjà vu.
+ */
 export function dessineCarteMonde(
   ctx: CanvasRenderingContext2D,
   largeur: number,
   niveau: number,
   page: number,
   tick: number,
+  faits: readonly number[] = [],
 ): void {
   const i = MONDE.indexOf(niveau);
   const suivant = suivantDansMonde(niveau);
@@ -296,7 +300,7 @@ export function dessineCarteMonde(
   // le trajet : un temps d'arrêt, la route (accélération puis freinage), l'arrivée
   const t = borne((page / DUREE_CARTE - 0.08) / 0.82, 0, 1);
   const pos = i + (j - i) * t * t * (3 - 2 * t);
-  const etats = MONDE.map((_, k): EtatEtape => (k <= i ? 'faite' : k === j ? 'cible' : 'fermee'));
+  const etats = etatsDuTrajet(niveau, suivant, faits);
   const def = suivant === null ? null : NIVEAUX[suivant];
   ctx.fillStyle = '#2f86d8';
   ctx.fillRect(0, 0, largeur, HAUTEUR_CARTE);

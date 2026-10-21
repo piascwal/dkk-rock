@@ -228,6 +228,8 @@ export interface EtatVue {
   phase: Phase;
   /** les ennemis « convertis au rock » depuis le début du niveau, par type (voir GENRES_CONVERTIS), 255 au plus chacun */
   convertis: number[];
+  /** le temps de la run (le niveau, depuis son début), en secondes : l'écran de fin de niveau l'affiche */
+  temps: number;
   /** page de l'histoire en cours (intro, outro ou fin) */
   page: number;
   niveau: number;

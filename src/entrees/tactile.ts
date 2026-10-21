@@ -94,7 +94,7 @@ export class Tactile {
    */
   arme(icone: { url: string; w: number; h: number } | null, munitions: number): void {
     const bouton = this.element.querySelector<HTMLElement>('.bouton.tir');
-    if (!bouton || this.element.classList.contains('drift')) return; // au concours de drift : le frein à main
+    if (!bouton || this.element.classList.contains('drift')) return; // au concours de drift : pas de tir
     const cle = icone ? `${icone.url}|${munitions}` : '';
     if (bouton.dataset.arme === cle) return;
     bouton.dataset.arme = cle;
@@ -111,8 +111,9 @@ export class Tactile {
   }
 
   /**
-   * Au concours de drift, les boutons changent de rôle : SAUT donne les gaz, TIR tire le frein à main, le spécial n'a rien à
-   * faire (il disparaît). Hors du concours, les libellés du jeu reviennent (et le tir, l'icône de l'arme ramassée).
+   * Au concours de drift, les boutons changent de rôle : SAUT donne les gaz (« GAZ »), le tir et le spécial n'ont rien à faire
+   * (ils disparaissent), et le joystick reste affiché, son manche qui se balance (voir le CSS) : on le prend pour tourner. Hors
+   * du concours, les libellés du jeu reviennent (et le tir, l'icône de l'arme ramassée).
    */
   pilote(oui: boolean): void {
     if (this.element.classList.contains('drift') === oui) return;
@@ -122,7 +123,8 @@ export class Tactile {
     saut.textContent = oui ? 'GAZ' : 'SAUT';
     tir.classList.remove('avec-arme');
     tir.dataset.arme = 'drift'; // l'arme sera redessinée au retour en jeu
-    tir.textContent = oui ? 'FREIN À MAIN' : 'TIR';
+    tir.textContent = 'TIR';
+    tir.hidden = oui;
     this.element.querySelector<HTMLElement>('.bouton.special')!.hidden = oui;
   }
 

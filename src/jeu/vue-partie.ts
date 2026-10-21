@@ -1,4 +1,4 @@
-import { MAX_JOUEURS } from '../config';
+import { MAX_JOUEURS, TICKS_PAR_SECONDE } from '../config';
 import type { EntiteVue, EtatVue, JoueurVue } from './vue';
 import type { Partie } from './partie';
 
@@ -59,6 +59,7 @@ export function construitVue(p: Partie): EtatVue {
     tick: p.tick,
     phase: p.phase,
     convertis: p.convertis.map((n) => Math.min(255, n)),
+    temps: Math.min(65535, Math.floor(p.tempsNiveau / TICKS_PAR_SECONDE)),
     page: p.page,
     niveau: p.niveau,
     vies: p.vies,

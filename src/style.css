@@ -174,12 +174,15 @@ h2 {
   line-height: 1.35;
 }
 
-.boutons-menu {
-  display: flex;
-  flex-wrap: wrap;
+/* des boutons en colonne ; si la colonne ne tient pas dans l'écran, elle se coupe en plusieurs (--lignes, voir ajusteColonnes) */
+.boutons-menu,
+.ligne {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(var(--lignes, 8), auto);
   gap: 0.5rem;
   justify-content: center;
-  max-width: 44rem;
+  align-items: stretch;
 }
 
 .ecran button,
@@ -285,14 +288,6 @@ h2 {
   flex-direction: column;
   gap: 0.35rem;
   min-width: min(26rem, 90vw);
-}
-
-.ligne {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
 }
 
 .code {
@@ -597,41 +592,30 @@ h2 {
   font-size: clamp(0.9rem, 3.6vh, 1.2rem);
 }
 
-/* l'écran des ennemis « convertis au rock » */
-#histoire .convertis {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.4rem 1.6rem;
-  max-width: 46rem;
-}
-
-#histoire .converti {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  min-width: 15rem;
-  font-size: clamp(0.8rem, 3.8vh, 1.15rem);
-  animation: apparait 0.25s ease-out;
-}
-
-#histoire .icone-converti {
-  width: 70px;
-  height: 77px;
+/* l'écran des ennemis « convertis au rock » : la pile de sprites, puis le temps de la run et le score */
+#histoire .pile-convertis {
+  max-width: 96vw;
   image-rendering: pixelated;
 }
 
-#histoire .converti .nom {
-  flex: 1;
-  text-align: left;
+#histoire .stats-run {
+  display: flex;
+  justify-content: center;
+  gap: clamp(1.5rem, 8vw, 4rem);
 }
 
-#histoire .converti .compteur {
+#histoire .stat-run {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: clamp(0.7rem, 3vh, 0.95rem);
+  opacity: 0.95;
+}
+
+#histoire .stat-run strong {
   font-family: var(--titre);
   color: var(--jaune);
-  font-size: clamp(1rem, 5vh, 1.5rem);
-  min-width: 3.4rem;
-  text-align: right;
+  font-size: clamp(1.1rem, 6vh, 1.9rem);
 }
 
 #histoire .total-convertis {
@@ -838,11 +822,42 @@ h2 {
   font-size: 1.3rem;
 }
 
-/* au concours de drift : « GAZ » et « FREIN À MAIN », sur deux lignes dans le bouton rouge */
-.tactile.drift .bouton.tir {
-  font-size: 0.62rem;
-  line-height: 1.15;
-  padding: 0 6px;
+/*
+ * au concours de drift : le joystick reste affiché en bas à gauche, au repos, et son manche se balance de gauche à droite pour
+ * inviter à le prendre (au toucher, il se place sous le doigt comme d'habitude) ; seul « GAZ » reste à droite
+ */
+.tactile.drift .joystick-base:not(.actif) {
+  display: block;
+  left: max(86px, calc(env(safe-area-inset-left) + 78px)) !important;
+  top: calc(100% - max(90px, calc(env(safe-area-inset-bottom) + 84px))) !important;
+  animation: invite-base 1.8s ease-in-out infinite;
+}
+
+.tactile.drift .joystick-base:not(.actif) .joystick-manche {
+  animation: invite-manche 1.8s ease-in-out infinite;
+}
+
+@keyframes invite-manche {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-24px);
+  }
+  75% {
+    transform: translateX(24px);
+  }
+}
+
+@keyframes invite-base {
+  0%,
+  100% {
+    border-color: rgba(255, 255, 255, 0.35);
+  }
+  50% {
+    border-color: rgba(255, 255, 255, 0.8);
+  }
 }
 
 /* ——— version et mise à jour ——— */

@@ -37,19 +37,19 @@ describe('le concours de drift du pré du Clos', () => {
   it('la voiture qui part en travers laboure la pelouse ; en ligne droite, elle la laisse', () => {
     const v = new Voiture();
     const pelouse = new Pelouse();
-    const roule = (n: number, volant: number, freinAMain: boolean) => {
+    const roule = (n: number, volant: number) => {
       for (let i = 0; i < n; i++) {
         const avant = v.pose();
-        v.avance({ gaz: true, frein: false, volant, freinAMain });
+        v.avance({ gaz: true, frein: false, volant });
         marqueVoiture(pelouse, avant, v.pose(), v.griffe);
       }
     };
-    roule(45, 0, false);
+    roule(45, 0);
     const depart = pelouse.pourcent; // le démarrage patine un peu
-    roule(60, 0, false);
+    roule(60, 0);
     expect(pelouse.pourcent).toBe(depart); // lancée, en ligne droite : rien
     expect(v.vitesse).toBeGreaterThan(8);
-    roule(90, 1, true); // braqué, frein à main : elle part en travers
+    roule(90, 1); // braquée à pleine vitesse, pied au plancher : elle part en travers
     expect(Math.abs(v.glisse)).toBeGreaterThan(2);
     expect(pelouse.pourcent).toBeGreaterThan(depart + 0.3);
   });

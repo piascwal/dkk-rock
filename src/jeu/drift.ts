@@ -13,7 +13,7 @@ const SECONDE = TICKS_PAR_SECONDE;
 const DUREE_COMPTE = 3 * SECONDE;
 const DUREE_COURSE = 60 * SECONDE;
 const DUREE_RESULTAT = 5 * SECONDE;
-/** Le temps avant qu'un appui passe l'écran du score ou du podium : un doigt encore sur le frein à main ne le saute pas. */
+/** Le temps avant qu'un appui passe l'écran du score ou du podium : un doigt encore sur le gaz ne le saute pas. */
 const ATTENTE_APPUI = SECONDE;
 
 const VALIDE = C.SAUT | C.TIR;
@@ -122,7 +122,6 @@ export class ConcoursDrift {
       gaz: k.tenu(C.HAUT) || k.tenu(C.SAUT),
       frein: k.tenu(C.BAS),
       volant: k.horizontal,
-      freinAMain: k.tenu(C.TIR),
     });
     marqueVoiture(this.pelouse, avant, v.pose(), v.griffe);
     if (v.griffe >= 2 && this.minuteur % 18 === 0) son('derapage');

@@ -74,6 +74,8 @@ export class Partie implements Contexte {
   departDans = -1;
   /** les ennemis convertis au rock depuis le début du niveau (voir GENRES_CONVERTIS) */
   convertis: number[] = GENRES_CONVERTIS.map(() => 0);
+  /** les pas de jeu depuis le début du niveau (la run : il repart de zéro quand le niveau est refait) */
+  tempsNiveau = 0;
   /** change à chaque chargement de carte : le réseau renvoie alors la carte aux clients */
   generation = 0;
   /** prévenu à chaque drapeau et à chaque niveau fini */
@@ -198,6 +200,7 @@ export class Partie implements Contexte {
     this.drapeau = drapeau;
     this.generation++;
     this.convertis = GENRES_CONVERTIS.map(() => 0);
+    this.tempsNiveau = 0;
     this.lu = niveauLu(niveau);
     this.carte = new Carte(this.lu.largeur, this.lu.hauteur, this.lu.tuiles, this.lu.fond);
     // les tuiles de l'ancienne carte n'ont plus de sens
@@ -248,6 +251,7 @@ export class Partie implements Contexte {
     if (this.phase === 'carte' && ++this.page >= DUREE_CARTE) this.chargeNiveauSuivant();
     if (this.phase === 'drift') majDrift(this);
     if (this.phase !== 'jeu') return;
+    this.tempsNiveau++;
 
     this.recalculeCibles();
     for (let s = 0; s < MAX_JOUEURS; s++) {
@@ -334,11 +338,8 @@ export class Partie implements Contexte {
     this.page = 0;
     this.drapeau = -1;
     this.son('victoire', 0, 0);
-    this.onProgression(
-      { ...this.progression(), niveau: suivantDansMonde(this.niveau) ?? this.niveau },
-      true,
-      this.niveau,
-    );
+    const suivant = suivantDansMonde(this.niveau) ?? this.niveau;
+    this.onProgression({ ...this.progression(), niveau: suivant }, true, this.niveau);
   }
 
   private recalculeCibles(): void {
