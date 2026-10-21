@@ -36,6 +36,17 @@ describe('l’écran des convertis', () => {
     }
   });
 
+  it('quand il y a plusieurs lignes, une marge les sépare', () => {
+    const d = dispose(80, 600, 300);
+    const h = HAUTEUR_SPRITE * d.echelle;
+    const lignes = [...new Set(d.positions.map(([, y]) => y))].sort((a, b) => a - b);
+    expect(lignes.length).toBeGreaterThan(1);
+    for (let k = 1; k < lignes.length; k++) expect(lignes[k]! - lignes[k - 1]!).toBeGreaterThan(h); // pas de recouvrement vertical
+    // et la pile garde son recouvrement de moitié : l'écart d'un sprite au suivant, sur une ligne
+    const [a, b] = [d.positions[0]!, d.positions[1]!];
+    expect(b[0] - a[0]).toBe((LARGEUR_SPRITE * d.echelle) / 2);
+  });
+
   it('le temps de la run s’écrit minutes:secondes', () => {
     expect(formateTemps(0)).toBe('0:00');
     expect(formateTemps(187)).toBe('3:07');

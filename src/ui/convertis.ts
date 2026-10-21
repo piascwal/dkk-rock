@@ -55,7 +55,7 @@ export class Convertis {
   /** jusqu'à quand les éclats continuent de s'éteindre après la fin du comptage */
   private finEffets = 0;
   private genres: Genre[] = [];
-  private disposition: Disposition = { echelle: 1, positions: [] };
+  private disposition: Disposition = { echelle: 1, positions: [], hauteur: 0 };
   private posees = 0;
   private ecart = ECART_MAX;
   private score = 0;
@@ -87,7 +87,9 @@ export class Convertis {
     const sous = el('p', 'selon les DKK');
     this.pile = el('canvas', '', 'pile-convertis');
     this.pile.width = Math.round(Math.min(innerWidth * 0.94, 960));
-    this.pile.height = Math.round(Math.max(110, Math.min(innerHeight * 0.4, 340)));
+    // la hauteur que le titre et les chiffres laissent, ramenée à ce dont la pile a besoin : pas de vide autour
+    const place = Math.round(Math.max(110, Math.min(innerHeight - 380, 420)));
+    this.pile.height = Math.max(8, dispose(this.genres.length, this.pile.width, place).hauteur);
     this.fond = el('canvas');
     this.fond.width = this.pile.width;
     this.fond.height = this.pile.height;
