@@ -6,11 +6,12 @@ import { PREMIER_PLAN_TUVES } from './premier-plan-tuves';
 import type { Decor } from './themes';
 
 /**
- * Le premier plan : entre le jeu et l'écran, des éléments tout proches (un arbre feuillu, une roche et ses fougères...) qui
- * défilent plus vite que le jeu, en largeur comme en hauteur. Chacun est posé sur le terrain, à un endroit du niveau : on
- * le croise en passant, et quand on monte ou qu'on descend il reste où il est (il sort de l'écran par le bas ou par le haut),
- * une fois dépassé il est derrière nous. Ils sont clairsemés et peints en couleurs translucides : ils cachent un peu du jeu,
- * par endroits et le temps de passer, pour la profondeur.
+ * Le premier plan : entre le jeu et l'écran, des éléments tout proches (un arbre feuillu, une motte, une cascade...) qui
+ * défilent plus vite que le jeu en largeur. En hauteur, ils sont cloués au monde, comme le terrain : en sautant, en montant
+ * ou en descendant, rien ne bouge de son propre chef. Chacun est posé sur le terrain, à un endroit du niveau : on le croise
+ * en passant, une fois dépassé il est derrière nous. Pour ne jamais montrer leur pied en sautant, ceux qui le demandent
+ * (`prolonge`) sont étirés vers le bas jusqu'au fond du niveau, là où l'on tombe. Ils sont clairsemés et peints en couleurs
+ * translucides : ils cachent un peu du jeu, par endroits et le temps de passer, pour la profondeur.
  *
  * Un monde qui en veut un le déclare dans PREMIERS_PLANS : ses sortes d'éléments (peintes une fois) et où les poser.
  */
@@ -20,6 +21,8 @@ export interface Sorte {
   toile: HTMLCanvasElement;
   /** le pied de l'élément dans l'image : au milieu en bas pour un arbre */
   pied: { x: number; y: number };
+  /** la dernière rangée de l'image est étirée vers le bas jusqu'au fond du niveau (un tronc, un sol) */
+  prolonge?: boolean;
   /** ce qui bouge à chaque image ; (x, y) : le coin haut gauche de l'image à l'écran */
   anime?: (ctx: CanvasRenderingContext2D, x: number, y: number, tick: number) => void;
 }
@@ -40,7 +43,7 @@ export interface Terrain {
 }
 
 export interface DefPremierPlan {
-  /** de combien l'élément défile pour un pixel de caméra : au-delà de 1, il passe devant le jeu */
+  /** de combien l'élément défile en largeur pour un pixel de caméra : au-delà de 1, il passe devant le jeu */
   parallaxe: number;
   sortes(r: Aleatoire): Sorte[];
   pose(terrain: Terrain, r: Aleatoire): Pose[];
@@ -75,9 +78,12 @@ export class PremierPlan {
   private readonly def: DefPremierPlan | undefined;
   private sortes: Sorte[] = [];
   private poses: Pose[] = [];
+  /** le fond du niveau, en pixels du monde */
+  private readonly fond: number;
 
   constructor(decor: Decor, lu: NiveauLu) {
     this.def = PREMIERS_PLANS[decor];
+    this.fond = lu.hauteur * TUILE;
     if (!this.def) return;
     const r = new Aleatoire(29);
     this.sortes = this.def.sortes(r);
@@ -90,11 +96,15 @@ export class PremierPlan {
     if (!p) return;
     for (const o of this.poses) {
       const s = this.sortes[o.sorte]!;
-      // la parallaxe est centrée sur l'écran : un élément posé à la hauteur du héros est à la sienne
+      // la parallaxe en largeur est centrée sur l'écran ; en hauteur, l'élément est au monde, comme le terrain
       const x = Math.round((o.x - camX - largeur / 2) * p + largeur / 2 - s.pied.x);
-      const y = Math.round((o.y - camY - HAUTEUR_VUE / 2) * p + HAUTEUR_VUE / 2 - s.pied.y);
+      const y = Math.round(o.y - camY - s.pied.y);
+      const bas = s.prolonge ? Math.min(HAUTEUR_VUE, Math.round(this.fond - camY)) : y + s.toile.height;
       if (x + s.toile.width < 0 || x > largeur || y + s.toile.height < 0 || y > HAUTEUR_VUE) continue;
       ctx.drawImage(s.toile, x, y);
+      const h = s.toile.height;
+      if (s.prolonge && bas > y + h)
+        ctx.drawImage(s.toile, 0, h - 1, s.toile.width, 1, x, y + h, s.toile.width, bas - y - h);
       s.anime?.(ctx, x, y, tick);
     }
   }
