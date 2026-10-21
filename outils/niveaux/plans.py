@@ -83,7 +83,7 @@ NIVEAUX = {
         nom='Les Alpages Lounge', theme='alpages', textes='02-alpages.ts', fichier='02-alpages.ts',
         constante='CARTE_ALPAGES', graine=22, base=34, raccord='ad', caves='ad',
         lieux=[
-            ('plat', 12, dict(lettres='a', deco=3)),  # la radio : « Radio Sommet »
+            ('plat', 12, dict(lettres='a', deco=3, digit='1')),  # la radio : « Radio Sommet »
             ('colline', 18, dict(haut=3, lettres='ac')),
             ('plat', 10, dict(lettres='a', digit='3', drones=1)),  # les vaches
             ('forteresse', 36, dict(etages=3, lettres='ad', cage=True)),
