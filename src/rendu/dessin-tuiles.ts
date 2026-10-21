@@ -29,7 +29,8 @@ export function dessineTuiles(
       const x = tx * TUILE - Math.round(camX);
       const y = ty * TUILE - Math.round(camY);
       const plein = t !== T.VIDE && !TUILES_LEGERES.has(t);
-      const cotes = t === T.VIDE ? 0 : cotesLibres(carte, t, tx, ty);
+      // l'eau n'a ni herbe ni bords arrondis : elle épouse ce qui l'entoure
+      const cotes = t === T.VIDE || t === T.EAU ? 0 : cotesLibres(carte, t, tx, ty);
       // la paroi de fond, aux coins extérieurs arrondis ; derrière un coin arrondi d'une tuile pleine, elle remplit
       // les angles où elle continue (sinon on verrait le ciel par ces angles)
       if (carte.aFond(tx, ty) && (!plein || aUnCoin(cotes)))
@@ -51,6 +52,12 @@ export function dessineTuiles(
           ctx.drawImage(toile, x - Math.round((cote - TUILE) / 2), y - (cote - TUILE), cote, cote);
         } else if (toile) ctx.drawImage(toile, x, y, TUILE, TUILE);
         ctx.imageSmoothingEnabled = false;
+      }
+      // la surface de l'eau, à l'air libre : une ligne claire qui ondule
+      if (t === T.EAU && carte.get(tx, ty - 1) !== T.EAU) {
+        ctx.fillStyle = 'rgba(200, 240, 250, 0.8)';
+        for (let i = 0; i < TUILE; i += 4)
+          ctx.fillRect(x + i, y + ((tick / 12 + tx + i / 4) % 2 < 1 ? 0 : 1), 3, 1);
       }
       const usure = carte.usure(tx, ty);
       if (usure < 0.7) fissures(ctx, x, y, usure, tx, ty);

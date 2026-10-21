@@ -17,6 +17,7 @@ from plans import NIVEAUX, enchaine
 from souterrain import souterrain, tonneaux_de_surface
 from ferry import ferry
 from fise import bigair, breakdance, densite, entree, flat_bmx, food_court, gradins, halfpipe_bois, parc_street, soirees, spine, village
+from stc import calade, chapelle, clos, place, remparts, restanques
 from hauteurs import corniches, descente, grotte, pont_de_singe, tours, vide_partout
 from signatures import falaise, glacier, parking, ponton, scene, toits
 from structures import forteresse, traversee
@@ -39,6 +40,9 @@ THEMES = {
     'mer': dict(sol='D', sous='#', profond='R', mur='B', deco=['C']),
     # le FISE : le béton des skateparks, les rampes en bois
     'fise': dict(sol='D', sous='#', profond='R', mur='W', deco=[]),
+    # Saint-Cézaire : la pierre calcaire des maisons et des remparts ; les gorges de la Siagne : la roche, le bois des cabanes
+    'stc': dict(sol='#', sous='#', profond='R', mur='{', deco=['C', 'C', 'T']),
+    'tuves': dict(sol='#', sous='#', profond='R', mur='{', deco=['C', 'W']),
 }
 
 
@@ -210,6 +214,25 @@ class Recette:
     def p_tours(self, x0, x1, etages=3, mode='pont', lettres='a', mat=None):
         tours(self.n, x0, x1 - x0, etages, mode, lettres, mat)
 
+    # ---- Saint-Cézaire (voir niveaux/stc.py) : le Clos, les restanques, les remparts, la place, les calades, la chapelle
+    def p_clos(self, x0, x1, lettres='a'):
+        clos(self.n, x0, x1 - x0, lettres)
+
+    def p_restanques(self, x0, x1, lettres='a', marches=3, haut=2):
+        restanques(self.n, x0, x1 - x0, lettres, marches, haut)
+
+    def p_remparts(self, x0, x1, haut=5, lettres='a'):
+        remparts(self.n, x0, x1 - x0, haut, lettres)
+
+    def p_place(self, x0, x1, lettres='a', caissons=True):
+        place(self.n, x0, x1 - x0, lettres, caissons)
+
+    def p_calade(self, x0, x1, lettres='a', haut=5):
+        calade(self.n, x0, x1 - x0, lettres, haut)
+
+    def p_chapelle(self, x0, x1, lettres='a', cage=True):
+        chapelle(self.n, x0, x1 - x0, lettres, cage)
+
     # ---- le FISE (voir niveaux/fise.py) : chaque zone du festival, son décor placé à la main
     def p_entree(self, x0, x1, lettres='s'):
         entree(self.n, x0, x1 - x0, lettres)
@@ -294,7 +317,7 @@ COULEURS = {
     ' ': (30, 20, 40), '.': (60, 50, 70), '#': (122, 74, 42), 'R': (109, 109, 120), 'B': (156, 59, 46), 'M': (138, 150, 163),
     'X': (20, 20, 20), 'N': (230, 240, 251), 'G': (143, 208, 238), 'W': (168, 116, 58), '-': (210, 154, 85), 'H': (196, 154, 90),
     'E': (255, 255, 255), '=': (190, 200, 210), 'C': (176, 125, 60), 'T': (60, 60, 60), 'S': (232, 207, 138), 'V': (191, 233, 255),
-    'D': (154, 154, 146), 'L': (44, 44, 49), 'U': (232, 96, 122), 'A': (216, 168, 104), 'I': (170, 80, 220), '|': (255, 79, 216), '(': (255, 0, 255), ')': (255, 0, 255),
+    'D': (154, 154, 146), 'L': (44, 44, 49), 'U': (232, 96, 122), 'A': (216, 168, 104), 'I': (170, 80, 220), '|': (255, 79, 216), '{': (200, 184, 150), '^': (184, 73, 46), '~': (60, 150, 190), ';': (90, 64, 40), '(': (255, 0, 255), ')': (255, 0, 255),
 }
 
 
@@ -365,7 +388,7 @@ def fabrique(cle):
     )
     if not cfg.get('sans_caves'):  # le ferry est un petit niveau : rien sous le quai
         souterrain(r, cfg['caves'])
-    tonneaux_de_surface(r, barils=cle in ('garage', 'ville'))
+    tonneaux_de_surface(r, barils=cle in ('stc', 'ville'))
     if cle == 'cimes':
         arene_du_yeti(r)
     if cle == 'club':

@@ -1,7 +1,19 @@
 /** L'ambiance de chaque monde : couleurs du ciel, du sol, décor de fond, météo et musique. */
 
 export type NomTheme =
-  'garage' | 'montagne' | 'neige' | 'plage' | 'ville' | 'club' | 'foret' | 'port' | 'groix' | 'mer' | 'fise';
+  | 'garage'
+  | 'montagne'
+  | 'neige'
+  | 'plage'
+  | 'ville'
+  | 'club'
+  | 'foret'
+  | 'port'
+  | 'groix'
+  | 'mer'
+  | 'fise'
+  | 'stc'
+  | 'tuves';
 
 export type Decor =
   | 'pavillons'
@@ -14,7 +26,9 @@ export type Decor =
   | 'quais'
   | 'falaises'
   | 'large'
-  | 'fise';
+  | 'fise'
+  | 'stc'
+  | 'tuves';
 
 export interface Theme {
   /** dégradé du ciel, du haut vers l'horizon */
@@ -162,5 +176,29 @@ export const THEMES: Record<NomTheme, Theme> = {
     decor: 'fise',
     meteo: null,
     musique: 'plage',
+  },
+  // Saint-Cézaire (STC), village perché au-dessus de la Siagne : un matin d'été, la pierre claire, les oliviers
+  stc: {
+    ciel: ['#4f9fe0', '#e8f4ff'],
+    lointain: '#9aaccc',
+    proche: '#5a6a48',
+    paroi: '#7a6a52',
+    dessus: '#7aa04a',
+    terre: '#9a7350',
+    decor: 'stc',
+    meteo: null,
+    musique: 'garage',
+  },
+  // le pont des Tuves, au fond des gorges de la Siagne : l'ombre verte, l'eau fraîche, la boue des figuiers
+  tuves: {
+    ciel: ['#5aa8d8', '#d8f0e8'],
+    lointain: '#c8bea4',
+    proche: '#2f5a2a',
+    paroi: '#4a4234',
+    dessus: '#4f9a3a',
+    terre: '#6a5038',
+    decor: 'tuves',
+    meteo: null,
+    musique: 'montagne',
   },
 };

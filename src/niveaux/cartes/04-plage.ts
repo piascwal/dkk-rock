@@ -1,4 +1,4 @@
-// La Plage du Tube de l’Été : la carte du niveau, générée par outils/genere-niveaux.py puis modifiable à la main.
+// Les Plages Électroniques : la carte du niveau, générée par outils/genere-niveaux.py puis modifiable à la main.
 // Légende dans ../format.ts. Une ligne par rangée de tuiles de 16 px ; sous la dernière rangée de terre, le vide.
 export const CARTE_PLAGE: string[] = [
   '',

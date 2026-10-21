@@ -2,7 +2,7 @@ import type { DefNiveau } from '../format';
 
 export const CIMES: Omit<DefNiveau, 'carte'> = {
   id: 'cimes',
-  titre: 'Les Cimes Minimales',
+  titre: 'Gréau',
   sousTitre: 'Niveau 4 — Boum. Tchk. Boum. Tchk.',
   theme: 'neige',
   // le niveau finit au sommet : le van en repart en décollant
@@ -11,7 +11,7 @@ export const CIMES: Omit<DefNiveau, 'carte'> = {
     {
       qui: 'NARRATEUR',
       texte:
-        'Les cimes enneigées. Ici, depuis des années, des yétis écoutent le même kick. Boum. Tchk. Boum. Tchk.',
+        'Gréau, ses cimes enneigées au-dessus du Cheiron. Ici, depuis des années, des yétis écoutent le même kick. Boum. Tchk. Boum. Tchk.',
     },
     { qui: 'TOM', texte: 'Ils n’attaquent que sur le temps. Profitez du contretemps !' },
     { qui: 'JBT', texte: 'Le contretemps, c’est mon domaine.' },

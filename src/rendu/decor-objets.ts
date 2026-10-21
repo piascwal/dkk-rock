@@ -1,4 +1,5 @@
 import { ACCESSOIRES_SUPPLEMENTAIRES } from './decor-accessoires';
+import { ACCESSOIRES_PROVENCE } from './decor-provence';
 import type { Pinceau } from './pinceau';
 
 /**
@@ -236,6 +237,7 @@ export const ACCESSOIRES = {
   caisseDeco,
   etagere,
   ...ACCESSOIRES_SUPPLEMENTAIRES,
+  ...ACCESSOIRES_PROVENCE,
 } satisfies Record<string, Accessoire>;
 
 export type NomAccessoire = keyof typeof ACCESSOIRES;

@@ -64,21 +64,23 @@ export function semeDecor(
   graine: number,
   /** le décor placé à la main par le générateur (voir DefNiveau.decor) : il remplace le semis */
   fixe?: readonly (readonly [string, number, number])[],
+  /** avec `fixe` : le semis s'y ajoute au lieu d'être remplacé (voir DefNiveau.semis) */
+  semerAussi = false,
 ): Pose[] {
   const rng = new Aleatoire(graine);
-  if (fixe)
-    return fixe
-      .filter(([quoi]) => quoi in ACCESSOIRES)
-      .map(([quoi, tx, ty]) => ({
-        tx,
-        ty,
-        quoi: quoi as NomAccessoire,
-        v: rng.entier(0, 255),
-        devant: false,
-        dedans: carte.aFond(tx, ty - 1),
-      }));
+  const fixes: Pose[] = (fixe ?? [])
+    .filter(([quoi]) => quoi in ACCESSOIRES)
+    .map(([quoi, tx, ty]) => ({
+      tx,
+      ty,
+      quoi: quoi as NomAccessoire,
+      v: rng.entier(0, 255),
+      devant: false,
+      dedans: carte.aFond(tx, ty - 1),
+    }));
+  if (fixe && !semerAussi) return fixes;
   const semis = SEMIS[theme];
-  const poses: Pose[] = [];
+  const poses: Pose[] = [...fixes];
   // chaque rangée garde son propre espacement : des accessoires sur le sol, sur les passerelles, sur les toits
   const libreDepuis = new Map<number, number>();
   let derniereVoiture = -ECART_VOITURES;
@@ -97,6 +99,8 @@ export function semeDecor(
     if (libre) for (const [x, y] of cases) prises.add(cle(x, y));
     return libre;
   };
+  // le décor placé à la main garde sa place : rien ne se sème par-dessus
+  for (const f of fixes) for (const [x, y] of emprise(f.tx, f.ty)) prises.add(cle(x, y));
   // le premier arrière-plan : les grands accessoires du monde (les stands du FISE), en file sur le sol principal, à tour de
   // rôle, partout où ils tiennent : loin des échelles, et rien d'autre ne se pose sur leur largeur
   const solNiveau = solPrincipal(carte);

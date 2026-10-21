@@ -26,29 +26,32 @@ def enchaine(lieux, graine, lettres):
 
 
 NIVEAUX = {
-    'garage': dict(
-        nom='Le Garage', theme='garage', textes='01-garage.ts', fichier='01-garage.ts', constante='CARTE_GARAGE',
+    # Saint-Cézaire-sur-Siagne (voir niveaux/stc.py) : on part du Clos ; les dialogues 1 à 6 sont le tutoriel
+    'stc': dict(
+        nom='Saint-Cézaire', theme='stc', textes='01-stc.ts', fichier='01-stc.ts', constante='CARTE_STC',
         graine=11, base=30, raccord='a', caves='a',
         lieux=[
-            ('plat', 14, dict(lettres='a', deco=2)),
+            ('clos', 34, dict(lettres='a', digit='1')),  # le Clos : la maison, le local de répétition, le pré
             ('plat', 10, dict(lettres='a', digit='2')),  # les fêtards autotunés
-            ('colline', 18, dict(haut=3)),
-            ('mur', 16, dict(haut=5, digit='3')),  # sauter contre le mur
+            ('restanques', 26, dict(lettres='a')),  # les oliviers en terrasses
+            ('remparts', 16, dict(haut=5, digit='3')),  # sauter contre le mur
             ('plat', 10, dict(digit='4', cage=True)),  # la cage
-            ('plat', 10, dict(digit='5', deco=0, caissons=True)),  # les caissons de basses
-            ('tour', 18, dict(etages=2, tyro=9, apres=13, digit='6')),  # la tyrolienne
-            ('forteresse', 32, dict(etages=3, lettres='ac', cage=True)),
+            ('place', 38, dict(lettres='a', digit='5')),  # la place de la fontaine des Mulets, ses caissons, la mairie
+            ('tour', 18, dict(etages=2, tyro=9, apres=13, digit='6')),  # la tour du château, et sa tyrolienne
+            ('forteresse', 32, dict(etages=3, lettres='ac', cage=True)),  # le château
+            ('calade', 34, dict(lettres='ac')),  # une ruelle en escalier sous un passage voûté
             ('gouffre', 18, dict(lettres='ac', nb=4)),
-            ('parking', 42, dict(lettres='ac')),  # le parking à étages, propre au garage
-            ('echafaudage', 22, dict(niveaux=3, lettres='ac')),
+            ('chapelle', 22, dict(lettres='ac')),  # Notre-Dame de Sardaigne
+            ('toits', 42, dict(lettres='ac')),  # les toits du village
+            ('restanques', 34, dict(lettres='ac', marches=4)),
             ('traversee', 36, dict(lettres='ac', mode='pont')),
-            ('barrage', 20, dict(haut=12, lettres='ac', butin='*')),
+            ('grotte', 18, dict(monte=6, lettres='ac', butin='+')),  # la grotte de Saint-Cézaire
             ('forteresse', 40, dict(etages=4, lettres='ac', cage=True)),
-            ('mur', 16, dict(haut=6, lettres='ac')),
+            ('calade', 30, dict(lettres='ac', haut=4)),
+            ('remparts', 18, dict(haut=6, lettres='ac')),
             ('traversee', 36, dict(lettres='ac', mode='iles')),
-            ('parking', 46, dict(lettres='ac')),
             ('gouffre', 22, dict(lettres='ac', nb=5)),
-            ('barrage', 20, dict(haut=16, lettres='ac', tyro=11, butin='+')),
+            ('barrage', 20, dict(haut=16, lettres='ac', tyro=11, butin='+')),  # le bord de la falaise, au belvédère
             ('arene', 40, dict(lettres='ac')),
         ],
     ),
@@ -79,7 +82,7 @@ NIVEAUX = {
         ],
     ),
     'cimes': dict(
-        nom='Les Cimes Minimales', theme='cimes', textes='03-cimes.ts', fichier='03-cimes.ts',
+        nom='Gréau', theme='cimes', textes='03-cimes.ts', fichier='03-cimes.ts',
         constante='CARTE_CIMES', graine=33, base=86, raccord='y', caves='y', altitude=True, sans_caves=True,
         # un niveau en hauteur (voir niveaux/hauteurs.py) : on ne fait que monter, de massif en massif, au-dessus du vide,
         # par des corniches, des grottes et des forteresses, jusqu'à l'arène du Yéti Alpha au sommet ; le van s'envole de là-haut
@@ -105,7 +108,7 @@ NIVEAUX = {
         ],
     ),
     'plage': dict(
-        nom='La Plage du Tube de l’Été', theme='plage', textes='04-plage.ts', fichier='04-plage.ts',
+        nom='Les Plages Électroniques', theme='plage', textes='04-plage.ts', fichier='04-plage.ts',
         constante='CARTE_PLAGE', graine=44, base=30, raccord='acd', caves='acd',
         lieux=[
             ('plat', 12, dict(lettres='c', deco=3)),

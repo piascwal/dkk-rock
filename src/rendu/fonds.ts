@@ -5,6 +5,7 @@ import { Ciel } from './ciel';
 import { arbreRond, brume, palmierPixel, sapinPixel } from './fonds-arbres';
 import { DECORS_BRETONS, type Peinture } from './fonds-bretagne';
 import { batimentsFise, PEINTURE_FISE, QUAI_FISE, tramFise } from './fonds-fise';
+import { PEINTURE_STC, PEINTURE_TUVES } from './fonds-provence';
 import type { Decor, Theme } from './themes';
 
 const LARGEUR_BANDE = 960;
@@ -165,6 +166,8 @@ const DECORS: Record<Decor, Peinture> = {
   },
   ...DECORS_BRETONS,
   fise: PEINTURE_FISE,
+  stc: PEINTURE_STC,
+  tuves: PEINTURE_TUVES,
 };
 
 /** Vitesse de défilement des trois plans (1 = la même que le jeu) : lointain, moyen, proche. */
@@ -255,7 +258,14 @@ export class Fond {
 
   private astres(ctx: CanvasRenderingContext2D, largeur: number, tick: number): void {
     const d = this.theme.decor;
-    if (d === 'pavillons' || d === 'palmiers' || d === 'falaises' || d === 'fise') {
+    if (
+      d === 'pavillons' ||
+      d === 'palmiers' ||
+      d === 'falaises' ||
+      d === 'fise' ||
+      d === 'stc' ||
+      d === 'tuves'
+    ) {
       ctx.fillStyle = d === 'pavillons' ? '#ffb36b' : '#fff3b0';
       ctx.beginPath();
       ctx.arc(largeur * 0.7, 120, 26, 0, Math.PI * 2);

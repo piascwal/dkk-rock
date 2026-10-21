@@ -117,7 +117,7 @@ export class Menus {
       ),
       drift
         ? bouton('Concours de drift — le pré du Clos', () => this.a.lanceMiniJeu(), 'principal')
-        : el('p', 'Concours de drift : se débloque après le Garage.', 'aide'),
+        : el('p', 'Concours de drift : se débloque après Saint-Cézaire.', 'aide'),
       drift && s.recordDrift > 0 ? el('p', record, 'aide') : el('span'),
       bouton('Retour', () => this.titre()),
     );

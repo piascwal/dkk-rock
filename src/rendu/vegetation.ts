@@ -29,6 +29,8 @@ const STYLES: Record<Decor, Style> = {
   quais: { sorte: 'cable', couleurs: ['#3a2a1a', '#6a5a3a', '#a8946a'] },
   large: { sorte: 'cable', couleurs: ['#3a2a1a', '#6a5a3a', '#a8946a'] },
   fise: { sorte: 'cable', couleurs: ['#3a3a40', '#6a6a72', '#a8a8b0'] },
+  stc: { sorte: 'liane', couleurs: ['#4a6a3a', '#6a8a4a', '#8a5ab8'], mousse: ['#7a8a5a', '#9aa86a'] },
+  tuves: { sorte: 'liane', couleurs: ['#24402e', '#3f7a3a', '#6ab04a'], mousse: ['#3f7a3a', '#5a9a3a'] },
   falaises: { sorte: 'liane', couleurs: ['#4a6a3a', '#7aa04a', '#ffd23f'], mousse: ['#7a8a4a', '#9aa85a'] },
 };
 
@@ -43,6 +45,7 @@ const PENDANTES = new Set<number>([
   T.GLACE,
   T.METAL,
   T.SOCLE,
+  T.PIERRE,
 ]);
 const PLANCHES = new Set<number>([T.PLATEFORME, T.PITON]);
 

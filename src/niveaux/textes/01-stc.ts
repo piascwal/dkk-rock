@@ -1,10 +1,12 @@
 import type { DefNiveau } from '../format';
 
-export const GARAGE: Omit<DefNiveau, 'carte'> = {
-  id: 'garage',
-  titre: 'Le Garage',
+export const STC: Omit<DefNiveau, 'carte'> = {
+  id: 'stc',
+  titre: 'Saint-Cézaire',
   sousTitre: 'Niveau 1 — La reformation',
-  theme: 'garage',
+  theme: 'stc',
+  // les monuments sont posés à la main (la fontaine, le puits du Clos...), la végétation semée autour
+  semis: true,
   intro: [
     {
       qui: 'NARRATEUR',
@@ -14,7 +16,7 @@ export const GARAGE: Omit<DefNiveau, 'carte'> = {
     {
       qui: 'NARRATEUR',
       texte:
-        'La veille du grand départ, les cinq DKK se sont retrouvés au Clos, chez les parents de JBT. Il reste quelques photos de cette soirée.',
+        'La veille du grand départ, les cinq DKK se sont retrouvés au Clos, chez les parents de JBT, à Saint-Cézaire. Il reste quelques photos de cette soirée.',
     },
     {
       qui: 'NARRATEUR',
@@ -66,11 +68,12 @@ export const GARAGE: Omit<DefNiveau, 'carte'> = {
     ],
   },
   outro: [
-    { qui: 'JBM', texte: 'Première date de la tournée : réussie.' },
+    { qui: 'JBM', texte: 'Saint-Cézaire est libéré. Première date de la tournée : réussie.' },
     { qui: 'MAT', texte: 'Il n’y avait personne.' },
     {
-      qui: 'JBM',
-      texte: 'Réussie quand même. Direction les Alpes : un festival de « chill lounge » y endort les vaches.',
+      qui: 'JBG',
+      texte:
+        'Avant de partir, on descend au pont des Tuves. À pied, par le sentier, comme quand on avait quinze ans.',
     },
   ],
 };

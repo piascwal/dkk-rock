@@ -19,6 +19,9 @@ export const SOLS_DECORES: number[] = [
   T.PARC,
   T.PLATEAU,
   T.RAMPE,
+  T.PIERRE,
+  T.TOIT,
+  T.BOUE,
 ];
 
 /** Une tuile d'herbe : de la terre à l'air libre (rien de plein au-dessus, pas de paroi de fond). */

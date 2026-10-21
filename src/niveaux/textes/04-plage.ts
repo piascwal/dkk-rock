@@ -2,14 +2,14 @@ import type { DefNiveau } from '../format';
 
 export const PLAGE: Omit<DefNiveau, 'carte'> = {
   id: 'plage',
-  titre: 'La Plage du Tube de l’Été',
+  titre: 'Les Plages Électroniques',
   sousTitre: 'Niveau 5 — À gauche, à droite',
   theme: 'plage',
   intro: [
     {
       qui: 'NARRATEUR',
       texte:
-        'La côte. Chaque été, un tube y naît, tourne en boucle quatre mois et meurt en septembre. Son fantôme hante les mariages pendant dix ans.',
+        'Cannes, la plage du Palais des Festivals : Les Plages Électroniques. On arrive à 14 heures, on repart à minuit et demi, sourd.',
     },
     {
       qui: 'JBT',

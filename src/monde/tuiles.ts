@@ -36,6 +36,14 @@ export const T = {
   CAISSON_ROSE: 24,
   /** la barrière du boss : indestructible, elle s'ouvre à la mort du boss (voir jeu/chargement.ts : ouvreBarrieres) */
   BARRIERE: 25,
+  /** la pierre calcaire de Provence (moellons) : les maisons de Saint-Cézaire, les restanques, les remparts, le pont des Tuves */
+  PIERRE: 26,
+  /** les tuiles canal des toits provençaux */
+  TOIT: 27,
+  /** l'eau de la Siagne : on la traverse, les pieds dedans (elle ralentit), on voit le fond à travers */
+  EAU: 28,
+  /** la boue du lit de la rivière, sous les figuiers */
+  BOUE: 29,
 } as const;
 
 export type Tuile = (typeof T)[keyof typeof T];
@@ -116,6 +124,10 @@ export const PROPRIETES: Record<Tuile, ProprietesTuile> = {
     debris: '#7a2a8a',
   }),
   [T.BARRIERE]: base({ nom: 'barrière du boss', car: '|', pv: Infinity, debris: '#ff4fd8' }),
+  [T.PIERRE]: base({ nom: 'pierre', car: '{', pv: 6, debris: '#c8b896' }),
+  [T.TOIT]: base({ nom: 'toit de tuiles', car: '^', pv: 3, debris: '#b8492e' }),
+  [T.EAU]: base({ nom: 'eau', car: '~', pv: Infinity, solide: false, debris: '#6ab8d8' }),
+  [T.BOUE]: base({ nom: 'boue', car: ';', pv: 2, debris: '#5a4028' }),
 };
 
 const PAR_CARACTERE = new Map<string, Tuile>(
@@ -137,4 +149,5 @@ export const TUILES_LEGERES: ReadonlySet<number> = new Set<number>([
   T.PITON,
   T.TONNEAU_WOG,
   T.TONNEAU_OR,
+  T.EAU,
 ]);

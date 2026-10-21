@@ -13,7 +13,7 @@ import { THEMES, type Decor } from './themes';
 /**
  * La carte du monde entre deux niveaux, façon Super Mario Bros 3 : une île vue de dessus, une route qui serpente
  * d'étape en étape, une région par niveau (aux bords irréguliers) avec son sol et ses décors, et le van qui roule.
- * Une seule carte pour tous les arcs : la route part du garage, traverse la tournée, puis continue vers l'arc suivant
+ * Une seule carte pour tous les arcs : la route part de Saint-Cézaire, traverse la tournée, puis continue vers l'arc suivant
  * (la Bretagne, à l'est, et Groix au large). Un nouvel arc prolonge la route ; un nouveau thème doit avoir son sol dans
  * carte-monde-decor.ts (SOLS).
  */

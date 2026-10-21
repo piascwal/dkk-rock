@@ -1,4 +1,4 @@
-import { CARTE_GARAGE } from './cartes/01-garage';
+import { CARTE_STC, DECOR_STC } from './cartes/01-stc';
 import { CARTE_ALPAGES } from './cartes/02-alpages';
 import { CARTE_CIMES } from './cartes/03-cimes';
 import { CARTE_PLAGE } from './cartes/04-plage';
@@ -11,7 +11,7 @@ import { CARTE_FERRY } from './cartes/10-ferry';
 import { CARTE_PRE_DU_CLOS } from './cartes/12-pre-du-clos';
 import { ASSAUTS_FISE, CARTE_FISE, DECOR_FISE, ZONES_FISE } from './cartes/11-fise';
 import { litNiveau, type DefNiveau, type NiveauLu } from './format';
-import { GARAGE } from './textes/01-garage';
+import { STC } from './textes/01-stc';
 import { ALPAGES } from './textes/02-alpages';
 import { CIMES } from './textes/03-cimes';
 import { PLAGE } from './textes/04-plage';
@@ -26,7 +26,7 @@ import { PRE_DU_CLOS } from './textes/12-pre-du-clos';
 
 /** Les niveaux, arc après arc (voir arcs.ts). Pour en ajouter un : un texte, une carte, une ligne ici. */
 export const NIVEAUX: DefNiveau[] = [
-  { ...GARAGE, carte: CARTE_GARAGE },
+  { ...STC, carte: CARTE_STC, decor: DECOR_STC },
   { ...ALPAGES, carte: CARTE_ALPAGES },
   { ...CIMES, carte: CARTE_CIMES },
   { ...PLAGE, carte: CARTE_PLAGE },

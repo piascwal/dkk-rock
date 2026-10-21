@@ -52,7 +52,7 @@ export const ALPAGES: Omit<DefNiveau, 'carte'> = {
     {
       qui: 'JBM',
       texte:
-        'Fadatchi a raison. Direction les cimes : on dit qu’un yéti y mixe de la techno minimale depuis 1997.',
+        'Fadatchi a raison. Direction Gréau, là-haut dans la neige : on dit qu’un yéti y mixe de la techno minimale depuis 1997.',
     },
   ],
 };

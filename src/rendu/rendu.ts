@@ -222,6 +222,7 @@ export class Rendu {
         NIVEAUX[vue.niveau]!.theme,
         11 + vue.niveau,
         NIVEAUX[vue.niveau]!.decor,
+        NIVEAUX[vue.niveau]!.semis,
       );
       this.braises.regle(this.decor);
       this.decorParTuile = new Map();

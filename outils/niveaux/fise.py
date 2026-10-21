@@ -19,42 +19,12 @@ deck du half-pipe). Les rampes en marches se montent à pied.
 """
 import math
 
+from a_la_main import colonne as _colonne
+from a_la_main import echelle as _echelle
+from a_la_main import pose as _pose
 from structures import complexe
 
 PARC, PLATEAU, RAMPE = 'L', 'U', 'A'
-
-
-def _libre3(n, x, y):
-    """Les neuf cases qu'occupe un décor posé en (x, y) : une de part et d'autre, trois au-dessus du sol de rangée y."""
-    return all(n.get(x + dx, y - dy) in ' .' for dx in (-1, 0, 1) for dy in (1, 2, 3))
-
-
-def _pose(n, x, nom, y=None, ecart=3):
-    """Le décor à la main, mais jamais devant une échelle (deux tuiles de part et d'autre, cinq au-dessus), jamais sur une tuile,
-    ni sur un autre décor. Renvoie True s'il est posé."""
-    y = n.base if y is None else y
-    for dx in range(-2, 3):
-        for dy in range(1, 6):
-            if n.get(x + dx, y - dy) == 'H':
-                return False
-    if not _libre3(n, x, y):
-        return False
-    if any(abs(x - xx) < ecart and yy == y for _, xx, yy in n.decors):
-        return False
-    n.decor(x, nom, y)
-    return True
-
-
-def _colonne(n, x, h, mat, dessus=None):
-    """Une colonne pleine de `h` tuiles posée sur le sol ; `dessus` : la matière de la tuile du haut."""
-    for k in range(h):
-        n.set(x, n.base - 1 - k, dessus if (dessus and k == h - 1) else mat)
-
-
-def _echelle(n, x, haut):
-    """Une échelle de `haut` tuiles, posée sur la colonne libre x, au pied du module : on monte jusqu'à son plateau."""
-    for k in range(1, haut + 1):
-        n.set(x, n.base - k, 'H')
 
 
 def _caissons(n, xs, piso, haut=1):

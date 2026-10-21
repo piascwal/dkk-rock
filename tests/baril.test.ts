@@ -23,7 +23,7 @@ const pres = (p: Partie, b: Baril, ecart = 0) => {
 };
 
 describe('le baril explosif', () => {
-  it('est posé dans le garage et dans la ville, et nulle part ailleurs', () => {
+  it('est posé à Saint-Cézaire et dans la ville, et nulle part ailleurs', () => {
     expect(barils(nouvelle(0)).length).toBeGreaterThan(0);
     expect(barils(nouvelle(4)).length).toBeGreaterThan(0);
     expect(barils(nouvelle(1))).toHaveLength(0);
@@ -40,7 +40,8 @@ describe('le baril explosif', () => {
     p.avance();
     expect(b.fini).toBe(true);
     const explosions = p.releveEvenements().filter((e) => e.k === 'explo');
-    expect(explosions).toMatchObject([{ r: RAYON_BARIL }]);
+    // la sienne (un caisson de basses voisin peut sauter avec lui)
+    expect(explosions).toContainEqual(expect.objectContaining({ r: RAYON_BARIL }));
   });
 
   it("ignore les coups suivants : la mèche n'est allumée qu'une fois", () => {

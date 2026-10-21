@@ -8,8 +8,8 @@ sur téléphone** (ou au clavier, ou à la manette), **seul ou jusqu'à 4**.
 ## L'histoire
 
 2026. La musique a été remplacée par des boucles de quatre secondes, des voix autotunées et des
-      refrains de trois mots. Le groupe de rock du collège, **les DKK**, se reforme dans le garage des
-      parents de JBT pour débrancher **DJ Boucle**, qui hypnotise le monde avec un beat qui ne s'arrête
+      refrains de trois mots. Le groupe de rock du collège, **les DKK**, se reforme au Clos, chez les
+      parents de JBT, à Saint-Cézaire, pour débrancher **DJ Boucle**, qui hypnotise le monde avec un beat qui ne s'arrête
       jamais.
 
 | Héros   | Instrument        | Arme de base                        | Spécial                               |
@@ -26,8 +26,9 @@ n'a jamais vérifié) : il picore les ennemis et pond des œufs explosifs.
 Tout au long de la tournée, les héros découvrent la richesse des autres musiques (jazz modal,
 techno de Detroit, musette, cumbia, yodel, Kraftwerk...)... et refusent de l'admettre.
 
-**La tournée :** le Garage → les Alpages Lounge → les Cimes Minimales (yétis fans de techno
-minimale, et le Yéti Alpha) → la Plage du Tube de l'Été → la Ville Autotunée → le Club Infini
+**La tournée :** Saint-Cézaire (STC, le village perché au-dessus de la Siagne, où tout commence au
+Clos) → le pré du Clos (le concours de drift) → les Alpages Lounge → Gréau (yétis fans de techno
+minimale, et le Yéti Alpha) → les Plages Électroniques de Cannes → la Ville Autotunée → le Club Infini
 (DJ Boucle).
 
 ## Comment on joue
@@ -38,8 +39,8 @@ minimale, et le Yéti Alpha) → la Plage du Tube de l'Été → la Ville Autotu
 - **Pause :** « Recommencer le niveau » (et « Recommencer au drapeau » une fois un drapeau levé) refait la carte, détruite ou non,
   pour se sortir d'une impasse ; les vies et le score restent. Deux pressions (3 s pour confirmer) ; réservé à l'hôte.
 - **Ennemis touchés** : ils clignotent en blanc (sprite compris) pendant un instant, et ceux qui tiennent plus d'un coup montrent leur barre de vie au-dessus de la tête pendant deux secondes.
-- **Bidons d'essence** (garage et ville, marqueur `J`) : des tuiles comme les caisses, on monte dessus, et elles arrêtent le héros ; un tir les casse.
-- **Barils explosifs** (garage et ville, marqueur `%`) : rouges, à terre. Le premier tir qui les touche (le leur comme celui d'une explosion voisine) les allume ; deux secondes plus tard, ils explosent (rayon 48 px, 5 dégâts aux héros comme aux ennemis : un cinquième de plus qu'un caisson de basses) et cassent ce qui se casse autour. Personne ne les vise, mais les tirs des ennemis les allument aussi.
+- **Bidons d'essence** (Saint-Cézaire et ville, marqueur `J`) : des tuiles comme les caisses, on monte dessus, et elles arrêtent le héros ; un tir les casse.
+- **Barils explosifs** (Saint-Cézaire et ville, marqueur `%`) : rouges, à terre. Le premier tir qui les touche (le leur comme celui d'une explosion voisine) les allume ; deux secondes plus tard, ils explosent (rayon 48 px, 5 dégâts aux héros comme aux ennemis : un cinquième de plus qu'un caisson de basses) et cassent ce qui se casse autour. Personne ne les vise, mais les tirs des ennemis les allument aussi.
 - **Tonneaux WOG** (le WOG, une passion magique pour les membres des DKK ; l'histoire sera retravaillée) : ce sont des tuiles
   (`O` bois, `Q` or ; `outils/fixe-tuiles.py`), semées par le générateur (un raccord sur deux en bois, et un tonneau d'or bien en vue au milieu du parcours, en plus de celui d'une cache).
   Cassé, un tonneau en bois libère un **cœur** (+1 vie, 5 au plus) ; un tonneau d'or, un **cœur d'or** : tous les points de vie
@@ -83,7 +84,7 @@ spécial, Échap pause ; manette standard.
 Entre certains niveaux, l'histoire fait une pause pour un mini-jeu ; une fois rencontré, il se rejoue depuis le menu
 **Mini-jeux** de l'écran titre (seul, ou à plusieurs : Pause → Inviter des amis).
 
-**Le concours de drift du pré du Clos** (après le Garage, avant de partir pour de bon) : vue de derrière la voiture, chaque
+**Le concours de drift du pré du Clos** (au Clos, à Saint-Cézaire, avant de partir pour de bon) : vue de derrière la voiture, chaque
 joueur choisit son pilote — **Tom** et sa Renault 11, ou **Matt** et son Opel Corsa — et a **une minute** pour saccager le
 plus de pelouse possible. Gaz : HAUT ou SAUT ; frein et marche arrière : BAS ; volant : GAUCHE / DROITE ; frein à main :
 TIR. Les roues qui glissent arrachent l'herbe, puis la terre, puis font de la boue ; le score est la part du pré qui n'est
@@ -182,8 +183,10 @@ validé.
   **Fin de niveau :** quand le camping-car a disparu, l'écran des _convertis au rock_ (`ui/convertis.ts`) liste les ennemis vaincus
   par type, avec leurs compteurs (« selon les DKK ») ; il vient de la vue (`EtatVue.convertis`, protocole v5), donc chez tous les
   joueurs ; un premier toucher termine le comptage, le suivant passe au récit.
-  **Chaque monde a sa géométrie** (`outils/niveaux/signatures.py`) : le garage son _parking à étages_ (rampes en escalier, local
-  dessous, niveau de pitons dessus), les alpages leur _falaise à corniches_ (échelles en zigzag, grotte à mi-hauteur), les cimes
+  **Chaque monde a sa géométrie** (`outils/niveaux/signatures.py`) : Saint-Cézaire ses lieux à lui (`outils/niveaux/stc.py` : le
+  Clos, les restanques d'oliviers, les remparts, la place de la fontaine des Mulets et sa mairie, les calades sous leurs passages
+  voûtés, la chapelle Notre-Dame de Sardaigne), en pierre calcaire (`{`) sous des toits de tuiles (`^`) ; le _parking à étages_
+  (rampes en escalier, local dessous, niveau de pitons dessus) attend un nouveau monde, les alpages leur _falaise à corniches_ (échelles en zigzag, grotte à mi-hauteur), les cimes
   leur _glacier_ (bosses de glace qui glisse, crevasses, igloo à traverser), la plage son _ponton_ de planches sur pilotis et son
   phare, la ville ses _toits sur pilotis_ (on saute de toit en toit). Les pièces communes varient aussi : la traversée de gouffre
   existe en trois modes (`mixte`, `pont`, `iles`), et forteresses, barrages et gouffres changent de taille d'un niveau à l'autre.

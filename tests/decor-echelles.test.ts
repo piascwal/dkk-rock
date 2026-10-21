@@ -8,7 +8,7 @@ import { semeDecor } from '../src/rendu/decor';
 const semis = (i: number) => {
   const lu = niveauLu(i);
   const carte = new Carte(lu.largeur, lu.hauteur, lu.tuiles, lu.fond);
-  return { carte, poses: semeDecor(carte, NIVEAUX[i]!.theme, 11 + i, NIVEAUX[i]!.decor) };
+  return { carte, poses: semeDecor(carte, NIVEAUX[i]!.theme, 11 + i, NIVEAUX[i]!.decor, NIVEAUX[i]!.semis) };
 };
 
 describe('le décor', () => {

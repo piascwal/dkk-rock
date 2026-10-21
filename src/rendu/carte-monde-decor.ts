@@ -170,6 +170,33 @@ const halfpipe = (p: Px, x: number, y: number) => {
   p(x + 1, y + 14, 14, 1, '#3a3a40');
 };
 
+/** Saint-Cézaire perché (2×2 tuiles) : des maisons de pierre aux toits rouges, serrées, le clocher au-dessus. */
+const villagePerche = (p: Px, x: number, y: number) => {
+  p(x + 1, y + 10, 14, 6, '#8a7a5a');
+  for (const [dx, h] of [
+    [1, 5],
+    [5, 7],
+    [10, 5],
+  ] as const) {
+    p(x + dx, y + 15 - h, 5, h, '#d2c4a2');
+    p(x + dx, y + 14 - h, 5, 2, '#b8492e');
+  }
+  p(x + 8, y + 1, 3, 8, '#c2a87e');
+  p(x + 8, y, 3, 1, '#3a3a40');
+  p(x + 9, y + 3, 1, 2, '#2a2018');
+};
+
+/** La Siagne au fond de ses gorges (2×2 tuiles) : l'eau turquoise, et le pont de pierre des Tuves qui l'enjambe. */
+const pontDesTuves = (p: Px, x: number, y: number) => {
+  p(x, y + 9, 16, 7, '#3fa8b8');
+  p(x + 1, y + 11, 4, 1, '#cfeff5');
+  p(x + 10, y + 13, 4, 1, '#cfeff5');
+  p(x, y + 5, 16, 4, '#c8b896');
+  p(x, y + 5, 16, 1, '#e2d6b8');
+  p(x + 5, y + 8, 6, 3, '#3fa8b8');
+  p(x + 6, y + 7, 4, 1, '#3fa8b8');
+};
+
 export const SOLS: Record<Decor, Sol> = {
   pavillons: {
     clair: '#5aa83f',
@@ -231,6 +258,18 @@ export const SOLS: Record<Decor, Sol> = {
     sombre: '#cfc28e',
     petits: [tente, tente, palmier, caillou],
     grands: [halfpipe, immeuble],
+  },
+  stc: {
+    clair: '#8ab05a',
+    sombre: '#7aa04a',
+    petits: [maison, buisson, maison, caillou],
+    grands: [villagePerche, colline('#7aa04a', '#6a9040', '#a8c870')],
+  },
+  tuves: {
+    clair: '#3f7a3a',
+    sombre: '#356e32',
+    petits: [buisson, buisson, caillou, sapin],
+    grands: [pontDesTuves, chene, chene],
   },
   falaises: {
     clair: '#7aa04a',
