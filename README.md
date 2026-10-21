@@ -195,8 +195,11 @@ validé.
   s'arrête que sur la terre ou la pierre ; le niveau est plus profond que les autres (`profondeur` dans son plan) et son fond
   suit le chemin (la rivière reste derrière, à toutes les hauteurs). **Un premier plan** passe devant le jeu
   (`src/rendu/premier-plan.ts`, un par monde qui en déclare un) : des éléments tout proches, clairsemés, translucides,
-  qui défilent plus vite que le jeu ; aux Tuves, un figuier, une branche et ses lianes, un rocher qui goutte, des
-  fougères (`premier-plan-tuves.ts`). Pour en donner un à un autre monde : une définition de plus dans `PREMIERS_PLANS` ; le _parking à étages_
+  qui défilent plus vite que le jeu, en largeur comme en hauteur ; ils sont posés sur le terrain, à un endroit du niveau
+  (on les croise, puis ils sont derrière nous ; en montant, ils restent là où ils sont). Aux Tuves : de grands arbres
+  feuillus avec leur branche et leurs lianes, de larges roches translucides d'où l'eau goutte, des fougères sur leur crête
+  (`premier-plan-tuves.ts`). Pour en donner un à un autre monde : une définition de plus dans `PREMIERS_PLANS`
+  (les sortes d'éléments, et où les poser) ; le _parking à étages_
   (rampes en escalier, local dessous, niveau de pitons dessus) attend un nouveau monde, les alpages leur _falaise à corniches_ (échelles en zigzag, grotte à mi-hauteur), les cimes
   leur _glacier_ (bosses de glace qui glisse, crevasses, igloo à traverser), la plage son _ponton_ de planches sur pilotis et son
   phare, la ville ses _toits sur pilotis_ (on saute de toit en toit). Les pièces communes varient aussi : la traversée de gouffre

@@ -6,8 +6,11 @@ import { Projectile } from '../src/entites/projectile';
 import { FIGUE } from '../src/entites/projectiles-ennemis';
 import { Partie } from '../src/jeu/partie';
 import { G } from '../src/jeu/vue';
+import { Aleatoire } from '../src/moteur/maths';
 import { T } from '../src/monde/tuiles';
 import { NIVEAUX, niveauLu } from '../src/niveaux';
+import { terrainDe } from '../src/rendu/premier-plan';
+import { PREMIER_PLAN_TUVES } from '../src/rendu/premier-plan-tuves';
 
 const TUVES = NIVEAUX.findIndex((n) => n.id === 'tuves');
 
@@ -48,6 +51,20 @@ describe('le pont des Tuves', () => {
         if (t(x, k) === T.EAU) vide = Math.max(vide, k - y - 1);
       }
     expect(vide).toBeGreaterThanOrEqual(10);
+  });
+
+  it('le premier plan est posé sur le terrain, tout au long du niveau, jamais sur le pont ni sur les parois', () => {
+    const lu = niveauLu(TUVES);
+    const terrain = terrainDe(lu);
+    const poses = PREMIER_PLAN_TUVES.pose(terrain, new Aleatoire(29));
+    expect(poses.length).toBeGreaterThan(20);
+    expect(Math.max(...poses.map((o) => o.x))).toBeGreaterThan((lu.largeur - 20) * TUILE);
+    for (const o of poses) {
+      const s = terrain.surface(Math.floor(o.x / TUILE))!;
+      expect(o.y).toBe(s.ty * TUILE); // le pied touche la surface, quelle que soit la hauteur de la colonne
+      expect([T.TERRE, T.BOUE, T.EAU, T.SABLE]).toContain(s.tuile);
+    }
+    expect(new Set(poses.map((o) => Math.round(o.y / TUILE / 4))).size).toBeGreaterThan(3); // à toutes les altitudes
   });
 
   it('la figue brûle les planches qu’elle traverse, mais s’arrête sur la pierre', () => {

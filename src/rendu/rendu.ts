@@ -13,6 +13,7 @@ import { dessineDecor, semeDecor, type CoucheDecor } from './decor';
 import { dessineTuiles, dessineTyroliennes } from './dessin-tuiles';
 import { Emojis } from './emojis';
 import { Fond } from './fonds';
+import { PremierPlan } from './premier-plan';
 import { Braises } from './flammes';
 import { dessineIndicateurs } from './indicateurs';
 import { Particules } from './particules';
@@ -46,6 +47,8 @@ export class Rendu {
   theme: Theme = THEMES.garage;
   private atlas = new AtlasTuiles(THEMES.garage);
   private fond = new Fond(THEMES.garage);
+  /** les éléments posés devant le jeu (arbres, roches...) ; vide tant qu'un niveau n'est pas préparé */
+  private premierPlan = new PremierPlan('pavillons', niveauLu(0));
   /** le ferry, dans le niveau de la traversée */
   private navire: RenduNavire | null = null;
   private niveau = -1;
@@ -137,6 +140,7 @@ export class Rendu {
     this.theme = THEMES[NIVEAUX[niveau]?.theme ?? 'garage'];
     this.atlas = new AtlasTuiles(this.theme);
     this.fond = new Fond(this.theme);
+    this.premierPlan = new PremierPlan(this.theme.decor, niveauLu(niveau));
     const emb = niveauLu(niveau).embarquement;
     this.navire = emb ? new RenduNavire(geometrieNavire(emb)) : null;
     this.camera.recadre();
@@ -285,7 +289,7 @@ export class Rendu {
       this.braises.maj();
       this.braises.dessine(ctx, camX, camY);
     }
-    this.fond.premierPlan(ctx, camX, this.largeur, this.tick);
+    this.premierPlan.dessine(ctx, camX, camY, this.largeur, this.tick);
     this.traits.maj(vue, this.decor, carte, { emojis: this.emojis });
     this.emojis.accompagne(vue.entites);
     this.emojis.maj();

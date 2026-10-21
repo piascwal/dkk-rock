@@ -16,7 +16,6 @@ import { dessineLumieresClub } from './lumieres-club';
 import { DECORS_BRETONS, type Peinture } from './fonds-bretagne';
 import { batimentsFise, PEINTURE_FISE, QUAI_FISE, tramFise } from './fonds-fise';
 import { PEINTURE_STC, PEINTURE_TUVES } from './fonds-provence';
-import { PremierPlan } from './premier-plan';
 import type { Decor, Theme } from './themes';
 
 const LARGEUR_BANDE = 960;
@@ -209,11 +208,9 @@ export class Fond {
   largeurNiveau = 0;
   private readonly ciel: Ciel;
   private plansNuit: HTMLCanvasElement[] = [];
-  private readonly premier: PremierPlan;
 
   constructor(private readonly theme: Theme) {
     this.ciel = new Ciel(theme.decor);
-    this.premier = new PremierPlan(theme.decor);
     // le plan proche reprend le dessin du plan moyen, autre graine, assombri : plus près, plus sombre
     this.plans = ([0, 1, 2] as const).map((plan, i) => {
       const toile = document.createElement('canvas');
@@ -303,11 +300,6 @@ export class Fond {
     });
     if (nuit >= 0) fouleAuLoin(ctx, camFond, largeur, nuit, hautDe(2) + PIED_DE_BANDE + 6, tick);
     if (nuit < 0.5) this.ciel.oiseaux(ctx, camFond, largeur, tick);
-  }
-
-  /** Devant tout le jeu (voir premier-plan.ts) : le feuillage, les gouttes... des mondes qui en ont un. */
-  premierPlan(ctx: CanvasRenderingContext2D, camX: number, largeur: number, tick: number): void {
-    this.premier.dessine(ctx, camX, largeur, tick);
   }
 
   /** Après les tuiles, sous les personnages : les projecteurs du club, la nuit et le festival des Plages Électroniques. */

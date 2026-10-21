@@ -1,50 +1,107 @@
-import { HAUTEUR_VUE } from '../config';
+import { HAUTEUR_VUE, TUILE } from '../config';
 import { Aleatoire } from '../moteur/maths';
+import { T } from '../monde/tuiles';
+import type { NiveauLu } from '../niveaux/format';
 import { PREMIER_PLAN_TUVES } from './premier-plan-tuves';
 import type { Decor } from './themes';
 
 /**
- * Le premier plan : entre le jeu et l'écran, des éléments tout proches (un feuillage, des gouttes qui tombent...) qui
- * défilent plus vite que le jeu. Ils sont clairsemés et peints en couleurs translucides : ils cachent un peu du jeu, par
- * endroits et le temps de passer, pour la profondeur. Un monde qui en veut un le déclare dans PREMIERS_PLANS ; la bande est
- * peinte une fois, à la hauteur de la vue, et se répète.
+ * Le premier plan : entre le jeu et l'écran, des éléments tout proches (un arbre feuillu, une roche et ses fougères...) qui
+ * défilent plus vite que le jeu, en largeur comme en hauteur. Chacun est posé sur le terrain, à un endroit du niveau : on
+ * le croise en passant, et quand on monte ou qu'on descend il reste où il est (il sort de l'écran par le bas ou par le haut),
+ * une fois dépassé il est derrière nous. Ils sont clairsemés et peints en couleurs translucides : ils cachent un peu du jeu,
+ * par endroits et le temps de passer, pour la profondeur.
+ *
+ * Un monde qui en veut un le déclare dans PREMIERS_PLANS : ses sortes d'éléments (peintes une fois) et où les poser.
  */
-export interface DefPremierPlan {
-  /** la largeur de la bande, en pixels du jeu (plus elle est large, plus les éléments sont rares) */
+
+/** Une sorte d'élément, peinte une fois : une image, son pied (le point posé sur le terrain), ce qui bouge dessus. */
+export interface Sorte {
+  toile: HTMLCanvasElement;
+  /** le pied de l'élément dans l'image : au milieu en bas pour un arbre */
+  pied: { x: number; y: number };
+  /** ce qui bouge à chaque image ; (x, y) : le coin haut gauche de l'image à l'écran */
+  anime?: (ctx: CanvasRenderingContext2D, x: number, y: number, tick: number) => void;
+}
+
+/** Un élément posé : sa sorte (indice dans `sortes`) et son pied, en pixels du monde. */
+export interface Pose {
+  sorte: number;
+  x: number;
+  y: number;
+}
+
+/** Le terrain d'un niveau, tel que le voit un premier plan pour poser ses éléments. */
+export interface Terrain {
+  /** la largeur du niveau, en tuiles */
   largeur: number;
-  /** de combien la bande défile pour un pixel de caméra : au-delà de 1, plus vite que le jeu, elle passe devant */
+  /** la première tuile en partant du haut de la colonne `tx` (hors échelles) : sa rangée et sa nature, ou null s'il n'y en a pas */
+  surface(tx: number): { ty: number; tuile: number } | null;
+}
+
+export interface DefPremierPlan {
+  /** de combien l'élément défile pour un pixel de caméra : au-delà de 1, il passe devant le jeu */
   parallaxe: number;
-  /** peint la bande, une fois pour toutes */
-  peint: (c: CanvasRenderingContext2D, r: Aleatoire) => void;
-  /** ce qui bouge, à chaque image ; `x0` : où commence la bande à l'écran */
-  anime?: (ctx: CanvasRenderingContext2D, x0: number, tick: number) => void;
+  sortes(r: Aleatoire): Sorte[];
+  pose(terrain: Terrain, r: Aleatoire): Pose[];
 }
 
 const PREMIERS_PLANS: Partial<Record<Decor, DefPremierPlan>> = {
   tuves: PREMIER_PLAN_TUVES,
 };
 
+/** Une image vide, pour y peindre une sorte. */
+export function toile(largeur: number, hauteur: number): [HTMLCanvasElement, CanvasRenderingContext2D] {
+  const t = document.createElement('canvas');
+  t.width = largeur;
+  t.height = hauteur;
+  return [t, t.getContext('2d')!];
+}
+
+export function terrainDe(lu: NiveauLu): Terrain {
+  return {
+    largeur: lu.largeur,
+    surface: (tx) => {
+      for (let ty = 0; ty < lu.hauteur; ty++) {
+        const tuile = lu.tuiles[ty * lu.largeur + tx]!;
+        if (tuile !== T.VIDE && tuile !== T.ECHELLE) return { ty, tuile };
+      }
+      return null;
+    },
+  };
+}
+
 export class PremierPlan {
   private readonly def: DefPremierPlan | undefined;
-  private readonly toile: HTMLCanvasElement | null = null;
+  private sortes: Sorte[] = [];
+  private poses: Pose[] = [];
 
-  constructor(decor: Decor) {
+  constructor(decor: Decor, lu: NiveauLu) {
     this.def = PREMIERS_PLANS[decor];
     if (!this.def) return;
-    this.toile = document.createElement('canvas');
-    this.toile.width = this.def.largeur;
-    this.toile.height = HAUTEUR_VUE;
-    this.def.peint(this.toile.getContext('2d')!, new Aleatoire(29));
+    const r = new Aleatoire(29);
+    this.sortes = this.def.sortes(r);
+    this.poses = this.def.pose(terrainDe(lu), r);
   }
 
   /** Après les personnages et les particules, avant les indicateurs. */
-  dessine(ctx: CanvasRenderingContext2D, camX: number, largeur: number, tick: number): void {
-    const d = this.def;
-    if (!d || !this.toile) return;
-    const decale = (((camX * d.parallaxe) % d.largeur) + d.largeur) % d.largeur;
-    for (let x = -Math.round(decale); x < largeur; x += d.largeur) {
-      ctx.drawImage(this.toile, x, 0);
-      d.anime?.(ctx, x, tick);
+  dessine(ctx: CanvasRenderingContext2D, camX: number, camY: number, largeur: number, tick: number): void {
+    const p = this.def?.parallaxe;
+    if (!p) return;
+    for (const o of this.poses) {
+      const s = this.sortes[o.sorte]!;
+      // la parallaxe est centrée sur l'écran : un élément posé à la hauteur du héros est à la sienne
+      const x = Math.round((o.x - camX - largeur / 2) * p + largeur / 2 - s.pied.x);
+      const y = Math.round((o.y - camY - HAUTEUR_VUE / 2) * p + HAUTEUR_VUE / 2 - s.pied.y);
+      if (x + s.toile.width < 0 || x > largeur || y + s.toile.height < 0 || y > HAUTEUR_VUE) continue;
+      ctx.drawImage(s.toile, x, y);
+      s.anime?.(ctx, x, y, tick);
     }
   }
 }
+
+/** Le pied d'un élément posé sur la tuile (tx, ty) : le milieu de la tuile, à sa surface. */
+export const pied = (tx: number, ty: number): { x: number; y: number } => ({
+  x: (tx + 0.5) * TUILE,
+  y: ty * TUILE,
+});
