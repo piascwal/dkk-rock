@@ -59,7 +59,7 @@ NIVEAUX = {
     # du niveau (il est plus profond que les autres), puis la rivière et les figuiers du Viet Cong glaireux (v)
     'tuves': dict(
         nom='Le Pont des Tuves', theme='tuves', textes='13-tuves.ts', fichier='13-tuves.ts', constante='CARTE_TUVES',
-        graine=13, base=30, profondeur=64, raccord='a', caves='a', sans_caves=True,
+        graine=13, base=30, profondeur=64, raccord='a', caves='a', sans_caves=True, drapeaux=30,
         lieux=[
             ('sentier', 22, dict(lettres='a', digit='1')),  # le départ du sentier, sa balise
             ('lacets', 30, dict(chute=6, lettres='a')),

@@ -70,6 +70,7 @@ class Recette:
         self.x = 6
         self.digits = declencheurs(fichier_textes)
         self.pieces = []  # (x0, x1, genre)
+        self.base_debut = {}  # x0 -> la rangée du sol au début du lieu
         self.flags = []
 
     @property
@@ -80,6 +81,7 @@ class Recette:
         x0, n = self.x, self.n
         x1 = x0 + largeur
         n.niveler(x0, x1)
+        self.base_debut[x0] = n.base  # le sol de ce lieu : les drapeaux, posés après tout, le retrouvent (n.base a descendu)
         poser = getattr(self, 'p_' + genre)
         poser(x0, x1, **kw)
         self.pieces.append((x0, x1, genre))
@@ -302,11 +304,13 @@ class Recette:
     def dialogue(self, c, x):
         self.n.repere(x, c)
 
-    def drapeau(self, x):
-        for dx in (0, 1, -1, 2, -2, 3, -3):  # le plus près possible d'un sol libre
-            if self.n.repere(x + dx, '!', ymin=self.n.base - 3, surface=True):  # au sol, jamais sur une plate-forme en hauteur
+    def drapeau(self, x, portee=3, monte=3, base=None):
+        base = self.n.base if base is None else base
+        for dx in sorted(range(-portee, portee + 1), key=abs):  # le plus près possible d'un sol libre
+            if self.n.repere(x + dx, '!', ymin=base - monte, surface=True):  # au sol, jamais sur une plate-forme en hauteur
                 self.flags.append(x + dx)
-                return
+                return True
+        return False
 
     def ecrit(self, indice, nom_fichier, constante):
         n = self.n
@@ -367,7 +371,7 @@ def apercu(lignes, nom, z=3):
 # Les recettes. Chaque recette : une liste de pièces (genre, largeur, options), puis les galeries et le butin.
 
 
-def construit(nom, theme, textes, plan, fichier, constante, graine, base=30, van=True, altitude=False, profondeur=30):  # fichier et constante : inutilisés ici
+def construit(nom, theme, textes, plan, fichier, constante, graine, base=30, van=True, altitude=False, profondeur=30, drapeaux=None):  # fichier et constante : inutilisés ici
     total = 12 + sum(p[1] for p in plan)
     r = Recette(nom, theme, textes, largeur=total, graine=graine, base=base, profondeur=profondeur)
     n = r.n
@@ -386,10 +390,18 @@ def construit(nom, theme, textes, plan, fichier, constante, graine, base=30, van
             any(n.repere(x, c, surface=True) for x in range(x0 + 1, x0 + 9))
         if kw.get('flag'):
             pass
-    # drapeaux : après chaque lieu important (un par 50 colonnes au moins), et juste avant chaque boss
+    # drapeaux : après chaque lieu important (un par 50 colonnes au moins), et juste avant chaque boss. `drapeaux` (un
+    # espacement, en colonnes) : un drapeau sur chaque lieu et non plus sur les seuls raccords, pour un niveau sans plat
+    # (le pont des Tuves : la descente, les lacets, la rivière), la place du sol se cherche plus loin
     dernier = 0
     for x0, x1, g in r.pieces:
-        if g == 'raccord' and x0 - dernier >= 50 and x0 > 30:
+        if drapeaux and x0 - dernier >= drapeaux and x0 > 20:
+            # le milieu du lieu, sinon son quart ou ses trois quarts : un lieu sans sol où poser n'arrête pas la suite
+            for k in (2, 1, 3):  # quarts de lieu : 2 = le milieu
+                if r.drapeau(x0 + (x1 - x0) * k // 4, portee=8, monte=14, base=r.base_debut[x0]):
+                    dernier = x0
+                    break
+        elif g == 'raccord' and x0 - dernier >= 50 and x0 > 30 and not drapeaux:
             r.drapeau(x0 + (x1 - x0) // 2)
             dernier = x0
     for x0, x1, g in r.pieces:
@@ -411,7 +423,7 @@ def fabrique(cle):
     plan = enchaine(cfg['lieux'], cfg['graine'], cfg['raccord'])
     r = construit(
         cfg['nom'], cfg['theme'], cfg['textes'], plan, '', '', cfg['graine'], base=cfg['base'], van=cfg.get('van', True),
-        altitude=cfg.get('altitude', False), profondeur=cfg.get('profondeur', 30),
+        altitude=cfg.get('altitude', False), profondeur=cfg.get('profondeur', 30), drapeaux=cfg.get('drapeaux'),
     )
     if not cfg.get('sans_caves'):  # le ferry est un petit niveau : rien sous le quai
         souterrain(r, cfg['caves'])
