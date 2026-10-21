@@ -10,8 +10,8 @@ export class Hud {
   constructor(private readonly element: HTMLElement) {}
 
   maj(v: EtatVue, siegeLocal: number, noms: string[]): void {
-    // pendant le concours de drift, le chrono et le score sont dans le canvas : pas de HUD des héros
-    this.element.hidden = v.phase === 'drift';
+    // pendant un mini-jeu (drift, plongeon), le chrono et le score sont dans le canvas : pas de HUD des héros
+    this.element.hidden = v.phase === 'drift' || v.phase === 'plongeon';
     const joueurs = v.joueurs
       .map((j, s) => {
         if (!j.present) return '';

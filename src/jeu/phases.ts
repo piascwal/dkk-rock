@@ -1,6 +1,6 @@
 import { VIES_DEPART } from '../config';
 import { arcOuvertPar, suivantDansArc } from '../niveaux/arcs';
-import { lanceDrift } from './drift-partie';
+import { lanceMiniJeu } from './mini-jeux';
 import type { Partie } from './partie';
 
 /**
@@ -8,8 +8,9 @@ import type { Partie } from './partie';
  * à la carte du monde ou à l'épilogue, l'épilogue à la carte de l'arc suivant ; après une défaite, on reprend au drapeau).
  */
 export function changePhase(p: Partie): void {
-  // un mini-jeu (le pré du Clos) : son intro lue, il commence à la place du niveau
-  if (p.phase === 'histoire' && p.lu.def.miniJeu === 'drift') lanceDrift(p, false);
+  // un mini-jeu (le pré du Clos, le saut du pont des Tuves) : son intro lue, il commence à la place du niveau
+  const miniJeu = p.lu.def.miniJeu;
+  if (p.phase === 'histoire' && miniJeu) lanceMiniJeu(p, miniJeu);
   else if (p.phase === 'histoire') p.phase = 'jeu';
   else if (p.phase === 'convertis')
     p.phase = 'bilan'; // l'écran des convertis passé, place au récit

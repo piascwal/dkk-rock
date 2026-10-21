@@ -39,7 +39,7 @@ export const TUVES: Omit<DefNiveau, 'carte'> = {
     4: [
       { qui: 'JBM', texte: 'Le pont des Tuves. 1802. On sautait d’ici.' },
       { qui: 'JBT', texte: 'Toi, tu te jetais. Nuance.' },
-      { qui: 'NARRATEUR', texte: 'Le saut du pont attendra : un autre jour, un autre jeu.' },
+      { qui: 'NARRATEUR', texte: 'Le saut du pont attendra la fin du niveau. D’abord, la Siagne à libérer.' },
     ],
     5: [
       { qui: 'TOM', texte: 'Les figuiers… On est chez le Viet Cong glaireux !' },
@@ -57,6 +57,9 @@ export const TUVES: Omit<DefNiveau, 'carte'> = {
   outro: [
     { qui: 'JBM', texte: 'La Siagne est libérée. Le Viet Cong glaireux a capitulé.' },
     { qui: 'MAT', texte: 'J’ai des cloques jusque dans les oreilles.' },
-    { qui: 'JBG', texte: 'On remonte vers les Alpes. La tournée continue, et DJ Boucle nous attend.' },
+    {
+      qui: 'JBG',
+      texte: 'Avant de remonter vers les Alpes : on retourne au pont. Comme à quinze ans, on saute.',
+    },
   ],
 };

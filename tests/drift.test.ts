@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { VIES_DEPART } from '../src/config';
 import { C } from '../src/jeu/commandes';
+import { NIVEAU_PLONGEON } from '../src/jeu/plongeon';
 import { NIVEAU_DRIFT } from '../src/jeu/drift';
 import { lanceDrift } from '../src/jeu/drift-partie';
 import { Pelouse, marqueVoiture } from '../src/jeu/drift-pelouse';
@@ -54,11 +55,12 @@ describe('le concours de drift du pré du Clos', () => {
     expect(pelouse.pourcent).toBeGreaterThan(depart + 0.3);
   });
 
-  it('vient après Saint-Cézaire, avant le pont des Tuves', () => {
+  it('vient après Saint-Cézaire, avant le pont des Tuves (et son saut, puis les Alpes)', () => {
     const tuves = NIVEAUX.findIndex((n) => n.id === 'tuves');
     expect(suivantDansMonde(0)).toBe(NIVEAU_DRIFT);
     expect(suivantDansMonde(NIVEAU_DRIFT)).toBe(tuves);
-    expect(suivantDansMonde(tuves)).toBe(1);
+    expect(suivantDansMonde(tuves)).toBe(NIVEAU_PLONGEON);
+    expect(suivantDansMonde(NIVEAU_PLONGEON)).toBe(1);
   });
 
   it('au pré du Clos : chaque joueur conduit une minute, puis le podium ; le niveau est fait, en route', () => {

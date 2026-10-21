@@ -148,7 +148,8 @@ export interface JoueurVue {
 }
 
 /** `carte` : entre deux niveaux, le van roule sur la carte du monde (`page` compte alors les ticks du trajet). */
-export type Phase = 'histoire' | 'jeu' | 'convertis' | 'bilan' | 'fin' | 'perdu' | 'carte' | 'drift';
+export type Phase =
+  'histoire' | 'jeu' | 'convertis' | 'bilan' | 'fin' | 'perdu' | 'carte' | 'drift' | 'plongeon';
 
 export const PHASES: readonly Phase[] = [
   'histoire',
@@ -159,6 +160,7 @@ export const PHASES: readonly Phase[] = [
   'carte',
   'convertis',
   'drift',
+  'plongeon',
 ];
 
 /** Les étapes du concours de drift (`VueDrift.etape`) : le choix du pilote, le compte à rebours, la minute, le score, le podium. */
@@ -188,6 +190,33 @@ export interface VueDrift {
   pourcent: number;
   /** le score de chaque siège (pilote et pourcentage), ou null s'il n'a pas encore conduit */
   scores: ({ pilote: number; pourcent: number } | null)[];
+}
+
+/** Les étapes du concours de plongeon (`VuePlongeon.etape`) : viser, tomber, toucher l'eau (ou la berge), le score, le podium. */
+export const ETAPES_PLONGEON = ['visee', 'chute', 'impact', 'resultat', 'podium'] as const;
+export type EtapePlongeon = (typeof ETAPES_PLONGEON)[number];
+
+/** Le concours de plongeon du pont des Tuves, tel qu'on le voit (voir jeu/plongeon.ts ; la rivière vient de `tirage(manche)`). */
+export interface VuePlongeon {
+  etape: EtapePlongeon;
+  /** le siège du joueur qui saute */
+  siege: number;
+  /** le numéro du saut : il fixe la rivière (le trou d'eau, les rafales, l'hirondelle) */
+  manche: number;
+  miniJeu: boolean;
+  minuteur: number;
+  /** où est le plongeur (m, en travers de la rivière), où vise le curseur, le vent (-1 à 1) */
+  x: number;
+  visee: number;
+  vent: number;
+  /** les bras tendus (l'entrée dans l'eau) */
+  bras: boolean;
+  /** le résultat du saut : la zone touchée et l'entrée (voir ZONE, ENTREE), la note sur 100 */
+  zone: number;
+  entree: number;
+  score: number;
+  /** le meilleur score de chaque siège, ou null s'il n'a pas encore sauté */
+  scores: (number | null)[];
 }
 
 /**
@@ -247,6 +276,8 @@ export interface EtatVue {
   entites: EntiteVue[];
   /** le concours de drift, pendant la phase `drift` */
   drift?: VueDrift;
+  /** le concours de plongeon, pendant la phase `plongeon` */
+  plongeon?: VuePlongeon;
 }
 
 /** Ce qui se passe une fois (son, explosion, texte flottant, dialogue) : envoyé de façon fiable. */

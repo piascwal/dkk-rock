@@ -94,7 +94,7 @@ export class Tactile {
    */
   arme(icone: { url: string; w: number; h: number } | null, munitions: number): void {
     const bouton = this.element.querySelector<HTMLElement>('.bouton.tir');
-    if (!bouton || this.element.classList.contains('drift')) return; // au concours de drift : pas de tir
+    if (!bouton || this.element.classList.contains('mini-jeu')) return; // dans un mini-jeu : pas de tir
     const cle = icone ? `${icone.url}|${munitions}` : '';
     if (bouton.dataset.arme === cle) return;
     bouton.dataset.arme = cle;
@@ -111,18 +111,21 @@ export class Tactile {
   }
 
   /**
-   * Au concours de drift, les boutons changent de rôle : SAUT donne les gaz (« GAZ »), le tir et le spécial n'ont rien à faire
-   * (ils disparaissent), et le joystick reste affiché, son manche qui se balance (voir le CSS) : on le prend pour tourner. Hors
-   * du concours, les libellés du jeu reviennent (et le tir, l'icône de l'arme ramassée).
+   * Dans un mini-jeu, les boutons changent de rôle : SAUT prend le libellé du mini-jeu (« GAZ » au drift, « PLONGE » au plongeon),
+   * le tir et le spécial n'ont rien à faire (ils disparaissent), et le joystick reste affiché, son manche qui se balance (voir le
+   * CSS) : on le prend pour tourner ou se diriger. `libelle` null : hors mini-jeu, les libellés du jeu reviennent (et le tir,
+   * l'icône de l'arme ramassée).
    */
-  pilote(oui: boolean): void {
-    if (this.element.classList.contains('drift') === oui) return;
-    this.element.classList.toggle('drift', oui);
+  pilote(libelle: string | null): void {
     const saut = this.element.querySelector<HTMLElement>('.bouton.saut')!;
+    const oui = libelle !== null;
+    if (this.element.classList.contains('mini-jeu') === oui && saut.textContent === (libelle ?? 'SAUT'))
+      return;
+    this.element.classList.toggle('mini-jeu', oui);
     const tir = this.element.querySelector<HTMLElement>('.bouton.tir')!;
-    saut.textContent = oui ? 'GAZ' : 'SAUT';
+    saut.textContent = libelle ?? 'SAUT';
     tir.classList.remove('avec-arme');
-    tir.dataset.arme = 'drift'; // l'arme sera redessinée au retour en jeu
+    tir.dataset.arme = 'mini-jeu'; // l'arme sera redessinée au retour en jeu
     tir.textContent = 'TIR';
     tir.hidden = oui;
     this.element.querySelector<HTMLElement>('.bouton.special')!.hidden = oui;

@@ -3,7 +3,7 @@ import type { DefNiveau } from '../format';
 export const CIMES: Omit<DefNiveau, 'carte'> = {
   id: 'cimes',
   titre: 'Gréau',
-  sousTitre: 'Niveau 5 — Boum. Tchk. Boum. Tchk.',
+  sousTitre: 'Niveau 6 — Boum. Tchk. Boum. Tchk.',
   theme: 'neige',
   // le niveau finit au sommet : le van en repart en décollant
   envol: true,

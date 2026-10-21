@@ -3,7 +3,7 @@ import type { DefNiveau } from '../format';
 export const ALPAGES: Omit<DefNiveau, 'carte'> = {
   id: 'alpages',
   titre: 'Les Alpages Lounge',
-  sousTitre: 'Niveau 4 — 2 000 mètres de chill',
+  sousTitre: 'Niveau 5 — 2 000 mètres de chill',
   theme: 'montagne',
   intro: [
     {

@@ -823,17 +823,17 @@ h2 {
 }
 
 /*
- * au concours de drift : le joystick reste affiché en bas à gauche, au repos, et son manche se balance de gauche à droite pour
- * inviter à le prendre (au toucher, il se place sous le doigt comme d'habitude) ; seul « GAZ » reste à droite
+ * dans un mini-jeu (drift, plongeon) : le joystick reste affiché en bas à gauche, au repos, et son manche se balance de gauche à droite pour
+ * inviter à le prendre (au toucher, il se place sous le doigt comme d'habitude) ; seul le gros bouton (« GAZ », « PLONGE ») reste à droite
  */
-.tactile.drift .joystick-base:not(.actif) {
+.tactile.mini-jeu .joystick-base:not(.actif) {
   display: block;
   left: max(86px, calc(env(safe-area-inset-left) + 78px)) !important;
   top: calc(100% - max(90px, calc(env(safe-area-inset-bottom) + 84px))) !important;
   animation: invite-base 1.8s ease-in-out infinite;
 }
 
-.tactile.drift .joystick-base:not(.actif) .joystick-manche {
+.tactile.mini-jeu .joystick-base:not(.actif) .joystick-manche {
   animation: invite-manche 1.8s ease-in-out infinite;
 }
 

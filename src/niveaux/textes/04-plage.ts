@@ -4,7 +4,7 @@ import type { DefNiveau } from '../format';
 export const PLAGE: Omit<DefNiveau, 'carte'> = {
   id: 'plage',
   titre: 'Les Plages Électroniques',
-  sousTitre: 'Niveau 6 — Du jour à la nuit',
+  sousTitre: 'Niveau 7 — Du jour à la nuit',
   theme: 'plage',
   // la foule du festival est posée à la main ; les palmiers et le reste du décor sont semés autour
   semis: true,

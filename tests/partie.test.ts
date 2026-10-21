@@ -24,12 +24,14 @@ const avance = (p: Partie, n: number, bits = 0) => {
   }
 };
 
-/** Du bilan au niveau suivant : les pages, la carte du monde, et le pré du Clos (après Saint-Cézaire : son concours, terminé d'office). */
+/** Du bilan au niveau suivant : les pages, la carte du monde, et les mini-jeux en chemin (le drift, le plongeon : terminés d'office). */
 function entreDeuxNiveaux(p: Partie): void {
   const miniJeu = () => p.phase === 'histoire' && p.lu.def.miniJeu !== undefined;
-  while (['convertis', 'bilan', 'carte', 'drift'].includes(p.phase) || miniJeu()) {
-    if (p.phase === 'drift') {
-      p.drift!.fini = true;
+  while (['convertis', 'bilan', 'carte', 'drift', 'plongeon'].includes(p.phase) || miniJeu()) {
+    // un mini-jeu (le drift, le plongeon) : on le termine d'office
+    const miniJeuEnCours = p.drift ?? p.plongeon;
+    if (miniJeuEnCours) {
+      miniJeuEnCours.fini = true;
       p.avance();
     } else p.suivant();
   }

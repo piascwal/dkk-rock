@@ -28,7 +28,7 @@ techno de Detroit, musette, cumbia, yodel, Kraftwerk...)... et refusent de l'adm
 
 **La tournée :** Saint-Cézaire (STC, le village perché au-dessus de la Siagne, où tout commence au
 Clos) → le pré du Clos (le concours de drift, facultatif) → le Pont des Tuves (la descente à pied aux gorges de la Siagne, le
-pont de 1802, et la bataille de figues du Viet Cong glaireux) → les Alpages Lounge → Gréau (yétis fans de techno
+pont de 1802, et la bataille de figues du Viet Cong glaireux) → le Saut du Pont (le concours de plongeon, facultatif) → les Alpages Lounge → Gréau (yétis fans de techno
 minimale, et le Yéti Alpha) → les Plages Électroniques de Cannes (on arrive en plein jour, la nuit tombe à mesure qu'on avance : coucher de soleil dans la
 mer, puis le festival, sa foule, ses lasers, ses stroboscopes et sa grande scène ; `src/rendu/festival.ts`, `outils/niveaux/plage.py`) → la Ville Autotunée → le Club Infini
 (DJ Boucle).
@@ -98,6 +98,17 @@ Côté code : la simulation est dans `src/jeu/drift*.ts` (la pelouse, la voiture
 Partie), le rendu en vue arrière (sol projeté comme en « mode 7 », panorama à 360°, voitures, écrans) dans
 `src/rendu/drift*.ts` ; les sprites des voitures sortent de `outils/fixe-voitures.py` (sources dans
 `assets-sources/drift/`).
+
+**Le saut du pont des Tuves** (juste après le pont) : vu du haut du pont, la Siagne tout en bas (le pont est exagérément haut :
+60 m). Tom, en jean sur le parapet, vise le trou d'eau (le bleu le plus foncé) : un viseur balaie la rivière, berges comprises,
+et SAUT le fait sauter là où il est. Dans la chute (3,4 s), Tom est en slip de bain, la caméra tombe avec lui et la rivière grandit
+jusqu'à remplir l'écran ; GAUCHE / DROITE le dirigent, des rafales de vent le poussent, une hirondelle passe au-dessus du trou
+d'eau et le bouscule s'il est sur son chemin ; SAUT tend les bras. La note est la précision : 100 au milieu du trou d'eau, 70 à
+son bord ; en eau peu profonde, les galets coûtent 10 points (genoux râpés) ; sur la berge, zéro, et Tom s'y plante la tête la
+première dans un nuage de terre. L'entrée compte : bras tendus au dernier moment (moins de 0,6 s de l'eau), +10 ; jamais tendus,
+un plat, −20. À plusieurs, chacun saute à son tour (la rivière change à chaque saut), puis le podium ; le record reste dans la
+sauvegarde. La simulation est dans `src/jeu/plongeon*.ts` (aiguillée avec le drift par `jeu/mini-jeux.ts`), le rendu dans
+`src/rendu/plongeon*.ts`, les deux sprites de Tom sortent de `outils/fixe-plongeon.py` (sources dans `assets-sources/plongeon/`).
 
 ## À plusieurs
 

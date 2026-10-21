@@ -28,6 +28,8 @@ export interface Sauvegarde {
   qualite: Qualite;
   /** le record du concours de drift du pré du Clos : la plus grande part de pelouse saccagée (0 à 100) */
   recordDrift: number;
+  /** le record du plongeon du pont des Tuves : la meilleure note (0 à 100) */
+  recordPlongeon: number;
 }
 
 const CLE = 'dkk-rock.sauvegarde';
@@ -42,6 +44,7 @@ export const SAUVEGARDE_VIDE: Sauvegarde = {
   musique: true,
   qualite: 'auto',
   recordDrift: 0,
+  recordPlongeon: 0,
 };
 
 const entier = (v: unknown, min: number, max: number, defaut: number): number =>
@@ -80,8 +83,8 @@ export function valideSauvegarde(brut: unknown, nbNiveaux: number): Sauvegarde {
     son: o.son !== false,
     musique: o.musique !== false,
     qualite: o.qualite === 'max' || o.qualite === 'eco' ? o.qualite : 'auto',
-    recordDrift:
-      typeof o.recordDrift === 'number' && o.recordDrift >= 0 && o.recordDrift <= 100 ? o.recordDrift : 0,
+    recordDrift: pourcent(o.recordDrift),
+    recordPlongeon: pourcent(o.recordPlongeon),
   };
 }
 
@@ -102,10 +105,32 @@ export function enregistre(s: Sauvegarde): void {
   }
 }
 
+/** Un record de mini-jeu relu : un nombre de 0 à 100, sinon 0. */
+const pourcent = (v: unknown): number => (typeof v === 'number' && v >= 0 && v <= 100 ? v : 0);
+
 /** Garde le meilleur score du concours de drift comme record du pré du Clos. Vrai s'il est battu (à enregistrer). */
 export function retiensRecordDrift(s: Sauvegarde, scores: readonly ({ pourcent: number } | null)[]): boolean {
   const meilleur = Math.max(0, ...scores.map((x) => x?.pourcent ?? 0));
   if (meilleur <= s.recordDrift + 0.01) return false;
   s.recordDrift = meilleur;
   return true;
+}
+
+/** Garde la meilleure note du plongeon comme record du pont des Tuves. Vrai s'il est battu (à enregistrer). */
+export function retiensRecordPlongeon(s: Sauvegarde, scores: readonly (number | null)[]): boolean {
+  const meilleur = Math.max(0, ...scores.map((x) => x ?? 0));
+  if (meilleur <= s.recordPlongeon) return false;
+  s.recordPlongeon = meilleur;
+  return true;
+}
+
+/** Les records des mini-jeux, d'après la vue (le drift ou le plongeon en cours). Vrai si l'un est battu (à enregistrer). */
+export function retiensRecords(
+  s: Sauvegarde,
+  v: { drift?: { scores: ({ pourcent: number } | null)[] }; plongeon?: { scores: (number | null)[] } },
+): boolean {
+  return (
+    (!!v.drift && retiensRecordDrift(s, v.drift.scores)) ||
+    (!!v.plongeon && retiensRecordPlongeon(s, v.plongeon.scores))
+  );
 }

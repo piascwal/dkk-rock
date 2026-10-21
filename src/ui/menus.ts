@@ -4,6 +4,8 @@ import type { Progression, Sauvegarde } from '../jeu/sauvegarde';
 import { NIVEAUX } from '../niveaux';
 import { ARCS, niveauOuvert } from '../niveaux/arcs';
 import { NIVEAU_DRIFT } from '../jeu/drift';
+import type { MiniJeu } from '../jeu/mini-jeux';
+import { NIVEAU_PLONGEON } from '../jeu/plongeon';
 import type { AnnonceDkk } from '../reseau/annonce';
 import { Recherche } from '../reseau/client';
 import type { Hote } from '../reseau/hote';
@@ -19,8 +21,8 @@ export interface Actions {
   readonly sauvegarde: Sauvegarde;
   enregistre(): void;
   lance(niveau: number, membre: number, reprise: Progression | null): void;
-  /** lance le concours de drift du pré du Clos, hors de l'histoire (on rejoue au podium) */
-  lanceMiniJeu(): void;
+  /** lance un mini-jeu (le drift du pré du Clos, le plongeon du pont des Tuves), hors de l'histoire (on rejoue au podium) */
+  lanceMiniJeu(quel: MiniJeu): void;
   rejoins(r: Recherche, a: Annonce<AnnonceDkk>, pseudo: string, membre: number): Promise<void>;
   reprend(): void;
   /** refait le niveau en cours (hôte seulement) : du départ, ou du dernier drapeau */
@@ -111,7 +113,9 @@ export class Menus {
   miniJeux(): void {
     const s = this.a.sauvegarde;
     const drift = niveauOuvert(NIVEAU_DRIFT, s.faits);
+    const plongeon = niveauOuvert(NIVEAU_PLONGEON, s.faits);
     const record = `Record du pré : ${s.recordDrift.toFixed(1).replace('.', ',')} % de pelouse saccagée.`;
+    const recordSaut = `Record du pont : ${s.recordPlongeon} % de précision.`;
     this.montre(
       el('h2', 'Mini-jeux'),
       el(
@@ -120,9 +124,13 @@ export class Menus {
         'aide',
       ),
       drift
-        ? bouton('Concours de drift — le pré du Clos', () => this.a.lanceMiniJeu(), 'principal')
+        ? bouton('Concours de drift — le pré du Clos', () => this.a.lanceMiniJeu('drift'), 'principal')
         : el('p', 'Concours de drift : se débloque après Saint-Cézaire.', 'aide'),
       drift && s.recordDrift > 0 ? el('p', record, 'aide') : el('span'),
+      plongeon
+        ? bouton('Plongeon — le pont des Tuves', () => this.a.lanceMiniJeu('plongeon'), 'principal')
+        : el('p', 'Plongeon du pont des Tuves : se débloque après le pont.', 'aide'),
+      plongeon && s.recordPlongeon > 0 ? el('p', recordSaut, 'aide') : el('span'),
       bouton('Retour', () => this.titre()),
     );
   }

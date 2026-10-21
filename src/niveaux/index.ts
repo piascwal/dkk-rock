@@ -9,6 +9,7 @@ import { CARTE_PORT } from './cartes/08-port';
 import { CARTE_GROIX } from './cartes/09-groix';
 import { CARTE_FERRY } from './cartes/10-ferry';
 import { CARTE_PRE_DU_CLOS } from './cartes/12-pre-du-clos';
+import { CARTE_PLONGEON } from './cartes/14-plongeon';
 import { CARTE_TUVES, DECOR_TUVES } from './cartes/13-tuves';
 import { ASSAUTS_FISE, CARTE_FISE, DECOR_FISE, ZONES_FISE } from './cartes/11-fise';
 import { litNiveau, type DefNiveau, type NiveauLu } from './format';
@@ -24,6 +25,7 @@ import { GROIX } from './textes/09-groix';
 import { FERRY } from './textes/10-ferry';
 import { FISE } from './textes/11-fise';
 import { PRE_DU_CLOS } from './textes/12-pre-du-clos';
+import { PLONGEON } from './textes/14-plongeon';
 import { TUVES } from './textes/13-tuves';
 
 /** Les niveaux, arc après arc (voir arcs.ts). Pour en ajouter un : un texte, une carte, une ligne ici. */
@@ -46,6 +48,8 @@ export const NIVEAUX: DefNiveau[] = [
   { ...PRE_DU_CLOS, carte: CARTE_PRE_DU_CLOS },
   // le pont des Tuves, ajouté après coup : il vient juste après Saint-Cézaire dans la tournée
   { ...TUVES, carte: CARTE_TUVES, decor: DECOR_TUVES },
+  // le saut du pont des Tuves (un mini-jeu, le concours de plongeon), ajouté après coup : il vient juste après le pont
+  { ...PLONGEON, carte: CARTE_PLONGEON },
 ];
 
 const lus = new Map<number, NiveauLu>();

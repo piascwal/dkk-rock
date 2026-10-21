@@ -71,5 +71,6 @@ export function construitVue(p: Partie): EtatVue {
     joueurs,
     entites,
     ...(p.phase === 'drift' && p.drift ? { drift: p.drift.vue() } : {}),
+    ...(p.phase === 'plongeon' && p.plongeon ? { plongeon: p.plongeon.vue() } : {}),
   };
 }

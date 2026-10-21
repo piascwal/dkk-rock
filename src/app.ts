@@ -7,9 +7,9 @@ import { Clavier, commandesManette } from './entrees/clavier';
 import { Tactile } from './entrees/tactile';
 import { iconeDeLArme } from './ui/icones-hud';
 import { C } from './jeu/commandes';
-import { nouveauConcours } from './jeu/drift-partie';
+import { nouveauMiniJeu, type MiniJeu } from './jeu/mini-jeux';
 import { Partie } from './jeu/partie';
-import { charge, enregistre, retiensRecordDrift, type Progression, type Sauvegarde } from './jeu/sauvegarde';
+import { charge, enregistre, retiensRecords, type Progression, type Sauvegarde } from './jeu/sauvegarde';
 import type { EtatVue, Evenement } from './jeu/vue';
 import { NIVEAUX } from './niveaux';
 import type { AnnonceDkk } from './reseau/annonce';
@@ -29,8 +29,8 @@ import { pleinEcran } from './ui/plein-ecran';
 import { verifieVersion } from './version';
 
 const PAS_MS = 1000 / 60;
-/** Les phases où SAUT et TIR servent au jeu (le concours de drift passe ses écrans lui-même) : ils ne tournent pas les pages. */
-const EN_ACTION: ReadonlySet<string> = new Set(['jeu', 'drift']);
+/** Les phases où SAUT et TIR servent au jeu (les mini-jeux passent leurs écrans eux-mêmes) : ils ne tournent pas les pages. */
+const EN_ACTION: ReadonlySet<string> = new Set(['jeu', 'drift', 'plongeon']);
 const $ = (id: string) => document.getElementById(id)!;
 
 /**
@@ -158,10 +158,10 @@ export class App implements Actions {
     this.entreEnJeu();
   }
 
-  lanceMiniJeu(): void {
+  lanceMiniJeu(quel: MiniJeu): void {
     this.arreteTout();
     this.membreVu = null;
-    this.partie = nouveauConcours(this.sauvegarde.membre);
+    this.partie = nouveauMiniJeu(quel, this.sauvegarde.membre);
     this.entreEnJeu();
   }
 
@@ -339,10 +339,10 @@ export class App implements Actions {
       noms[0] = this.sauvegarde.pseudo || 'DKK';
       for (const d of this.hote.distants.values()) noms[d.siege] = d.nom;
     }
-    if (v.drift && retiensRecordDrift(this.sauvegarde, v.drift.scores)) this.enregistre();
+    if (retiensRecords(this.sauvegarde, v)) this.enregistre();
     this.hud.maj(v, siege, noms);
     const moi = v.joueurs[siege];
-    this.tactile.pilote(v.phase === 'drift');
+    this.tactile.pilote(v.phase === 'drift' ? 'GAZ' : v.phase === 'plongeon' ? 'PLONGE' : null);
     this.tactile.arme(moi?.present && moi.arme ? iconeDeLArme(moi.arme, 34) : null, moi?.munitions ?? 0);
     this.histoire.maj(v);
     const theme = this.rendu.theme.musique;

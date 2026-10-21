@@ -22,7 +22,7 @@ import type { Camp, Cible, Contexte, EntiteSimulee, Tyrolienne } from './context
 import { explose } from './explosions';
 import { zoneVisible } from './zone-visible';
 import { declencheAssauts } from './assauts';
-import { majDrift, type ConcoursDrift } from './drift-partie';
+import { majMiniJeux, PHASES_MINI_JEUX, type ConcoursDrift, type ConcoursPlongeon } from './mini-jeux';
 import { ouvreBarrieres, peuple, releveCarte } from './chargement';
 import { changePhase } from './phases';
 import { majTraversee, prepareTraversee, type Traversee } from './traversee';
@@ -53,8 +53,9 @@ export class Partie implements Contexte {
   tyroliennes: Tyrolienne[] = [];
   /** la traversée en ferry du niveau du port, une fois embarqué (voir traversee.ts) */
   traversee: Traversee | null = null;
-  /** le concours de drift du pré du Clos, pendant la phase `drift` (voir drift.ts) */
+  /** les mini-jeux (voir mini-jeux.ts) : le concours de drift du pré du Clos, le plongeon du pont des Tuves, pendant leur phase */
   drift: ConcoursDrift | null = null;
+  plongeon: ConcoursPlongeon | null = null;
   entites: EntiteSimulee[] = [];
   readonly joueurs: (Joueur | null)[] = Array<Joueur | null>(MAX_JOUEURS).fill(null);
   readonly rng = new Aleatoire(Date.now() & 0xffff);
@@ -164,7 +165,7 @@ export class Partie implements Contexte {
 
   /** Un joueur veut passer la page d'histoire (ou recommencer après une défaite) ; le drift passe ses écrans lui-même. */
   suivant(): void {
-    if (this.phase === 'jeu' || this.phase === 'drift') return;
+    if (this.phase === 'jeu' || PHASES_MINI_JEUX.has(this.phase)) return;
     if (this.phase === 'carte') {
       this.chargeNiveauSuivant(); // on peut passer le trajet
       return;
@@ -208,12 +209,11 @@ export class Partie implements Contexte {
     this.tyroliennes = this.lu.tyroliennes;
     this.entites = [];
     this.enAttente = [];
-    this.finDans = -1;
-    this.departDans = -1;
+    this.finDans = this.departDans = -1;
     this.van = null;
     this.dejaDit = new Set();
     this.assautsFaits = new Set();
-    this.drift = null;
+    this.drift = this.plongeon = null;
     peuple(this);
     prepareTraversee(this);
     // un nouveau niveau, ou une reprise : tout le monde repart du départ, pas de là où il était
@@ -249,7 +249,7 @@ export class Partie implements Contexte {
     this.numeroTemps = temps;
     if (this.secousse > 0) this.secousse = Math.max(0, this.secousse - 1);
     if (this.phase === 'carte' && ++this.page >= DUREE_CARTE) this.chargeNiveauSuivant();
-    if (this.phase === 'drift') majDrift(this);
+    majMiniJeux(this);
     if (this.phase !== 'jeu') return;
     this.tempsNiveau++;
 

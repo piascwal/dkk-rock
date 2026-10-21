@@ -138,6 +138,11 @@ const SONS: Record<string, Son> = {
   rebond: (s, v) => s.note({ freq: 700, duree: 0.04, type: 'triangle', volume: 0.05 * v }),
   picore: (s, v) => s.note({ freq: 1800, duree: 0.03, type: 'square', volume: 0.05 * v }),
   chute: (s, v) => s.bruit({ duree: 0.15, volume: 0.15 * v, passeBas: 600 }),
+  // le plongeur entre dans la rivière : une gerbe d'écume et un « ploc » grave
+  plouf: (s, v) => {
+    s.bruit({ duree: 0.5, volume: 0.28 * v, passeBas: 1400 });
+    s.note({ freq: 220, vers: 70, duree: 0.25, type: 'sine', volume: 0.2 * v });
+  },
   tyrolienne: (s, v) => s.bruit({ duree: 0.4, volume: 0.06 * v, passeHaut: 2500 }),
   rugissement: (s, v) => {
     s.note({ freq: 90, vers: 60, duree: 0.8, type: 'sawtooth', volume: 0.2 * v, filtre: 600 });
