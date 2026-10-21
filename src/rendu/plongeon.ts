@@ -6,6 +6,8 @@ import { dessineFeuille } from './feuilles-images';
 import { disque } from './formes-pixels';
 import { dessineEcranPlongeon } from './plongeon-ecrans';
 import { gorges, profondeur } from './plongeon-gorge';
+import { HAUTEUR_PAYSAGE, paysage } from './plongeon-paysage';
+import { tablier } from './plongeon-pont';
 import { LARGEUR_MONDE, px, py, S, XM, YB } from './plongeon-monde';
 
 /**
@@ -20,6 +22,8 @@ const DENSITE = 6;
 /** Tom en slip est dessiné à cette échelle de sa planche (il fait alors la taille des héros sur le parapet). */
 const TAILLE_TOM = 0.5;
 const VUE = HAUTEUR_VUE / S;
+/** Là où regarde la caméra sur le pont (le haut de l'écran, en m). */
+const PONT = -VUE * 0.62;
 const POSES = ['chute', 'plonge'] as const;
 const images = new Map<string, HTMLImageElement>();
 /** Le groupe sur les berges : qui, où (m), tourné vers la rivière. */
@@ -52,9 +56,13 @@ export class RenduPlongeon {
     this.cadre(v, largeur);
     const ex = (x: number) => Math.round((x - this.camX) * S + largeur / 2);
     const ey = (y: number) => Math.round((y - this.camY) * S);
-    // le décor peint du saut, la part que la caméra voit
-    ctx.fillStyle = '#6a5a44';
+    // le lointain, qui défile moins vite (de la rivière en amont au ciel), puis le décor peint du saut
+    ctx.fillStyle = '#7a6440';
     ctx.fillRect(0, 0, largeur, HAUTEUR_VUE);
+    const k = (this.camY - PONT) / (YB - VUE - PONT);
+    const fy = Math.round(Math.max(0, Math.min(1, k)) * (HAUTEUR_PAYSAGE - HAUTEUR_VUE));
+    const fx = Math.round((LARGEUR_MONDE - largeur) / 2 + this.camX * S * 0.4);
+    ctx.drawImage(paysage(v.manche), fx, fy, largeur, HAUTEUR_VUE, 0, 0, largeur, HAUTEUR_VUE);
     const sx = px(this.camX) - largeur / 2;
     const debut = Math.max(0, sx);
     const fin = Math.min(LARGEUR_MONDE, sx + largeur);
@@ -93,7 +101,7 @@ export class RenduPlongeon {
 
   /** Où regarde la caméra : le survol de la rivière au pont, puis Tom qu'elle précède dans la chute, puis la rivière. */
   private cadre(v: VuePlongeon, largeur: number): void {
-    const pont = -VUE * 0.62;
+    const pont = PONT;
     const bas = YB - VUE;
     let cible = pont;
     if (v.etape === 'visee') {
@@ -158,7 +166,7 @@ export class RenduPlongeon {
   ): void {
     if (v.x !== this.dernierX) this.regard = v.x > this.dernierX ? 1 : -1;
     const x = ex(v.x);
-    const y = ey(-1.15);
+    const y = ey(tablier(v.x));
     ctx.save();
     ctx.translate(x, y);
     ctx.scale(this.regard, 1);

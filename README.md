@@ -99,8 +99,10 @@ Partie), le rendu en vue arrière (sol projeté comme en « mode 7 », panorama 
 `src/rendu/drift*.ts` ; les sprites des voitures sortent de `outils/fixe-voitures.py` (sources dans
 `assets-sources/drift/`).
 
-**Le saut du pont des Tuves** (juste après le pont) : vu de face, façon Doodle Jump mais en chute. Les gorges de la Siagne
-sous le pont de 1802 (exagérément haut : 60 m), Saint-Cézaire perché sur la falaise, le fond en calcaire qui verdit en descendant.
+**Le saut du pont des Tuves** (juste après le pont) : vu de face, façon Doodle Jump mais en chute. Le vieux pont en dos
+d'âne de pierres brutes, moussu et mangé de lierre (exagérément haut : 60 m), et sous lui rien que le paysage, qui défile moins
+vite : le ciel, les collines et Saint-Cézaire sur sa crête, les pentes boisées, la Siagne turquoise en amont et ses vasques de
+tuf ; de part et d'autre, des rives de feuillage, de tuf et de mousse, et une cascade en voile jusqu'à la rivière.
 D'abord un survol montre la rivière et son trou d'eau (à retenir : on ne le revoit plus avant l'arrivée ; un appui le passe).
 Tom, en jean, se place sur le parapet (GAUCHE / DROITE) puis saute avec SAUT : une jauge d'élan oscille, au milieu il tombe droit,
 sur les bords il part de travers. Dans la chute, Tom est en slip de bain et la caméra le suit : GAUCHE / DROITE le dirigent
