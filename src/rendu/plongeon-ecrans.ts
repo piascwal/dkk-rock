@@ -1,5 +1,5 @@
 import { HAUTEUR_VUE } from '../config';
-import { DUREE_SURVOL, ENTREE, HAUTEUR, ZONE } from '../jeu/plongeon';
+import { DUREE_SURVOL, HAUTEUR, ZONE } from '../jeu/plongeon';
 import type { VuePlongeon } from '../jeu/vue';
 import { ecrit, ecritCentre, largeurTexte } from './police';
 
@@ -23,18 +23,11 @@ function recit(v: VuePlongeon): [string, string] {
   if (v.zone === ZONE.BERGE)
     return ['SUR LA BERGE ! PLANTÉ COMME UN PIQUET.', 'LES POMPIERS DE SAINT-CÉZAIRE SONT EN ROUTE.'];
   if (v.zone === ZONE.BAS)
-    return ['PEU PROFOND : GENOUX RÂPÉS SUR LES GALETS (-10).', 'IL BOITERA JUSQU’AUX ALPES.'];
+    return ['PEU PROFOND : LA TÊTE DANS LES GALETS (-10).', 'UNE BOSSE QUI TIENDRA JUSQU’AUX ALPES.'];
   return [
     v.score >= 95 ? 'PILE DANS LE TROU D’EAU !' : 'DANS LE TROU D’EAU.',
     'LE GROUPE APPLAUDIT DEPUIS LA BERGE.',
   ];
-}
-
-function entree(v: VuePlongeon): [string, string] {
-  if (v.entree === ENTREE.PARFAITE) return ['ENTRÉE PARFAITE, BRAS TENDUS (+10)', VERT];
-  if (v.entree === ENTREE.PLAT) return ['À PLAT ! ÇA CLAQUE (-25)', ROUGE];
-  if (v.entree === ENTREE.GAINEE) return ['BRAS TENDUS TROP TÔT', BLANC];
-  return ['', BLANC];
 }
 
 export function dessineEcranPlongeon(
@@ -54,8 +47,20 @@ export function dessineEcranPlongeon(
         ecritCentre(ctx, 'LE TROU D’EAU EST LÀ. RETIENS BIEN OÙ.', m, HAUTEUR_VUE - 10, BLANC);
         return;
       }
-      bandeau(ctx, largeur, 26, 12);
-      ecritCentre(ctx, '< > SE PLACER   SAUT : SAUTER (L’ÉLAN AU MILIEU)', m, 28, BLANC);
+      bandeau(ctx, largeur, HAUTEUR_VUE - 22, 22);
+      if (v.tension > 0) {
+        ecritCentre(ctx, 'TIRE PLUS OU MOINS, VISE AVEC < >', m, HAUTEUR_VUE - 20, BLANC);
+        ecritCentre(ctx, 'LÂCHE POUR SAUTER !', m, HAUTEUR_VUE - 10, JAUNE);
+      } else {
+        ecritCentre(ctx, '< > SE PLACER', m, HAUTEUR_VUE - 20, BLANC);
+        ecritCentre(
+          ctx,
+          'TIRE LE JOYSTICK VERS LE BAS (OU SAUT) : TENDRE LES JAMBES',
+          m,
+          HAUTEUR_VUE - 10,
+          BLANC,
+        );
+      }
       return;
     case 'chute': {
       ecrit(ctx, `${Math.max(0, Math.round(HAUTEUR - v.y))} M`, 4, 14, BLANC, 2);
@@ -64,8 +69,7 @@ export function dessineEcranPlongeon(
         ecrit(ctx, texte, largeur - 4 - largeurTexte(texte), 14, ROUGE);
       }
       bandeau(ctx, largeur, HAUTEUR_VUE - 12, 12);
-      const aide = v.bras ? 'BRAS TENDUS !' : '< > SE DIRIGER   SAUT : TENDRE LES BRAS';
-      ecritCentre(ctx, aide, m, HAUTEUR_VUE - 10, v.bras ? VERT : BLANC);
+      ecritCentre(ctx, '< > SE DIRIGER', m, HAUTEUR_VUE - 10, BLANC);
       return;
     }
     case 'impact':
@@ -80,20 +84,19 @@ export function dessineEcranPlongeon(
       return;
     case 'resultat': {
       const [ou, suite] = recit(v);
-      const [e, couleur] = entree(v);
-      bandeau(ctx, largeur, 14, 80);
-      ecritCentre(ctx, `PRÉCISION ${v.score} %`, m, 18, JAUNE, 2);
-      ecritCentre(ctx, ou, m, 38, v.zone === ZONE.PROFOND ? VERT : ROUGE);
-      if (e) ecritCentre(ctx, e, m, 50, couleur);
+      // en haut de l'écran, pour qu'on voie Tom en bas : planté, ou qui nage vers la berge
+      bandeau(ctx, largeur, 0, 52);
+      ecritCentre(ctx, `PRÉCISION ${v.score} %`, m, 3, JAUNE, 2);
+      ecritCentre(ctx, ou, m, 20, v.zone === ZONE.PROFOND ? VERT : ROUGE);
       if (v.eraflures)
         ecritCentre(
           ctx,
           `${v.eraflures} BRANCHE${v.eraflures > 1 ? 'S' : ''} (-${5 * v.eraflures})`,
           m,
-          62,
+          30,
           ROUGE,
         );
-      ecritCentre(ctx, suite, m, 78, ROSE);
+      ecritCentre(ctx, suite, m, 41, ROSE);
       return;
     }
     case 'podium': {

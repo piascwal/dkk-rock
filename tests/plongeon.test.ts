@@ -6,11 +6,10 @@ import {
   ConcoursPlongeon,
   DUREE_SURVOL,
   EAU,
-  ENTREE,
   GORGE,
   HAUTEUR,
-  jaugeDe,
   NIVEAU_PLONGEON,
+  pente,
   note,
   PROFOND,
   tirage,
@@ -26,26 +25,28 @@ const appuie = (c: ConcoursPlongeon) => {
   pas(c, 0);
 };
 
-/** Le survol passé, Tom se place au-dessus de `x`, attend que la jauge d'élan soit au milieu, et saute. */
-function saute(c: ConcoursPlongeon, x: number): void {
+/**
+ * Le survol passé, Tom se place au-dessus de `x`, tire le joystick vers le bas (en visant de côté avec `vise` : 1 tire à gauche,
+ * donc part à droite) jusqu'à la tension voulue, et lâche.
+ */
+function saute(c: ConcoursPlongeon, x: number, tension = 1, vise = 0): void {
   while (c.vise < DUREE_SURVOL) pas(c);
   for (let t = 0; t < 2000 && Math.abs(c.x - x) > 0.06; t++) pas(c, c.x < x ? C.DROITE : C.GAUCHE);
-  for (let t = 0; t < 200 && Math.abs(jaugeDe(c.vise)) > 0.06; t++) pas(c);
-  pas(c, C.SAUT);
+  const cote = vise > 0 ? C.GAUCHE : vise < 0 ? C.DROITE : 0;
+  pas(c, C.BAS);
+  for (let t = 0; t < 200 && c.tension < tension - 0.02; t++) pas(c, C.BAS | cote);
   pas(c, 0);
 }
 
 describe('le concours de plongeon du pont des Tuves', () => {
   it('la note : 100 au milieu du trou d’eau, 70 à son bord ; l’eau peu profonde blesse, la berge vaut zéro', () => {
-    expect(note(2, 2, ENTREE.GAINEE)).toEqual({ zone: ZONE.PROFOND, score: 100 });
-    expect(note(2 + PROFOND, 2, ENTREE.GAINEE)).toEqual({ zone: ZONE.PROFOND, score: 70 });
+    expect(note(2, 2)).toEqual({ zone: ZONE.PROFOND, score: 100 });
+    expect(note(2 + PROFOND, 2)).toEqual({ zone: ZONE.PROFOND, score: 70 });
     // deux mètres au-delà du trou : l'eau baisse vite (−24) et les galets coûtent 10 points
-    expect(note(PROFOND + 2, 0, ENTREE.GAINEE)).toEqual({ zone: ZONE.BAS, score: 36 });
-    expect(note(EAU + 0.5, 2, ENTREE.PARFAITE)).toEqual({ zone: ZONE.BERGE, score: 0 });
-    // l'entrée : bras tendus au dernier moment +10, à plat −25 ; chaque branche heurtée −5
-    expect(note(2 + PROFOND, 2, ENTREE.PARFAITE).score).toBe(80);
-    expect(note(2 + PROFOND, 2, ENTREE.PLAT).score).toBe(45);
-    expect(note(2, 2, ENTREE.PARFAITE, 3).score).toBe(95);
+    expect(note(PROFOND + 2, 0)).toEqual({ zone: ZONE.BAS, score: 36 });
+    expect(note(EAU + 0.5, 2)).toEqual({ zone: ZONE.BERGE, score: 0 });
+    // chaque branche heurtée −5
+    expect(note(2, 2, 3).score).toBe(85);
   });
 
   it('les gorges de chaque saut sont tirées d’après son numéro : beaucoup de branches, trois hirondelles, trois couloirs de vent', () => {
@@ -64,23 +65,53 @@ describe('le concours de plongeon du pont des Tuves', () => {
     }
   });
 
-  it('un saut : le survol, la place sur le parapet, l’élan, la chute, les bras tendus au dernier moment, l’eau, le podium', () => {
+  it('un saut : le survol, la place sur le dos d’âne, la tension des jambes, la montée bras pliés, la descente bras tendus, l’eau, le podium', () => {
     const c = new ConcoursPlongeon([0], false);
     expect(c.etape).toBe('visee');
-    saute(c, c.fosse);
+    saute(c, 3, 1);
     expect(c.etape).toBe('chute');
-    expect(Math.abs(c.vx)).toBeLessThan(0.3); // l'élan pris au milieu de la jauge : on tombe droit
-    while (c.y < HAUTEUR - 5) pas(c);
-    appuie(c);
+    expect(c.y).toBeCloseTo(pente(3), 1); // le tablier descend de part et d'autre de la clé
+    expect(c.vy).toBeLessThan(-6); // pleine tension : il part vers le haut
+    expect(Math.abs(c.vx)).toBeLessThan(2);
+    expect(c.vue().bras).toBe(false); // il monte, bras pliés
+    while (c.vy < 0) pas(c);
+    pas(c);
+    expect(c.vue().bras).toBe(true); // il redescend, bras tendus, jusqu'en bas
     while (c.etape === 'chute') pas(c);
     expect(c.etape).toBe('impact');
-    if (c.zone !== ZONE.BERGE) expect(c.entree).toBe(ENTREE.PARFAITE);
     expect(c.scores[0]).toBe(c.score);
     while (c.etape === 'impact' || c.etape === 'resultat') pas(c);
     expect(c.etape).toBe('podium');
     for (let t = 0; t < 70; t++) pas(c);
     appuie(c);
     expect(c.fini).toBe(true);
+  });
+
+  it('les jambes comme un élastique : plus on tend, plus il monte ; tenues trop longtemps, elles flanchent ; on vise à l’opposé', () => {
+    const sommet = (tension: number, vise = 0) => {
+      const c = new ConcoursPlongeon([0], false);
+      saute(c, 0, tension, vise);
+      const vx = c.vx;
+      let haut = c.y;
+      while (c.vy < 0) {
+        pas(c);
+        haut = Math.min(haut, c.y);
+      }
+      return { haut, vx };
+    };
+    expect(sommet(1).haut).toBeLessThan(sommet(0.4).haut - 1);
+    expect(sommet(1, 1).vx).toBeGreaterThan(1); // tiré vers la gauche : il part à droite
+    expect(sommet(1, -1).vx).toBeLessThan(-1);
+    const c2 = new ConcoursPlongeon([0], false);
+    while (c2.vise < DUREE_SURVOL) pas(c2);
+    let max = 0;
+    pas(c2, C.BAS);
+    for (let t = 0; t < 80; t++) {
+      pas(c2, C.BAS);
+      max = Math.max(max, c2.tension);
+    }
+    expect(max).toBeGreaterThan(0.95);
+    expect(c2.tension).toBeLessThan(0.7); // trop tenu : les jambes ont flanché
   });
 
   it('une branche heurtée : on y laisse sa vitesse et cinq points', () => {
@@ -93,11 +124,10 @@ describe('le concours de plongeon du pont des Tuves', () => {
     expect(c.vy).toBeLessThan(5);
   });
 
-  it('en l’air, on se dirige ; tendre les bras trop tôt fait perdre le contrôle et l’entrée parfaite', () => {
-    const tombe = (bits: number, brasTot = false) => {
+  it('en l’air, on se dirige', () => {
+    const tombe = (bits: number) => {
       const c = new ConcoursPlongeon([0], false);
       saute(c, 0);
-      if (brasTot) appuie(c);
       while (c.etape === 'chute') pas(c, bits);
       return c;
     };
@@ -105,9 +135,6 @@ describe('le concours de plongeon du pont des Tuves', () => {
     const rien = tombe(0).x;
     expect(tombe(C.DROITE).x - rien).toBeGreaterThan(2);
     expect(tombe(C.GAUCHE).x).toBeLessThan(rien);
-    const tot = tombe(0, true);
-    if (tot.zone !== ZONE.BERGE) expect(tot.entree).toBe(ENTREE.GAINEE);
-    expect(tombe(C.DROITE, true).x - tot.x).toBeLessThan(tombe(C.DROITE).x - rien);
   });
 
   it('vient juste après le pont des Tuves, se laisse de côté, et passe par le réseau', () => {

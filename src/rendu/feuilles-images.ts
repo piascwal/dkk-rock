@@ -4,7 +4,7 @@ import { FEUILLES, caseDeLaPlanche, colonneDuCycle, type Feuille } from './feuil
 import { FEUILLES_DECOR } from './feuilles-objets';
 import { chargeTuiles } from './atlas-tuiles';
 import { chargeVoitures } from './drift-voitures';
-import { chargePlongeon } from './plongeon';
+import { chargePlongeon } from './plongeon-tom';
 import type { Genre } from '../jeu/vue';
 
 const images = new Map<Genre, HTMLImageElement>();

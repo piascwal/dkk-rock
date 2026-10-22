@@ -205,20 +205,21 @@ export interface VuePlongeon {
   manche: number;
   miniJeu: boolean;
   minuteur: number;
-  /** les ticks passés sur le parapet (le survol, puis la jauge d'élan), et ceux depuis le saut */
+  /** les ticks du survol, la tension des jambes (0 à 1) et la visée (-1 à 1) sur le parapet, les ticks depuis le saut */
   vise: number;
+  tension: number;
+  visee: number;
   temps: number;
   /** Tom : en travers (m, 0 sous la clé de l'arche), sous le tablier (m, la rivière à HAUTEUR), sa vitesse en travers (m/s) */
   x: number;
   y: number;
   vx: number;
-  /** les bras tendus (l'entrée dans l'eau) */
+  /** les bras tendus : Tom redescend, en position de plongeon */
   bras: boolean;
   /** les branches heurtées (−5 chacune) */
   eraflures: number;
-  /** le résultat du saut : la zone touchée et l'entrée (voir ZONE, ENTREE), la note sur 100 */
+  /** le résultat du saut : la zone touchée (voir ZONE), la note sur 100 */
   zone: number;
-  entree: number;
   score: number;
   /** le meilleur score de chaque siège, ou null s'il n'a pas encore sauté */
   scores: (number | null)[];

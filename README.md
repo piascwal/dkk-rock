@@ -100,18 +100,21 @@ Partie), le rendu en vue arrière (sol projeté comme en « mode 7 », panorama 
 `assets-sources/drift/`).
 
 **Le saut du pont des Tuves** (juste après le pont) : vu de face, façon Doodle Jump mais en chute. Le vieux pont en dos
-d'âne de pierres brutes, moussu et mangé de lierre (exagérément haut : 60 m), et sous lui rien que le paysage, qui défile moins
-vite : le ciel, les collines et Saint-Cézaire sur sa crête, les pentes boisées, la Siagne turquoise en amont et ses vasques de
-tuf ; de part et d'autre, des rives de feuillage, de tuf et de mousse, et une cascade en voile jusqu'à la rivière.
+d'âne pointu, de pierres brutes, moussu et mangé de lierre (exagérément haut : 60 m), et sous lui rien que le paysage, qui défile
+moins vite : le ciel, les collines et Saint-Cézaire sur sa crête, les pentes boisées, la Siagne turquoise en amont et ses vasques
+de tuf ; de part et d'autre, des rives de feuillage, de tuf et de mousse, et une cascade en voile jusqu'à la rivière.
 D'abord un survol montre la rivière et son trou d'eau (à retenir : on ne le revoit plus avant l'arrivée ; un appui le passe).
-Tom, en jean, se place sur le parapet (GAUCHE / DROITE) puis saute avec SAUT : une jauge d'élan oscille, au milieu il tombe droit,
-sur les bords il part de travers. Dans la chute, Tom est en slip de bain et la caméra le suit : GAUCHE / DROITE le dirigent
-(il garde son élan), des branches de figuier sortent des falaises (une branche heurtée l'arrête, le sonne et coûte 5 points),
-des couloirs de vent le déportent, trois hirondelles le bousculent ; SAUT tend les bras, mais on ne se dirige presque plus.
-La note est la précision : 100 au milieu du trou d'eau, 70 à son bord ; en eau peu profonde, elle chute vite et les galets coûtent
-10 points (genoux râpés) ; sur la berge, zéro, et Tom s'y plante la tête la première dans un nuage de terre. L'entrée compte : bras
-tendus au dernier moment (moins de 0,4 s de l'eau), +10 ; jamais tendus, un plat, −25. À plusieurs, chacun saute à son tour (les
-gorges changent à chaque saut), puis le podium ; le record reste dans la sauvegarde. La simulation est dans `src/jeu/plongeon*.ts` (aiguillée avec le drift par `jeu/mini-jeux.ts`), le rendu dans
+Tom, en jean, se place sur le dos d'âne (GAUCHE / DROITE), puis tend ses jambes comme un élastique : joystick tiré vers le bas
+(ou SAUT tenu), il se ramasse et une flèche montre l'impulsion ; la tension monte, mais tenue trop longtemps les jambes flanchent
+et elle retombe ; tirer de côté le fait partir de l'autre, comme une fronde. Au lâcher, il monte bras pliés, d'autant plus haut
+que la tension était forte (trop faible, il bascule du parapet et ne contrôle rien un moment), puis bascule et redescend bras
+tendus, en slip de bain, la caméra avec lui : GAUCHE / DROITE le dirigent (il garde son élan), des branches de figuier sortent
+des rives (une branche heurtée l'arrête, le sonne et coûte 5 points), des couloirs de vent le déportent, trois hirondelles le
+bousculent. La note est la précision : 100 au milieu du trou d'eau, 70 à son bord ; en eau peu profonde, elle chute vite et les
+galets coûtent 10 points : Tom y reste planté la tête dans les galets, les jambes hors de l'eau ; sur la berge, zéro, planté la
+tête la première dans un nuage de terre. Dans le trou d'eau, il touche le fond, se retourne, remonte et nage la brasse jusqu'à
+la berge. À plusieurs, chacun saute à son tour (les gorges changent à chaque saut), puis le podium ; le record reste dans la
+sauvegarde. La simulation est dans `src/jeu/plongeon*.ts` (aiguillée avec le drift par `jeu/mini-jeux.ts`), le rendu dans
 `src/rendu/plongeon*.ts`, les deux sprites de Tom sortent de `outils/fixe-plongeon.py` (sources dans `assets-sources/plongeon/`).
 
 ## À plusieurs

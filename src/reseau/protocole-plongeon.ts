@@ -2,7 +2,7 @@ import { MAX_JOUEURS } from '../config';
 import { ETAPES_PLONGEON, type VuePlongeon } from '../jeu/vue';
 
 /** Le concours de plongeon dans l'instantané réseau (voir protocole.ts), à la suite des entités pendant la phase `plongeon`. */
-export const OCTETS_PLONGEON = 21 + MAX_JOUEURS;
+export const OCTETS_PLONGEON = 22 + MAX_JOUEURS;
 
 const i16 = (x: number) => Math.max(-32768, Math.min(32767, Math.round(x)));
 const u16 = (x: number) => Math.max(0, Math.min(65535, Math.round(x)));
@@ -24,7 +24,8 @@ export function encodePlongeon(d: DataView, o: number, v: VuePlongeon): void {
   d.setUint8(o++, v.bras ? 1 : 0);
   d.setUint8(o++, Math.min(255, v.eraflures));
   d.setUint8(o++, v.zone);
-  d.setUint8(o++, v.entree);
+  d.setUint8(o++, Math.round(Math.max(0, Math.min(1, v.tension)) * 200));
+  d.setInt8(o++, Math.round(Math.max(-1, Math.min(1, v.visee)) * 100));
   d.setUint8(o++, Math.max(0, Math.min(100, v.score)));
   for (let s = 0; s < MAX_JOUEURS; s++) {
     const sc = v.scores[s];
@@ -51,7 +52,8 @@ export function decodePlongeon(d: DataView, o: number): VuePlongeon | null {
   const bras = d.getUint8(o++) === 1;
   const eraflures = d.getUint8(o++);
   const zone = d.getUint8(o++) % 4;
-  const entree = d.getUint8(o++) % 4;
+  const tension = Math.min(200, d.getUint8(o++)) / 200;
+  const visee = d.getInt8(o++) / 100;
   const score = Math.min(100, d.getUint8(o++));
   const scores: (number | null)[] = [];
   for (let s = 0; s < MAX_JOUEURS; s++) {
@@ -65,6 +67,8 @@ export function decodePlongeon(d: DataView, o: number): VuePlongeon | null {
     miniJeu,
     minuteur,
     vise,
+    tension,
+    visee,
     temps,
     x,
     y,
@@ -72,7 +76,6 @@ export function decodePlongeon(d: DataView, o: number): VuePlongeon | null {
     bras,
     eraflures,
     zone,
-    entree,
     score,
     scores,
   };

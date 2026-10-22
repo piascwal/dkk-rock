@@ -1,9 +1,10 @@
+import { PENTE, pente } from '../jeu/plongeon';
 import type { Aleatoire } from '../moteur/maths';
 import { disque } from './formes-pixels';
 import { px, py, rect, S, XM, YH } from './plongeon-monde';
 
 /**
- * Le pont des Tuves vu de face, comme sur les photos : un vieux pont en dos d'âne, une seule arche en plein cintre de pierres
+ * Le pont des Tuves vu de face, comme sur les photos : un vieux pont en dos d'âne pointu, une seule arche en plein cintre de pierres
  * brutes, sans corniche, gris-blanc taché d'ocre, mangé de mousse et de lierre. Sous l'arche, rien : on voit au travers le
  * lointain (le ciel, les arbres, la rivière en amont). Ses culées plongent dans le feuillage des rives.
  */
@@ -13,14 +14,17 @@ type Ctx = CanvasRenderingContext2D;
 /** La demi-ouverture de l'arche (m), la hauteur de sa naissance et de sa clé sous le tablier, l'épaisseur de l'anneau. */
 const DEMI = 7.2;
 const NAISSANCE = 8;
-const CLE = 1.4;
+const CLE = 0.9;
 const ANNEAU = 0.7;
 /** Jusqu'où vont les culées, de part et d'autre, et jusqu'à quelle profondeur. */
 const CULEE = 13;
 const PIED = 11;
+/** La clé du dos d'âne, à peine arrondie sur cette demi-largeur (m). */
+const ARRONDI = 0.6;
 
-/** Le dessus du tablier à `x` (m) : presque plat là où Tom marche, puis les rampes du dos d'âne. */
-export const tablier = (x: number): number => -1.15 + 0.004 * x * x + 0.35 * Math.max(0, Math.abs(x) - 8);
+/** Le dessus du tablier à `x` (m) : un dos d'âne en pointe, à peine arrondi à la clé (la pente vient de la simulation). */
+export const tablier = (x: number): number =>
+  -1.15 + (Math.abs(x) < ARRONDI ? PENTE * ((x * x) / (2 * ARRONDI) + ARRONDI / 2) : pente(x));
 
 /** L'intrados de l'arche à `x` (m), ou rien hors de l'ouverture. */
 const intrados = (x: number): number =>
