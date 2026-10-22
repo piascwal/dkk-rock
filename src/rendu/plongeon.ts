@@ -4,6 +4,7 @@ import { ANIM, G, type Genre, type VuePlongeon } from '../jeu/vue';
 import { dessineFeuille } from './feuilles-images';
 import { dessineEcranPlongeon } from './plongeon-ecrans';
 import { dessineArrivee, sol } from './plongeon-arrivee';
+import { dessineCascade } from './plongeon-cascade';
 import { gorges } from './plongeon-gorge';
 import { HAUTEUR_PAYSAGE, paysage } from './plongeon-paysage';
 import { tablier } from './plongeon-pont';
@@ -64,6 +65,7 @@ export class RenduPlongeon {
     );
 
     const alea = tirage(v.manche);
+    dessineCascade(ctx, ex, ey, tick);
     this.reflets(ctx, ex, ey, tick);
     this.public(ctx, v, ex, ey, tick);
     if (v.etape === 'visee') {

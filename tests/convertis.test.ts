@@ -8,6 +8,8 @@ import {
   genresEmpiles,
   HAUTEUR_SPRITE,
   LARGEUR_SPRITE,
+  melange,
+  PAS_SPRITES,
 } from '../src/ui/pile-convertis';
 
 describe('l’écran des convertis', () => {
@@ -19,10 +21,21 @@ describe('l’écran des convertis', () => {
     expect(genresEmpiles([])).toEqual([]);
   });
 
-  it('les sprites se chevauchent de moitié, en ligne, et tiennent tous dans l’image, quel que soit leur nombre', () => {
+  it('les types sont mélangés, toujours dans le même ordre pour la même pile', () => {
+    const c = GENRES_CONVERTIS.map(() => 0);
+    c[GENRES_CONVERTIS.indexOf(G.FETARD)] = 8;
+    c[GENRES_CONVERTIS.indexOf(G.VIDEUR)] = 8;
+    const pile = genresEmpiles(c);
+    const m = melange(pile);
+    expect(m).toEqual(melange(pile));
+    expect(m).not.toEqual(pile);
+    expect([...m].sort()).toEqual([...pile].sort());
+  });
+
+  it('les sprites se touchent presque, en ligne, et tiennent tous dans l’image, quel que soit leur nombre', () => {
     const un = dispose(2, 900, 300);
     expect(un.echelle).toBe(3);
-    expect(un.positions[1]![0] - un.positions[0]![0]).toBe((LARGEUR_SPRITE * 3) / 2); // recouvert de moitié
+    expect(un.positions[1]![0] - un.positions[0]![0]).toBe(Math.round(LARGEUR_SPRITE * 3 * PAS_SPRITES)); // à peine recouvert
     expect(un.positions[1]![1]).toBe(un.positions[0]![1]); // sur la même ligne
     for (const n of [1, 12, 80, 400, 3000]) {
       const d = dispose(n, 600, 180);
@@ -42,9 +55,9 @@ describe('l’écran des convertis', () => {
     const lignes = [...new Set(d.positions.map(([, y]) => y))].sort((a, b) => a - b);
     expect(lignes.length).toBeGreaterThan(1);
     for (let k = 1; k < lignes.length; k++) expect(lignes[k]! - lignes[k - 1]!).toBeGreaterThan(h); // pas de recouvrement vertical
-    // et la pile garde son recouvrement de moitié : l'écart d'un sprite au suivant, sur une ligne
+    // et d'un sprite au suivant, sur une ligne, l'écart n'est jamais plus grand que la largeur
     const [a, b] = [d.positions[0]!, d.positions[1]!];
-    expect(b[0] - a[0]).toBe((LARGEUR_SPRITE * d.echelle) / 2);
+    expect(b[0] - a[0]).toBeLessThanOrEqual(LARGEUR_SPRITE * d.echelle);
   });
 
   it('le temps de la run s’écrit minutes:secondes', () => {

@@ -16,7 +16,7 @@ const VERTS = ['#2f5a2a', '#3a6a30', '#4a7a36', '#5a8a3c', '#3f7030'];
 const CLAIRS = ['#7aaa48', '#8ab850', '#6a9a40'];
 /** Le haut des rives (m), sous les culées du pont, et la cascade de droite (de haut en bas). */
 const HAUT_RIVE = 4;
-const CASCADE = [HAUTEUR - 17, HAUTEUR - 1] as const;
+export const CASCADE = [HAUTEUR - 17, HAUTEUR - 1] as const;
 
 /** Où commence la rive, à la hauteur y (m) : le feuillage avance et recule. */
 export const faceRive = (y: number, cote: number): number =>
@@ -92,35 +92,23 @@ function rive(c: Ctx, r: Aleatoire, cote: number): void {
   }
 }
 
-/** La cascade de droite : un voile d'eau blanche sur la mousse sombre, qui écume sur une vasque de tuf en bas. */
-function cascade(c: Ctx, r: Aleatoire): void {
+/** La cascade de droite, vue de l'image peinte : la roche sombre et mouillée, une nappe d'eau claire, la vasque de tuf (le
+ *  mouvement de l'eau est dessiné à chaque image : voir plongeon-cascade.ts). */
+function cascade(c: Ctx): void {
   const [haut, bas] = CASCADE;
   for (let y = haut; y < bas; y += 0.25) {
     const face = faceRive(y, 1);
     rect(c, px(face + 0.3), py(y), 2.6 * S, S / 4 + 1, '#1e2e22');
-  }
-  for (let i = 0; i < 70; i++) {
-    const x = px(faceRive(haut, 1) + r.entre(0.4, 2.8));
-    const y = py(haut + r.entre(0, 3));
-    rect(
-      c,
-      x,
-      y,
-      1,
-      py(bas) - y,
-      r.choix(['rgba(255,255,255,0.7)', 'rgba(210,240,240,0.6)', 'rgba(255,255,255,0.45)']),
-    );
+    rect(c, px(face + 0.3), py(y), 2.6 * S, S / 4 + 1, 'rgba(150,205,220,0.3)');
   }
   rect(c, px(faceRive(bas, 1)), py(bas) - 4, 3.2 * S, 6, '#d4b878');
-  c.fillStyle = 'rgba(255,255,255,0.85)';
-  for (let k = 0; k < 14; k++) disque(c, px(faceRive(bas, 1) + r.entre(0.3, 3)), py(bas) - 3, r.entier(1, 3));
 }
 
 /** Les deux rives, la cascade, et des branches feuillues qui encadrent le pont en haut, devant lui. */
 export function peintRives(c: Ctx, r: Aleatoire): void {
   rive(c, r, -1);
   rive(c, r, 1);
-  cascade(c, r);
+  cascade(c);
   for (const cote of [-1, 1])
     for (let k = 0; k < 26; k++) {
       const y = r.entre(-7, 3);

@@ -12,8 +12,8 @@ import { px, py, rect, S, XM, YH } from './plongeon-monde';
 type Ctx = CanvasRenderingContext2D;
 
 /** La demi-ouverture de l'arche (m), la hauteur de sa naissance et de sa clé sous le tablier, l'épaisseur de l'anneau. */
-const DEMI = 7.2;
-const NAISSANCE = 8;
+export const DEMI = 7.2;
+export const NAISSANCE = 8;
 const CLE = 0.9;
 const ANNEAU = 0.7;
 /** Jusqu'où vont les culées, de part et d'autre, et jusqu'à quelle profondeur. */
@@ -27,10 +27,10 @@ export const tablier = (x: number): number =>
   -1.15 + (Math.abs(x) < ARRONDI ? PENTE * ((x * x) / (2 * ARRONDI) + ARRONDI / 2) : pente(x));
 
 /** L'intrados de l'arche à `x` (m), ou rien hors de l'ouverture. */
-const intrados = (x: number): number =>
+export const intrados = (x: number): number =>
   Math.abs(x) >= DEMI ? Infinity : NAISSANCE - (NAISSANCE - CLE) * Math.sqrt(1 - (x / DEMI) ** 2);
 
-const PIERRES = ['#b4af9e', '#a39d8a', '#c2bdac', '#958f7b', '#aca38a', '#b9ac90', '#8f8a78'];
+export const PIERRES = ['#b4af9e', '#a39d8a', '#c2bdac', '#958f7b', '#aca38a', '#b9ac90', '#8f8a78'];
 
 /** Une pierre brute : un bloc irrégulier, une arête claire en haut, un joint sombre autour. */
 function pierre(c: Ctx, r: Aleatoire, x: number, y: number, w: number, h: number): void {
@@ -51,6 +51,11 @@ function mousse(c: Ctx, r: Aleatoire, x: number, y: number, n: number, sombre: b
 }
 
 export function peintPont(c: Ctx, r: Aleatoire): void {
+  // le mortier, plein : sous les pierres, la maçonnerie n'a jamais de jour (on ne voit le ciel que sous l'arche)
+  for (let x = -CULEE; x < CULEE; x += 1 / S) {
+    const haut = py(tablier(x));
+    rect(c, px(x), haut, 1, (Math.abs(x) < DEMI ? py(intrados(x)) : py(PIED)) - haut, '#6e6858');
+  }
   // la maçonnerie : des rangs de pierres brutes, du tablier aux culées, en laissant l'arche vide
   for (let y = py(-1.2); y < py(PIED); y += r.entier(4, 6)) {
     let x = px(-CULEE) + r.entier(-4, 0);

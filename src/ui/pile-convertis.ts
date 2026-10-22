@@ -1,12 +1,15 @@
 import { GENRES_CONVERTIS, type Genre } from '../jeu/vue';
+import { Aleatoire } from '../moteur/maths';
 
 /** La case d'un sprite, en pixels du jeu (l'ennemi y est debout, les pieds à 2 pixels du bas). */
 export const LARGEUR_SPRITE = 40;
 export const HAUTEUR_SPRITE = 44;
 /** Le temps pour faire apparaître toute la pile, et l'écart minimal et maximal entre deux sprites (millisecondes). */
-export const DUREE_PILE = 2400;
+export const DUREE_PILE = 5500;
 export const ECART_MIN = 6;
-export const ECART_MAX = 110;
+export const ECART_MAX = 380;
+/** Le pas d'un sprite au suivant, en part de leur largeur, tant que la place le permet : ils se touchent presque sans se couvrir. */
+export const PAS_SPRITES = 0.85;
 /** La marge entre deux lignes de la pile, en pixels du jeu. */
 export const MARGE_LIGNES = 4;
 
@@ -20,12 +23,12 @@ export interface Disposition {
 }
 
 /**
- * Où poser `n` sprites dans une image de `largeur` × `hauteur` : en ligne, chacun recouvrant le précédent de moitié ; quand la
+ * Où poser `n` sprites dans une image de `largeur` × `hauteur` : en ligne, chacun recouvrant à peine le précédent ; quand la
  * ligne est pleine, une autre commence plus bas, séparée de la première par une petite marge. Plus il y en a, plus on réduit les
- * sprites (en gardant le recouvrement de moitié tant que c'est possible), puis on les recouvre davantage, pour que tous tiennent.
+ * sprites (en gardant PAS_SPRITES tant que c'est possible), puis on les recouvre davantage, pour que tous tiennent.
  */
 export function dispose(n: number, largeur: number, hauteur: number): Disposition {
-  const essais = [0.5, 0.35, 0.25, 0.15, 0.08].flatMap((f) =>
+  const essais = [PAS_SPRITES, 0.65, 0.5, 0.35, 0.25, 0.15, 0.08].flatMap((f) =>
     [3, 2.5, 2, 1.5, 1].map((e) => [e, f] as const),
   );
   let choix: Disposition = { echelle: 1, positions: [], hauteur: 0 };
@@ -58,6 +61,17 @@ export function genresEmpiles(convertis: readonly number[]): Genre[] {
   return GENRES_CONVERTIS.flatMap((genre, i) =>
     Array<Genre>(Math.max(0, convertis[i] ?? 0)).fill(genre as Genre),
   );
+}
+
+/** Mélange les genres, toujours dans le même ordre pour la même pile (hôte et invités voient la même chose). */
+export function melange(genres: readonly Genre[]): Genre[] {
+  const r = new Aleatoire(genres.length * 7919 + 17);
+  const m = [...genres];
+  for (let i = m.length - 1; i > 0; i--) {
+    const j = r.entier(0, i);
+    [m[i], m[j]] = [m[j]!, m[i]!];
+  }
+  return m;
 }
 
 /** « 3:07 » : le temps de la run. */

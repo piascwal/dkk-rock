@@ -102,7 +102,7 @@ Partie), le rendu en vue arrière (sol projeté comme en « mode 7 », panorama 
 **Le saut du pont des Tuves** (juste après le pont) : vu de face, façon Doodle Jump mais en chute. Le vieux pont en dos
 d'âne pointu, de pierres brutes, moussu et mangé de lierre (exagérément haut : 60 m), et sous lui rien que le paysage, qui défile
 moins vite : le ciel, les collines et Saint-Cézaire sur sa crête, les pentes boisées, la Siagne turquoise en amont et ses vasques
-de tuf ; de part et d'autre, des rives de feuillage, de tuf et de mousse, et une cascade en voile jusqu'à la rivière.
+de tuf ; de part et d'autre, des rives de feuillage, de tuf et de mousse, et une cascade dont l'eau coule en filets jusqu'à la vasque. Ce même pont se retrouve au loin, sur la rivière, dans le fond du niveau des Tuves.
 D'abord un survol montre la rivière et son trou d'eau (à retenir : on ne le revoit plus avant l'arrivée ; un appui le passe).
 Tom, en jean, se place sur le dos d'âne (GAUCHE / DROITE), puis tend ses jambes comme un élastique : joystick tiré vers le bas
 (ou SAUT tenu), il se ramasse et une flèche montre l'impulsion ; la tension monte, mais tenue trop longtemps les jambes flanchent
@@ -203,8 +203,9 @@ validé.
   se cogne dessous en sautant de mur en mur) et une annexe fermée à droite ; chacun a sa porte sur l'étage, il faut passer par
   l'intérieur (`_avancees` dans `outils/niveaux/structures.py`).
   **Fin de niveau :** quand le camping-car a disparu, l'écran des _convertis au rock_ (`ui/convertis.ts`) empile en ligne les sprites des
-  ennemis convertis, chevauchés de moitié (une autre ligne passe devant quand elle est pleine ; `ui/pile-convertis.ts`), qui
-  apparaissent l'un après l'autre à toute vitesse avec un éclat chacun ; en dessous, le temps de la run, le score et le total
+  ennemis convertis, mélangés (toujours dans le même ordre pour une même pile) et à peine chevauchés (une autre ligne
+  passe dessous quand elle est pleine ; `ui/pile-convertis.ts`), qui apparaissent l'un après l'autre en cinq ou six secondes
+  avec un éclat chacun ; en dessous, le temps de la run, le score et le total
   (« selon les DKK »). Tout vient de la vue (`EtatVue.convertis`, `temps` : protocole v22), donc chez tous les joueurs ; un
   premier toucher finit la pile, le suivant passe au récit. La carte du monde entre deux niveaux ne remet pas le brouillard sur
   les niveaux déjà faits un jour (`etatsDuTrajet`, `niveaux/arcs.ts`).

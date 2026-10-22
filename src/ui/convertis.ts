@@ -14,12 +14,13 @@ import {
   dispose,
   formateTemps,
   genresEmpiles,
+  melange,
   type Disposition,
 } from './pile-convertis';
 
 /**
- * L'écran de fin de niveau, façon Broforce : tous les ennemis « convertis au rock » en une pile, les sprites chevauchés de
- * moitié, qui apparaissent l'un après l'autre à toute vitesse, chacun avec un petit éclat comme quand on le met au tapis ; en
+ * L'écran de fin de niveau, façon Broforce : tous les ennemis « convertis au rock » en une pile, les sprites mélangés et à peine
+ * chevauchés, qui apparaissent l'un après l'autre en cinq ou six secondes, chacun avec un petit éclat comme quand on le met au tapis ; en
  * dessous, le temps de la run et le score. Selon les DKK, du moins : les intéressés n'ont pas été consultés. La liste vient de la
  * vue (`EtatVue.convertis`), donc chez tous les joueurs.
  */
@@ -78,7 +79,7 @@ export class Convertis {
   /** Construit l'écran dans `element` et lance la pile. `temps` : la run, en secondes ; `score` : celui de la partie. */
   affiche(element: HTMLElement, convertis: readonly number[], temps = 0, score = 0): void {
     this.arrete();
-    this.genres = genresEmpiles(convertis);
+    this.genres = melange(genresEmpiles(convertis));
     this.score = score;
     this.particules = new Particules();
     this.portraits.clear();
