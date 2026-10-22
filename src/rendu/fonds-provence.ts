@@ -200,8 +200,7 @@ function siagne(c: Ctx, r: Aleatoire): void {
     rect(c, x - 3, 232, w + 6, 1, 'rgba(255,255,255,0.8)');
   }
   // le pont des Tuves, au loin, celui du concours de plongeon : la rivière coule dessous
-  pontLointain(c, r, 200, 232);
-  pontLointain(c, r, 700, 232);
+  pontLointain(c, r, 480, 232);
   // une cascade de loin en loin : une coulée blanche depuis la falaise, un bouillon d'écume en bas
   for (let x = r.entier(60, 200); x < L; x += r.entier(300, 420)) {
     rect(c, x - 10, 176, 26, 40, '#b8ae94');
