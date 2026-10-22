@@ -35,7 +35,18 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// la page et version.json : le réseau d'abord (pour voir les mises à jour), le cache si on est hors ligne ;
+// un réseau lent ou capricieux ne doit pas bloquer le jeu : au-delà de ce délai, on sert le cache
+const DELAI_RESEAU = 3000;
+const avecDelai = (promesse) =>
+  new Promise((ok, ko) => {
+    const minuteur = setTimeout(() => ko(new Error('réseau trop lent')), DELAI_RESEAU);
+    promesse.then(
+      (r) => (clearTimeout(minuteur), ok(r)),
+      (err) => (clearTimeout(minuteur), ko(err)),
+    );
+  });
+
+// la page et version.json : le réseau d'abord (pour voir les mises à jour), le cache si on est hors ligne ou si le réseau traîne ;
 // tout le reste (fichiers à empreinte, sprites) : le cache d'abord
 // la version courante d'abord : `caches.match` seul fouille les caches dans l'ordre de leur création, et ressortirait
 // l'ancien sprite (même nom de fichier) de la version précédente, que l'on garde
@@ -57,7 +68,7 @@ self.addEventListener('fetch', (e) => {
     // « no-cache » : sans ça, le navigateur peut ressortir une page de sa mémoire (GitHub Pages la garde 10 minutes)
     // qui réclame les fichiers d'une version déjà effacée : écran vide
     e.respondWith(
-      fetch(req.url, { cache: 'no-cache', credentials: 'same-origin' }).catch(() =>
+      avecDelai(fetch(req.url, { cache: 'no-cache', credentials: 'same-origin' })).catch(() =>
         trouve(req).then((r) => r || caches.match('./')),
       ),
     );

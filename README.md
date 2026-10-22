@@ -136,7 +136,10 @@ Fadatchi pour icône, et il se joue hors ligne (seul : jouer à plusieurs demand
 écran est demandé au premier toucher, sur l'écran d'intro.
 
 Un service worker (`sw.js`, généré au déploiement d'après `outils/sw-modele.js`) garde tous les fichiers en cache ; la
-page et `version.json` passent par le réseau d'abord, pour que les mises à jour soient vues.
+page et `version.json` passent par le réseau d'abord, pour que les mises à jour soient vues. Mais si le réseau ne répond
+pas en trois secondes (ou pas du tout, hors ligne), on sert la copie du cache : le jeu démarre quand même. Le filet de
+secours (`public/secours.js`, qui vide le cache au bout de six secondes si le jeu n'a pas démarré) ne touche plus au cache
+hors ligne. Seule une toute première ouverture, sans aucun cache, a besoin du réseau.
 
 ## Version et mise à jour
 
