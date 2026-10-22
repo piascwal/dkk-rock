@@ -54,7 +54,7 @@ export interface DefNiveau {
   /** le van décolle à la fin du niveau, à la force de son réacteur, au lieu de partir sur la route (un sommet) */
   envol?: boolean;
   /** un mini-jeu à la place du niveau de plateforme (l'intro lue, il commence ; voir jeu/drift.ts) */
-  miniJeu?: 'drift' | 'plongeon';
+  miniJeu?: 'drift' | 'plongeon' | 'reve';
   /** le décor placé à la main (nom d'accessoire, colonne, rangée du sol) : il remplace le décor semé au hasard */
   decor?: readonly (readonly [string, number, number])[];
   /** le décor placé à la main s'ajoute au semis au hasard au lieu de le remplacer (Saint-Cézaire, les gorges de la Siagne) */

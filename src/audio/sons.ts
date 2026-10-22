@@ -143,6 +143,23 @@ const SONS: Record<string, Son> = {
     s.bruit({ duree: 0.5, volume: 0.28 * v, passeBas: 1400 });
     s.note({ freq: 220, vers: 70, duree: 0.25, type: 'sine', volume: 0.2 * v });
   },
+  // le rêve de JBT : une pile ramassée, un choc électrique, une étoile filante, le réveil qui sonne
+  tintement: (s, v) => s.note({ freq: 1320, vers: 1980, duree: 0.06, type: 'sine', volume: 0.07 * v }),
+  zap: (s, v) => {
+    s.note({ freq: 1200, vers: 90, duree: 0.25, type: 'sawtooth', volume: 0.12 * v });
+    s.bruit({ duree: 0.2, volume: 0.12 * v, passeHaut: 3000 });
+  },
+  fuse: (s, v) => s.bruit({ duree: 0.35, volume: 0.07 * v, passeHaut: 3500 }),
+  reveil: (s, v) =>
+    [0, 1, 2, 3, 4, 5, 6, 7].forEach((i) =>
+      s.note({
+        freq: i % 2 ? 1760 : 2093,
+        duree: 0.07,
+        type: 'square',
+        volume: 0.06 * v,
+        quand: (s.ctx?.currentTime ?? 0) + i * 0.08,
+      }),
+    ),
   tyrolienne: (s, v) => s.bruit({ duree: 0.4, volume: 0.06 * v, passeHaut: 2500 }),
   rugissement: (s, v) => {
     s.note({ freq: 90, vers: 60, duree: 0.8, type: 'sawtooth', volume: 0.2 * v, filtre: 600 });

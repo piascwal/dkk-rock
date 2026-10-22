@@ -1,3 +1,4 @@
+import type { VueReve } from './vue-reve';
 /**
  * Ce que l'on voit de la partie : la simulation (sur l'hôte) le produit à
  * chaque pas, le rendu le dessine et le réseau le transmet aux autres joueurs.
@@ -149,7 +150,7 @@ export interface JoueurVue {
 
 /** `carte` : entre deux niveaux, le van roule sur la carte du monde (`page` compte alors les ticks du trajet). */
 export type Phase =
-  'histoire' | 'jeu' | 'convertis' | 'bilan' | 'fin' | 'perdu' | 'carte' | 'drift' | 'plongeon';
+  'histoire' | 'jeu' | 'convertis' | 'bilan' | 'fin' | 'perdu' | 'carte' | 'drift' | 'plongeon' | 'reve';
 
 export const PHASES: readonly Phase[] = [
   'histoire',
@@ -161,6 +162,7 @@ export const PHASES: readonly Phase[] = [
   'convertis',
   'drift',
   'plongeon',
+  'reve',
 ];
 
 /** Les étapes du concours de drift (`VueDrift.etape`) : le choix du pilote, le compte à rebours, la minute, le score, le podium. */
@@ -284,6 +286,8 @@ export interface EtatVue {
   drift?: VueDrift;
   /** le concours de plongeon, pendant la phase `plongeon` */
   plongeon?: VuePlongeon;
+  /** le rêve de JBT, pendant la phase `reve` */
+  reve?: VueReve;
 }
 
 /** Ce qui se passe une fois (son, explosion, texte flottant, dialogue) : envoyé de façon fiable. */

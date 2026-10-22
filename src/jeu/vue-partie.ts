@@ -72,5 +72,6 @@ export function construitVue(p: Partie): EtatVue {
     entites,
     ...(p.phase === 'drift' && p.drift ? { drift: p.drift.vue() } : {}),
     ...(p.phase === 'plongeon' && p.plongeon ? { plongeon: p.plongeon.vue() } : {}),
+    ...(p.phase === 'reve' && p.reve ? { reve: p.reve.vue() } : {}),
   };
 }

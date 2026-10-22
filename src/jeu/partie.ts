@@ -1,12 +1,5 @@
-import {
-  BPM,
-  DELAI_REAPPARITION,
-  HEROS_HAUTEUR,
-  HEROS_LARGEUR,
-  MAX_JOUEURS,
-  TICKS_PAR_SECONDE,
-  TUILE,
-} from '../config';
+import { BPM, DELAI_REAPPARITION, HEROS_HAUTEUR, HEROS_LARGEUR } from '../config';
+import { MAX_JOUEURS, TICKS_PAR_SECONDE, TUILE } from '../config';
 import { Aleatoire } from '../moteur/maths';
 import { Carte } from '../monde/carte';
 import { Joueur } from '../entites/joueur';
@@ -22,7 +15,8 @@ import type { Camp, Cible, Contexte, EntiteSimulee, Tyrolienne } from './context
 import { explose } from './explosions';
 import { zoneVisible } from './zone-visible';
 import { declencheAssauts } from './assauts';
-import { majMiniJeux, PHASES_MINI_JEUX, type ConcoursDrift, type ConcoursPlongeon } from './mini-jeux';
+import { majMiniJeux, PHASES_MINI_JEUX } from './mini-jeux';
+import type { ConcoursDrift, ConcoursPlongeon, ConcoursReve } from './mini-jeux';
 import { ouvreBarrieres, peuple, releveCarte } from './chargement';
 import { changePhase } from './phases';
 import { majTraversee, prepareTraversee, type Traversee } from './traversee';
@@ -53,9 +47,10 @@ export class Partie implements Contexte {
   tyroliennes: Tyrolienne[] = [];
   /** la traversée en ferry du niveau du port, une fois embarqué (voir traversee.ts) */
   traversee: Traversee | null = null;
-  /** les mini-jeux (voir mini-jeux.ts) : le concours de drift du pré du Clos, le plongeon du pont des Tuves, pendant leur phase */
+  /** les mini-jeux (voir mini-jeux.ts) : le drift du pré du Clos, le plongeon du pont des Tuves, le rêve de JBT, pendant leur phase */
   drift: ConcoursDrift | null = null;
   plongeon: ConcoursPlongeon | null = null;
+  reve: ConcoursReve | null = null;
   entites: EntiteSimulee[] = [];
   readonly joueurs: (Joueur | null)[] = Array<Joueur | null>(MAX_JOUEURS).fill(null);
   readonly rng = new Aleatoire(Date.now() & 0xffff);
@@ -213,7 +208,7 @@ export class Partie implements Contexte {
     this.van = null;
     this.dejaDit = new Set();
     this.assautsFaits = new Set();
-    this.drift = this.plongeon = null;
+    this.drift = this.plongeon = this.reve = null;
     peuple(this);
     prepareTraversee(this);
     // un nouveau niveau, ou une reprise : tout le monde repart du départ, pas de là où il était

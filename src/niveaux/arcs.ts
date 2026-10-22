@@ -28,10 +28,10 @@ export const ARCS: DefArc[] = [
     titre: 'La tournée',
     resume: 'De Saint-Cézaire au Club Infini : débrancher DJ Boucle.',
     // Saint-Cézaire, le pré du Clos (le concours de drift, niveau 11), le pont des Tuves (niveau 12 de la liste), son saut (le
-    // concours de plongeon, niveau 13), puis la route des Alpes : les derniers venus gardent la fin de la liste pour ne pas
-    // décaler les sauvegardes ; les deux mini-jeux peuvent se laisser de côté
-    niveaux: [0, 11, 12, 13, 1, 2, 3, 4, 5],
-    facultatifs: [11, 13],
+    // concours de plongeon, niveau 13), puis la route des Alpes ; entre la Ville et le Club, le rêve de JBT (niveau 14) : les
+    // derniers venus gardent la fin de la liste pour ne pas décaler les sauvegardes ; les mini-jeux peuvent se laisser de côté
+    niveaux: [0, 11, 12, 13, 1, 2, 3, 4, 14, 5],
+    facultatifs: [11, 13, 14],
     fin: FIN_TOURNEE,
   },
   {

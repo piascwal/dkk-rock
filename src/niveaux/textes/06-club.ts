@@ -3,7 +3,7 @@ import type { DefNiveau } from '../format';
 export const CLUB: Omit<DefNiveau, 'carte'> = {
   id: 'club',
   titre: 'Le Club Infini',
-  sousTitre: 'Niveau 9 — Le morceau qui ne finit jamais',
+  sousTitre: 'Niveau 10 — Le morceau qui ne finit jamais',
   theme: 'club',
   intro: [
     {

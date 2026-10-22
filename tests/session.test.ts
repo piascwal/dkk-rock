@@ -106,7 +106,7 @@ describe('une session à plusieurs', () => {
     expect(client.carte.get(20, 18)).toBe(T.VIDE);
     partie.termineNiveau();
     const miniJeu = () => partie.phase === 'histoire' && partie.lu.def.miniJeu !== undefined;
-    while (['convertis', 'bilan', 'carte', 'drift', 'plongeon'].includes(partie.phase) || miniJeu()) {
+    while (['convertis', 'bilan', 'carte', 'drift', 'plongeon', 'reve'].includes(partie.phase) || miniJeu()) {
       // après Saint-Cézaire, le pré du Clos et son concours de drift : on le termine d'office (le plongeon aussi)
       if (partie.phase === 'drift') {
         partie.drift!.fini = true;

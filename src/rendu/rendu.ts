@@ -23,6 +23,7 @@ import { TraitsPersos } from './traits-persos';
 import { RenduNavire } from './navire';
 import { RenduDrift } from './drift';
 import { RenduPlongeon } from './plongeon';
+import { RenduReve } from './reve';
 import { CABRE, flammeReacteur, TUYERE } from './reacteur';
 import { geometrieNavire } from '../niveaux/navire';
 
@@ -45,6 +46,8 @@ export class Rendu {
   private readonly drift = new RenduDrift();
   /** le concours de plongeon du pont des Tuves (phase `plongeon`) */
   private readonly plongeon = new RenduPlongeon();
+  /** le rêve de JBT (phase `reve`) */
+  private readonly reve = new RenduReve();
   /** largeur de la vue en pixels du jeu (la hauteur est fixe, la largeur suit la forme de l'écran) */
   largeur = 480;
   theme: Theme = THEMES.garage;
@@ -205,6 +208,10 @@ export class Rendu {
     }
     if (vue.phase === 'plongeon' && vue.plongeon) {
       this.plongeon.dessine(ctx, vue.plongeon, this.largeur, this.tick);
+      return;
+    }
+    if (vue.phase === 'reve' && vue.reve) {
+      this.reve.dessine(ctx, vue.reve, this.largeur, this.tick);
       return;
     }
     this.prepareNiveau(vue.niveau);

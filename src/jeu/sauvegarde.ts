@@ -30,6 +30,8 @@ export interface Sauvegarde {
   recordDrift: number;
   /** le record du plongeon du pont des Tuves : la meilleure note (0 à 100) */
   recordPlongeon: number;
+  /** le record du rêve de JBT : le meilleur score (les piles, et la lune) */
+  recordReve: number;
 }
 
 const CLE = 'dkk-rock.sauvegarde';
@@ -45,6 +47,7 @@ export const SAUVEGARDE_VIDE: Sauvegarde = {
   qualite: 'auto',
   recordDrift: 0,
   recordPlongeon: 0,
+  recordReve: 0,
 };
 
 const entier = (v: unknown, min: number, max: number, defaut: number): number =>
@@ -85,6 +88,7 @@ export function valideSauvegarde(brut: unknown, nbNiveaux: number): Sauvegarde {
     qualite: o.qualite === 'max' || o.qualite === 'eco' ? o.qualite : 'auto',
     recordDrift: pourcent(o.recordDrift),
     recordPlongeon: pourcent(o.recordPlongeon),
+    recordReve: entier(o.recordReve, 0, 65534, 0),
   };
 }
 
@@ -124,13 +128,26 @@ export function retiensRecordPlongeon(s: Sauvegarde, scores: readonly (number | 
   return true;
 }
 
-/** Les records des mini-jeux, d'après la vue (le drift ou le plongeon en cours). Vrai si l'un est battu (à enregistrer). */
+/** Garde le meilleur score du rêve de JBT. Vrai s'il est battu (à enregistrer). */
+export function retiensRecordReve(s: Sauvegarde, scores: readonly (number | null)[]): boolean {
+  const meilleur = Math.max(0, ...scores.map((x) => x ?? 0));
+  if (meilleur <= s.recordReve) return false;
+  s.recordReve = meilleur;
+  return true;
+}
+
+/** Les records des mini-jeux, d'après la vue (le drift, le plongeon ou le rêve en cours). Vrai si l'un est battu (à enregistrer). */
 export function retiensRecords(
   s: Sauvegarde,
-  v: { drift?: { scores: ({ pourcent: number } | null)[] }; plongeon?: { scores: (number | null)[] } },
+  v: {
+    drift?: { scores: ({ pourcent: number } | null)[] };
+    plongeon?: { scores: (number | null)[] };
+    reve?: { scores: (number | null)[] };
+  },
 ): boolean {
   return (
     (!!v.drift && retiensRecordDrift(s, v.drift.scores)) ||
-    (!!v.plongeon && retiensRecordPlongeon(s, v.plongeon.scores))
+    (!!v.plongeon && retiensRecordPlongeon(s, v.plongeon.scores)) ||
+    (!!v.reve && retiensRecordReve(s, v.reve.scores))
   );
 }

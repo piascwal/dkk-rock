@@ -11,7 +11,7 @@ export class Hud {
 
   maj(v: EtatVue, siegeLocal: number, noms: string[]): void {
     // pendant un mini-jeu (drift, plongeon), le chrono et le score sont dans le canvas : pas de HUD des héros
-    this.element.hidden = v.phase === 'drift' || v.phase === 'plongeon';
+    this.element.hidden = v.phase === 'drift' || v.phase === 'plongeon' || v.phase === 'reve';
     const joueurs = v.joueurs
       .map((j, s) => {
         if (!j.present) return '';

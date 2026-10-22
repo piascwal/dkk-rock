@@ -7,7 +7,7 @@ import { Clavier, commandesManette } from './entrees/clavier';
 import { Tactile } from './entrees/tactile';
 import { iconeDeLArme } from './ui/icones-hud';
 import { C } from './jeu/commandes';
-import { nouveauMiniJeu, type MiniJeu } from './jeu/mini-jeux';
+import { BOUTON_MINI_JEU, nouveauMiniJeu, PHASES_MINI_JEUX, type MiniJeu } from './jeu/mini-jeux';
 import { Partie } from './jeu/partie';
 import { charge, enregistre, retiensRecords, type Progression, type Sauvegarde } from './jeu/sauvegarde';
 import type { EtatVue, Evenement } from './jeu/vue';
@@ -30,7 +30,7 @@ import { verifieVersion } from './version';
 
 const PAS_MS = 1000 / 60;
 /** Les phases où SAUT et TIR servent au jeu (les mini-jeux passent leurs écrans eux-mêmes) : ils ne tournent pas les pages. */
-const EN_ACTION: ReadonlySet<string> = new Set(['jeu', 'drift', 'plongeon']);
+const EN_ACTION: ReadonlySet<string> = new Set(['jeu', ...PHASES_MINI_JEUX]);
 const $ = (id: string) => document.getElementById(id)!;
 
 /**
@@ -342,7 +342,7 @@ export class App implements Actions {
     if (retiensRecords(this.sauvegarde, v)) this.enregistre();
     this.hud.maj(v, siege, noms);
     const moi = v.joueurs[siege];
-    this.tactile.pilote(v.phase === 'drift' ? 'GAZ' : v.phase === 'plongeon' ? 'PLONGE' : null);
+    this.tactile.pilote(BOUTON_MINI_JEU[v.phase] ?? null);
     this.tactile.arme(moi?.present && moi.arme ? iconeDeLArme(moi.arme, 34) : null, moi?.munitions ?? 0);
     this.histoire.maj(v);
     const theme = this.rendu.theme.musique;

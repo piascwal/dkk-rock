@@ -1,6 +1,7 @@
 import { MAX_JOUEURS } from '../config';
 import { decodeDrift, encodeDrift, OCTETS_DRIFT } from './protocole-drift';
 import { decodePlongeon, encodePlongeon, OCTETS_PLONGEON } from './protocole-plongeon';
+import { decodeReve, encodeReve, OCTETS_REVE } from './protocole-reve';
 import {
   GENRES_CONVERTIS,
   PHASES,
@@ -22,7 +23,7 @@ import {
  *
  * Changer ce fichier de façon incompatible : augmenter VERSION_PROTOCOLE.
  */
-export const VERSION_PROTOCOLE = 24;
+export const VERSION_PROTOCOLE = 25;
 export const APP_DKK = { id: 'dkk-rock', version: VERSION_PROTOCOLE };
 
 const TYPE_ETAT = 1;
@@ -35,13 +36,15 @@ export function encodeEtat(v: EtatVue): ArrayBuffer {
   const n = v.entites.length;
   const drift = v.phase === 'drift' && v.drift ? v.drift : null;
   const plongeon = v.phase === 'plongeon' && v.plongeon ? v.plongeon : null;
+  const reve = v.phase === 'reve' && v.reve ? v.reve : null;
   const buf = new ArrayBuffer(
     OCTETS_ENTETE +
       MAX_JOUEURS * OCTETS_JOUEUR +
       2 +
       n * OCTETS_ENTITE +
       (drift ? OCTETS_DRIFT : 0) +
-      (plongeon ? OCTETS_PLONGEON : 0),
+      (plongeon ? OCTETS_PLONGEON : 0) +
+      (reve ? OCTETS_REVE : 0),
   );
   const d = new DataView(buf);
   let o = 0;
@@ -92,6 +95,7 @@ export function encodeEtat(v: EtatVue): ArrayBuffer {
   }
   if (drift) encodeDrift(d, o, drift);
   if (plongeon) encodePlongeon(d, o, plongeon);
+  if (reve) encodeReve(d, o, reve);
   return buf;
 }
 
@@ -143,7 +147,8 @@ export function decodeEtat(buf: ArrayBuffer): EtatVue | null {
   o += 2;
   const avecDrift = phase === 'drift';
   const avecPlongeon = phase === 'plongeon';
-  const suite = avecDrift ? OCTETS_DRIFT : avecPlongeon ? OCTETS_PLONGEON : 0;
+  const avecReve = phase === 'reve';
+  const suite = avecDrift ? OCTETS_DRIFT : avecPlongeon ? OCTETS_PLONGEON : avecReve ? OCTETS_REVE : 0;
   if (buf.byteLength !== o + n * OCTETS_ENTITE + suite) return null;
   const entites: EntiteVue[] = [];
   for (let i = 0; i < n; i++) {
@@ -172,6 +177,8 @@ export function decodeEtat(buf: ArrayBuffer): EtatVue | null {
   if (avecDrift && !drift) return null;
   const plongeon = avecPlongeon ? decodePlongeon(d, o) : null;
   if (avecPlongeon && !plongeon) return null;
+  const reve = avecReve ? decodeReve(d, o) : null;
+  if (avecReve && !reve) return null;
   return {
     tick,
     phase,
@@ -189,6 +196,7 @@ export function decodeEtat(buf: ArrayBuffer): EtatVue | null {
     entites,
     ...(drift ? { drift } : {}),
     ...(plongeon ? { plongeon } : {}),
+    ...(reve ? { reve } : {}),
   };
 }
 

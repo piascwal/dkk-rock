@@ -6,6 +6,7 @@ import { ARCS, niveauOuvert } from '../niveaux/arcs';
 import { NIVEAU_DRIFT } from '../jeu/drift';
 import type { MiniJeu } from '../jeu/mini-jeux';
 import { NIVEAU_PLONGEON } from '../jeu/plongeon';
+import { NIVEAU_REVE } from '../jeu/reve';
 import type { AnnonceDkk } from '../reseau/annonce';
 import { Recherche } from '../reseau/client';
 import type { Hote } from '../reseau/hote';
@@ -116,6 +117,8 @@ export class Menus {
     const plongeon = niveauOuvert(NIVEAU_PLONGEON, s.faits);
     const record = `Record du pré : ${s.recordDrift.toFixed(1).replace('.', ',')} % de pelouse saccagée.`;
     const recordSaut = `Record du pont : ${s.recordPlongeon} % de précision.`;
+    const reve = niveauOuvert(NIVEAU_REVE, s.faits);
+    const recordReve = `Record du rêve : ${s.recordReve} points.`;
     this.montre(
       el('h2', 'Mini-jeux'),
       el(
@@ -131,6 +134,10 @@ export class Menus {
         ? bouton('Plongeon — le pont des Tuves', () => this.a.lanceMiniJeu('plongeon'), 'principal')
         : el('p', 'Plongeon du pont des Tuves : se débloque après le pont.', 'aide'),
       plongeon && s.recordPlongeon > 0 ? el('p', recordSaut, 'aide') : el('span'),
+      reve
+        ? bouton('Le rêve de JBT — la pleine lune', () => this.a.lanceMiniJeu('reve'), 'principal')
+        : el('p', 'Le rêve de JBT : se débloque après la Ville Autotunée.', 'aide'),
+      reve && s.recordReve > 0 ? el('p', recordReve, 'aide') : el('span'),
       bouton('Retour', () => this.titre()),
     );
   }

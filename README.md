@@ -30,7 +30,7 @@ techno de Detroit, musette, cumbia, yodel, Kraftwerk...)... et refusent de l'adm
 Clos) → le pré du Clos (le concours de drift, facultatif) → le Pont des Tuves (la descente à pied aux gorges de la Siagne, le
 pont de 1802, et la bataille de figues du Viet Cong glaireux) → le Saut du Pont (le concours de plongeon, facultatif) → les Alpages Lounge → Gréau (yétis fans de techno
 minimale, et le Yéti Alpha) → les Plages Électroniques de Cannes (on arrive en plein jour, la nuit tombe à mesure qu'on avance : coucher de soleil dans la
-mer, puis le festival, sa foule, ses lasers, ses stroboscopes et sa grande scène ; `src/rendu/festival.ts`, `outils/niveaux/plage.py`) → la Ville Autotunée → le Club Infini
+mer, puis le festival, sa foule, ses lasers, ses stroboscopes et sa grande scène ; `src/rendu/festival.ts`, `outils/niveaux/plage.py`) → la Ville Autotunée → le Rêve de JBT (un mini-jeu, facultatif) → le Club Infini
 (DJ Boucle).
 
 ## Comment on joue
@@ -116,6 +116,20 @@ tête la première dans un nuage de terre. Dans le trou d'eau, il touche le fond
 la berge. À plusieurs, chacun saute à son tour (les gorges changent à chaque saut), puis le podium ; le record reste dans la
 sauvegarde. La simulation est dans `src/jeu/plongeon*.ts` (aiguillée avec le drift par `jeu/mini-jeux.ts`), le rendu dans
 `src/rendu/plongeon*.ts`, les deux sprites de Tom sortent de `outils/fixe-plongeon.py` (sources dans `assets-sources/plongeon/`).
+
+**Le rêve de JBT** (entre la Ville Autotunée et le Club Infini) : la nuit avant la tour, JBT veut raconter son rêve, et au
+lieu de le raconter on le joue, façon Jetpack Joyride. JBT, en super-héros à cape, décolle de son lit sur un toit et traverse
+le ciel de nuit à toute vitesse, de plus en plus vite, pour retrouver la pleine lune qu'il a perdue de vue : on **tient** SAUT (ou
+HAUT, ou VOLE sur l'écran tactile) pour monter, on **lâche** pour redescendre. Il ramasse les piles alcalines (en ligne, en
+vague, en biais, en bloc ; les dorées en valent dix) et évite les arcs électriques entre deux astéroïdes (droits, couchés, en
+biais, certains tournent ; des portes au plafond et au sol), les pluies de météorites en feu qui foncent en ondulant, et les
+étoiles filantes, annoncées au bord de l'écran par une alerte avant de traverser à toute allure. Trois chocs et le réveil sonne ;
+au bout du ciel, la lune (qui grandissait au loin depuis le départ) arrive, et JBT y plante sa tête : on ne voit plus que son
+survêtement, ses baskets et sa cape. Le score : les piles, plus 100 pour la lune. Le ciel défile en plans (la voûte et la Voie
+lactée, une géante à anneaux, des nuages mauves, des moutons qu'on compte, la ville et la tour du Club Infini, les toits). Le
+parcours se tire d'après le numéro du vol (`jeu/reve-parcours.ts`), donc les invités le recalculent ; la simulation est dans
+`src/jeu/reve*.ts`, le rendu dans `src/rendu/reve*.ts`, les deux sprites de JBT (de dos, en vol) sortent de
+`outils/fixe-reve.py` (sources dans `assets-sources/reve/`).
 
 ## À plusieurs
 
