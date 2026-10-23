@@ -159,8 +159,8 @@ OBJETS = {
     # Tom : 0,123 pixel du jeu par pixel de l'image à sa grille, comme son saut (164 px de large pour 20,2 en jeu) ; l'image fournie
     # regardait à gauche : la source est son image retournée (miroir exact), comme celles des autres
     'tom-mur': (['heros/tom-mur-base.png'], None, 11.8),
-    # JBG : 0,124 pixel du jeu par pixel de l'image à sa grille, comme son saut (129 px de large pour 16 en jeu)
-    'jbg-mur': (['heros/jbg-mur-base.png'], None, 18.8),
+    # JBG : 0,11 pixel du jeu par pixel de l'image à sa grille (son saut : 0,124, mais l'image du mur paraissait trop grosse)
+    'jbg-mur': (['heros/jbg-mur-base.png'], None, 16.8),
     # la fougère (garage, alpages, plage)
     'fougere': (['decor/fougere-base.png'], None, 14),
     # le menhir des forêts et de l'île (arc breton) : une pierre levée, de l'artiste ; le dolmen, lui, est dessiné en code

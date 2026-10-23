@@ -261,7 +261,7 @@ export const FEUILLES_DECOR: Record<string, Feuille> = {
   'jbg-saut': { fichier: 'jbg-saut.png', w: 96, h: 115, images: [1], rythme: 1, densite: 6, pied: 48 },
   'mat-mur': { fichier: 'mat-mur.png', w: 100, h: 247, images: [1], rythme: 1, densite: 12, pied: 50 },
   'tom-mur': { fichier: 'tom-mur.png', w: 142, h: 280, images: [1], rythme: 1, densite: 12, pied: 92 },
-  'jbg-mur': { fichier: 'jbg-mur.png', w: 226, h: 272, images: [1], rythme: 1, densite: 12, pied: 176 },
+  'jbg-mur': { fichier: 'jbg-mur.png', w: 202, h: 243, images: [1], rythme: 1, densite: 12, pied: 152 },
   fougere: { fichier: 'fougere.png', w: 112, h: 107, images: [1], rythme: 1, densite: 8, pied: 56 },
   menhir: { fichier: 'menhir.png', w: 112, h: 214, images: [1], rythme: 1, densite: 8, pied: 56 },
   poubelle: { fichier: 'poubelle.png', w: 66, h: 96, images: [1, 1], rythme: 1, densite: 6, pied: 33 },
