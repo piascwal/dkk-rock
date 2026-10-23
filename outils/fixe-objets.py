@@ -23,11 +23,12 @@ DENSITE = 6
 ECHELLES = ('tom', 'mat', 'jbt', 'jbm', 'jbg')
 # et celles du saut (en l'air), une image par héros, de profil
 SAUTS = tuple(f'{h}-saut' for h in ECHELLES)
-# et celles du mur (accroché à une paroi), fournies héros après héros : Mat pour l'instant
+# et celles du mur (accroché à une paroi), fournies héros après héros : Mat pour l'instant ; à 12 pixels de planche par pixel du jeu
+# (le double : le jeu les réduit de moitié, au lieu de garder une image déjà lissée et floue)
 MURS = ('mat-mur',)
 # des planches plus fines que 6 pixels par pixel du jeu, et réduites avec lissage (au lieu d'un agrandissement entier, qui donne des
 # pixels inégaux quand l'écran n'est pas un multiple de la planche) : le DJ, très détaillé, plus grand que le reste
-DENSITES = {'dj': 8, 'robot': 8, 'borne': 8, 'pneus': 8, 'baril': 8, 'fougere': 8, 'menhir': 8, **{f'{h}-echelle': 6 for h in ECHELLES}, **{n: 6 for n in SAUTS + MURS}}
+DENSITES = {'dj': 8, 'robot': 8, 'borne': 8, 'pneus': 8, 'baril': 8, 'fougere': 8, 'menhir': 8, **{f'{h}-echelle': 6 for h in ECHELLES}, **{n: 6 for n in SAUTS}, **{n: 12 for n in MURS}}
 LISSES = {'barriere', 'archeFise', 'portiqueBreak', 'portiqueFlat', 'portiqueDance', 'juryBreak', 'foodDuke', 'foodRougail', 'foodCroque', 'foodGlace', 'pissotiere', 'toilettes', 'platane', 'platane2', 'tablePique', 'tableSkate', 'tableBmx', 'tableFamille', 'dj', 'voiture', 'rocker', 'robot', 'borne', 'pneus', 'baril', 'fougere', 'menhir', *(f'{h}-echelle' for h in ECHELLES), *SAUTS, *MURS}
 # celles de ces planches qu'on réduit à 256 couleurs (le DJ, les voitures) ; les rockers en ont trop : douze personnages différents sur une planche
 QUANTIFIEES = {'dj', 'voiture'}

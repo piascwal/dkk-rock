@@ -126,6 +126,7 @@ function dessineCase(
   // planche plus fine que le canvas (appareil lent) : lissage, sinon on perdrait des pixels au hasard
   const { a, b } = ctx.getTransform();
   ctx.imageSmoothingEnabled = Math.hypot(a, b) < d;
+  ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(
     img,
     col * f.w,
