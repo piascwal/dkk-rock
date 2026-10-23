@@ -23,9 +23,9 @@ DENSITE = 6
 ECHELLES = ('tom', 'mat', 'jbt', 'jbm', 'jbg')
 # et celles du saut (en l'air), une image par héros, de profil
 SAUTS = tuple(f'{h}-saut' for h in ECHELLES)
-# et celles du mur (accroché à une paroi), fournies héros après héros : Mat, JBG et Tom pour l'instant ; à 12 pixels de planche par pixel du jeu
+# et celles du mur (accroché à une paroi), fournies héros après héros : Mat, JBG, Tom et JBT pour l'instant ; à 12 pixels de planche par pixel du jeu
 # (le double : le jeu les réduit de moitié, au lieu de garder une image déjà lissée et floue)
-MURS = ('mat-mur', 'jbg-mur', 'tom-mur')
+MURS = ('mat-mur', 'jbg-mur', 'tom-mur', 'jbt-mur')
 # où, de part et d'autre du centre du héros, finit l'image du mur côté paroi (pixels du jeu) : le bout des doigts et du pied touche la
 # paroi, quelle que soit la largeur de l'image (le manteau de JBG déborde loin derrière lui)
 BORD_MUR = 4.2
@@ -161,6 +161,9 @@ OBJETS = {
     'tom-mur': (['heros/tom-mur-base.png'], None, 11.8),
     # JBG : 0,11 pixel du jeu par pixel de l'image à sa grille (son saut : 0,124, mais l'image du mur paraissait trop grosse)
     'jbg-mur': (['heros/jbg-mur-base.png'], None, 16.8),
+    # JBT : sa silhouette est haute et étroite (le bras tendu vers le haut) : 12,5 de large, pour une hauteur voisine de celle de Tom
+    # au mur ; l'image regarde à droite, comme Mat et JBG
+    'jbt-mur': (['heros/jbt-mur-base.png'], None, 12.5),
     # la fougère (garage, alpages, plage)
     'fougere': (['decor/fougere-base.png'], None, 14),
     # le menhir des forêts et de l'île (arc breton) : une pierre levée, de l'artiste ; le dolmen, lui, est dessiné en code
