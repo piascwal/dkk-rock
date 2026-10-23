@@ -85,20 +85,20 @@ export function dessineCompteSibylles(
   total: number,
 ): void {
   const texte = `${trouvees}/${total}`;
-  const w = 9 + 4 + largeurTexte(texte, 2) + 6;
-  const h = 19;
-  const x = largeur - w - 4;
-  const y = hauteur - h - 4;
+  const w = 6 + 4 + largeurTexte(texte) + 4;
+  const h = 11;
+  const x = largeur - w - 3;
+  const y = hauteur - h - 3;
   ctx.save();
   ctx.fillStyle = 'rgba(10,5,12,0.75)';
   ctx.fillRect(x, y, w, h);
   ctx.fillStyle = 'rgba(120,255,150,0.45)';
-  ctx.fillRect(x + 2, y + 2, 11, 15);
+  ctx.fillRect(x + 2, y + 1, 8, 9);
   if (image) {
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(image, x + 3, y + 3, 9, 13);
+    ctx.drawImage(image, x + 3, y + 2, 6, 7);
   }
   ctx.restore();
-  ecrit(ctx, texte, x + 16, y + 5, trouvees >= total ? '#8dff9e' : '#ffffff', 2);
+  ecrit(ctx, texte, x + 12, y + 3, trouvees >= total ? '#8dff9e' : '#ffffff');
 }
