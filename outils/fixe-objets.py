@@ -23,10 +23,12 @@ DENSITE = 6
 ECHELLES = ('tom', 'mat', 'jbt', 'jbm', 'jbg')
 # et celles du saut (en l'air), une image par héros, de profil
 SAUTS = tuple(f'{h}-saut' for h in ECHELLES)
+# et celles du mur (accroché à une paroi), fournies héros après héros : Mat pour l'instant
+MURS = ('mat-mur',)
 # des planches plus fines que 6 pixels par pixel du jeu, et réduites avec lissage (au lieu d'un agrandissement entier, qui donne des
 # pixels inégaux quand l'écran n'est pas un multiple de la planche) : le DJ, très détaillé, plus grand que le reste
-DENSITES = {'dj': 8, 'robot': 8, 'borne': 8, 'pneus': 8, 'baril': 8, 'fougere': 8, 'menhir': 8, **{f'{h}-echelle': 6 for h in ECHELLES}, **{n: 6 for n in SAUTS}}
-LISSES = {'barriere', 'archeFise', 'portiqueBreak', 'portiqueFlat', 'portiqueDance', 'juryBreak', 'foodDuke', 'foodRougail', 'foodCroque', 'foodGlace', 'pissotiere', 'toilettes', 'platane', 'platane2', 'tablePique', 'tableSkate', 'tableBmx', 'tableFamille', 'dj', 'voiture', 'rocker', 'robot', 'borne', 'pneus', 'baril', 'fougere', 'menhir', *(f'{h}-echelle' for h in ECHELLES), *SAUTS}
+DENSITES = {'dj': 8, 'robot': 8, 'borne': 8, 'pneus': 8, 'baril': 8, 'fougere': 8, 'menhir': 8, **{f'{h}-echelle': 6 for h in ECHELLES}, **{n: 6 for n in SAUTS + MURS}}
+LISSES = {'barriere', 'archeFise', 'portiqueBreak', 'portiqueFlat', 'portiqueDance', 'juryBreak', 'foodDuke', 'foodRougail', 'foodCroque', 'foodGlace', 'pissotiere', 'toilettes', 'platane', 'platane2', 'tablePique', 'tableSkate', 'tableBmx', 'tableFamille', 'dj', 'voiture', 'rocker', 'robot', 'borne', 'pneus', 'baril', 'fougere', 'menhir', *(f'{h}-echelle' for h in ECHELLES), *SAUTS, *MURS}
 # celles de ces planches qu'on réduit à 256 couleurs (le DJ, les voitures) ; les rockers en ont trop : douze personnages différents sur une planche
 QUANTIFIEES = {'dj', 'voiture'}
 # objet : (fichiers sources, un par état (une ligne de la planche chacun), genre dans jeu/vue.ts, largeur en jeu en pixels)
@@ -147,6 +149,9 @@ OBJETS = {
     'jbt-saut': (['heros/jbt-saut-base.png'], None, 16.8),
     'jbm-saut': (['heros/jbm-saut-base.png'], None, 14.4),
     'jbg-saut': (['heros/jbg-saut-base.png'], None, 16.0),
+    # le mur : accroché à une paroi, de profil face à elle (tourné vers la droite : le jeu le retourne pour l'autre paroi) ; même échelle
+    # que le saut (tête de 27 px de planche), soit 0,77 px de planche par pixel de l'image à sa grille
+    'mat-mur': (['heros/mat-mur-base.png'], None, 8.3),
     # la fougère (garage, alpages, plage)
     'fougere': (['decor/fougere-base.png'], None, 14),
     # le menhir des forêts et de l'île (arc breton) : une pierre levée, de l'artiste ; le dolmen, lui, est dessiné en code
@@ -169,7 +174,7 @@ OBJETS = {
 # Ces images ne sont pas du pixel art sur une grille de 2 : leurs pixels sont déjà ceux du jeu. Les ramener à la grille
 # détecterait une case fausse et abîmerait le dessin (bruit, détails perdus) ; on les prend telles quelles, et on les agrandit
 # d'un facteur entier pour que chaque pixel reste carré.
-NATIF_BRUT = {'voiture', 'rocker', 'robot', 'borne', 'pneus', 'baril', 'fougere', 'menhir', *(f'{h}-echelle' for h in ECHELLES), *SAUTS}
+NATIF_BRUT = {'voiture', 'rocker', 'robot', 'borne', 'pneus', 'baril', 'fougere', 'menhir', *(f'{h}-echelle' for h in ECHELLES), *SAUTS, *MURS}
 # les panneaux de direction (le texte doit se lire) : chaque pixel de l'artiste reste un carré net (agrandissement entier, sans
 # redimensionnement qui rend les pixels inégaux et brouille les lettres)
 ENTIERS = {'panneau'}

@@ -29,6 +29,8 @@ export class Joueur extends JoueurBase {
   private traverse = 0;
   private lacheTyro = 0;
   private contreMur = false;
+  /** de quel côté est la paroi contre laquelle on est (-1 : à gauche) : on la regarde, sur l'image du mur */
+  private cote: -1 | 0 | 1 = 0;
   /** numéro du prochain tir de l'instrument : la note de la mélodie */
   private notes = 0;
 
@@ -97,6 +99,7 @@ export class Joueur extends JoueurBase {
     const sensMur = c.auSol ? 0 : this.murVu;
     const contreMur = vu !== 0 && h === vu;
     this.contreMur = vu !== 0;
+    this.cote = vu;
     if (this.tamponSaut > 0 && (this.coyote > 0 || sensMur !== 0)) {
       this.tamponSaut = 0;
       this.coyote = 0;
@@ -280,7 +283,7 @@ export class Joueur extends JoueurBase {
       g: this.def.genre,
       x: this.cx,
       y: c.y + c.h,
-      gauche: this.dir < 0,
+      gauche: e === ANIM.MUR ? this.cote < 0 : this.dir < 0,
       clignote: this.invulnerable > 0 && this.invulnerable % 8 < 4,
       aura: this.invincible > 0,
       e,

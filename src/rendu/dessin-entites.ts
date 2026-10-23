@@ -158,6 +158,12 @@ export function dessineEntite(
   const imageSaut = enLair && heros !== undefined ? `${NOMS_HEROS[v.g]}-saut` : undefined;
   if (imageSaut && dessineDecorFeuille(ctx, imageSaut, 0)) {
     // en l'air : une image par héros, avec son instrument
+  } else if (
+    v.e === ANIM.MUR &&
+    heros !== undefined &&
+    dessineDecorFeuille(ctx, `${NOMS_HEROS[v.g]}-mur`, 0)
+  ) {
+    // accroché à une paroi : une image par héros, de profil face à elle (les héros qui n'en ont pas encore gardent leur planche)
   } else if (imagesEchelle && dessineDecorFeuille(ctx, imagesEchelle, (compteur >> 2) & 1)) {
     // de dos sur une échelle : deux images qui alternent, à la montée comme à la descente (la phase ne bouge qu'avec le joystick)
   } else if (
