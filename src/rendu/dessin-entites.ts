@@ -42,9 +42,22 @@ const IMAGES_ECHELLE: Partial<Record<number, string>> = {
  * sur l'image, seuls les doigts et le pied sont à la pointe de la silhouette ; le torse est un peu en retrait.
  */
 const COLLE_AU_MUR = 1.5;
-function imageMur(ctx: CanvasRenderingContext2D, nom: string): boolean {
+/**
+ * Les images dont les mains n'atteignent pas la paroi : un léger penché vers elle (radians, dans le sens des aiguilles d'une montre
+ * pour une paroi à droite) autour du pied qui y est posé (pixels du jeu depuis les pieds, vers la paroi puis vers le haut).
+ */
+const PENCHE_MUR: Partial<Record<number, { angle: number; x: number; y: number }>> = {
+  [G.JBG]: { angle: 0.12, x: 4.2, y: -8 },
+};
+function imageMur(ctx: CanvasRenderingContext2D, nom: string, genre: number): boolean {
   ctx.save();
   ctx.translate(COLLE_AU_MUR, 0);
+  const p = PENCHE_MUR[genre];
+  if (p) {
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.angle);
+    ctx.translate(-p.x, -p.y);
+  }
   const dessine = dessineDecorFeuille(ctx, nom, 0);
   ctx.restore();
   return dessine;
@@ -171,7 +184,7 @@ export function dessineEntite(
   const imageSaut = enLair && heros !== undefined ? `${NOMS_HEROS[v.g]}-saut` : undefined;
   if (imageSaut && dessineDecorFeuille(ctx, imageSaut, 0)) {
     // en l'air : une image par héros, avec son instrument
-  } else if (v.e === ANIM.MUR && heros !== undefined && imageMur(ctx, `${NOMS_HEROS[v.g]}-mur`)) {
+  } else if (v.e === ANIM.MUR && heros !== undefined && imageMur(ctx, `${NOMS_HEROS[v.g]}-mur`, v.g)) {
     // accroché à une paroi : une image par héros, de profil face à elle (les héros qui n'en ont pas encore gardent leur planche)
   } else if (imagesEchelle && dessineDecorFeuille(ctx, imagesEchelle, (compteur >> 2) & 1)) {
     // de dos sur une échelle : deux images qui alternent, à la montée comme à la descente (la phase ne bouge qu'avec le joystick)

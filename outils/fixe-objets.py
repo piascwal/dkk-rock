@@ -23,9 +23,9 @@ DENSITE = 6
 ECHELLES = ('tom', 'mat', 'jbt', 'jbm', 'jbg')
 # et celles du saut (en l'air), une image par héros, de profil
 SAUTS = tuple(f'{h}-saut' for h in ECHELLES)
-# et celles du mur (accroché à une paroi), fournies héros après héros : Mat et JBG pour l'instant ; à 12 pixels de planche par pixel du jeu
+# et celles du mur (accroché à une paroi), fournies héros après héros : Mat, JBG et Tom pour l'instant ; à 12 pixels de planche par pixel du jeu
 # (le double : le jeu les réduit de moitié, au lieu de garder une image déjà lissée et floue)
-MURS = ('mat-mur', 'jbg-mur')
+MURS = ('mat-mur', 'jbg-mur', 'tom-mur')
 # où, de part et d'autre du centre du héros, finit l'image du mur côté paroi (pixels du jeu) : le bout des doigts et du pied touche la
 # paroi, quelle que soit la largeur de l'image (le manteau de JBG déborde loin derrière lui)
 BORD_MUR = 4.2
@@ -156,6 +156,9 @@ OBJETS = {
     # le mur : accroché à une paroi, de profil face à elle (tourné vers la droite : le jeu le retourne pour l'autre paroi) ; même échelle
     # que le saut (tête de 27 px de planche), soit 0,77 px de planche par pixel de l'image à sa grille
     'mat-mur': (['heros/mat-mur-base.png'], None, 8.3),
+    # Tom : 0,123 pixel du jeu par pixel de l'image à sa grille, comme son saut (164 px de large pour 20,2 en jeu) ; l'image fournie
+    # regardait à gauche : la source est son image retournée (miroir exact), comme celles des autres
+    'tom-mur': (['heros/tom-mur-base.png'], None, 11.8),
     # JBG : 0,124 pixel du jeu par pixel de l'image à sa grille, comme son saut (129 px de large pour 16 en jeu)
     'jbg-mur': (['heros/jbg-mur-base.png'], None, 18.8),
     # la fougère (garage, alpages, plage)
