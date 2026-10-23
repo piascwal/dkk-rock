@@ -35,6 +35,16 @@ export const STC: Omit<DefNiveau, 'carte'> = {
         'Ce matin, à la radio : un morceau sans guitare. Il faut débrancher DJ Boucle. Prenez vos instruments : ROCK NEVER DIES.',
       image: '',
     },
+    {
+      qui: 'MAT',
+      texte:
+        'Au fait, JBM : t’as pas vu ma Sibylle des fontaines ? Ma carte Magic, la verte. Elle a disparu.',
+    },
+    {
+      qui: 'JBM',
+      texte:
+        'Non. Mais ça me donne un objectif : je récupérerai toutes les Sibylles des fontaines du monde. Elles doivent traîner en haut des forteresses, au fond des caves...',
+    },
   ],
   dialogues: {
     1: [

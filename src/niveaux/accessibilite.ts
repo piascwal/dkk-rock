@@ -12,6 +12,25 @@ import type { NiveauLu } from './format';
  * cachée doit pouvoir se prendre sans rien casser.
  */
 export function accessibles(lu: NiveauLu, barriereOuverte = true): Uint8Array {
+  return Uint8Array.from(parcoursAcces(lu, barriereOuverte).dist, (d) => (d >= 0 ? 1 : 0));
+}
+
+/** Le parcours en largeur des cases accessibles : le nombre de gestes depuis les sources (-1 : inaccessible), et la case d'où l'on vient. */
+export interface ParcoursAcces {
+  dist: Int32Array;
+  parent: Int32Array;
+}
+
+/**
+ * Le parcours en largeur des cases accessibles (les mêmes règles qu'`accessibles`), depuis `sources` (des cases y × largeur + x ;
+ * par défaut, le départ du niveau). `dist` est le nombre de gestes (un pas, un saut, un barreau...) qu'il faut pour y arriver : avec
+ * pour sources le chemin direct, c'est la mesure du détour d'une case.
+ */
+export function parcoursAcces(
+  lu: NiveauLu,
+  barriereOuverte = true,
+  sources?: readonly number[],
+): ParcoursAcces {
   // la barrière du boss s'ouvre quand on le bat : elle ne coupe pas le chemin (sauf pour vérifier qu'on ne la contourne pas)
   const tuiles = Uint8Array.from(lu.tuiles, (t) => (barriereOuverte && t === T.BARRIERE ? T.VIDE : t));
   const c = new Carte(lu.largeur, lu.hauteur, tuiles, lu.fond);
@@ -32,19 +51,28 @@ export function accessibles(lu: NiveauLu, barriereOuverte = true): Uint8Array {
     return null;
   };
 
-  const vu = new Uint8Array(L * lu.hauteur);
+  const dist = new Int32Array(L * lu.hauteur).fill(-1);
+  const parent = new Int32Array(L * lu.hauteur).fill(-1);
   const file: [number, number][] = [];
+  let de = -1;
   const ajoute = (p: [number, number] | null) => {
     if (!p || p[0] < 0 || p[0] >= L) return;
     const k = p[1] * L + p[0];
-    if (vu[k]) return;
-    vu[k] = 1;
+    if (dist[k]! >= 0) return;
+    dist[k] = de < 0 ? 0 : dist[de]! + 1;
+    parent[k] = de;
     file.push(p);
   };
-  ajoute(chute(lu.depart.tx, lu.depart.ty));
+  if (sources)
+    for (const k of sources) {
+      dist[k] = 0;
+      file.push([k % L, Math.floor(k / L)]);
+    }
+  else ajoute(chute(lu.depart.tx, lu.depart.ty));
 
   for (let tete = 0; tete < file.length; tete++) {
     const [x, y] = file[tete]!;
+    de = y * L + x;
     for (const d of [-1, 1]) {
       // marcher (puis tomber)
       if (libre(x + d, y)) ajoute(chute(x + d, y));
@@ -72,5 +100,5 @@ export function accessibles(lu: NiveauLu, barriereOuverte = true): Uint8Array {
       }
     }
   }
-  return vu;
+  return { dist, parent };
 }
