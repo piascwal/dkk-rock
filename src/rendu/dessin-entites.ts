@@ -37,6 +37,19 @@ const IMAGES_ECHELLE: Partial<Record<number, string>> = {
   [G.TOM]: 'tom-echelle',
 };
 
+/**
+ * L'image d'un héros contre une paroi, décalée vers elle (le sprite regarde la paroi) : le corps du héros s'arrête au mur, mais
+ * sur l'image, seuls les doigts et le pied sont à la pointe de la silhouette ; le torse est un peu en retrait.
+ */
+const COLLE_AU_MUR = 1.5;
+function imageMur(ctx: CanvasRenderingContext2D, nom: string): boolean {
+  ctx.save();
+  ctx.translate(COLLE_AU_MUR, 0);
+  const dessine = dessineDecorFeuille(ctx, nom, 0);
+  ctx.restore();
+  return dessine;
+}
+
 const DRAPEAUX_SANS_MIROIR = new Set<number>([
   G.CAGE,
   G.DRAPEAU,
@@ -158,11 +171,7 @@ export function dessineEntite(
   const imageSaut = enLair && heros !== undefined ? `${NOMS_HEROS[v.g]}-saut` : undefined;
   if (imageSaut && dessineDecorFeuille(ctx, imageSaut, 0)) {
     // en l'air : une image par héros, avec son instrument
-  } else if (
-    v.e === ANIM.MUR &&
-    heros !== undefined &&
-    dessineDecorFeuille(ctx, `${NOMS_HEROS[v.g]}-mur`, 0)
-  ) {
+  } else if (v.e === ANIM.MUR && heros !== undefined && imageMur(ctx, `${NOMS_HEROS[v.g]}-mur`)) {
     // accroché à une paroi : une image par héros, de profil face à elle (les héros qui n'en ont pas encore gardent leur planche)
   } else if (imagesEchelle && dessineDecorFeuille(ctx, imagesEchelle, (compteur >> 2) & 1)) {
     // de dos sur une échelle : deux images qui alternent, à la montée comme à la descente (la phase ne bouge qu'avec le joystick)

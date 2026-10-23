@@ -98,7 +98,8 @@ export class Joueur extends JoueurBase {
     else this.murVu = 0;
     const sensMur = c.auSol ? 0 : this.murVu;
     const contreMur = vu !== 0 && h === vu;
-    this.contreMur = vu !== 0;
+    // l'image du mur seulement collé à la paroi (à 2 px près), et non dans les 4 px de tolérance de la détection
+    this.contreMur = vu !== 0 && toucheMur(c, ctx.carte, vu, 2);
     this.cote = vu;
     if (this.tamponSaut > 0 && (this.coyote > 0 || sensMur !== 0)) {
       this.tamponSaut = 0;
