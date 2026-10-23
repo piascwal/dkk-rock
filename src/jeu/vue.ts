@@ -91,6 +91,8 @@ export const G = {
   VAN_REACTEUR: 68,
   /** la figue du Viet Cong glaireux : un tir, hors de la plage des tirs (pleine) ; voir `estUnTir` */
   P_FIGUE: 69,
+  /** une carte Sibylle des fontaines cachée dans le niveau (`f` : son numéro) : elle lévite dans son aura verte */
+  SIBYLLE: 70,
 } as const;
 
 export type Genre = (typeof G)[keyof typeof G];
@@ -279,6 +281,8 @@ export interface EtatVue {
   convertis: number[];
   /** le temps de la run (le niveau, depuis son début), en secondes : l'écran de fin de niveau l'affiche */
   temps: number;
+  /** les cartes Sibylle des fontaines du niveau : celles déjà trouvées (dans cette partie ou avant), et leur nombre */
+  sibylles: [number, number];
   /** page de l'histoire en cours (intro, outro ou fin) */
   page: number;
   niveau: number;

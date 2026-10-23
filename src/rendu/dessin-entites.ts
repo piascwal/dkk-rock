@@ -1,4 +1,5 @@
 import { TUILE } from '../config';
+import { dessineSibylle } from './sibylle';
 import { ARME_CHAUFFAGE, armeRamassee } from '../entites/armes';
 import { herosDuGenre } from '../entites/heros';
 import { ANIM, G, VOLANTS, estUnTir, type EntiteVue, type Genre } from '../jeu/vue';
@@ -128,6 +129,10 @@ export function dessineEntite(
   const estTir = estUnTir(v.g);
   if (estTir) y -= DEMI_TAILLE[v.g] ?? 2;
 
+  if (v.g === G.SIBYLLE) {
+    dessineSibylle(ctx, x, y, v.f, performance.now());
+    return;
+  }
   if (v.g === G.BLOC) {
     const toile = atlas.toile(v.f, 0, 0);
     if (toile) ctx.drawImage(toile, x - TUILE / 2, y - TUILE, TUILE, TUILE);

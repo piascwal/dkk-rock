@@ -34,6 +34,8 @@ export interface Sauvegarde {
   recordReve: number;
   /** le record de l'avion de JBG : le meilleur score */
   recordAvion: number;
+  /** les cartes Sibylle des fontaines acquises, par niveau (son `id`) : les numéros de leurs cachettes */
+  sibylles: Record<string, number[]>;
 }
 
 const CLE = 'dkk-rock.sauvegarde';
@@ -51,6 +53,7 @@ export const SAUVEGARDE_VIDE: Sauvegarde = {
   recordPlongeon: 0,
   recordReve: 0,
   recordAvion: 0,
+  sibylles: {},
 };
 
 const entier = (v: unknown, min: number, max: number, defaut: number): number =>
@@ -93,7 +96,18 @@ export function valideSauvegarde(brut: unknown, nbNiveaux: number): Sauvegarde {
     recordPlongeon: pourcent(o.recordPlongeon),
     recordReve: entier(o.recordReve, 0, 65534, 0),
     recordAvion: entier(o.recordAvion, 0, 65534, 0),
+    sibylles: sibyllesLues(o.sibylles),
   };
+}
+
+/** Les cartes Sibylle relues : par niveau, des numéros de cachette entiers, sans doublon ; le reste est ignoré. */
+function sibyllesLues(v: unknown): Record<string, number[]> {
+  const lues: Record<string, number[]> = {};
+  if (!v || typeof v !== 'object') return lues;
+  for (const [id, cartes] of Object.entries(v as Record<string, unknown>))
+    if (Array.isArray(cartes))
+      lues[id] = [...new Set(cartes.filter((n): n is number => Number.isInteger(n) && n >= 0 && n < 64))];
+  return lues;
 }
 
 export function charge(nbNiveaux: number): Sauvegarde {

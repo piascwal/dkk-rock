@@ -10,6 +10,7 @@ import { YetiAlpha } from '../entites/ennemis/yeti-alpha';
 import { Kiwi } from '../entites/kiwi';
 import { BlocTombant, Objet } from '../entites/objets';
 import { T, proprietes } from '../monde/tuiles';
+import { peupleSibylles } from './sibylles';
 import type { Partie } from './partie';
 
 /** Le module où se trouve la colonne x (ses bornes en pixels), ou null : hors d'un module, le rider s'en tient à sa ronde. */
@@ -21,7 +22,7 @@ function zoneDe(
   return z ? [z[0] * TUILE, z[1] * TUILE] : null;
 }
 
-/** Place tout ce que la carte du niveau annonce : objets, ennemis, boss, et Fadatchi le kiwi. */
+/** Place tout ce que la carte du niveau annonce : objets, cartes Sibylle, ennemis, boss, et Fadatchi le kiwi. */
 export function peuple(p: Partie): void {
   const lu = p.lu;
   if (lu.fin) {
@@ -39,6 +40,7 @@ export function peuple(p: Partie): void {
   for (const a of lu.armes)
     p.ajoute(new Objet(p, 'arme', a.x, a.y, p.rng.entier(1, ARMES_RAMASSABLES.length)));
   for (const s of lu.soins) p.ajoute(new Objet(p, 'soin', s.x, s.y));
+  peupleSibylles(p);
   // à la reprise sur un drapeau, les ennemis déjà dépassés ne reviennent pas
   const depart = p.drapeau >= 0 ? lu.drapeaux[p.drapeau]!.x : -Infinity;
   for (const e of lu.ennemis) {

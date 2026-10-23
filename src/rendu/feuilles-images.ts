@@ -7,6 +7,7 @@ import { chargeVoitures } from './drift-voitures';
 import { chargePlongeon } from './plongeon-tom';
 import { chargeReve } from './reve-jbt';
 import { chargeAvion } from './avion-appareil';
+import { chargeSibylle } from './sibylle';
 import type { Genre } from '../jeu/vue';
 
 const images = new Map<Genre, HTMLImageElement>();
@@ -19,6 +20,7 @@ export function chargeFeuilles(base: string): void {
   chargePlongeon(base);
   chargeReve(base);
   chargeAvion(base);
+  chargeSibylle(base);
   for (const [genre, f] of Object.entries(FEUILLES)) {
     const img = new Image();
     img.onload = () => images.set(Number(genre) as Genre, img);

@@ -1,6 +1,7 @@
 import { MAX_JOUEURS, TICKS_PAR_SECONDE } from '../config';
 import type { EntiteVue, EtatVue, JoueurVue } from './vue';
 import type { Partie } from './partie';
+import { cachettesDuNiveau } from '../niveaux/cachettes';
 
 /** Au-delà de cette distance de tout héros, une entité n'est ni dessinée ni transmise. */
 const PORTEE_X = 420;
@@ -60,6 +61,7 @@ export function construitVue(p: Partie): EtatVue {
     phase: p.phase,
     convertis: p.convertis.map((n) => Math.min(255, n)),
     temps: Math.min(65535, Math.floor(p.tempsNiveau / TICKS_PAR_SECONDE)),
+    sibylles: [p.sibylles.size, cachettesDuNiveau(p.niveau).length],
     page: p.page,
     niveau: p.niveau,
     vies: p.vies,

@@ -53,6 +53,17 @@ mer, puis le festival, sa foule, ses lasers, ses stroboscopes et sa grande scèn
   Les petits traits propres à un personnage (Tom : un cœur pixel art quand il croise un rondin) sont des entrées de `TRAITS`
   dans `src/rendu/traits-persos.ts`, côté rendu et d'après la vue (rien à changer dans la simulation ni le protocole) ; les
   emojis sont dans `src/rendu/emojis.ts`.
+- **Cartes Sibylle des fontaines** (la carte Magic, `public/sprites/carte-sibylle.png`) : de 5 à 12 par niveau (une pour 45
+  colonnes ; aucune dans les mini-jeux), pour pousser à explorer au lieu de filer tout droit. Leurs cachettes se calculent d'après
+  la carte (`niveaux/cachettes.ts`, les mêmes chez tous les joueurs) : en haut des structures et au fond des caves, nettement
+  au-dessus ou en dessous du terrain alentour, toujours accessibles sans rien casser (`niveaux/accessibilite.ts`, le modèle des
+  tests), jamais dans l'eau ni sur une échelle, et à plus de 6 tuiles d'un tonneau WOG, d'une cage, d'une arme, d'un médiator,
+  d'un baril, d'un drapeau, du départ ou du van ; les plus hautes et les plus profondes d'abord, sommets et caves en alternance,
+  espacées sur tout le niveau. La carte lévite dans une aura verte (`rendu/sibylle.ts`) ; prise, elle rapporte 250 points et elle
+  est acquise pour de bon (la sauvegarde la retient aussitôt, par `id` de niveau : `Sauvegarde.sibylles`) : elle ne revient
+  plus, ni en recommençant le niveau, ni en le rejouant. L'écran de fin de niveau affiche les cartes trouvées sur le total du
+  niveau (`EtatVue.sibylles`, protocole v27) ; la carte du monde du menu, une fois le van arrivé sur un niveau, aussi (en bas à
+  droite).
 - **Cages** : un membre du groupe y est enfermé. Le libérer donne une vie (cinq au plus : au maximum, on change seulement de personnage), et on prend sa place. Chaque niveau en cache quatre ou cinq.
 - **Chaos visuel** (sans dégât en plus) : quand la tuile qui porte un accessoire de décor est détruite, des morceaux colorés
   s'envolent (`rendu/debris-decor.ts`, notes en plus pour les enceintes) ; les bonus (armes, médiators, cœurs) sont enfermés dans

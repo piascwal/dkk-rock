@@ -10,6 +10,7 @@ import { C } from './jeu/commandes';
 import { nouveauMiniJeu, PHASES_MINI_JEUX, type MiniJeu } from './jeu/mini-jeux';
 import { Partie } from './jeu/partie';
 import { charge, enregistre, retiensRecords, type Progression, type Sauvegarde } from './jeu/sauvegarde';
+import { partieSauvegardee } from './jeu/partie-sauvegardee';
 import type { EtatVue, Evenement } from './jeu/vue';
 import { NIVEAUX } from './niveaux';
 import type { AnnonceDkk } from './reseau/annonce';
@@ -146,14 +147,9 @@ export class App implements Actions {
   lance(niveau: number, membre: number, reprise: Progression | null): void {
     this.arreteTout();
     this.membreVu = null;
-    const p = new Partie(reprise ?? { niveau, drapeau: -1, vies: VIES_DEPART, score: 0 });
+    const prog = reprise ?? { niveau, drapeau: -1, vies: VIES_DEPART, score: 0 };
+    const p = partieSauvegardee(prog, this.sauvegarde, () => this.enregistre());
     p.ajouteJoueur(0, membre);
-    p.onProgression = (prog, fini, niveauFini) => {
-      this.sauvegarde.enCours = prog;
-      if (fini && niveauFini !== undefined && !this.sauvegarde.faits.includes(niveauFini))
-        this.sauvegarde.faits.push(niveauFini);
-      this.enregistre();
-    };
     this.partie = p;
     this.entreEnJeu();
   }

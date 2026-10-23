@@ -111,7 +111,7 @@ export class Histoire {
       if (this.cle === `convertis-${v.niveau}`) return;
       this.cle = `convertis-${v.niveau}`;
       this.element.classList.remove('carte');
-      this.convertis.affiche(this.element, v.convertis, v.temps, v.score);
+      this.convertis.affiche(this.element, v.convertis, v.temps, v.score, v.sibylles);
       this.element.hidden = false;
       return;
     }

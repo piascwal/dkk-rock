@@ -17,6 +17,7 @@ import { texteVersion } from '../version';
 import { estInstallee, installe, peutInstaller, surIPhone } from './installation';
 import { pleinEcran } from './plein-ecran';
 import { ecranCarte } from './carte-choix';
+import { compteSibylles } from '../jeu/sibylles';
 
 /** Ce que les menus demandent à l'application. */
 export interface Actions {
@@ -104,6 +105,7 @@ export class Menus {
     ecranCarte(
       (...enfants) => this.montre(...enfants),
       s.faits,
+      (n) => compteSibylles(s, n),
       depart,
       // depuis le menu, on repart du début du niveau (les vies et le score restent) ; le dernier drapeau sert à la pause
       (n) => this.lanceNiveau(n, s.enCours?.niveau === n ? { ...s.enCours, drapeau: -1 } : null),

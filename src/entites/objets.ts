@@ -4,7 +4,7 @@ import { G, type EntiteVue, type Genre } from '../jeu/vue';
 import { appliqueGravite, deplace, nouveauCorps, type Corps } from '../monde/physique';
 import type { Tuile } from '../monde/tuiles';
 
-export type SorteObjet = 'cage' | 'drapeau' | 'van' | 'arme' | 'soin' | 'coeur' | 'coeurOr';
+export type SorteObjet = 'cage' | 'drapeau' | 'van' | 'arme' | 'soin' | 'coeur' | 'coeurOr' | 'sibylle';
 
 const GENRES: Record<SorteObjet, Genre> = {
   cage: G.CAGE,
@@ -14,6 +14,7 @@ const GENRES: Record<SorteObjet, Genre> = {
   soin: G.SOIN,
   coeur: G.COEUR,
   coeurOr: G.COEUR_OR,
+  sibylle: G.SIBYLLE,
 };
 
 /** Le départ du van : ticks d'attente moteur lancé, puis accélération (px/tick²) jusqu'à la vitesse maximale (px/tick). */
@@ -33,11 +34,12 @@ const TAILLES: Record<SorteObjet, [number, number]> = {
   soin: [10, 10],
   coeur: [10, 9],
   coeurOr: [12, 11],
+  sibylle: [14, 20],
 };
 
 /**
  * Ce qui attend les héros dans le niveau : cages, drapeaux, le van, armes et
- * médiators. Les objets sont passifs : la partie regarde qui les touche.
+ * médiators, cartes Sibylle. Les objets sont passifs : la partie regarde qui les touche.
  */
 export class Objet implements EntiteSimulee {
   readonly id: number;
@@ -95,8 +97,8 @@ export class Objet implements EntiteSimulee {
         if (this.depuis === ATTENTE_VAN + 1) ctx.son('derapage', this.corps.x, this.corps.y);
       } else if (this.depuis % 8 === 0) ctx.secoue(2);
     }
-    // tout retombe si on détruit le sol dessous (sauf le van, garé pour de bon)
-    if (this.sorte !== 'van') {
+    // tout retombe si on détruit le sol dessous (sauf le van, garé pour de bon, et la carte Sibylle, qui lévite)
+    if (this.sorte !== 'van' && this.sorte !== 'sibylle') {
       appliqueGravite(this.corps);
       deplace(this.corps, ctx.carte);
       if (this.corps.y > ctx.carte.hauteur * TUILE + 32) this.fini = true;
@@ -117,7 +119,7 @@ export class Objet implements EntiteSimulee {
       f:
         this.partant || this.vx > 0
           ? Math.round(this.vx * 20)
-          : this.sorte === 'arme' || this.sorte === 'cage'
+          : this.sorte === 'arme' || this.sorte === 'cage' || this.sorte === 'sibylle'
             ? this.variante
             : this.anim & 255,
     };

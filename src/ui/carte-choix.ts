@@ -2,16 +2,19 @@ import { HAUTEUR_CARTE } from '../config';
 import { NIVEAUX } from '../niveaux';
 import { arcDe, MONDE, niveauOuvert } from '../niveaux/arcs';
 import { dessineCarte, etapeTouchee, type EtatEtape } from '../rendu/carte-monde';
+import { dessineCompteSibylles } from '../rendu/sibylle';
 import { bouton, el } from './elements';
 
 /**
  * L'écran « Continuer » : la carte du monde, le van posé sur le dernier niveau débloqué. On choisit un niveau ouvert
- * (du doigt, ou avec les flèches), puis « Jouer ». La partie en cours, s'il y en a une, repart du début de son niveau (avec ses vies
+ * (du doigt, ou avec les flèches), puis « Jouer » ; une fois le van arrivé, les cartes Sibylle trouvées dans ce niveau, en bas à droite. La partie en cours, s'il y en a une, repart du début de son niveau (avec ses vies
  * et son score).
  */
 export function ecranCarte(
   conteneur: (...enfants: HTMLElement[]) => void,
   faits: readonly number[],
+  /** les cartes Sibylle d'un niveau : trouvées, et leur nombre */
+  sibylles: (niveau: number) => readonly [number, number],
   depart: number,
   jouer: (niveau: number) => void,
   retour: () => void,
@@ -95,6 +98,10 @@ export function ecranCarte(
       tick,
       Math.abs(ecart) > 0.01 ? Math.sign(ecart) : 0,
     );
+    // le van arrivé sur le niveau : ses cartes Sibylle, en bas à droite
+    const [trouvees, total] = sibylles(MONDE[choix]!);
+    if (Math.abs(ecart) <= 0.01 && total > 0)
+      dessineCompteSibylles(ctx, largeur, HAUTEUR_CARTE, trouvees, total);
     requestAnimationFrame(image);
   };
   requestAnimationFrame(image);

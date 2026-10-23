@@ -21,6 +21,7 @@ import { ouvreBarrieres, peuple, releveCarte } from './chargement';
 import { changePhase } from './phases';
 import { majTraversee, prepareTraversee, type Traversee } from './traversee';
 import { interactions, membreLibre } from './interactions';
+import { CARNET_VIDE, type Carnet } from './sibylles';
 import type { Progression } from './sauvegarde';
 import { CACHE_VIDE, calculeCibles, type CacheCibles } from './cibles';
 import { construitVue } from './vue-partie';
@@ -73,6 +74,9 @@ export class Partie implements Contexte {
   convertis: number[] = GENRES_CONVERTIS.map(() => 0);
   /** les pas de jeu depuis le début du niveau (la run : il repart de zéro quand le niveau est refait) */
   tempsNiveau = 0;
+  /** les cartes Sibylle du niveau déjà trouvées (numéros de cachette), dans cette partie ou avant (voir sibylles.ts) */
+  sibylles = new Set<number>();
+  readonly carnet: Carnet;
   /** change à chaque chargement de carte : le réseau renvoie alors la carte aux clients */
   generation = 0;
   /** prévenu à chaque drapeau et à chaque niveau fini */
@@ -84,7 +88,9 @@ export class Partie implements Contexte {
   private id = 1;
   private cache: CacheCibles = CACHE_VIDE;
 
-  constructor(p: Progression) {
+  /** `carnet` : les cartes Sibylle déjà acquises, et la sauvegarde à prévenir quand une carte est prise */
+  constructor(p: Progression, carnet: Carnet = CARNET_VIDE) {
+    this.carnet = carnet;
     this.niveau = p.niveau;
     this.vies = p.vies;
     this.score = p.score;

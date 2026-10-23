@@ -79,8 +79,17 @@ export class Convertis {
     return !this.fini;
   }
 
-  /** Construit l'écran dans `element` et lance la pile. `temps` : la run, en secondes ; `score` : celui de la partie. */
-  affiche(element: HTMLElement, convertis: readonly number[], temps = 0, score = 0): void {
+  /**
+   * Construit l'écran dans `element` et lance la pile. `temps` : la run, en secondes ; `score` : celui de la partie ;
+   * `sibylles` : les cartes Sibylle du niveau trouvées, et leur nombre (rien à afficher dans un niveau qui n'en a pas).
+   */
+  affiche(
+    element: HTMLElement,
+    convertis: readonly number[],
+    temps = 0,
+    score = 0,
+    sibylles: readonly [number, number] = [0, 0],
+  ): void {
     this.arrete();
     this.genres = melange(genresEmpiles(convertis));
     this.score = score;
@@ -107,6 +116,9 @@ export class Convertis {
     this.valeurScore = el('strong', '0');
     const stats = el('div', '', 'stats-run');
     stats.append(this.stat('Temps', el('strong', formateTemps(temps))), this.stat('Score', this.valeurScore));
+    const [trouvees, total] = sibylles;
+    if (total > 0)
+      stats.append(this.stat('Cartes Sibylle', el('strong', `${trouvees} / ${total}`, 'stat-sibylle')));
     this.total = el('p', '', 'total-convertis');
     this.total.hidden = true;
     const n = this.genres.length;

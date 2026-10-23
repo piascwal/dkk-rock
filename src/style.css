@@ -627,6 +627,12 @@ h2 {
   font-size: clamp(1.1rem, 6vh, 1.9rem);
 }
 
+/* les cartes Sibylle des fontaines trouvées : le vert de la carte, et son aura */
+#histoire .stat-run strong.stat-sibylle {
+  color: #8dff9e;
+  text-shadow: 0 0 8px rgba(60, 220, 110, 0.8);
+}
+
 #histoire .total-convertis {
   margin: 0;
   font-size: clamp(0.85rem, 4vh, 1.2rem);

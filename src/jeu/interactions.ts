@@ -6,6 +6,7 @@ import { Objet } from '../entites/objets';
 import { Projectile } from '../entites/projectile';
 import { chevauche } from '../moteur/maths';
 import type { Partie } from './partie';
+import { prendSibylle } from './sibylles';
 
 /** Un membre du groupe que personne d'autre ne joue, si possible le préféré. */
 export function membreLibre(p: Partie, prefere: number, siege = -1): number {
@@ -17,7 +18,7 @@ export function membreLibre(p: Partie, prefere: number, siege = -1): number {
   return prefere % HEROS.length;
 }
 
-/** Ce que touchent les héros : cages, drapeaux, van, armes, médiators ; et les dialogues de la carte. */
+/** Ce que touchent les héros : cages, drapeaux, van, armes, médiators, cartes Sibylle ; et les dialogues de la carte. */
 export function interactions(p: Partie): void {
   for (const j of p.joueurs) {
     if (!j || j.mort) continue;
@@ -83,6 +84,9 @@ export function interactions(p: Partie): void {
           p.son('liberation', e.corps.x, e.corps.y);
           p.texte(e.corps.x, e.corps.y - 10, 'WOG ! INVINCIBLE', '#ffd23f');
           p.evenement({ k: 'confettis', x: e.corps.x, y: e.corps.y });
+          break;
+        case 'sibylle':
+          prendSibylle(p, e);
           break;
         case 'soin':
           j.pv = PV_HEROS;
