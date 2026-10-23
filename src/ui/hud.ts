@@ -1,5 +1,6 @@
 import { HEROS } from '../entites/heros';
 import { armeRamassee } from '../entites/armes';
+import { PHASES_MINI_JEUX } from '../jeu/mini-jeux';
 import type { EtatVue } from '../jeu/vue';
 import { icone, iconeDeLArme, rangeeDIcones } from './icones-hud';
 
@@ -11,7 +12,7 @@ export class Hud {
 
   maj(v: EtatVue, siegeLocal: number, noms: string[]): void {
     // pendant un mini-jeu (drift, plongeon), le chrono et le score sont dans le canvas : pas de HUD des héros
-    this.element.hidden = v.phase === 'drift' || v.phase === 'plongeon' || v.phase === 'reve';
+    this.element.hidden = PHASES_MINI_JEUX.has(v.phase);
     const joueurs = v.joueurs
       .map((j, s) => {
         if (!j.present) return '';

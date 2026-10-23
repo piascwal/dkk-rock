@@ -48,20 +48,22 @@ describe('les arcs de l’histoire', () => {
     const premier = bretagne.niveaux[0]!;
     expect(niveauOuvert(premier, tournee.slice(0, -1))).toBe(false);
     expect(niveauOuvert(premier, tournee)).toBe(true);
-    expect(niveauOuvert(bretagne.niveaux[1]!, tournee)).toBe(false);
+    // l'avion de JBG, en tête, se laisse de côté : la forêt s'ouvre aussi ; le port, lui, attend la forêt
+    expect(niveauOuvert(bretagne.niveaux[1]!, tournee)).toBe(true);
+    expect(niveauOuvert(bretagne.niveaux[2]!, tournee)).toBe(false);
     expect(suivantDansArc(tournee.at(-1)!)).toBeNull();
   });
 
-  it('l’arc breton : la forêt, le port, la traversée en ferry, puis Groix', () => {
+  it('l’arc breton : l’avion de JBG, la forêt, le port, la traversée en ferry, puis Groix', () => {
     const ids = ARCS.find((a) => a.id === 'bretagne')!.niveaux.map((i) => NIVEAUX[i]!.id);
-    expect(ids).toEqual(['foret', 'port', 'ferry', 'groix']);
+    expect(ids).toEqual(['avion', 'foret', 'port', 'ferry', 'groix']);
   });
 
   it('une seule route : après le dernier niveau de la tournée, on continue vers la Bretagne', () => {
     const club = ARCS[0]!.niveaux.at(-1)!;
-    const foret = ARCS.find((a) => a.id === 'bretagne')!.niveaux[0]!;
-    expect(suivantDansMonde(club)).toBe(foret);
-    expect(MONDE.indexOf(foret)).toBe(MONDE.indexOf(club) + 1);
+    const avion = ARCS.find((a) => a.id === 'bretagne')!.niveaux[0]!;
+    expect(suivantDansMonde(club)).toBe(avion); // l'avion de JBG pour la Bretagne
+    expect(MONDE.indexOf(avion)).toBe(MONDE.indexOf(club) + 1);
     expect(suivantDansMonde(MONDE.at(-1)!)).toBeNull();
   });
 

@@ -131,6 +131,18 @@ parcours se tire d'après le numéro du vol (`jeu/reve-parcours.ts`), donc les i
 `src/jeu/reve*.ts`, le rendu dans `src/rendu/reve*.ts`, les deux sprites de JBT (de dos, en vol) sortent de
 `outils/fixe-reve.py` (sources dans `assets-sources/reve/`).
 
+**L'avion de JBG** (entre la fin de la tournée et le Breizh Tour) : en hommage à l'avion pour Madrid que JBG a raté, il court
+après celui de la Ville Autotunée vers la Bretagne, façon Subway Surfers. L'avion des DKK roule au bout de la piste, l'arrière
+tourné vers JBG : JBT, JBM et Mat collés aux hublots, Tom qui fait des signes à la porte, l'échelle qui pend. Il accélère, et
+décolle au bout d'une minute. JBG change de voie (haut, bas : trois voies) et saute (un toucher sur l'écran, un clic ou le
+bouton SAUTE) par-dessus les cônes, les valises tombées et les flaques de kérosène ; il esquive les agents de piste (certains
+traversent), les trains de chariots et les camions-escaliers ; il grimpe sur les camions à tapis par leur rampe et court
+dessus. Chaque faux pas le fait trébucher et l'avion file. Il ramasse les cartes d'embarquement (5 points) et des bonus : le
+solo (il pulvérise ce qui est devant lui), les ressorts (il saute plus haut), la trottinette (plus vite, et elle encaisse un
+choc), l'aimant (les cartes viennent à lui). Quand l'avion est à portée, sur la voie du haut, il saute sur l'échelle : 300
+points, plus 10 par seconde d'avance sur le décollage. Le tarmac se tire d'après le numéro de la course
+(`jeu/avion-parcours.ts`) ; la simulation est dans `src/jeu/avion*.ts`, le rendu dans `src/rendu/avion*.ts`.
+
 ## À plusieurs
 
 Grâce à [lan-kit](https://github.com/piascwal/lan-kit) (figé sur `v0.2.0`), **sans serveur** :
@@ -266,7 +278,8 @@ validé.
   échelle depuis la surface et qui sont des impasses gardées (butin, arme ou cage +1 vie). Le monde est peu profond :
   24 rangées sous la surface, puis le vide.
 - **Un arc de l'histoire :** les niveaux d'un arc s'enchaînent, avec leur épilogue ; l'arc principal est « La tournée ».
-  Viennent ensuite le « Breizh Tour » (la forêt, le port, la traversée, Groix) puis « Le FISE ».
+  Viennent ensuite le « Breizh Tour » (l'avion de JBG, un mini-jeu facultatif, puis la forêt, le port, la traversée, Groix)
+  puis « Le FISE ».
   **Le FISE** (Montpellier, sur les berges du Lez) est fait à la main, zone par zone (`outils/niveaux/fise.py`) : l'entrée
   (l'arche et le logo officiel), le grand parc noir à plateaux roses (tuiles `L` et `U`), le food court à l'ombre des platanes
   et ses pissotières, le Freestyle Park de bois (half-pipe : descente, plat, remontée ; mini spine ; tuile `A`), la scène de

@@ -1,6 +1,7 @@
 import { MAX_JOUEURS } from '../config';
 import { decodeDrift, encodeDrift, OCTETS_DRIFT } from './protocole-drift';
 import { decodePlongeon, encodePlongeon, OCTETS_PLONGEON } from './protocole-plongeon';
+import { decodeAvion, encodeAvion, OCTETS_AVION } from './protocole-avion';
 import { decodeReve, encodeReve, OCTETS_REVE } from './protocole-reve';
 import {
   GENRES_CONVERTIS,
@@ -23,7 +24,7 @@ import {
  *
  * Changer ce fichier de façon incompatible : augmenter VERSION_PROTOCOLE.
  */
-export const VERSION_PROTOCOLE = 25;
+export const VERSION_PROTOCOLE = 26;
 export const APP_DKK = { id: 'dkk-rock', version: VERSION_PROTOCOLE };
 
 const TYPE_ETAT = 1;
@@ -37,6 +38,7 @@ export function encodeEtat(v: EtatVue): ArrayBuffer {
   const drift = v.phase === 'drift' && v.drift ? v.drift : null;
   const plongeon = v.phase === 'plongeon' && v.plongeon ? v.plongeon : null;
   const reve = v.phase === 'reve' && v.reve ? v.reve : null;
+  const avion = v.phase === 'avion' && v.avion ? v.avion : null;
   const buf = new ArrayBuffer(
     OCTETS_ENTETE +
       MAX_JOUEURS * OCTETS_JOUEUR +
@@ -44,7 +46,8 @@ export function encodeEtat(v: EtatVue): ArrayBuffer {
       n * OCTETS_ENTITE +
       (drift ? OCTETS_DRIFT : 0) +
       (plongeon ? OCTETS_PLONGEON : 0) +
-      (reve ? OCTETS_REVE : 0),
+      (reve ? OCTETS_REVE : 0) +
+      (avion ? OCTETS_AVION : 0),
   );
   const d = new DataView(buf);
   let o = 0;
@@ -96,6 +99,7 @@ export function encodeEtat(v: EtatVue): ArrayBuffer {
   if (drift) encodeDrift(d, o, drift);
   if (plongeon) encodePlongeon(d, o, plongeon);
   if (reve) encodeReve(d, o, reve);
+  if (avion) encodeAvion(d, o, avion);
   return buf;
 }
 
@@ -148,7 +152,16 @@ export function decodeEtat(buf: ArrayBuffer): EtatVue | null {
   const avecDrift = phase === 'drift';
   const avecPlongeon = phase === 'plongeon';
   const avecReve = phase === 'reve';
-  const suite = avecDrift ? OCTETS_DRIFT : avecPlongeon ? OCTETS_PLONGEON : avecReve ? OCTETS_REVE : 0;
+  const avecAvion = phase === 'avion';
+  const suite = avecDrift
+    ? OCTETS_DRIFT
+    : avecPlongeon
+      ? OCTETS_PLONGEON
+      : avecReve
+        ? OCTETS_REVE
+        : avecAvion
+          ? OCTETS_AVION
+          : 0;
   if (buf.byteLength !== o + n * OCTETS_ENTITE + suite) return null;
   const entites: EntiteVue[] = [];
   for (let i = 0; i < n; i++) {
@@ -179,6 +192,8 @@ export function decodeEtat(buf: ArrayBuffer): EtatVue | null {
   if (avecPlongeon && !plongeon) return null;
   const reve = avecReve ? decodeReve(d, o) : null;
   if (avecReve && !reve) return null;
+  const avion = avecAvion ? decodeAvion(d, o) : null;
+  if (avecAvion && !avion) return null;
   return {
     tick,
     phase,
@@ -197,6 +212,7 @@ export function decodeEtat(buf: ArrayBuffer): EtatVue | null {
     ...(drift ? { drift } : {}),
     ...(plongeon ? { plongeon } : {}),
     ...(reve ? { reve } : {}),
+    ...(avion ? { avion } : {}),
   };
 }
 

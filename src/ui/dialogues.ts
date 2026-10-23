@@ -1,4 +1,5 @@
 import { pagesDe } from '../histoire/pages';
+import { PHASES_MINI_JEUX } from '../jeu/mini-jeux';
 import type { EtatVue } from '../jeu/vue';
 import { NIVEAUX } from '../niveaux';
 import type { Qui } from '../niveaux/format';
@@ -100,7 +101,7 @@ export class Histoire {
   }
 
   maj(v: EtatVue): void {
-    if (v.phase === 'jeu' || v.phase === 'drift' || v.phase === 'plongeon' || v.phase === 'reve') {
+    if (v.phase === 'jeu' || PHASES_MINI_JEUX.has(v.phase)) {
       this.element.hidden = true;
       this.cle = '';
       this.convertis.arrete();

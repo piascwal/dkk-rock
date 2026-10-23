@@ -149,6 +149,11 @@ const SONS: Record<string, Son> = {
     s.note({ freq: 1200, vers: 90, duree: 0.25, type: 'sawtooth', volume: 0.12 * v });
     s.bruit({ duree: 0.2, volume: 0.12 * v, passeHaut: 3000 });
   },
+  // l'avion de JBG : les réacteurs qui montent en régime
+  moteur: (s, v) => {
+    s.bruit({ duree: 1.4, volume: 0.12 * v, passeBas: 500 });
+    s.note({ freq: 90, vers: 160, duree: 1.4, type: 'sawtooth', volume: 0.05 * v, filtre: 400 });
+  },
   fuse: (s, v) => s.bruit({ duree: 0.35, volume: 0.07 * v, passeHaut: 3500 }),
   reveil: (s, v) =>
     [0, 1, 2, 3, 4, 5, 6, 7].forEach((i) =>

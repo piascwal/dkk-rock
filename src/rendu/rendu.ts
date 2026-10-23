@@ -24,6 +24,7 @@ import { RenduNavire } from './navire';
 import { RenduDrift } from './drift';
 import { RenduPlongeon } from './plongeon';
 import { RenduReve } from './reve';
+import { RenduAvion } from './avion';
 import { CABRE, flammeReacteur, TUYERE } from './reacteur';
 import { geometrieNavire } from '../niveaux/navire';
 
@@ -48,6 +49,8 @@ export class Rendu {
   private readonly plongeon = new RenduPlongeon();
   /** le rêve de JBT (phase `reve`) */
   private readonly reve = new RenduReve();
+  /** l'avion de JBG (phase `avion`) */
+  private readonly avion = new RenduAvion();
   /** largeur de la vue en pixels du jeu (la hauteur est fixe, la largeur suit la forme de l'écran) */
   largeur = 480;
   theme: Theme = THEMES.garage;
@@ -212,6 +215,10 @@ export class Rendu {
     }
     if (vue.phase === 'reve' && vue.reve) {
       this.reve.dessine(ctx, vue.reve, this.largeur, this.tick);
+      return;
+    }
+    if (vue.phase === 'avion' && vue.avion) {
+      this.avion.dessine(ctx, vue.avion, this.largeur, this.tick);
       return;
     }
     this.prepareNiveau(vue.niveau);

@@ -7,6 +7,7 @@ import { NIVEAU_DRIFT } from '../jeu/drift';
 import type { MiniJeu } from '../jeu/mini-jeux';
 import { NIVEAU_PLONGEON } from '../jeu/plongeon';
 import { NIVEAU_REVE } from '../jeu/reve';
+import { NIVEAU_AVION } from '../jeu/avion';
 import type { AnnonceDkk } from '../reseau/annonce';
 import { Recherche } from '../reseau/client';
 import type { Hote } from '../reseau/hote';
@@ -119,6 +120,8 @@ export class Menus {
     const recordSaut = `Record du pont : ${s.recordPlongeon} % de précision.`;
     const reve = niveauOuvert(NIVEAU_REVE, s.faits);
     const recordReve = `Record du rêve : ${s.recordReve} points.`;
+    const avion = niveauOuvert(NIVEAU_AVION, s.faits);
+    const recordAvion = `Record du tarmac : ${s.recordAvion} points.`;
     this.montre(
       el('h2', 'Mini-jeux'),
       el(
@@ -138,6 +141,10 @@ export class Menus {
         ? bouton('Le rêve de JBT — la pleine lune', () => this.a.lanceMiniJeu('reve'), 'principal')
         : el('p', 'Le rêve de JBT : se débloque après la Ville Autotunée.', 'aide'),
       reve && s.recordReve > 0 ? el('p', recordReve, 'aide') : el('span'),
+      avion
+        ? bouton('L’avion de JBG — dernier appel', () => this.a.lanceMiniJeu('avion'), 'principal')
+        : el('p', 'L’avion de JBG : se débloque après le Club Infini.', 'aide'),
+      avion && s.recordAvion > 0 ? el('p', recordAvion, 'aide') : el('span'),
       bouton('Retour', () => this.titre()),
     );
   }

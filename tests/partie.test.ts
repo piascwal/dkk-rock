@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { DUREE_INVINCIBLE, PV_HEROS, TUILE, VIES_DEPART, VIES_MAX } from '../src/config';
 import { C } from '../src/jeu/commandes';
 import { Partie } from '../src/jeu/partie';
+import { PHASES_MINI_JEUX } from '../src/jeu/mini-jeux';
 import { ARCS, suivantDansMonde } from '../src/niveaux/arcs';
 import { DUREE_CARTE, G, GENRES_CONVERTIS } from '../src/jeu/vue';
 import { Objet } from '../src/entites/objets';
@@ -24,12 +25,12 @@ const avance = (p: Partie, n: number, bits = 0) => {
   }
 };
 
-/** Du bilan au niveau suivant : les pages, la carte du monde, et les mini-jeux en chemin (drift, plongeon, rêve : terminés d'office). */
+/** Du bilan au niveau suivant : les pages, la carte du monde, et les mini-jeux en chemin (terminés d'office). */
 function entreDeuxNiveaux(p: Partie): void {
   const miniJeu = () => p.phase === 'histoire' && p.lu.def.miniJeu !== undefined;
-  while (['convertis', 'bilan', 'carte', 'drift', 'plongeon', 'reve'].includes(p.phase) || miniJeu()) {
-    // un mini-jeu (le drift, le plongeon, le rêve) : on le termine d'office
-    const miniJeuEnCours = p.drift ?? p.plongeon ?? p.reve;
+  while (['convertis', 'bilan', 'carte'].includes(p.phase) || PHASES_MINI_JEUX.has(p.phase) || miniJeu()) {
+    // un mini-jeu en cours : on le termine d'office
+    const miniJeuEnCours = p.drift ?? p.plongeon ?? p.reve ?? p.avion;
     if (miniJeuEnCours) {
       miniJeuEnCours.fini = true;
       p.avance();

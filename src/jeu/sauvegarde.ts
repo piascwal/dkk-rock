@@ -32,6 +32,8 @@ export interface Sauvegarde {
   recordPlongeon: number;
   /** le record du rêve de JBT : le meilleur score (les piles, et la lune) */
   recordReve: number;
+  /** le record de l'avion de JBG : le meilleur score */
+  recordAvion: number;
 }
 
 const CLE = 'dkk-rock.sauvegarde';
@@ -48,6 +50,7 @@ export const SAUVEGARDE_VIDE: Sauvegarde = {
   recordDrift: 0,
   recordPlongeon: 0,
   recordReve: 0,
+  recordAvion: 0,
 };
 
 const entier = (v: unknown, min: number, max: number, defaut: number): number =>
@@ -89,6 +92,7 @@ export function valideSauvegarde(brut: unknown, nbNiveaux: number): Sauvegarde {
     recordDrift: pourcent(o.recordDrift),
     recordPlongeon: pourcent(o.recordPlongeon),
     recordReve: entier(o.recordReve, 0, 65534, 0),
+    recordAvion: entier(o.recordAvion, 0, 65534, 0),
   };
 }
 
@@ -128,11 +132,15 @@ export function retiensRecordPlongeon(s: Sauvegarde, scores: readonly (number | 
   return true;
 }
 
-/** Garde le meilleur score du rêve de JBT. Vrai s'il est battu (à enregistrer). */
-export function retiensRecordReve(s: Sauvegarde, scores: readonly (number | null)[]): boolean {
+/** Garde le meilleur score d'un mini-jeu à points (le rêve de JBT, l'avion de JBG). Vrai s'il est battu (à enregistrer). */
+function retiensMeilleur(
+  s: Sauvegarde,
+  cle: 'recordReve' | 'recordAvion',
+  scores: readonly (number | null)[],
+): boolean {
   const meilleur = Math.max(0, ...scores.map((x) => x ?? 0));
-  if (meilleur <= s.recordReve) return false;
-  s.recordReve = meilleur;
+  if (meilleur <= s[cle]) return false;
+  s[cle] = meilleur;
   return true;
 }
 
@@ -143,11 +151,13 @@ export function retiensRecords(
     drift?: { scores: ({ pourcent: number } | null)[] };
     plongeon?: { scores: (number | null)[] };
     reve?: { scores: (number | null)[] };
+    avion?: { scores: (number | null)[] };
   },
 ): boolean {
   return (
     (!!v.drift && retiensRecordDrift(s, v.drift.scores)) ||
     (!!v.plongeon && retiensRecordPlongeon(s, v.plongeon.scores)) ||
-    (!!v.reve && retiensRecordReve(s, v.reve.scores))
+    (!!v.reve && retiensMeilleur(s, 'recordReve', v.reve.scores)) ||
+    (!!v.avion && retiensMeilleur(s, 'recordAvion', v.avion.scores))
   );
 }

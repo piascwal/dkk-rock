@@ -11,6 +11,7 @@ import { CARTE_FERRY } from './cartes/10-ferry';
 import { CARTE_PRE_DU_CLOS } from './cartes/12-pre-du-clos';
 import { CARTE_PLONGEON } from './cartes/14-plongeon';
 import { CARTE_REVE } from './cartes/15-reve';
+import { CARTE_AVION } from './cartes/16-avion';
 import { CARTE_TUVES, DECOR_TUVES } from './cartes/13-tuves';
 import { ASSAUTS_FISE, CARTE_FISE, DECOR_FISE, ZONES_FISE } from './cartes/11-fise';
 import { litNiveau, type DefNiveau, type NiveauLu } from './format';
@@ -28,6 +29,7 @@ import { FISE } from './textes/11-fise';
 import { PRE_DU_CLOS } from './textes/12-pre-du-clos';
 import { PLONGEON } from './textes/14-plongeon';
 import { REVE } from './textes/15-reve';
+import { AVION } from './textes/16-avion';
 import { TUVES } from './textes/13-tuves';
 
 /** Les niveaux, arc après arc (voir arcs.ts). Pour en ajouter un : un texte, une carte, une ligne ici. */
@@ -54,6 +56,8 @@ export const NIVEAUX: DefNiveau[] = [
   { ...PLONGEON, carte: CARTE_PLONGEON },
   // le rêve de JBT (un mini-jeu), ajouté après coup : il vient entre la Ville Autotunée et le Club Infini
   { ...REVE, carte: CARTE_REVE },
+  // l'avion de JBG (un mini-jeu), ajouté après coup : il ouvre le Breizh Tour (on prend l'avion pour la Bretagne)
+  { ...AVION, carte: CARTE_AVION },
 ];
 
 const lus = new Map<number, NiveauLu>();
