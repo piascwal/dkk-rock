@@ -3,7 +3,7 @@ import { DUREE_CARTE, G } from '../jeu/vue';
 import { Aleatoire, borne } from '../moteur/maths';
 import { NIVEAUX } from '../niveaux';
 import { arcDe, etatsDuTrajet, MONDE, suivantDansMonde } from '../niveaux/arcs';
-import { C, SOLS, mer, type Px } from './carte-monde-decor';
+import { arbreDeLimite, C, limiteVillePort, SOLS, mer, type Px } from './carte-monde-decor';
 import { brouillard } from './carte-brouillard';
 import { dessineRoute, detroit, longueur, surRoute } from './carte-route';
 import { imageDe } from './feuilles-images';
@@ -117,6 +117,10 @@ function plan(): Plan {
   const ile = (x: number, y: number) => grandeIle(x, y) && !eau.has(y * LT + x);
   // sol, côtes et décors
   const occupe = new Set<number>();
+  const limite = limiteVillePort(
+    region.map((k) => decorDe(k)),
+    LT,
+  );
   for (let y = 0; y < HT; y++)
     for (let x = 0; x < LT; x++) {
       if (!ile(x, y)) continue;
@@ -144,6 +148,11 @@ function plan(): Plan {
       const k = y * LT + x;
       const libre = (i: number) =>
         ile(i % LT, Math.floor(i / LT)) && !surRouteOuPres.has(i) && !occupe.has(i);
+      if (libre(k) && limite.has(k)) {
+        arbreDeLimite(p, x * C, y * C);
+        occupe.add(k);
+        continue;
+      }
       if (!libre(k) || r.suivant() > 0.42) continue;
       const sol = SOLS[decorDe(region[k]!)];
       const grand =

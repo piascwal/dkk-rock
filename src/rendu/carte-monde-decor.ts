@@ -240,16 +240,17 @@ export const SOLS: Record<Decor, Sol> = {
     petits: [sapin, buisson, menhir, menhir, dolmen],
     grands: [chene, chene],
   },
+  // le port de Lorient : un pavé brun-beige, bien distinct de la pierre gris-violet de la Ville Autotunée
   quais: {
-    clair: '#8a8a86',
-    sombre: '#7e7e7a',
+    clair: '#a39878',
+    sombre: '#968b6c',
     petits: [penty, penty, casier, caillou],
     grands: [chalutier, chalutier, phare],
   },
   // l'embarquement du ferry : un quai, des chalutiers, le phare
   large: {
-    clair: '#8a8a86',
-    sombre: '#7e7e7a',
+    clair: '#a39878',
+    sombre: '#968b6c',
     petits: [casier, caillou, casier],
     grands: [chalutier, phare],
   },
@@ -278,6 +279,22 @@ export const SOLS: Record<Decor, Sol> = {
     grands: [phare, colline('#6e9442', '#5e8438', '#b8d070'), colline('#6e9442', '#5e8438', '#b8d070')],
   },
 };
+
+const VILLES = new Set<Decor>(['immeubles']);
+const PORTS = new Set<Decor>(['quais', 'large']);
+
+/** Les cases d'une rangée d'arbres, là où une ville touche un port (la Ville Autotunée et Lorient) : deux cases d'épaisseur. */
+export function limiteVillePort(decors: readonly Decor[], largeur: number): Set<number> {
+  const limite = new Set<number>();
+  decors.forEach((d, k) => {
+    const autre = VILLES.has(d) ? PORTS : PORTS.has(d) ? VILLES : null;
+    if (autre && [1, -1, largeur, -largeur].some((o) => decors[k + o] && autre.has(decors[k + o]!)))
+      limite.add(k);
+  });
+  return limite;
+}
+
+export const arbreDeLimite = sapin;
 
 /** La mer autour de l'île : vagues qui scintillent selon le temps. */
 export function mer(p: Px, x: number, y: number, tick: number, gx: number, gy: number): void {
