@@ -1,5 +1,5 @@
 import { HAUTEUR_VUE } from '../config';
-import { BONUS_LUNE, DUREE_LUNE } from '../jeu/reve';
+import { BONUS_LUNE, DUREE_LUNE, VIES } from '../jeu/reve';
 import { LONGUEUR } from '../jeu/reve-parcours';
 import type { VueReve } from '../jeu/vue-reve';
 import { disque } from './formes-pixels';
@@ -49,7 +49,7 @@ function coeur(ctx: Ctx, x: number, y: number, plein: boolean): void {
 function hud(ctx: Ctx, largeur: number, v: VueReve, tick: number): void {
   dessineImage(ctx, 'pile', 9, 9, 0, 1);
   ecrit(ctx, `${v.piles}`, 17, 4, JAUNE, 2);
-  for (let i = 0; i < 3; i++) coeur(ctx, largeur - 32 + i * 10, 4, i < v.vies);
+  for (let i = 0; i < VIES; i++) coeur(ctx, largeur - 10 * VIES - 4 + i * 10, 4, i < v.vies);
   const l = Math.min(110, largeur - 150);
   const x0 = Math.round(largeur / 2 - l / 2);
   const k = Math.min(1, v.distance / LONGUEUR);
@@ -99,7 +99,7 @@ export function dessineEcranReve(ctx: Ctx, largeur: number, v: VueReve, tick: nu
       ecritCentre(ctx, 'LE RÊVE DE JBT', m, 3, JAUNE, 2);
       ecritCentre(ctx, `${joueur(v.siege)} - JBT, SUPER-HÉROS`, m, 17, ROSE);
       bandeau(ctx, largeur, HAUTEUR_VUE - 32, 32);
-      ecritCentre(ctx, 'TIENS SAUT (OU HAUT) : MONTER   LÂCHE : DESCENDRE', m, HAUTEUR_VUE - 29, BLANC);
+      ecritCentre(ctx, 'TIENS LE BOUTON OU L’ÉCRAN : MONTER   LÂCHE : DESCENDRE', m, HAUTEUR_VUE - 29, BLANC);
       ecritCentre(ctx, 'RAMASSE LES PILES, ÉVITE TOUT LE RESTE', m, HAUTEUR_VUE - 19, CYAN);
       ecritCentre(ctx, 'ET RETROUVE LA PLEINE LUNE !', m, HAUTEUR_VUE - 10, JAUNE);
       return;

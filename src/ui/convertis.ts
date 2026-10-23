@@ -49,6 +49,9 @@ function commentaire(total: number): string {
   return 'Un vrai mouvement. Pardon : un public.';
 }
 
+/** La marge du canvas de la pile (pixels d'écran), autour de la pile : de la place pour que les éclats ne soient pas coupés. */
+const MARGE_EFFETS = 56;
+
 export class Convertis {
   private minuteur: ReturnType<typeof setInterval> | null = null;
   private depart = 0;
@@ -87,14 +90,19 @@ export class Convertis {
     const titre = el('h1', 'Convertis au rock !', 'titre-niveau');
     const sous = el('p', 'selon les DKK');
     this.pile = el('canvas', '', 'pile-convertis');
-    this.pile.width = Math.round(Math.min(innerWidth * 0.94, 960));
-    // la hauteur que le titre et les chiffres laissent, ramenée à ce dont la pile a besoin : pas de vide autour
-    const place = Math.round(Math.max(110, Math.min(innerHeight - 380, 420)));
-    this.pile.height = Math.max(8, dispose(this.genres.length, this.pile.width, place).hauteur);
+    // la pile, puis une marge tout autour où les éclats (explosions, confettis) peuvent déborder : sans elle, le canvas les
+    // coupe net à son bord, ligne du haut et du bas comprises ; la marge est reprise en négatif dans le style (pas de vide)
+    const largeur = Math.round(Math.min(innerWidth * 0.94, 960));
+    // la hauteur que le titre, les chiffres et le total laissent, ramenée à ce dont la pile a besoin : pas de vide autour
+    const place = Math.round(Math.max(110, Math.min(innerHeight - 440, 420)));
+    const hauteur = Math.max(8, dispose(this.genres.length, largeur, place).hauteur);
+    this.pile.width = largeur + 2 * MARGE_EFFETS;
+    this.pile.height = hauteur + 2 * MARGE_EFFETS;
+    this.pile.style.margin = `-${MARGE_EFFETS}px`;
     this.fond = el('canvas');
-    this.fond.width = this.pile.width;
-    this.fond.height = this.pile.height;
-    this.disposition = dispose(this.genres.length, this.pile.width, this.pile.height);
+    this.fond.width = largeur;
+    this.fond.height = hauteur;
+    this.disposition = dispose(this.genres.length, largeur, hauteur);
     this.ecart = Math.min(ECART_MAX, Math.max(ECART_MIN, DUREE_PILE / Math.max(1, this.genres.length)));
     this.valeurScore = el('strong', '0');
     const stats = el('div', '', 'stats-run');
@@ -157,10 +165,10 @@ export class Convertis {
     ctx.imageSmoothingEnabled = false;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, this.pile.width, this.pile.height);
-    ctx.drawImage(this.fond, 0, 0);
+    ctx.drawImage(this.fond, MARGE_EFFETS, MARGE_EFFETS);
     const k = this.disposition.echelle;
     this.particules.maj(null);
-    ctx.setTransform(k, 0, 0, k, 0, 0);
+    ctx.setTransform(k, 0, 0, k, MARGE_EFFETS, MARGE_EFFETS);
     this.particules.dessine(ctx, 0, 0);
     ctx.setTransform(1, 0, 0, 1, 0, 0);
   }

@@ -66,7 +66,10 @@ def tonneaux_de_surface(r, barils=False):
     terrain (la cache en garde un)."""
     n = r.n
     raccords = [(a, b) for a, b, g in r.pieces if g == 'raccord' and b - a >= 4]
+    milieu = len(raccords) // 2
     for k, (a, b) in enumerate(raccords):
+        if k == milieu:
+            continue  # le tonneau d'or s'y pose, seul : jamais sur un tonneau de bois
         if k % 2 == 0:
             n.repere(a + 1, 'O', ymin=n.base - 3, surface=True)
         elif barils and k % 4 == 1:
@@ -74,5 +77,5 @@ def tonneaux_de_surface(r, barils=False):
         elif barils and k % 4 == 3:
             n.repere(a + 1, 'J', ymin=n.base - 3, surface=True)  # un bidon d'essence, comme une caisse
     if raccords:
-        a, b = raccords[len(raccords) // 2]
+        a, b = raccords[milieu]
         n.repere(a + 1, 'Q', ymin=n.base - 3, surface=True)

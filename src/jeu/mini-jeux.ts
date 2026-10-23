@@ -16,6 +16,9 @@ export type MiniJeu = 'drift' | 'plongeon' | 'reve';
 
 export const PHASES_MINI_JEUX: ReadonlySet<Phase> = new Set<Phase>(['drift', 'plongeon', 'reve']);
 
+/** Les mini-jeux sans joystick : un toucher n'importe où sur l'écran tient lieu du bouton (le rêve de JBT). */
+export const SANS_JOYSTICK: ReadonlySet<Phase> = new Set<Phase>(['reve']);
+
 /** Le libellé du bouton SAUT de l'écran tactile dans chaque mini-jeu (voir Tactile.pilote). */
 export const BOUTON_MINI_JEU: Partial<Record<Phase, string>> = {
   drift: 'GAZ',

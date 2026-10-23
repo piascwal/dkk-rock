@@ -1,4 +1,6 @@
 import { C } from '../jeu/commandes';
+import { BOUTON_MINI_JEU, SANS_JOYSTICK } from '../jeu/mini-jeux';
+import type { Phase } from '../jeu/vue';
 
 const ZONE_MORTE = 12;
 
@@ -9,6 +11,8 @@ const ZONE_MORTE = 12;
 export class Tactile {
   private joystick: { id: number; x: number; y: number; dx: number; dy: number } | null = null;
   private readonly boutons = new Map<number, number>();
+  /** les doigts posés sur l'écran quand il tient lieu de bouton (voir `pilote`) */
+  private readonly doigtsEcran = new Set<number>();
   readonly element: HTMLElement;
   private readonly base: HTMLElement;
   private readonly manche: HTMLElement;
@@ -29,6 +33,14 @@ export class Tactile {
 
     const zone = this.element.querySelector<HTMLElement>('.zone-joystick')!;
     zone.addEventListener('pointerdown', (e) => {
+      // sans joystick (le rêve de JBT) : toucher l'écran, n'importe où, fait l'action du bouton SAUT, tant que le doigt reste
+      if (this.element.classList.contains('appui-ecran')) {
+        zone.setPointerCapture(e.pointerId);
+        this.boutons.set(e.pointerId, C.SAUT);
+        this.doigtsEcran.add(e.pointerId);
+        this.element.querySelector('.bouton.saut')!.classList.add('appuye');
+        return;
+      }
       // un nouveau doigt remplace un joystick resté « tenu » par un doigt dont on n'a jamais vu la fin
       zone.setPointerCapture(e.pointerId);
       this.joystick = { id: e.pointerId, x: e.clientX, y: e.clientY, dx: 0, dy: 0 };
@@ -45,6 +57,11 @@ export class Tactile {
       this.place();
     });
     const lache = (e: PointerEvent) => {
+      if (this.doigtsEcran.delete(e.pointerId)) {
+        this.boutons.delete(e.pointerId);
+        if (![...this.boutons.values()].includes(C.SAUT))
+          this.element.querySelector('.bouton.saut')!.classList.remove('appuye');
+      }
       if (this.joystick?.id !== e.pointerId) return;
       this.relacheJoystick();
     };
@@ -54,6 +71,14 @@ export class Tactile {
     // geste système, notification, trois doigts...) ; sans eux le joystick ou un bouton reste enfoncé
     window.addEventListener('pointerup', lache);
     window.addEventListener('pointercancel', lache);
+    // à la souris (les commandes tactiles sont cachées), le clic tient lieu du bouton de la même façon, hors des menus
+    parent.addEventListener('pointerdown', (e) => {
+      const cible = e.target as HTMLElement;
+      if (e.pointerType !== 'mouse' || !this.element.classList.contains('appui-ecran')) return;
+      if (!this.element.hidden || cible.closest('button, input, select, a, #ecran, #histoire')) return;
+      this.boutons.set(e.pointerId, C.SAUT);
+      this.doigtsEcran.add(e.pointerId);
+    });
     const toutLacher = () => this.relache();
     window.addEventListener('blur', toutLacher);
     document.addEventListener('visibilitychange', toutLacher);
@@ -114,14 +139,23 @@ export class Tactile {
    * Dans un mini-jeu, les boutons changent de rôle : SAUT prend le libellé du mini-jeu (« GAZ » au drift, « PLONGE » au plongeon),
    * le tir et le spécial n'ont rien à faire (ils disparaissent), et le joystick reste affiché, son manche qui se balance (voir le
    * CSS) : on le prend pour tourner ou se diriger. `libelle` null : hors mini-jeu, les libellés du jeu reviennent (et le tir,
-   * l'icône de l'arme ramassée).
+   * l'icône de l'arme ramassée). Sans joystick du tout (SANS_JOYSTICK : le rêve de JBT), un toucher n'importe où sur l'écran vaut
+   * le bouton : on tient pour voler.
    */
-  pilote(libelle: string | null): void {
+  pilote(phase: Phase): void {
     const saut = this.element.querySelector<HTMLElement>('.bouton.saut')!;
+    const libelle = BOUTON_MINI_JEU[phase] ?? null;
     const oui = libelle !== null;
-    if (this.element.classList.contains('mini-jeu') === oui && saut.textContent === (libelle ?? 'SAUT'))
+    const ecran = oui && SANS_JOYSTICK.has(phase);
+    if (
+      this.element.classList.contains('mini-jeu') === oui &&
+      this.element.classList.contains('appui-ecran') === ecran &&
+      saut.textContent === (libelle ?? 'SAUT')
+    )
       return;
     this.element.classList.toggle('mini-jeu', oui);
+    this.element.classList.toggle('appui-ecran', ecran);
+    if (ecran) this.relacheJoystick();
     const tir = this.element.querySelector<HTMLElement>('.bouton.tir')!;
     saut.textContent = libelle ?? 'SAUT';
     tir.classList.remove('avec-arme');
@@ -135,6 +169,7 @@ export class Tactile {
   relache(): void {
     this.relacheJoystick();
     this.boutons.clear();
+    this.doigtsEcran.clear();
     for (const b of this.element.querySelectorAll('.bouton')) b.classList.remove('appuye');
   }
 

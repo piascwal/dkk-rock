@@ -27,7 +27,7 @@ export const REVE: Omit<DefNiveau, 'carte'> = {
     },
     {
       qui: 'TOM',
-      texte: 'Tiens le bouton pour monter, lâche pour descendre. Il nous l’a déjà raconté trois fois.',
+      texte: 'Touche l’écran pour monter, lâche pour descendre. Il nous l’a déjà raconté trois fois.',
     },
   ],
   dialogues: {},

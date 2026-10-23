@@ -7,6 +7,8 @@ import { VERSION } from '../version';
  */
 
 const DENSITE = 6;
+/** JBT est dessiné à cette échelle de sa planche : assez petit pour avoir de la marge dans le ciel. */
+export const ECHELLE_JBT = 0.68;
 const FICHIERS = { vol: 'reve-jbt-vol.png', dos: 'reve-jbt-dos.png', pile: 'tir-pile.png' } as const;
 export type ImageReve = keyof typeof FICHIERS;
 const images = new Map<ImageReve, HTMLImageElement>();
@@ -69,11 +71,12 @@ export function dessineJbt(
   angle: number,
   tick: number,
 ): void {
-  dessineImage(ctx, 'vol', x, y, angle);
+  dessineImage(ctx, 'vol', x, y, angle, ECHELLE_JBT);
   // le bout de la cape claque au vent, derrière lui
   ctx.save();
   ctx.translate(Math.round(x), Math.round(y));
   ctx.rotate(angle);
+  ctx.scale(ECHELLE_JBT, ECHELLE_JBT);
   for (let k = 0; k < 4; k++) {
     const dy = Math.round(Math.sin(tick / 2.5 + k * 0.9) * 1.5);
     ctx.fillStyle = k % 2 ? '#8e0c0c' : '#b01414';

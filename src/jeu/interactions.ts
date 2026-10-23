@@ -62,11 +62,17 @@ export function interactions(p: Partie): void {
           break;
         }
         case 'coeur': {
+          // le cœur d'un tonneau WOG : un cœur de plus dans le HUD de celui qui le ramasse (s'il en a perdu), et une vie de plus
+          const soigne = j.pv < PV_HEROS;
+          if (soigne) j.pv++;
           const gagne = p.vies < VIES_MAX;
           if (gagne) p.vies++;
           e.fini = true;
           p.son('liberation', e.corps.x, e.corps.y);
-          p.texte(e.corps.x, e.corps.y - 10, gagne ? '+1 VIE' : 'VIES AU MAX', gagne ? '#ff6b8a' : '#ffd23f');
+          const [texte, couleur] = gagne
+            ? [soigne ? '+1 CŒUR +1 VIE' : '+1 VIE', '#ff6b8a']
+            : [soigne ? '+1 CŒUR' : 'VIES AU MAX', soigne ? '#ff6b8a' : '#ffd23f'];
+          p.texte(e.corps.x, e.corps.y - 10, texte, couleur);
           break;
         }
         case 'coeurOr':

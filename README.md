@@ -44,8 +44,8 @@ mer, puis le festival, sa foule, ses lasers, ses stroboscopes et sa grande scèn
 - **Bidons d'essence** (Saint-Cézaire et ville, marqueur `J`) : des tuiles comme les caisses, on monte dessus, et elles arrêtent le héros ; un tir les casse.
 - **Barils explosifs** (Saint-Cézaire et ville, marqueur `%`) : rouges, à terre. Le premier tir qui les touche (le leur comme celui d'une explosion voisine) les allume ; deux secondes plus tard, ils explosent (rayon 48 px, 5 dégâts aux héros comme aux ennemis : un cinquième de plus qu'un caisson de basses) et cassent ce qui se casse autour. Personne ne les vise, mais les tirs des ennemis les allument aussi.
 - **Tonneaux WOG** (le WOG, une passion magique pour les membres des DKK ; l'histoire sera retravaillée) : ce sont des tuiles
-  (`O` bois, `Q` or ; `outils/fixe-tuiles.py`), semées par le générateur (un raccord sur deux en bois, et un tonneau d'or bien en vue au milieu du parcours, en plus de celui d'une cache).
-  Cassé, un tonneau en bois libère un **cœur** (+1 vie, 5 au plus) ; un tonneau d'or, un **cœur d'or** : tous les points de vie
+  (`O` bois, `Q` or ; `outils/fixe-tuiles.py`), semées par le générateur (un raccord sur deux en bois, et un tonneau d'or bien en vue au milieu du parcours, posé seul, jamais sur un tonneau en bois, en plus de celui d'une cache).
+  Cassé, un tonneau en bois libère un **cœur** (un cœur de plus dans le HUD de celui qui le ramasse, s'il en a perdu, et +1 vie, 5 au plus) ; un tonneau d'or, un **cœur d'or** : tous les points de vie
   et `DUREE_INVINCIBLE` (10 s) d'invincibilité, avec une forte aura (`rendu/aura.ts`, portée par `EntiteVue.aura`, protocole v4).
   Le tonneau sans pancarte est le décor ordinaire de l'arrière-plan.
 - **Zone visible et traits de personnages :** la simulation ne connaît pas la caméra ; `ZONE_VISIBLE` (config) approxime
@@ -119,11 +119,11 @@ sauvegarde. La simulation est dans `src/jeu/plongeon*.ts` (aiguillée avec le dr
 
 **Le rêve de JBT** (entre la Ville Autotunée et le Club Infini) : la nuit avant la tour, JBT veut raconter son rêve, et au
 lieu de le raconter on le joue, façon Jetpack Joyride. JBT, en super-héros à cape, décolle de son lit sur un toit et traverse
-le ciel de nuit à toute vitesse, de plus en plus vite, pour retrouver la pleine lune qu'il a perdue de vue : on **tient** SAUT (ou
-HAUT, ou VOLE sur l'écran tactile) pour monter, on **lâche** pour redescendre. Il ramasse les piles alcalines (en ligne, en
+le ciel de nuit à toute vitesse, de plus en plus vite, pour retrouver la pleine lune qu'il a perdue de vue : on **tient** pour monter (un
+toucher n'importe où sur l'écran, ou un clic, ou le bouton VOLE ; pas de joystick dans ce mini-jeu), on **lâche** pour redescendre. Il ramasse les piles alcalines (en ligne, en
 vague, en biais, en bloc ; les dorées en valent dix) et évite les arcs électriques entre deux astéroïdes (droits, couchés, en
 biais, certains tournent ; des portes au plafond et au sol), les pluies de météorites en feu qui foncent en ondulant, et les
-étoiles filantes, annoncées au bord de l'écran par une alerte avant de traverser à toute allure. Trois chocs et le réveil sonne ;
+étoiles filantes, annoncées au bord de l'écran par une alerte avant de traverser à toute allure. JBT est petit pour avoir de la marge : cinq vies, cinq chocs et le réveil sonne ;
 au bout du ciel, la lune (qui grandissait au loin depuis le départ) arrive, et JBT y plante sa tête : on ne voit plus que son
 survêtement, ses baskets et sa cape. Le score : les piles, plus 100 pour la lune. Le ciel défile en plans (la voûte et la Voie
 lactée, une géante à anneaux, des nuages mauves, des moutons qu'on compte, la ville et la tour du Club Infini, les toits). Le

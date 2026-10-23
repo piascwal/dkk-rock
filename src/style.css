@@ -435,9 +435,11 @@ h2 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: safe center;
   gap: 1.2rem;
   padding: 1rem 4vw;
+  /* un écran plus haut que la fenêtre (la pile des convertis) se fait défiler, et son haut n'est jamais coupé */
+  overflow: hidden auto;
   /* opaque : on assume les dialogues, rien du niveau ne doit transparaître (on peut toujours passer d'un toucher) */
   background: radial-gradient(ellipse at 50% 40%, #26142f 0%, #0a050c 85%);
   z-index: 8;
@@ -594,8 +596,15 @@ h2 {
 
 /* l'écran des ennemis « convertis au rock » : la pile de sprites, puis le temps de la run et le score */
 #histoire .pile-convertis {
-  max-width: 96vw;
+  /* sa marge d'éclats (voir ui/convertis.ts) la rend plus large que l'écran : sa largeur est celle de son canvas */
+  max-width: none;
   image-rendering: pixelated;
+  pointer-events: none;
+}
+
+/* l'écran des convertis, serré : le titre, la pile, les chiffres et le total tiennent ensemble */
+#histoire:has(.pile-convertis) {
+  gap: 0.5rem;
 }
 
 #histoire .stats-run {
@@ -820,6 +829,16 @@ h2 {
   height: 50px;
   background: #8a5cf6;
   font-size: 1.3rem;
+}
+
+/* sans joystick (le rêve de JBT) : toute la largeur de l'écran est un bouton, et le joystick ne s'affiche pas */
+.tactile.appui-ecran .zone-joystick {
+  width: 100%;
+}
+
+.tactile.appui-ecran .joystick-base,
+.tactile.mini-jeu.appui-ecran .joystick-base:not(.actif) {
+  display: none;
 }
 
 /*

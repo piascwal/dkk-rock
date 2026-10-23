@@ -6,7 +6,7 @@ import { disque } from './formes-pixels';
 import { ecrit } from './police';
 import { dessineCiel } from './reve-ciel';
 import { dessineEcranReve } from './reve-ecrans';
-import { dessineImage, dessineJbt } from './reve-jbt';
+import { dessineImage, dessineJbt, ECHELLE_JBT } from './reve-jbt';
 import { dessineLune, jbtPlante, reveil } from './reve-lune';
 import { dessineObstacles, lit } from './reve-obstacles';
 
@@ -98,8 +98,8 @@ export class RenduReve {
       if (k < 0.7) {
         const e = k / 0.7;
         const y = 132 - (132 - v.y) * e * (2 - e);
-        dessineImage(ctx, 'dos', JBT_X, y, 0, 0.62);
-        if (tick % 2 === 0) this.etincelle(JBT_X + (tick % 7) - 3, y + 16, 0, 40);
+        dessineImage(ctx, 'dos', JBT_X, y, 0, 0.62 * ECHELLE_JBT);
+        if (tick % 2 === 0) this.etincelle(JBT_X + (tick % 7) - 3, y + 11, 0, 40);
       } else dessineJbt(ctx, JBT_X, v.y, -(1 - (k - 0.7) / 0.3) * 0.5, tick);
       return;
     }
@@ -110,7 +110,7 @@ export class RenduReve {
       ctx.globalAlpha = 1;
       // les étincelles du rêve derrière lui : une traînée quand il monte, quelques-unes sinon
       if (v.pousse || tick % 4 === 0)
-        this.etincelle(JBT_X - 24, v.y + 2, -40 - Math.random() * 40, v.pousse ? 50 : 10);
+        this.etincelle(JBT_X - 17, v.y + 1, -40 - Math.random() * 40, v.pousse ? 50 : 10);
       return;
     }
     if (v.plante || v.etape === 'lune') {
@@ -118,7 +118,7 @@ export class RenduReve {
       jbtPlante(ctx, JBT_X, v.y, ex(LUNE_X), LUNE_Y, tick, v.etape === 'lune' ? p : 1);
       return;
     }
-    if (v.etape === 'reveil') dessineImage(ctx, 'vol', JBT_X, v.y, tick * 0.25);
+    if (v.etape === 'reveil') dessineImage(ctx, 'vol', JBT_X, v.y, tick * 0.25, ECHELLE_JBT);
   }
 
   /** Les traits de vitesse : JBT traverse le ciel à toute allure. */

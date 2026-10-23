@@ -124,8 +124,8 @@ export function jbtPlante(
   // des étoiles qui lui tournent autour des pieds
   for (let i = 0; i < 3; i++) {
     const a = tick / 9 + (i * Math.PI * 2) / 3;
-    const sx = x - 20 + Math.cos(a) * 12;
-    const sy = y - 11 + Math.sin(a) * 4;
+    const sx = x - 14 + Math.cos(a) * 9;
+    const sy = y - 8 + Math.sin(a) * 3;
     ctx.fillStyle = '#ffd23f';
     ctx.fillRect(Math.round(sx) - 1, Math.round(sy), 3, 1);
     ctx.fillRect(Math.round(sx), Math.round(sy) - 1, 1, 3);

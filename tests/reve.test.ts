@@ -74,16 +74,21 @@ describe('le rêve de JBT', () => {
     expect(c.distance).toBeGreaterThan(500);
   });
 
-  it('les piles se ramassent (une en or en vaut dix) ; trois chocs, et JBT se réveille', () => {
+  it('les piles se ramassent (une en or en vaut dix) ; cinq chocs, et JBT se réveille', () => {
     const c = new ConcoursReve([0], false);
     videLeCiel(c);
     appuie(c);
     const x = c.distance + 20;
-    c.ciel.piles.push({ x, y: c.y, or: false }, { x: x + 15, y: c.y, or: true });
-    for (let t = 0; t < 20; t++) pas(c);
+    const y = c.y;
+    c.ciel.piles.push({ x, y, or: false }, { x: x + 15, y, or: true });
+    for (let t = 0; t < 20; t++) {
+      c.y = y; // il garde sa hauteur : la pesanteur ne l'écarte pas des piles
+      c.vy = 0;
+      pas(c);
+    }
     expect(c.piles).toBe(11);
     expect(c.collectees).toEqual([0, 1]);
-    // trois météorites sur sa route, l'une après l'autre
+    // des météorites sur sa route, l'une après l'autre
     for (let k = 0; k < VIES; k++) {
       c.ciel.meteores = [{ x: c.distance + 6, y: c.y, rayon: 10, derive: 0, ampl: 0, phase: 0 }];
       pas(c);

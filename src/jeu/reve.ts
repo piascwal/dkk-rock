@@ -31,20 +31,20 @@ const ATTENTE_APPUI = SECONDE;
 const POUSSEE = 640;
 const PESANTEUR = 540;
 const VMAX = 200;
-export const VIES = 3;
+export const VIES = 5;
 const INVULNERABLE = Math.round(1.4 * SECONDE);
 /** Le bonus pour avoir atteint la lune, et ce que vaut une pile en or. */
 export const BONUS_LUNE = 100;
 const OR = 10;
 /** La hauteur de JBT, de son centre à ses bords : il ne sort jamais du ciel. */
-const DEMI_HAUTEUR = 8;
+const DEMI_HAUTEUR = 6;
 /** JBT se plante dans la lune quand son centre est là : la tête et les épaules dedans, le reste dehors. */
 export const PLANTE_X = LUNE_X - LUNE_R - 10;
 /** JBT, allongé, la tête à droite : trois cercles (devant, milieu, derrière : dx, dy, rayon) suffisent à le toucher. */
 const CORPS: readonly (readonly [number, number, number])[] = [
-  [13, 0, 5],
-  [1, 0, 6],
-  [-13, 1, 5],
+  [9, 0, 3.5],
+  [1, 0, 4],
+  [-9, 1, 3.5],
 ];
 
 const VALIDE = C.SAUT | C.TIR;
@@ -62,7 +62,7 @@ function auSegment(px: number, py: number, x1: number, y1: number, x2: number, y
 /**
  * Le rêve de JBT (un mini-jeu façon Jetpack Joyride) : JBT, en super-héros, traverse le ciel de nuit à toute vitesse pour
  * retrouver la pleine lune qu'il a perdue de vue. On tient le bouton pour monter, on lâche pour descendre ; on ramasse les
- * piles alcalines, on évite les arcs électriques, les météorites et les étoiles filantes. Trois chocs et JBT se réveille en
+ * piles alcalines, on évite les arcs électriques, les météorites et les étoiles filantes. Cinq chocs et JBT se réveille en
  * sursaut ; au bout du ciel, il plante sa tête dans la lune. Chaque joueur vole à son tour ; les piles (et la lune) font le score.
  */
 export class ConcoursReve {
