@@ -31,6 +31,12 @@ interface Plan {
 
 let monde: Plan | null = null;
 
+/**
+ * Les étapes qui ne tombent pas à leur place le long de la route (niveau → tuiles de décalage sur la route) : l'avion de JBG
+ * part de la Ville Autotunée, son carré reste donc près du Club Infini, et non au coin du port de Lorient.
+ */
+const DECALAGE_ETAPE: Partial<Record<number, number>> = { 15: -5 };
+
 /** Les décors d'une île à part, au large : on y arrive en ferry. */
 const AU_LARGE = new Set<Decor>(['falaises']);
 
@@ -62,7 +68,9 @@ function plan(): Plan {
   let total = 0;
   for (let i = 0; i + 1 < route.length; i++) total += longueur(route, i);
   const n = MONDE.length;
-  const etapes = MONDE.map((_, i) => Math.round((i * total) / Math.max(1, n - 1)));
+  const etapes = MONDE.map(
+    (niveau, i) => Math.round((i * total) / Math.max(1, n - 1)) + (DECALAGE_ETAPE[niveau] ?? 0),
+  );
   const pos = etapes.map((d) => surRoute(route, d));
   const r = new Aleatoire(36);
 
