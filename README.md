@@ -308,7 +308,10 @@ validé.
   plus haut du monde, jamais fini ; Jeanne Hachette ; l'avion low-cost) et la finale à Marseille, où JBG a vécu (JBG : le Vieux-Port, le Panier, la pétanque, l'OM, les calanques, la Bonne Mère), avec l'épilogue
   `histoire/fin-international.ts`. Les monuments sont des pièces du générateur (`outils/niveaux/international.py` : la
   cathédrale sans nef et ses arcs-boutants, l'avion, le château à tours rondes, l'université, le pub, la Shannon et son pont, la cathédrale
-  romane, les maisons rouges, les gratte-ciel, le métro, le pont de Brooklyn, la colline de la Bonne Mère, les calanques). Les
+  romane, les maisons rouges, les gratte-ciel, le métro, le pont de Brooklyn, la colline de la Bonne Mère, les calanques), et
+  ce qui change la façon d'y jouer (`outils/niveaux/international_jeu.py` : le gymnase de JBT à Beauvais, son mur d'escalade,
+  sa corde et sa poutre ; le lac gelé de Lund, sa glace qui glisse et ses trous, et la butte de luge). Lund et Beauvais forcent
+  aussi à monter et descendre (corniches, tyroliennes, à-pics, galeries) sur près de 680 colonnes. Les
   fonds sont peints en code au chargement du niveau (`rendu/fonds-international*.ts`), comme les gens du coin
   (`entites/ennemis/locaux.ts`, dessinés dans `rendu/dessins-locaux.ts`) : dans ces villes, les lettres ordinaires « a » et
   « c » des cartes deviennent un passager perdu et un passager pressé, un habitué du pub et un mouton, un étudiant en

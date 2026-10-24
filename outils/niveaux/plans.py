@@ -316,11 +316,19 @@ NIVEAUX = {
             ('toits', 42, dict(lettres='ac')),
             ('cathedrale_beauvais', 40, dict(lettres='ac', digit='2')),  # le chœur le plus haut du monde, sans nef
             ('plat', 10, dict(lettres='ac', digit='3', drones=2)),  # l'horloge astronomique ; les gargouilles s'envolent
+            ('corniches', 24, dict(monte=6, lettres='ac')),  # on monte sur les remparts de la cité
             ('remparts', 18, dict(haut=6, lettres='ac', digit='4')),  # la place Jeanne-Hachette
             ('forteresse', 34, dict(etages=3, lettres='ac', mat='{', cage=True)),
+            ('descente', 24, dict(chute=6, lettres='ac')),  # on redescend des remparts en tyrolienne
+            ('gymnase', 46, dict(lettres='ac')),  # le gymnase de JBT : le mur d'escalade, la corde, la poutre
+            ('plat', 12, dict(lettres='ac', plus=2, drones=1)),  # une classe entière
+            ('barrage', 20, dict(haut=12, lettres='ac', tyro=11, butin='+')),  # le chantier : l'échafaudage, la tyrolienne
             ('gouffre', 20, dict(lettres='ac', nb=4)),
+            ('pont_singe', 22, dict(lettres='ac', butin='+')),
             ('tour', 18, dict(etages=3, tyro=9, apres=13, lettres='ac')),
+            ('grotte', 20, dict(monte=6, lettres='ac', butin='+')),
             ('traversee', 36, dict(lettres='ac', mode='pont')),
+            ('descente', 24, dict(chute=6, lettres='ac')),
             ('plat', 10, dict(lettres='ac', digit='5', drones=1)),  # le dernier appel
             ('avion', 52, dict(lettres='c')),  # l'avion low-cost sur le tarmac de Beauvais-Tillé
             ('arene', 40, dict(lettres='acz')),
@@ -353,13 +361,21 @@ NIVEAUX = {
         lieux=[
             ('plat', 12, dict(lettres='a', digit='1')),  # les étudiants en salopette
             ('maisons_rouges', 36, dict(lettres='ac')),
+            ('lac_gele', 44, dict(lettres='ac')),  # le lac gelé du parc : la glace glisse, les trous mènent à l'eau
             ('toits', 42, dict(lettres='ac')),
             ('cathedrale_lund', 48, dict(lettres='ac', digit='2')),  # la cathédrale romane, la crypte du géant Finn
-            ('plat', 10, dict(lettres='ac', digit='3')),  # l'horloge astronomique
+            ('plat', 10, dict(lettres='ac', digit='3', plus=1)),  # l'horloge astronomique
+            ('corniches', 22, dict(monte=6, lettres='ac')),  # on monte sur la colline de l'université
             ('forteresse', 34, dict(etages=3, lettres='ac', mat='B', cage=True)),  # l'université
+            ('descente', 24, dict(chute=6, lettres='ac')),
+            ('luge', 44, dict(lettres='ac')),  # la butte de luge : on monte, on dévale sur la glace
             ('maisons_rouges', 36, dict(lettres='ac', digit='4')),  # Kulturen
             ('traversee', 36, dict(lettres='ac', mode='iles')),
-            ('plat', 12, dict(lettres='cj', digit='5')),  # un élan sur la piste cyclable
+            ('grotte', 20, dict(monte=6, lettres='ac', butin='+')),
+            ('plat', 12, dict(lettres='cj', digit='5', plus=1)),  # un élan sur la piste cyclable
+            ('lac_gele', 36, dict(lettres='cj')),  # les élans sur la glace
+            ('descente', 24, dict(chute=6, lettres='acj')),
+            ('barrage', 20, dict(haut=12, lettres='acj', tyro=11, butin='+')),
             ('gouffre', 20, dict(lettres='acj', nb=4)),
             ('tour', 18, dict(etages=3, tyro=9, apres=13, lettres='ac', mat='B')),
             ('arene', 40, dict(lettres='acj')),

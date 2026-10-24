@@ -25,6 +25,7 @@ from signatures import falaise, glacier, parking, ponton, scene, toits
 from structures import forteresse, traversee
 from verrous import barrage, gouffre
 import international
+import international_jeu
 
 RACINE = pathlib.Path(__file__).resolve().parent.parent
 CARTES = RACINE / 'src' / 'niveaux' / 'cartes'
@@ -321,6 +322,15 @@ class Recette:
 
     def p_universite(self, x0, x1, lettres='a'):
         international.universite_limerick(self.n, x0, x1 - x0, lettres)
+
+    def p_gymnase(self, x0, x1, lettres='a'):
+        international_jeu.gymnase(self.n, x0, x1 - x0, lettres)
+
+    def p_lac_gele(self, x0, x1, lettres='a'):
+        international_jeu.lac_gele(self.n, x0, x1 - x0, lettres)
+
+    def p_luge(self, x0, x1, lettres='a', haut=7):
+        international_jeu.butte_de_luge(self.n, x0, x1 - x0, lettres, haut)
 
     def p_pres(self, x0, x1, lettres='c'):
         international.pres_a_murets(self.n, x0, x1 - x0, lettres)
