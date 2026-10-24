@@ -7,6 +7,18 @@ export const SECONDE = TICKS_PAR_SECONDE;
 export const DT = 1 / SECONDE;
 export const DUREE_INTRO = Math.round(2.5 * SECONDE);
 export const DUREE_FIN = Math.round(3 * SECONDE);
+/**
+ * L'embarquement réussi : JBG grimpe à l'échelle (GRIMPE), l'échelle remonte, puis l'avion accélère, cabre et s'envole ; le tout
+ * dure DUREE_EMBARQUE.
+ */
+export const GRIMPE = Math.round(1.6 * SECONDE);
+export const DUREE_EMBARQUE = Math.round(5.5 * SECONDE);
+const AVANT_ENVOL = GRIMPE + Math.round(0.4 * SECONDE);
+/** Depuis combien de temps l'avion a quitté le sol après l'embarquement (en « secondes de décollage », négatif avant). */
+export const envolApresEmbarquement = (minuteur: number): number =>
+  ((DUREE_EMBARQUE - minuteur - AVANT_ENVOL) / SECONDE) * 1.2;
+/** Le tick (valeur du minuteur) où les moteurs rugissent : l'avion part. */
+export const MINUTEUR_ENVOL = DUREE_EMBARQUE - AVANT_ENVOL;
 export const DUREE_RESULTAT = 6 * SECONDE;
 export const ATTENTE_APPUI = SECONDE;
 

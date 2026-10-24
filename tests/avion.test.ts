@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { VIES_DEPART } from '../src/config';
 import { C } from '../src/jeu/commandes';
 import { Partie } from '../src/jeu/partie';
-import { ConcoursAvion, DECOLLAGE, NIVEAU_AVION, PORTEE, xAvion } from '../src/jeu/avion';
+import { ConcoursAvion, DECOLLAGE, DUREE_EMBARQUE, NIVEAU_AVION, PORTEE, xAvion } from '../src/jeu/avion';
 import { BONUS, LONGUEURS, OBSTACLES, parcours, RAMPE, type Objet } from '../src/jeu/avion-parcours';
 import { NIVEAUX } from '../src/niveaux';
 import { MONDE, niveauOuvert, suivantDansMonde } from '../src/niveaux/arcs';
@@ -51,7 +51,15 @@ describe('l’avion de JBG', () => {
     expect(c.temps / 60).toBeLessThan(40);
     appuie(c);
     expect(c.etape).toBe('embarque');
-    while (c.etape === 'embarque') pas(c);
+    // la cinématique : il grimpe, l'échelle remonte, les moteurs rugissent et l'avion s'envole
+    const sons: string[] = [];
+    let ticks = 0;
+    while (c.etape === 'embarque') {
+      c.maj([0, 0, 0, 0], [0], (nom) => sons.push(nom));
+      ticks++;
+    }
+    expect(ticks).toBe(DUREE_EMBARQUE - 1);
+    expect(sons).toContain('moteur');
     expect(c.etape).toBe('resultat');
     expect(c.score).toBeGreaterThanOrEqual(300 + 10 * 20);
   });

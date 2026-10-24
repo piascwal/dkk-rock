@@ -1,4 +1,4 @@
-import { DECOLLAGE, DUREE_FIN, xAvion } from '../jeu/avion';
+import { DECOLLAGE, DUREE_EMBARQUE, GRIMPE, envolApresEmbarquement, xAvion } from '../jeu/avion';
 import { BONUS, LONGUEURS, estObstacle, parcours, type Objet } from '../jeu/avion-parcours';
 import { ANIM, G, type Genre } from '../jeu/vue';
 import type { VueAvion } from '../jeu/vue-avion';
@@ -65,11 +65,17 @@ export class RenduAvion {
     dessineEcranAvion(ctx, largeur, v, tick);
   }
 
-  /** L'avion : loin, il est petit au bout de la piste ; près, il est grand et sa porte arrière arrive à la hauteur de JBG. */
+  /**
+   * L'avion : loin, il est petit au bout de la piste ; près, il est grand et sa porte arrière arrive à la hauteur de JBG. JBG à
+   * bord, l'échelle remonte, puis il accélère, cabre et s'envole ; parti, il n'est plus là pour le score.
+   */
   private avion(ctx: CanvasRenderingContext2D, v: VueAvion, largeur: number, tick: number): void {
+    if (v.embarque && v.etape !== 'embarque') return;
+    const envol = v.etape === 'embarque' ? envolApresEmbarquement(v.minuteur) : -1;
+    const aBord = v.etape === 'embarque' && DUREE_EMBARQUE - v.minuteur > GRIMPE;
     const ecart = xAvion(v.temps) - v.x;
     const s = Math.max(0.36, Math.min(1, 1.05 - ecart / 1800));
-    const x = JBG_X + 10 + Math.max(0, ecart) * 0.12;
+    const x = JBG_X + 10 + Math.max(0, ecart) * 0.12 + (envol > 0 ? envol * envol * 30 : 0);
     if (x > largeur + 40) return;
     const k = (s - 0.36) / 0.64;
     const sol = Math.round(SOL_PISTE - 10 + 10 * k);
@@ -80,8 +86,8 @@ export class RenduAvion {
       sol,
       s,
       tick,
-      ecart < 260,
-      v.etape === 'rate' || v.embarque ? Math.max(0, decolle) : -1,
+      ecart < 260 && !aBord,
+      v.etape === 'rate' ? Math.max(0, decolle) : v.etape === 'embarque' ? Math.max(0, envol) : -1,
     );
   }
 
@@ -186,11 +192,11 @@ export class RenduAvion {
 
   /** L'embarquement : JBG grimpe à l'échelle, de dos, puis disparaît par la porte. */
   private grimpe(ctx: CanvasRenderingContext2D, v: VueAvion, tick: number): void {
-    const p = 1 - v.minuteur / DUREE_FIN;
-    if (p > 0.55) return;
+    const p = (DUREE_EMBARQUE - v.minuteur) / GRIMPE;
+    if (p > 1) return;
     const ecart = Math.max(0, xAvion(v.temps) - v.x);
     const x = JBG_X + 10 + ecart * 0.12 + 5;
-    const y = SOL_VOIES[2]! - (p / 0.55) * 26;
+    const y = SOL_VOIES[2]! - p * 26;
     ctx.save();
     ctx.translate(Math.round(x), Math.round(y));
     if (!dessineDecorFeuille(ctx, 'jbg-echelle', (tick >> 3) & 1))

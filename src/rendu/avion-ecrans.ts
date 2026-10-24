@@ -1,6 +1,6 @@
 import { HAUTEUR_VUE } from '../config';
 import { BONUS } from '../jeu/avion-parcours';
-import { DECOLLAGE, PORTEE, xAvion } from '../jeu/avion';
+import { DECOLLAGE, PORTEE, envolApresEmbarquement, xAvion } from '../jeu/avion';
 import type { VueAvion } from '../jeu/vue-avion';
 import { ecrit, ecritCentre, largeurTexte } from './police';
 import { iconeBonus } from './avion-objets';
@@ -119,6 +119,7 @@ export function dessineEcranAvion(ctx: Ctx, largeur: number, v: VueAvion, tick: 
     }
     case 'embarque':
       ecritCentre(ctx, 'À BORD !', m, 30, VERT, 3);
+      if (envolApresEmbarquement(v.minuteur) > 0) ecritCentre(ctx, 'CAP SUR LA BRETAGNE !', m, 54, JAUNE);
       return;
     case 'rate':
       ecritCentre(ctx, 'TROP TARD...', m, 30, ROUGE, 3);

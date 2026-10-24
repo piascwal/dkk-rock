@@ -19,8 +19,11 @@ import { OBJETS_RECENTS, vueDuConcours, type EtapeAvion, type VueAvion } from '.
 export {
   DECOLLAGE,
   DEPART_AVION,
+  DUREE_EMBARQUE,
   DUREE_FIN,
   DUREE_INTRO,
+  GRIMPE,
+  envolApresEmbarquement,
   DUREE_RESULTAT,
   PORTEE,
   xAvion,
@@ -110,6 +113,7 @@ export class ConcoursAvion {
       case 'embarque':
       case 'rate':
         this.temps++;
+        if (this.etape === 'embarque' && this.minuteur === R.MINUTEUR_ENVOL) son('moteur');
         if (this.minuteur === 0) this.termine();
         break;
       case 'resultat':
@@ -137,7 +141,7 @@ export class ConcoursAvion {
     if (k.appuye(VALIDE) && aPortee && this.voie === VOIES - 1) {
       this.etape = 'embarque';
       this.embarque = true;
-      this.minuteur = R.DUREE_FIN;
+      this.minuteur = R.DUREE_EMBARQUE;
       son('liberation');
       return;
     }
