@@ -1,4 +1,4 @@
-import { ANIM } from '../jeu/vue';
+import { ANIM, G } from '../jeu/vue';
 import { VERSION } from '../version';
 import { FEUILLES, caseDeLaPlanche, colonneDuCycle, type Feuille } from './feuilles';
 import { FEUILLES_DECOR } from './feuilles-objets';
@@ -13,25 +13,56 @@ import type { Genre } from '../jeu/vue';
 const images = new Map<Genre, HTMLImageElement>();
 const imagesDecor = new Map<string, HTMLImageElement>();
 
-/** Lance le chargement de toutes les planches déclarées ; celles qui échouent sont ignorées (repli sur le dessin en code). */
+/** Les planches dont l'intro a besoin dès sa première image : les cinq héros et Fadatchi. Elles passent avant toutes les autres. */
+const ESSENTIELLES: readonly Genre[] = [G.JBT, G.JBM, G.JBG, G.MAT, G.TOM, G.KIWI];
+let essentiellesRestantes = ESSENTIELLES.length;
+
+/** Où en est le chargement des planches essentielles, de 0 à 1 (une planche en échec compte : le jeu a son dessin de repli). */
+export const progresEssentielles = (): number => 1 - essentiellesRestantes / ESSENTIELLES.length;
+
+function chargeImage(src: string, charge: (img: HTMLImageElement) => void, fini?: () => void): void {
+  const img = new Image();
+  img.onload = () => {
+    charge(img);
+    fini?.();
+  };
+  img.onerror = () => fini?.();
+  // la version dans l'adresse : après une mise à jour, le navigateur ne ressert pas l'ancienne image
+  img.src = `${src}?v=${VERSION}`;
+}
+
+/**
+ * Lance le chargement de toutes les planches déclarées ; celles qui échouent sont ignorées (repli sur le dessin en code). Les
+ * héros et Fadatchi d'abord, seuls : 140 images demandées d'un coup se partageaient la connexion, et l'intro démarrait sans
+ * personnages ; le reste (ennemis, décors, mini-jeux) suit dès qu'elles sont là.
+ */
 export function chargeFeuilles(base: string): void {
-  chargeTuiles(base, VERSION);
-  chargeVoitures(base);
-  chargePlongeon(base);
-  chargeReve(base);
-  chargeAvion(base);
-  chargeSibylle(base);
-  for (const [genre, f] of Object.entries(FEUILLES)) {
-    const img = new Image();
-    img.onload = () => images.set(Number(genre) as Genre, img);
-    // la version dans l'adresse : après une mise à jour, le navigateur ne ressert pas l'ancienne image
-    img.src = `${base}sprites/${f.fichier}?v=${VERSION}`;
+  let suiteLancee = false;
+  const suite = () => {
+    if (suiteLancee) return;
+    suiteLancee = true;
+    chargeTuiles(base, VERSION);
+    chargeVoitures(base);
+    chargePlongeon(base);
+    chargeReve(base);
+    chargeAvion(base);
+    chargeSibylle(base);
+    for (const [genre, f] of Object.entries(FEUILLES))
+      if (!ESSENTIELLES.includes(Number(genre) as Genre))
+        chargeImage(`${base}sprites/${f.fichier}`, (img) => images.set(Number(genre) as Genre, img));
+    for (const [nom, f] of Object.entries(FEUILLES_DECOR))
+      chargeImage(`${base}sprites/${f.fichier}`, (img) => imagesDecor.set(nom, img));
+  };
+  for (const g of ESSENTIELLES) {
+    const f = FEUILLES[g];
+    const fini = () => {
+      if (--essentiellesRestantes <= 0) suite();
+    };
+    if (f) chargeImage(`${base}sprites/${f.fichier}`, (img) => images.set(g, img), fini);
+    else fini();
   }
-  for (const [nom, f] of Object.entries(FEUILLES_DECOR)) {
-    const img = new Image();
-    img.onload = () => imagesDecor.set(nom, img);
-    img.src = `${base}sprites/${f.fichier}?v=${VERSION}`;
-  }
+  // filet : une connexion qui traîne ne bloque pas le reste plus de quelques secondes
+  setTimeout(suite, 4000);
 }
 
 /** Dessine l'apparence `ligne` d'une planche du décor, pieds au point courant. False si elle n'est pas chargée. */

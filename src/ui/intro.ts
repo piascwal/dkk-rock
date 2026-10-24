@@ -1,7 +1,7 @@
 import type { Synthe } from '../audio/synthe';
 import { G } from '../jeu/vue';
 import { FEUILLES } from '../rendu/feuilles';
-import { imageDe } from '../rendu/feuilles-images';
+import { imageDe, progresEssentielles } from '../rendu/feuilles-images';
 import { ecritCentre } from '../rendu/police';
 import { VERSION } from '../version';
 import { DUREE_CASE, dessineCase } from './intro-comics';
@@ -19,6 +19,8 @@ const H = 240;
 const NOMS = ['JBT', 'JBM', 'JBG', 'MAT', 'TOM'];
 const GENRES = [G.JBT, G.JBM, G.JBG, G.MAT, G.TOM];
 const COULEURS = ['#e5432f', '#3fa7f2', '#ffd23f', '#7cfc7c', '#ff4fd8'];
+/** Au plus ce temps d'attente des planches des héros avant d'accepter le toucher (ms) : une connexion lente ne bloque pas. */
+const ATTENTE_MAX = 5000;
 
 interface Eclat {
   x: number;
@@ -37,6 +39,7 @@ export class Intro {
   private finie = false;
   private eclats: Eclat[] = [];
   private readonly passer = document.createElement('button');
+  private readonly creee = performance.now();
 
   constructor(
     private readonly toile: HTMLCanvasElement,
@@ -68,8 +71,15 @@ export class Intro {
     this.w = calibreToile(this.toile, this.ctx, H);
   };
 
+  /** Les héros sont chargés (ou on a assez attendu) : l'intro peut démarrer avec eux à l'écran, pas sans. */
+  private get prete(): boolean {
+    const bases = this.bases.complete;
+    return (progresEssentielles() >= 1 && bases) || performance.now() - this.creee > ATTENTE_MAX;
+  }
+
   private touche = (e: Event): void => {
     e.preventDefault();
+    if (!this.lancee && !this.prete) return;
     if (!this.lancee) {
       // le premier toucher : le son devient possible, l'intro démarre
       this.synthe.demarre();
@@ -118,7 +128,15 @@ export class Intro {
     c.fillRect(-10, -10, w + 20, H + 20);
     if (!this.lancee) {
       ecritCentre(c, 'DKK', w / 2, 80, '#fff4d6', 6);
-      if (Math.floor(performance.now() / 500) % 2)
+      if (!this.prete) {
+        // le petit chargement : les héros arrivent (une barre, rien de plus)
+        const k = (progresEssentielles() + (this.bases.complete ? 1 : 0)) / 2;
+        c.fillStyle = '#3a1a2a';
+        c.fillRect(Math.round(w / 2 - 60), 150, 120, 6);
+        c.fillStyle = '#ffd23f';
+        c.fillRect(Math.round(w / 2 - 59), 151, Math.round(118 * k), 4);
+        ecritCentre(c, 'Chargement', w / 2, 162, '#a89060', 1);
+      } else if (Math.floor(performance.now() / 500) % 2)
         ecritCentre(c, 'Touchez pour rocker', w / 2, 150, '#ffd23f', 2);
       c.restore();
       return;
