@@ -58,9 +58,11 @@ export const ARCS: DefArc[] = [
   {
     id: 'international',
     titre: 'International Tour',
-    resume: 'Une ville par membre du groupe : Beauvais, Limerick, Lund, New York, et la finale à Marseille.',
-    // les niveaux 16 à 20 de la liste ; le départ de Beauvais (son aéroport « Paris »), JBT en guide ; puis Mat, Tom, JBM, JBG
-    niveaux: [16, 17, 18, 19, 20],
+    resume:
+      'Une ville qui a marqué chaque membre du groupe : Limerick, New York, Lund, l’exotique Beauvais, et la finale à Marseille.',
+    // les niveaux 16 à 20 de la liste, dans l'ordre de la tournée : Limerick (Mat), New York (JBM), Lund (Tom), Beauvais (JBT),
+    // Marseille (JBG)
+    niveaux: [17, 19, 18, 16, 20],
     apres: 10,
     fin: FIN_INTERNATIONAL,
   },

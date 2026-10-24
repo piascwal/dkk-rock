@@ -33,7 +33,7 @@ function quadrupede(
 }
 
 export const DESSINS_LOCAUX: Partial<Record<number, Dessin>> = {
-  // Beauvais : le passager perdu, sa valise cabine aux mesures exactes, son plan de Paris
+  // Beauvais : le passager perdu, sa valise cabine aux mesures exactes, son plan de la ville
   [G.PASSAGER]: (p, e, f) => {
     const yt = humain(
       p,

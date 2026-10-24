@@ -7,7 +7,7 @@ import { ecrit } from './police';
  * Les fonds de l'International Tour (1/2), peints une fois au chargement du niveau (aucune image à télécharger) :
  * - Beauvais : la plaine de Picardie, et le chœur de la cathédrale Saint-Pierre, immense, hérissé d'arcs-boutants et de pinacles,
  *   sans nef (un mur plat à l'ouest) ; un avion low-cost qui décolle ; devant, les maisons à colombages et la brique de la
- *   reconstruction, un panneau « PARIS 85 KM » ;
+ *   reconstruction, un panneau « BEAUVAIS INTL » ;
  * - Limerick : les collines vertes à murets de pierre sèche, les moutons, le château du roi Jean et ses tours rondes au bord de la
  *   Shannon ; devant, les maisons géorgiennes de brique rouge aux portes de couleur, et le pub ;
  * - Lund : la nuit d'hiver sur la plaine de Scanie enneigée, les deux tours de la cathédrale ; devant, les maisons de bois rouge
@@ -129,10 +129,10 @@ const beauvais: Peinture = (c, r, th, plan) => {
     if (r.suivant() < 0.25) arbreRond(c, x + w + 2, 240, r.entier(16, 24), '#4a6a3a');
   }
   if (plan === 1) {
-    // le panneau, pour ceux qui croyaient atterrir à Paris
+    // le panneau : l'aéroport est international, la ville aussi
     rect(c, 300, 196, 2, 42, '#5a5a62');
-    rect(c, 280, 186, 46, 12, '#1a4a9a');
-    ecrit(c, 'PARIS 85 KM', 282, 189, '#ffffff');
+    rect(c, 274, 186, 56, 12, '#1a4a9a');
+    ecrit(c, 'BEAUVAIS INTL', 276, 189, '#ffffff');
   }
 };
 

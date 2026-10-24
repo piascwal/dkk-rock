@@ -3,77 +3,38 @@ import type { DefNiveau } from '../format';
 export const BEAUVAIS: Omit<DefNiveau, 'carte'> = {
   id: 'beauvais',
   titre: 'Beauvais',
-  sousTitre: 'International Tour 1 — Paris (à 85 km)',
+  sousTitre: 'International Tour 4 — L’étape exotique, chez l’ancien prof de sport',
   theme: 'beauvais',
   intro: [
     {
       qui: 'NARRATEUR',
-      texte:
-        'Après le FISE, une idée de JBT : une tournée internationale. Une ville par membre du groupe. Le départ ? De chez lui.',
+      texte: 'Après l’Irlande, New York et la Suède, une contrée lointaine et mystérieuse : Beauvais.',
     },
-    { qui: 'JBT', texte: 'Beauvais. La ville. L’aéroport. La cathédrale. Dans cet ordre ou dans un autre.' },
-    { qui: 'JBM', texte: 'Sur le billet, c’est écrit « Paris ».' },
     {
       qui: 'JBT',
-      texte: 'Paris-Beauvais. Paris, c’est juste un peu plus loin. Quatre-vingt-cinq kilomètres. Un détail.',
+      texte: 'Beauvais ! J’y ai été prof de sport. Des générations d’élèves m’appellent encore « Monsieur ».',
     },
+    { qui: 'MAT', texte: 'C’est international, Beauvais ?' },
+    { qui: 'JBT', texte: 'Il y a un aéroport international. Donc c’est international.' },
   ],
   dialogues: {
     1: [
-      {
-        qui: 'NARRATEUR',
-        texte:
-          'Le centre-ville : des maisons à colombages, des rues pavées, et des voyageurs qui cherchent la navette pour Paris.',
-      },
-      { qui: 'TOM', texte: 'Ils ont tous une valise cabine. Format exact. Au centimètre près.' },
+      { qui: 'JBT', texte: 'Échauffement ! Trois tours du centre-ville. On ne marche pas, Tom.' },
+      { qui: 'TOM', texte: 'J’ai un mot de mes parents.' },
     ],
     2: [
-      {
-        qui: 'NARRATEUR',
-        texte:
-          'La cathédrale Saint-Pierre : le chœur gothique le plus haut du monde, quarante-huit mètres sous la voûte. Commencée en 1225. Jamais finie.',
-      },
-      {
-        qui: 'JBT',
-        texte:
-          'Il manque la nef. Tout le reste est là. C’est comme nos morceaux : le refrain est grandiose, le couplet viendra.',
-      },
-      { qui: 'MAT', texte: 'Elle s’est effondrée deux fois, quand même.' },
-      { qui: 'JBT', texte: 'Elle a été ambitieuse deux fois.' },
+      { qui: 'MAT', texte: 'Elle n’a jamais été finie, cette cathédrale.' },
+      { qui: 'JBT', texte: 'Comme nos morceaux : le refrain est grandiose, le couplet viendra.' },
     ],
-    3: [
-      {
-        qui: 'JBT',
-        texte:
-          'L’horloge astronomique : quatre-vingt-dix mille pièces. Elle donne l’heure, les marées, les saisons. Pas l’heure du dernier bus pour Paris.',
-      },
-    ],
-    4: [
-      {
-        qui: 'NARRATEUR',
-        texte:
-          'La place Jeanne-Hachette. En 1472, elle a repoussé l’armée de Charles le Téméraire du haut des remparts, une hache à la main.',
-      },
-      { qui: 'JBG', texte: 'On devrait l’engager. Pour les pogos.' },
-    ],
+    3: [{ qui: 'JBT', texte: 'Mes élèves y lisaient surtout l’heure de la fin du cours.' }],
+    4: [{ qui: 'JBT', texte: 'Jeanne Hachette. Vingt sur vingt en lancer. Sans échauffement.' }],
     5: [
-      {
-        qui: 'RADIO',
-        texte: 'Dernier appel pour le vol à destination de Limerick. Les bagages cabine seront mesurés.',
-      },
-      {
-        qui: 'JBT',
-        texte: 'L’aéroport ! Courez ! Les avions low-cost n’attendent personne. Même pas leurs pilotes.',
-      },
+      { qui: 'RADIO', texte: 'Dernier appel pour le vol international à destination de Marseille.' },
+      { qui: 'JBT', texte: 'Courez ! Comme au cross : l’avion n’attend pas les derniers.' },
     ],
   },
   outro: [
-    {
-      qui: 'NARRATEUR',
-      texte:
-        'Le groupe embarque de justesse. Les instruments voyagent en soute. La basse de Mat, en supplément.',
-    },
-    { qui: 'MAT', texte: 'Quarante euros pour ma basse. Elle n’a même pas de siège.' },
-    { qui: 'JBT', texte: 'Prochaine étape : l’Irlande. Mat, c’est chez toi, maintenant.' },
+    { qui: 'JBT', texte: 'Beauvais, terre d’aventure. Prochaine étape, la finale : Marseille.' },
+    { qui: 'JBG', texte: 'J’y ai vécu. Enfin du soleil.' },
   ],
 };

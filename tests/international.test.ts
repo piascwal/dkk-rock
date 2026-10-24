@@ -12,7 +12,7 @@ import { ARCS, MONDE, niveauOuvert, suivantDansMonde } from '../src/niveaux/arcs
 import { DESSINS_ENNEMIS } from '../src/rendu/dessins-ennemis';
 import { THEMES } from '../src/rendu/themes';
 
-const VILLES = ['beauvais', 'limerick', 'lund', 'newyork', 'marseille'] as const;
+const VILLES = ['limerick', 'newyork', 'lund', 'beauvais', 'marseille'] as const;
 const indice = (id: string) => NIVEAUX.findIndex((n) => n.id === id);
 
 const enJeu = (niveau: number) => {
@@ -23,14 +23,14 @@ const enJeu = (niveau: number) => {
 };
 
 describe('l’International Tour', () => {
-  it('s’ouvre après le FISE : Beauvais, Limerick, Lund, New York, Marseille, au bout de la route', () => {
+  it('s’ouvre après le FISE : Limerick, New York, Lund, Beauvais, Marseille, au bout de la route', () => {
     const arc = ARCS.find((a) => a.id === 'international')!;
     expect(arc.niveaux.map((n) => NIVEAUX[n]!.id)).toEqual([...VILLES]);
     const fise = indice('fise');
     expect(arc.apres).toBe(fise);
-    expect(suivantDansMonde(fise)).toBe(indice('beauvais'));
-    expect(niveauOuvert(indice('beauvais'), [])).toBe(false);
-    expect(niveauOuvert(indice('beauvais'), [fise])).toBe(true);
+    expect(suivantDansMonde(fise)).toBe(indice('limerick'));
+    expect(niveauOuvert(indice('limerick'), [])).toBe(false);
+    expect(niveauOuvert(indice('limerick'), [fise])).toBe(true);
     expect(MONDE.slice(-5)).toEqual(arc.niveaux);
   });
 

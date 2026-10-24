@@ -109,7 +109,7 @@ export const ENNEMIS_LOCAUX: Partial<Record<NomTheme, Record<string, DefEnnemi>>
       nom: 'Passager perdu',
       genre: G.PASSAGER,
       comportement: tireur,
-      cris: ['C’est où, Paris ?', 'Il part à quelle heure, le bus ?', 'Quatre-vingt-cinq kilomètres ?!'],
+      cris: ['Excuse me, Beauvais ?', 'Il part à quelle heure, le bus ?', 'C’est ça, l’international ?'],
     }),
     c: humain({
       nom: 'Passager pressé',
