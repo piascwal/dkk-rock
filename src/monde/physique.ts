@@ -61,9 +61,21 @@ export function deplace(c: Corps, carte: Carte, traverse = false): void {
       c.vx = 0;
       break;
     }
+    for (const o of carte.obstacles) {
+      if (o === c || c.y >= o.y + o.h || c.y + c.h <= o.y || c.x >= o.x + o.w || c.x + c.w <= o.x) continue;
+      if (c.vx > 0) {
+        c.x = o.x - c.w;
+        c.mur = 1;
+      } else {
+        c.x = o.x + o.w;
+        c.mur = -1;
+      }
+      c.vx = 0;
+    }
   }
 
   const ancienBas = c.y + c.h;
+  const ancienHaut = c.y;
   c.auSol = false;
   c.plafond = false;
   if (c.vy === 0) return;
@@ -93,6 +105,24 @@ export function deplace(c: Corps, carte: Carte, traverse = false): void {
       c.vy = 0;
       c.plafond = true;
       break;
+    }
+  }
+  poseSurObstacle(c, carte, ancienBas, ancienHaut);
+}
+
+/** Un objet plein (un baril) : le corps qui tombe dessus s'y pose, celui qui monte s'y cogne la tête. */
+function poseSurObstacle(c: Corps, carte: Carte, ancienBas: number, ancienHaut: number): void {
+  for (const o of carte.obstacles) {
+    if (o === c || c.x >= o.x + o.w || c.x + c.w <= o.x || c.y >= o.y + o.h || c.y + c.h <= o.y) continue;
+    if (c.vy >= 0 && ancienBas <= o.y + 0.01) {
+      c.y = o.y - c.h;
+      c.vy = 0;
+      c.auSol = true;
+      c.surGlace = false;
+    } else if (c.vy < 0 && ancienHaut >= o.y + o.h - 0.01) {
+      c.y = o.y + o.h;
+      c.vy = 0;
+      c.plafond = true;
     }
   }
 }

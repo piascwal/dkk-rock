@@ -4,7 +4,11 @@ import { Baril, DUREE_MECHE, RAYON_BARIL } from '../src/entites/baril';
 import { Projectile } from '../src/entites/projectile';
 import { BAGUETTE } from '../src/entites/projectiles-defs';
 import { NOTE_AUTOTUNE } from '../src/entites/projectiles-ennemis';
+import { C } from '../src/jeu/commandes';
 import { Partie } from '../src/jeu/partie';
+import { deplace, nouveauCorps } from '../src/monde/physique';
+import { Carte } from '../src/monde/carte';
+import { T } from '../src/monde/tuiles';
 
 const nouvelle = (niveau: number) => {
   const p = new Partie({ niveau, drapeau: -1, vies: VIES_DEPART, score: 0 });
@@ -81,5 +85,87 @@ describe('le baril explosif', () => {
     p.explosion(b.corps.x + 20, b.corps.y, 30, 3, 'heros');
     for (let t = 0; t < DUREE_MECHE; t++) p.avance();
     expect(b.fini).toBe(true);
+  });
+
+  describe('est plein : on bute contre lui, on monte dessus', () => {
+    /** Un sol de terre, un baril de 14 × 16 posé dessus (16 px = une tuile) : à l'abscisse 64. */
+    const monde = () => {
+      const carte = new Carte(
+        12,
+        4,
+        new Uint8Array(48).fill(0).map((_, i) => (i >= 36 ? T.TERRE : T.VIDE)),
+      );
+      const baril = nouveauCorps(64, 32, 14, 16);
+      carte.obstacles = [baril];
+      return { carte, baril };
+    };
+
+    it('bloque un corps qui marche contre lui, des deux côtés', () => {
+      const { carte } = monde();
+      for (const [x0, vx] of [
+        [20, 3],
+        [130, -3],
+      ] as const) {
+        const c = nouveauCorps(x0, 16, 12, 32);
+        for (let i = 0; i < 60; i++) {
+          c.vx = vx;
+          c.vy = 1;
+          deplace(c, carte);
+        }
+        expect(c.mur).toBe(vx > 0 ? 1 : -1);
+        expect(vx > 0 ? c.x + c.w : c.x).toBe(vx > 0 ? 64 : 78);
+      }
+    });
+
+    it('porte un corps qui lui tombe dessus, qui peut y marcher et en redescendre', () => {
+      const { carte, baril } = monde();
+      const c = nouveauCorps(62, 0, 12, 20);
+      for (let i = 0; i < 60; i++) {
+        c.vy = Math.min(6, c.vy + 0.5);
+        deplace(c, carte);
+      }
+      expect(c.auSol).toBe(true);
+      expect(c.y + c.h).toBe(baril.y);
+      // il avance sur le baril, puis tombe de l'autre bord jusqu'au sol
+      for (let i = 0; i < 40; i++) {
+        c.vx = 1;
+        c.vy = Math.min(6, c.vy + 0.5);
+        deplace(c, carte);
+      }
+      expect(c.x).toBeGreaterThan(baril.x + baril.w);
+      expect(c.y + c.h).toBe(48);
+    });
+
+    it("s'y cogne la tête en sautant dessous, et ne se bloque pas lui-même", () => {
+      const { carte, baril } = monde();
+      baril.y = 16; // en l'air : on passe dessous
+      const dessous = nouveauCorps(62, 34, 12, 14);
+      dessous.vy = -4;
+      deplace(dessous, carte);
+      expect(dessous.vy).toBe(0);
+      expect(dessous.y).toBe(32);
+      // lui-même retombe jusqu'au sol, sans que sa propre boîte le retienne
+      for (let i = 0; i < 30; i++) {
+        baril.vy = Math.min(6, baril.vy + 0.5);
+        deplace(baril, carte);
+      }
+      expect(baril.y + baril.h).toBe(48);
+    });
+  });
+
+  it('héros et ennemis y sont bloqués dans la partie, et il disparaît avec son explosion', () => {
+    const p = nouvelle(0);
+    const b = barils(p)[0]!;
+    pres(p, b, 40);
+    const j = p.joueurs[0]!;
+    for (let t = 0; t < 90; t++) {
+      p.commande(0, C.DROITE);
+      p.avance();
+    }
+    expect(p.carte.obstacles).toContain(b.corps);
+    expect(j.corps.x + j.corps.w).toBeLessThanOrEqual(b.corps.x + 0.01);
+    b.blesse(1, p);
+    for (let t = 0; t < DUREE_MECHE + 1; t++) p.avance();
+    expect(p.carte.obstacles).not.toContain(b.corps);
   });
 });

@@ -10,10 +10,15 @@ export const RAYON_BARIL = 48;
 /** Les dégâts de l'explosion : ceux d'un caisson de basses. */
 const DEGATS_BARIL = 5;
 
+/** Les corps des barils encore là : ils sont pleins (voir `Carte.obstacles`), héros et ennemis s'y heurtent et montent dessus. */
+export const corpsDesBarils = (entites: readonly EntiteSimulee[]): Corps[] =>
+  entites.filter((e): e is Baril => e instanceof Baril && !e.fini).map((b) => b.corps);
+
 /**
  * Un baril rouge posé au sol, dans le garage et la ville. Il s'allume au premier tir qui le touche (ceux des héros comme
  * ceux des ennemis) ou au premier souffle d'une explosion ; deux secondes après, il explose et casse ce qui se casse
- * autour de lui. Personne ne le vise : il ne compte dans aucun camp (voir `Contexte.props`).
+ * autour de lui. Personne ne le vise : il ne compte dans aucun camp (voir `Contexte.props`). Il est plein : on bute contre lui,
+ * on peut monter dessus.
  */
 export class Baril implements EntiteSimulee, Cible {
   readonly id: number;

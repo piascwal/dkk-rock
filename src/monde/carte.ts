@@ -40,6 +40,11 @@ export class Carte {
   /** 1 là où le niveau d'origine avait de la matière : on y dessine une paroi de fond une fois détruite */
   readonly fond: Uint8Array;
   modifications: Modification[] = [];
+  /**
+   * Les objets pleins qui ne sont pas des tuiles (les barils explosifs) : les corps qui se déplacent (`deplace`) s'y heurtent et
+   * peuvent monter dessus. La partie les tient à jour à chaque pas.
+   */
+  obstacles: readonly { x: number; y: number; w: number; h: number }[] = [];
 
   constructor(
     readonly largeur: number,

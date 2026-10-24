@@ -4,6 +4,7 @@ import { Aleatoire } from '../moteur/maths';
 import { Carte } from '../monde/carte';
 import { Joueur } from '../entites/joueur';
 import { Projectile } from '../entites/projectile';
+import { corpsDesBarils } from '../entites/baril';
 import { Boss } from '../entites/ennemis/boss';
 import { DjBoucle } from '../entites/ennemis/dj';
 import { ATTENTE_VAN, Objet } from '../entites/objets';
@@ -346,6 +347,7 @@ export class Partie implements Contexte {
 
   private recalculeCibles(): void {
     this.cache = calculeCibles(this.joueurs, this.entites);
+    this.carte.obstacles = corpsDesBarils(this.entites);
   }
 
   /** La vie du boss éveillé, pour la barre du HUD. */
@@ -362,10 +364,5 @@ export class Partie implements Contexte {
     const e = this.evenements;
     this.evenements = [];
     return e;
-  }
-
-  /** Centre des héros pour situer la caméra de l'hôte et le réveil des ennemis. */
-  get largeurMonde(): number {
-    return this.carte.largeur * TUILE;
   }
 }
