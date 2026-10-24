@@ -106,14 +106,14 @@ export function dessineEcranAvion(ctx: Ctx, largeur: number, v: VueAvion, tick: 
       ecritCentre(ctx, `${joueur(v.siege)} - JBG, EN RETARD`, m, 17, ROSE);
       // les consignes dans le ciel : les voies restent dégagées
       bandeau(ctx, largeur, 26, 30);
-      ecritCentre(ctx, 'GAUCHE / DROITE : VOIE   HAUT : SAUTER   BAS : GLISSER', m, 28, BLANC);
+      ecritCentre(ctx, 'HAUT / BAS : CHANGER DE VOIE   SAUT : SAUTER', m, 28, BLANC);
       ecritCentre(ctx, 'ÉVITE TOUT, PRENDS LES CARTES ET LES BONUS', m, 37, CYAN);
-      ecritCentre(ctx, 'ET SAUTE SUR L’ÉCHELLE, PAR LA VOIE DU MILIEU !', m, 46, JAUNE);
+      ecritCentre(ctx, 'ET SAUTE SUR L’ÉCHELLE, PAR LA VOIE DU HAUT !', m, 46, JAUNE);
       return;
     case 'course': {
       hud(ctx, largeur, v, tick);
       if (xAvion(v.temps) - v.x <= PORTEE && tick % 16 < 11)
-        ecritCentre(ctx, v.voie === 1 ? 'SAUTE !' : 'AU MILIEU !', m, 34, v.voie === 1 ? VERT : JAUNE, 3);
+        ecritCentre(ctx, v.voie === 2 ? 'SAUTE !' : 'VOIE DU HAUT !', m, 34, v.voie === 2 ? VERT : JAUNE, 3);
       else if (v.trebuche > 0) ecritCentre(ctx, 'AÏE ! L’AVION FILE...', m, 34, ROUGE);
       return;
     }

@@ -36,12 +36,6 @@ export const PHASES_MINI_JEUX: ReadonlySet<Phase> = new Set<Phase>(Object.keys(M
 /** Les mini-jeux sans joystick : un toucher n'importe où sur l'écran tient lieu du bouton (le rêve de JBT). */
 export const SANS_JOYSTICK: ReadonlySet<Phase> = new Set<Phase>(['reve']);
 
-/**
- * Les mini-jeux au balayage, façon Subway Surfers (l'avion de JBG) : ni joystick ni bouton ; on glisse le doigt n'importe où sur
- * l'écran (gauche, droite, haut, bas), un simple toucher vaut le saut.
- */
-export const AU_BALAYAGE: ReadonlySet<Phase> = new Set<Phase>(['avion']);
-
 /** Le libellé du bouton SAUT de l'écran tactile dans chaque mini-jeu (voir Tactile.pilote). */
 export const BOUTON_MINI_JEU: Partial<Record<Phase, string>> = {
   drift: 'GAZ',

@@ -838,16 +838,8 @@ h2 {
 }
 
 /* sans joystick (le rêve de JBT) : toute la largeur de l'écran est un bouton, et le joystick ne s'affiche pas */
-.tactile.appui-ecran .zone-joystick,
-.tactile.balayage .zone-joystick {
+.tactile.appui-ecran .zone-joystick {
   width: 100%;
-}
-
-/* au balayage (l'avion de JBG) : on glisse le doigt n'importe où, ni joystick ni bouton à l'écran */
-.tactile.balayage .joystick-base,
-.tactile.balayage.mini-jeu .joystick-base:not(.actif),
-.tactile.balayage .boutons {
-  display: none;
 }
 
 .tactile.appui-ecran .joystick-base,

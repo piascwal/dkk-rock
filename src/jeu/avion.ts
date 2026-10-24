@@ -14,7 +14,7 @@ import {
   type Objet,
 } from './avion-parcours';
 import * as R from './avion-regles';
-import { OBJETS_RECENTS, vueDuConcours, type EtapeAvion, type VueAvion } from './vue-avion';
+import { OBJETS_RECENTS, type EtapeAvion, type VueAvion } from './vue-avion';
 
 export {
   DECOLLAGE,
@@ -32,11 +32,10 @@ const VALIDE = C.SAUT | C.TIR;
 export const NIVEAU_AVION = 15;
 
 /**
- * L'avion de JBG (un mini-jeu façon Subway Surfers, vu de derrière) : un hommage au jour où JBG a raté l'avion pour Madrid.
- * Cette fois, l'avion des DKK pour la Bretagne roule déjà sur la piste ; JBG court sur le tarmac, change de voie (gauche,
- * droite), saute (haut), glisse (bas), ramasse les cartes d'embarquement et les bonus ; chaque faux pas lui fait perdre du
- * terrain. Sur la voie du milieu, quand l'échelle qui pend sous la queue de l'avion est à portée, il saute dessus. Chaque
- * joueur court à son tour.
+ * L'avion de JBG (un mini-jeu façon Subway Surfers, de profil) : un hommage au jour où JBG a raté l'avion pour Madrid. Cette
+ * fois, l'avion des DKK pour la Bretagne roule déjà sur la piste ; JBG court sur le tarmac, change de voie, saute, ramasse
+ * les cartes d'embarquement et les bonus ; chaque faux pas lui fait perdre du terrain. Sur la voie du haut, quand l'échelle de
+ * la porte arrière est à portée, il saute dessus. Chaque joueur court à son tour.
  */
 export class ConcoursAvion {
   etape: EtapeAvion = 'intro';
@@ -50,8 +49,6 @@ export class ConcoursAvion {
   voieVue = 0;
   z = 0;
   vz = 0;
-  /** ce qui lui reste de glissade (ticks) : il passe sous les portiques */
-  glisse = 0;
   /** le convoyeur sur le tapis duquel il court (indice dans le tarmac), ou -1 */
   tapis = -1;
   trebuche = 0;
@@ -128,35 +125,26 @@ export class ConcoursAvion {
     }
   }
 
-  /** Un pas de course : changer de voie, sauter, glisser, avancer, ramasser, se cogner ; l'avion à portée, ou parti. */
+  /** Un pas de course : changer de voie, sauter, avancer, ramasser, se cogner ; l'avion à portée, ou parti. */
   private course(k: EtatCommandes, son: (nom: string) => void): void {
     this.temps++;
-    if (k.appuye(C.GAUCHE) && this.voie > 0) this.changeVoie(-1);
-    if (k.appuye(C.DROITE) && this.voie < VOIES - 1) this.changeVoie(1);
-    const saute = k.appuye(VALIDE) || k.appuye(C.HAUT);
+    if (k.appuye(C.HAUT) && this.voie < VOIES - 1) this.changeVoie(1);
+    if (k.appuye(C.BAS) && this.voie > 0) this.changeVoie(-1);
     this.voieVue +=
       Math.sign(this.voie - this.voieVue) * Math.min(Math.abs(this.voie - this.voieVue), 10 * R.DT);
     const avion = R.xAvion(this.temps);
     const aPortee = avion - this.x <= R.PORTEE;
-    if (saute && aPortee && this.voie === R.VOIE_ECHELLE) {
+    if (k.appuye(VALIDE) && aPortee && this.voie === VOIES - 1) {
       this.etape = 'embarque';
       this.embarque = true;
       this.minuteur = R.DUREE_FIN;
       son('liberation');
       return;
     }
-    if (saute && this.z === 0) {
+    if (k.appuye(VALIDE) && this.z === 0) {
       this.vz = this.bonusEst('ressorts') ? R.SAUT_RESSORTS : R.SAUT;
-      this.glisse = 0;
       son('saut');
     }
-    // la glissade ; demandée en l'air, il plonge d'abord vers le sol
-    if (k.appuye(C.BAS) && this.tapis < 0) {
-      if (this.z > 0) this.vz = Math.min(this.vz, -R.PLONGE);
-      this.glisse = R.GLISSE;
-      son('glisse');
-    }
-    if (this.glisse > 0) this.glisse--;
     if (this.z > 0 || this.vz > 0) {
       this.vz -= R.PESANTEUR * R.DT;
       this.z = Math.max(0, this.z + this.vz * R.DT);
@@ -252,9 +240,7 @@ export class ConcoursAvion {
         }
       } else if (this.tapis >= 0)
         continue; // là-haut, rien ne le touche
-      else if (o.sorte === 'portique') {
-        if (this.glisse > 0) continue; // dessous, en glissant ; aucun saut ne le passe
-      } else if (BAS.has(o.sorte as never) ? this.z > 7 : this.bonusEst('ressorts') && this.z > 22) continue;
+      else if (BAS.has(o.sorte as never) ? this.z > 7 : this.bonusEst('ressorts') && this.z > 22) continue;
       this.choc(i, son);
     }
   }
@@ -296,7 +282,6 @@ export class ConcoursAvion {
     this.x = 0;
     this.voie = this.voieVue = 1;
     this.z = this.vz = 0;
-    this.glisse = 0;
     this.tapis = -1;
     this.trebuche = this.invulnerable = 0;
     this.bonus = -1;
@@ -325,6 +310,28 @@ export class ConcoursAvion {
   }
 
   vue(): VueAvion {
-    return vueDuConcours(this);
+    return {
+      etape: this.etape,
+      siege: this.siege,
+      manche: this.manche,
+      miniJeu: this.miniJeu,
+      minuteur: this.minuteur,
+      temps: this.temps,
+      x: this.x,
+      voie: this.voie,
+      voieVue: this.voieVue,
+      z: this.z,
+      surTapis: this.tapis >= 0,
+      trebuche: this.trebuche,
+      invulnerable: this.invulnerable,
+      bonus: this.bonus,
+      bonusReste: this.bonusReste,
+      cartes: this.cartes,
+      chutes: this.chutes,
+      embarque: this.embarque,
+      score: this.score,
+      consommes: [...this.consommes],
+      scores: [...this.scores],
+    };
   }
 }

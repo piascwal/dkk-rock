@@ -28,7 +28,7 @@ export const AVION: Omit<DefNiveau, 'carte'> = {
     {
       qui: 'JBG',
       texte:
-        'Gauche, droite pour changer de voie, haut pour sauter, bas pour glisser. Et au milieu, l’échelle sous la queue. Facile.',
+        'Haut et bas pour changer de voie, saut pour sauter. Et sur la voie du haut, l’échelle de la porte arrière. Facile.',
     },
   ],
   dialogues: {},

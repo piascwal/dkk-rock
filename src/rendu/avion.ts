@@ -9,13 +9,9 @@ import { dessineAvion } from './avion-appareil';
 import { dessineFond, dessineTarmac, SOL_PISTE, SOL_VOIES } from './avion-decor';
 import { dessineEcranAvion } from './avion-ecrans';
 import { dessineObjet, voieDe } from './avion-objets';
-import { RenduAvionDos } from './avion-dos';
-import { HAUTEUR_VUE } from '../config';
 
 /**
- * L'avion de JBG à l'écran, d'après la seule vue (comme chez un invité). La course est vue de derrière JBG (avion-dos.ts) ; l'arrivée
- * et la fin (l'embarquement, ou l'avion qui décolle sans lui) restent vues de côté, en cinématique, avec un fondu entre les deux.
- * De côté : l'aéroport (avion-decor.ts), l'avion des DKK qui roule
+ * L'avion de JBG à l'écran, d'après la seule vue (comme chez un invité) : l'aéroport (avion-decor.ts), l'avion des DKK qui roule
  * au bout de la piste, de plus en plus grand à mesure que JBG le rattrape (avion-appareil.ts), le tarmac et ce qui l'encombre
  * (avion-objets.ts), JBG qui court (ses planches : la course, le saut, l'échelle), et les écrans (avion-ecrans.ts). Les éclats
  * des cartes ramassées et des obstacles pulvérisés par le solo ne vivent qu'ici.
@@ -23,8 +19,6 @@ import { HAUTEUR_VUE } from '../config';
 
 /** Où court JBG, à l'écran (pixels depuis la gauche). */
 export const JBG_X = 64;
-/** Le fondu entre la vue de côté et la vue de derrière (ticks). */
-const FONDU = 40;
 
 interface Eclat {
   x: number;
@@ -43,8 +37,6 @@ export class RenduAvion {
   private flottants: { x: number; y: number; texte: string; vie: number; couleur: string }[] = [];
   private chutes = 0;
   private secousse = 0;
-  private readonly dos = new RenduAvionDos();
-  private toile: HTMLCanvasElement | null = null;
 
   dessine(ctx: CanvasRenderingContext2D, v: VueAvion, largeur: number, tick: number): void {
     if (v.manche !== this.manche) {
@@ -58,47 +50,16 @@ export class RenduAvion {
     this.chutes = v.chutes;
     const sx = this.secousse > 0 ? Math.round(Math.sin(tick * 2.1) * this.secousse * 0.3) : 0;
     if (this.secousse > 0) this.secousse--;
+    const ex = (x: number) => Math.round(x - v.x + JBG_X);
     ctx.save();
     ctx.translate(sx, 0);
-    // la course de derrière ; l'arrivée et la fin de côté ; aux changements de vue, l'ancienne s'efface sur la nouvelle
-    const derriere = v.etape === 'course';
-    const fin = v.etape === 'embarque' || v.etape === 'rate';
-    const fondu = derriere ? 1 - v.temps / FONDU : fin ? 1 - (DUREE_FIN - v.minuteur) / FONDU : 0;
-    if (derriere) this.dos.dessine(ctx, v, this.tarmac, largeur, tick);
-    else this.deCote(ctx, v, largeur, tick);
-    if (fondu > 0) {
-      const t = this.calque(largeur);
-      const c = t.getContext('2d')!;
-      c.clearRect(0, 0, t.width, t.height);
-      if (derriere) this.deCote(c, v, largeur, tick);
-      else this.dos.dessine(c, v, this.tarmac, largeur, tick);
-      ctx.globalAlpha = Math.min(1, fondu);
-      ctx.drawImage(t, 0, 0);
-      ctx.globalAlpha = 1;
-    }
-    ctx.restore();
-    dessineEcranAvion(ctx, largeur, v, tick);
-  }
-
-  /** Une toile à la taille de la vue, pour la vue qui s'efface pendant un fondu. */
-  private calque(largeur: number): HTMLCanvasElement {
-    if (!this.toile || this.toile.width !== largeur) {
-      this.toile = document.createElement('canvas');
-      this.toile.width = largeur;
-      this.toile.height = HAUTEUR_VUE;
-      this.toile.getContext('2d')!.imageSmoothingEnabled = false;
-    }
-    return this.toile;
-  }
-
-  /** La vue de côté : l'aéroport qui défile, l'avion au bout de la piste, le tarmac, JBG, les éclats. */
-  private deCote(ctx: CanvasRenderingContext2D, v: VueAvion, largeur: number, tick: number): void {
-    const ex = (x: number) => Math.round(x - v.x + JBG_X);
     dessineFond(ctx, v.x, largeur, tick);
     this.avion(ctx, v, largeur, tick);
     dessineTarmac(ctx, v.x, largeur);
     this.objetsEtJbg(ctx, v, ex, largeur, tick);
     this.effets(ctx);
+    ctx.restore();
+    dessineEcranAvion(ctx, largeur, v, tick);
   }
 
   /** L'avion : loin, il est petit au bout de la piste ; près, il est grand et sa porte arrière arrive à la hauteur de JBG. */

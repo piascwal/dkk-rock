@@ -2,7 +2,7 @@ import { MAX_JOUEURS } from '../config';
 import { ETAPES_AVION, OBJETS_RECENTS, type VueAvion } from '../jeu/vue-avion';
 
 /** L'avion de JBG dans l'instantané réseau (voir protocole.ts), à la suite des entités pendant la phase `avion`. */
-export const OCTETS_AVION = 27 + 2 * OBJETS_RECENTS + 2 * MAX_JOUEURS;
+export const OCTETS_AVION = 26 + 2 * OBJETS_RECENTS + 2 * MAX_JOUEURS;
 
 const u8 = (x: number) => Math.max(0, Math.min(255, Math.round(x)));
 const u16 = (x: number) => Math.max(0, Math.min(65535, Math.round(x)));
@@ -18,7 +18,6 @@ export function encodeAvion(d: DataView, o: number, v: VueAvion): void {
   for (const n of [v.voie, v.voieVue * 50, v.z * 4, v.trebuche, v.invulnerable, v.bonus + 1, v.chutes])
     d.setUint8(o++, u8(n));
   d.setUint8(o++, (v.surTapis ? 1 : 0) | (v.embarque ? 2 : 0));
-  d.setUint8(o++, u8(v.glisse));
   const n = Math.min(OBJETS_RECENTS, v.consommes.length);
   d.setUint8(o++, n);
   for (let i = 0; i < OBJETS_RECENTS; i++) {
@@ -47,7 +46,6 @@ export function decodeAvion(d: DataView, o: number): VueAvion | null {
     (k) => d.getUint8(o + k),
   ) as [number, number, number, number, number, number, number, number];
   o += 8;
-  const glisse = d.getUint8(o++);
   const n = Math.min(OBJETS_RECENTS, d.getUint8(o++));
   const consommes: number[] = [];
   for (let i = 0; i < OBJETS_RECENTS; i++) {
@@ -71,7 +69,6 @@ export function decodeAvion(d: DataView, o: number): VueAvion | null {
     voie: Math.min(2, voie),
     voieVue: voie50 / 50,
     z: z4 / 4,
-    glisse,
     surTapis: (drapeaux & 1) !== 0,
     trebuche,
     invulnerable,
