@@ -964,3 +964,10 @@ h2 {
   display: flex;
   gap: 0.5rem;
 }
+
+.carte-retour {
+  position: absolute;
+  left: max(10px, env(safe-area-inset-left));
+  bottom: max(10px, env(safe-area-inset-bottom));
+  margin: 0;
+}

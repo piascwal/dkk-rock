@@ -42,8 +42,11 @@ export function ecranCarte(
   const precedent = bouton('◀', () => choisit(choix - 1));
   const suivant = bouton('▶', () => choisit(choix + 1));
   const barre = el('div', '', 'carte-barre');
-  barre.append(precedent, jouerB, suivant, bouton('Retour', retour));
-  conteneur(toile, entete, titre, barre);
+  barre.append(precedent, jouerB, suivant);
+  // Retour à part, en bas à gauche : loin des flèches et de Jouer
+  const retourB = bouton('Retour', retour);
+  retourB.classList.add('carte-retour');
+  conteneur(toile, entete, titre, barre, retourB);
 
   let largeur = 240;
   const dimensionne = () => {
