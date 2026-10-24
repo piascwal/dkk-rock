@@ -1,4 +1,5 @@
 import type { VueAvion } from './vue-avion';
+import type { VueKart } from './vue-kart';
 import type { VueReve } from './vue-reve';
 /**
  * Ce que l'on voit de la partie : la simulation (sur l'hôte) le produit à
@@ -185,7 +186,8 @@ export type Phase =
   | 'drift'
   | 'plongeon'
   | 'reve'
-  | 'avion';
+  | 'avion'
+  | 'kart';
 
 export const PHASES: readonly Phase[] = [
   'histoire',
@@ -199,6 +201,7 @@ export const PHASES: readonly Phase[] = [
   'plongeon',
   'reve',
   'avion',
+  'kart',
 ];
 
 /** Les étapes du concours de drift (`VueDrift.etape`) : le choix du pilote, le compte à rebours, la minute, le score, le podium. */
@@ -343,6 +346,8 @@ export interface EtatVue {
   reve?: VueReve;
   /** l'avion de JBG, pendant la phase `avion` */
   avion?: VueAvion;
+  /** le Grand Prix de la Sarré, pendant la phase `kart` */
+  kart?: VueKart;
 }
 
 /** Ce qui se passe une fois (son, explosion, texte flottant, dialogue) : envoyé de façon fiable. */

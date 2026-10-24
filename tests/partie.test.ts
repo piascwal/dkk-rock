@@ -30,7 +30,7 @@ function entreDeuxNiveaux(p: Partie): void {
   const miniJeu = () => p.phase === 'histoire' && p.lu.def.miniJeu !== undefined;
   while (['convertis', 'bilan', 'carte'].includes(p.phase) || PHASES_MINI_JEUX.has(p.phase) || miniJeu()) {
     // un mini-jeu en cours : on le termine d'office
-    const miniJeuEnCours = p.drift ?? p.plongeon ?? p.reve ?? p.avion;
+    const miniJeuEnCours = p.drift ?? p.plongeon ?? p.reve ?? p.avion ?? p.kart;
     if (miniJeuEnCours) {
       miniJeuEnCours.fini = true;
       p.avance();

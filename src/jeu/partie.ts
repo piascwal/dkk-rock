@@ -17,7 +17,7 @@ import { explose } from './explosions';
 import { zoneVisible } from './zone-visible';
 import { declencheAssauts } from './assauts';
 import { majMiniJeux, PHASES_MINI_JEUX } from './mini-jeux';
-import type { ConcoursAvion, ConcoursDrift, ConcoursPlongeon, ConcoursReve } from './mini-jeux';
+import type { ConcoursAvion, ConcoursDrift, ConcoursKart, ConcoursPlongeon, ConcoursReve } from './mini-jeux';
 import { ouvreBarrieres, peuple, releveCarte } from './chargement';
 import { changePhase } from './phases';
 import { majTraversee, prepareTraversee, type Traversee } from './traversee';
@@ -54,6 +54,7 @@ export class Partie implements Contexte {
   plongeon: ConcoursPlongeon | null = null;
   reve: ConcoursReve | null = null;
   avion: ConcoursAvion | null = null;
+  kart: ConcoursKart | null = null;
   entites: EntiteSimulee[] = [];
   readonly joueurs: (Joueur | null)[] = Array<Joueur | null>(MAX_JOUEURS).fill(null);
   readonly rng = new Aleatoire(Date.now() & 0xffff);
@@ -216,7 +217,7 @@ export class Partie implements Contexte {
     this.van = null;
     this.dejaDit = new Set();
     this.assautsFaits = new Set();
-    this.drift = this.plongeon = this.reve = this.avion = null;
+    this.drift = this.plongeon = this.reve = this.avion = this.kart = null;
     peuple(this);
     prepareTraversee(this);
     // un nouveau niveau, ou une reprise : tout le monde repart du départ, pas de là où il était

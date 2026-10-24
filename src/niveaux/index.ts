@@ -12,6 +12,7 @@ import { CARTE_PRE_DU_CLOS } from './cartes/12-pre-du-clos';
 import { CARTE_PLONGEON } from './cartes/14-plongeon';
 import { CARTE_REVE } from './cartes/15-reve';
 import { CARTE_AVION } from './cartes/16-avion';
+import { CARTE_KART } from './cartes/22-kart';
 import { CARTE_TUVES, DECOR_TUVES } from './cartes/13-tuves';
 import { ASSAUTS_FISE, CARTE_FISE, DECOR_FISE, ZONES_FISE } from './cartes/11-fise';
 import { CARTE_BEAUVAIS } from './cartes/17-beauvais';
@@ -35,6 +36,7 @@ import { PRE_DU_CLOS } from './textes/12-pre-du-clos';
 import { PLONGEON } from './textes/14-plongeon';
 import { REVE } from './textes/15-reve';
 import { AVION } from './textes/16-avion';
+import { KART } from './textes/22-kart';
 import { TUVES } from './textes/13-tuves';
 import { BEAUVAIS } from './textes/17-beauvais';
 import { LIMERICK } from './textes/18-limerick';
@@ -74,6 +76,8 @@ export const NIVEAUX: DefNiveau[] = [
   { ...LUND, carte: CARTE_LUND },
   { ...NEW_YORK, carte: CARTE_NEW_YORK },
   { ...MARSEILLE, carte: CARTE_MARSEILLE },
+  // le Grand Prix de la Sarré (un mini-jeu), ajouté après coup : la surprise pour Mat, juste après Gréau dans la tournée
+  { ...KART, carte: CARTE_KART },
 ];
 
 const lus = new Map<number, NiveauLu>();

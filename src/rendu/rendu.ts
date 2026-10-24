@@ -25,6 +25,7 @@ import { RenduDrift } from './drift';
 import { RenduPlongeon } from './plongeon';
 import { RenduReve } from './reve';
 import { RenduAvion } from './avion';
+import { RenduKart } from './kart';
 import { CABRE, flammeReacteur, TUYERE } from './reacteur';
 import { geometrieNavire } from '../niveaux/navire';
 
@@ -51,6 +52,8 @@ export class Rendu {
   private readonly reve = new RenduReve();
   /** l'avion de JBG (phase `avion`) */
   private readonly avion = new RenduAvion();
+  /** le Grand Prix de la Sarré (phase `kart`) */
+  private readonly kart = new RenduKart();
   /** largeur de la vue en pixels du jeu (la hauteur est fixe, la largeur suit la forme de l'écran) */
   largeur = 480;
   theme: Theme = THEMES.garage;
@@ -219,6 +222,10 @@ export class Rendu {
     }
     if (vue.phase === 'avion' && vue.avion) {
       this.avion.dessine(ctx, vue.avion, this.largeur, this.tick);
+      return;
+    }
+    if (vue.phase === 'kart' && vue.kart) {
+      this.kart.dessine(ctx, vue.kart, this.largeur, this.tick);
       return;
     }
     this.prepareNiveau(vue.niveau);

@@ -1,5 +1,5 @@
 import { C } from '../jeu/commandes';
-import { BOUTON_MINI_JEU, SANS_JOYSTICK } from '../jeu/mini-jeux';
+import { BOUTON_MINI_JEU, BOUTON_TIR_MINI_JEU, SANS_JOYSTICK } from '../jeu/mini-jeux';
 import type { Phase } from '../jeu/vue';
 
 const ZONE_MORTE = 12;
@@ -147,21 +147,24 @@ export class Tactile {
     const libelle = BOUTON_MINI_JEU[phase] ?? null;
     const oui = libelle !== null;
     const ecran = oui && SANS_JOYSTICK.has(phase);
+    // le tir reste à l'écran dans certains mini-jeux, sous un autre nom (le Grand Prix : lancer son bonus)
+    const libelleTir = BOUTON_TIR_MINI_JEU[phase] ?? null;
+    const tir = this.element.querySelector<HTMLElement>('.bouton.tir')!;
     if (
       this.element.classList.contains('mini-jeu') === oui &&
       this.element.classList.contains('appui-ecran') === ecran &&
-      saut.textContent === (libelle ?? 'SAUT')
+      saut.textContent === (libelle ?? 'SAUT') &&
+      (!oui || tir.hidden === !libelleTir)
     )
       return;
     this.element.classList.toggle('mini-jeu', oui);
     this.element.classList.toggle('appui-ecran', ecran);
     if (ecran) this.relacheJoystick();
-    const tir = this.element.querySelector<HTMLElement>('.bouton.tir')!;
     saut.textContent = libelle ?? 'SAUT';
     tir.classList.remove('avec-arme');
     tir.dataset.arme = 'mini-jeu'; // l'arme sera redessinée au retour en jeu
-    tir.textContent = 'TIR';
-    tir.hidden = oui;
+    tir.textContent = libelleTir ?? 'TIR';
+    tir.hidden = oui && !libelleTir;
     this.element.querySelector<HTMLElement>('.bouton.special')!.hidden = oui;
   }
 

@@ -8,6 +8,7 @@ import type { MiniJeu } from '../jeu/mini-jeux';
 import { NIVEAU_PLONGEON } from '../jeu/plongeon';
 import { NIVEAU_REVE } from '../jeu/reve';
 import { NIVEAU_AVION } from '../jeu/avion';
+import { NIVEAU_KART } from '../jeu/kart';
 import type { AnnonceDkk } from '../reseau/annonce';
 import { Recherche } from '../reseau/client';
 import type { Hote } from '../reseau/hote';
@@ -122,6 +123,7 @@ export class Menus {
     const recordSaut = `Record du pont : ${s.recordPlongeon} % de précision.`;
     const reve = niveauOuvert(NIVEAU_REVE, s.faits);
     const recordReve = `Record du rêve : ${s.recordReve} points.`;
+    const kart = niveauOuvert(NIVEAU_KART, s.faits);
     const avion = niveauOuvert(NIVEAU_AVION, s.faits);
     const recordAvion = `Record du tarmac : ${s.recordAvion} points.`;
     this.montre(
@@ -139,6 +141,13 @@ export class Menus {
         ? bouton('Plongeon — le pont des Tuves', () => this.a.lanceMiniJeu('plongeon'), 'principal')
         : el('p', 'Plongeon du pont des Tuves : se débloque après le pont.', 'aide'),
       plongeon && s.recordPlongeon > 0 ? el('p', recordSaut, 'aide') : el('span'),
+      kart
+        ? bouton(
+            'Grand Prix de la Sarré — la surprise de Mat',
+            () => this.a.lanceMiniJeu('kart'),
+            'principal',
+          )
+        : el('p', 'Le Grand Prix de la Sarré : se débloque après Gréau.', 'aide'),
       reve
         ? bouton('Le rêve de JBT — la pleine lune', () => this.a.lanceMiniJeu('reve'), 'principal')
         : el('p', 'Le rêve de JBT : se débloque après la Ville Autotunée.', 'aide'),

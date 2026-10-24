@@ -149,6 +149,17 @@ parcours se tire d'après le numéro du vol (`jeu/reve-parcours.ts`), donc les i
 `src/jeu/reve*.ts`, le rendu dans `src/rendu/reve*.ts`, les deux sprites de JBT (de dos, en vol) sortent de
 `outils/fixe-reve.py` (sources dans `assets-sources/reve/`).
 
+**Le Grand Prix de la Sarré** (juste après Gréau, facultatif) : la surprise des DKK pour Mat, fou de F1 : la piste du karting
+de la Sarré, où chacun court avec sa propre voiture (JBT et sa Clio, JBM et sa Xantia, JBG et sa Mégane, Mat et sa Corsa, Tom
+et sa Renault 11), vue d'en haut façon Micro Machines. Chaque joueur choisit son pilote (son héros est proposé d'office), chaque
+voiture a ses notes (vitesse, tenue de route, poids). Gauche et droite tournent, saut (ou haut) accélère, bas freine et recule,
+tir lance le bonus pris dans les caisses « ? » : le turbo, la flaque d'huile (qui fait tourner sur soi-même), le marteau (qui
+aplatit la voiture de devant), le bouclier, le ressort (un saut par-dessus tout). Seul, on court trois tours contre les quatre
+autres (l'ordinateur, chacun avec son caractère) ; à plusieurs, c'est la règle de l'écran : la caméra suit le premier, qui en sort
+perd la manche, le dernier en piste la gagne, et le premier à huit manches remporte le Grand Prix. Le podium montre les DKK de
+face, avec leur instrument. La piste et la conduite sont dans `src/jeu/kart*.ts`, le rendu dans `src/rendu/kart*.ts` ; les
+voitures et les héros vus de dessus viennent de `assets-sources/kart/planche.jpg` (`outils/fixe-kart.py`).
+
 **L'avion de JBG** (entre la fin de la tournée et le Breizh Tour) : en hommage à l'avion pour Madrid que JBG a raté, il court
 après celui de la Ville Autotunée vers la Bretagne, façon Subway Surfers. L'avion des DKK roule au bout de la piste, l'arrière
 tourné vers JBG : JBT, JBM et Mat collés aux hublots, Tom qui fait des signes à la porte, l'échelle qui pend. Il accélère, et
