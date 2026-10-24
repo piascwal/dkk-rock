@@ -16,6 +16,8 @@ import { dessineLumieresClub } from './lumieres-club';
 import { DECORS_BRETONS, type Peinture } from './fonds-bretagne';
 import { batimentsFise, PEINTURE_FISE, QUAI_FISE, tramFise } from './fonds-fise';
 import { PEINTURE_STC, PEINTURE_TUVES } from './fonds-provence';
+import { PEINTURES_INTERNATIONAL_1 } from './fonds-international';
+import { PEINTURES_INTERNATIONAL_2 } from './fonds-international-2';
 import type { Decor, Theme } from './themes';
 
 const LARGEUR_BANDE = 960;
@@ -175,6 +177,8 @@ const DECORS: Record<Decor, Peinture> = {
     }
   },
   ...DECORS_BRETONS,
+  ...PEINTURES_INTERNATIONAL_1,
+  ...PEINTURES_INTERNATIONAL_2,
   fise: PEINTURE_FISE,
   stc: PEINTURE_STC,
   tuves: PEINTURE_TUVES,

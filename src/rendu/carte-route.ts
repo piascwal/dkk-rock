@@ -30,7 +30,7 @@ export function dessineRoute(
   route: [number, number][],
   C: number,
   LT: number,
-  eau: Set<number>,
+  eau: { has(k: number): boolean },
 ): void {
   for (const pass of [0, 1])
     for (let i = 0; i + 1 < route.length; i++) {

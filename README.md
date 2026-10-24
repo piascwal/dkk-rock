@@ -53,6 +53,8 @@ mer, puis le festival, sa foule, ses lasers, ses stroboscopes et sa grande scèn
   Les petits traits propres à un personnage (Tom : un cœur pixel art quand il croise un rondin) sont des entrées de `TRAITS`
   dans `src/rendu/traits-persos.ts`, côté rendu et d'après la vue (rien à changer dans la simulation ni le protocole) ; les
   emojis sont dans `src/rendu/emojis.ts`.
+- **Chargement :** les planches des cinq héros et de Fadatchi partent seules, avant les 140 autres (`chargeFeuilles`) ; l'écran
+  titre montre une petite barre tant qu'elles ne sont pas là (5 s au plus) : l'intro ne démarre plus sans ses personnages.
 - **Cartes Sibylle des fontaines** (la carte Magic, `public/sprites/carte-sibylle.png`) : cachées dans tous les niveaux (une
   pour 20 colonnes au mieux, de 6 à 36 ; 28 à Saint-Cézaire ; aucune dans les mini-jeux), pour pousser à explorer au lieu de
   filer tout droit. Leurs cachettes se calculent d'après la carte (`niveaux/cachettes.ts`, les mêmes chez tous les joueurs) :
@@ -295,7 +297,23 @@ validé.
   24 rangées sous la surface, puis le vide.
 - **Un arc de l'histoire :** les niveaux d'un arc s'enchaînent, avec leur épilogue ; l'arc principal est « La tournée ».
   Viennent ensuite le « Breizh Tour » (l'avion de JBG, un mini-jeu facultatif, puis la forêt, le port, la traversée, Groix)
-  puis « Le FISE ».
+  puis « Le FISE », puis l'« International Tour ».
+  **L'International Tour** (après le FISE, sur une seconde île à l'est de la carte du monde, qu'on rejoint par les airs : la route
+  y devient des pointillés au-dessus de la mer, `rendu/carte-iles.ts`) : une ville par membre du groupe, chacun en guide dans
+  l'intro de la sienne. Beauvais (JBT : « Paris-Beauvais », à 85 km de Paris ; le chœur gothique le plus haut du monde, jamais
+  fini ; Jeanne Hachette ; l'avion low-cost), Limerick (Mat : la Shannon, le château du roi Jean, le pub, les moutons, le
+  Munster, les Cranberries), Lund (Tom : la nuit d'hiver à quinze heures, la cathédrale et le géant Finn, les étudiants en
+  salopette, les vélos, l'élan), New York (JBM : les rats et leur pizza, les châteaux d'eau, Wall Street, le métro, le pont de
+  Brooklyn) et Marseille (JBG : le Vieux-Port, le Panier, la pétanque, l'OM, les calanques, la Bonne Mère), avec l'épilogue
+  `histoire/fin-international.ts`. Les monuments sont des pièces du générateur (`outils/niveaux/international.py` : la
+  cathédrale sans nef et ses arcs-boutants, l'avion, le château à tours rondes, le pub, la Shannon et son pont, la cathédrale
+  romane, les maisons rouges, les gratte-ciel, le métro, le pont de Brooklyn, la colline de la Bonne Mère, les calanques). Les
+  fonds sont peints en code au chargement du niveau (`rendu/fonds-international*.ts`), comme les gens du coin
+  (`entites/ennemis/locaux.ts`, dessinés dans `rendu/dessins-locaux.ts`) : dans ces villes, les lettres ordinaires « a » et
+  « c » des cartes deviennent un passager perdu et un passager pressé, un habitué du pub et un mouton, un étudiant en
+  salopette et un cycliste, un trader et un rat, un supporter de l'OM et un livreur en scooter ; chaque ville a en plus son
+  spécial (z : la gargouille, u : le pilier du Munster, j : l'élan, n : le pigeon, q : le bouliste et sa boule de pétanque).
+  Aucune image en plus à télécharger : l'arc coûte 16 Ko de code compressé (protocole v28).
   **Le FISE** (Montpellier, sur les berges du Lez) est fait à la main, zone par zone (`outils/niveaux/fise.py`) : l'entrée
   (l'arche et le logo officiel), le grand parc noir à plateaux roses (tuiles `L` et `U`), le food court à l'ombre des platanes
   et ses pissotières, le Freestyle Park de bois (half-pipe : descente, plat, remontée ; mini spine ; tuile `A`), la scène de

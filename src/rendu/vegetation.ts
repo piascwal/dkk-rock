@@ -32,6 +32,11 @@ const STYLES: Record<Decor, Style> = {
   stc: { sorte: 'liane', couleurs: ['#4a6a3a', '#6a8a4a', '#8a5ab8'], mousse: ['#7a8a5a', '#9aa86a'] },
   tuves: { sorte: 'liane', couleurs: ['#24402e', '#3f7a3a', '#6ab04a'], mousse: ['#3f7a3a', '#5a9a3a'] },
   falaises: { sorte: 'liane', couleurs: ['#4a6a3a', '#7aa04a', '#ffd23f'], mousse: ['#7a8a4a', '#9aa85a'] },
+  beauvais: { sorte: 'liane', couleurs: ['#3f6a32', '#5a8a3a', '#8aa84a'], mousse: ['#6a7a4a', '#8a9a5a'] },
+  limerick: { sorte: 'liane', couleurs: ['#2f6a2a', '#3fa040', '#7cc04a'], mousse: ['#3f8f3a', '#5fb347'] },
+  lund: { sorte: 'glacon', couleurs: ['#9fd8f0', '#c8f0ff', '#ffffff'] },
+  newyork: { sorte: 'cable', couleurs: ['#1a1a22', '#3a3a44', '#6a6a76'] },
+  marseille: { sorte: 'liane', couleurs: ['#4a6a3a', '#6a8a4a', '#d86aa8'], mousse: ['#7a8a5a', '#9aa86a'] },
 };
 
 /** Les matières qui portent des lianes, de la mousse, des glaçons. */

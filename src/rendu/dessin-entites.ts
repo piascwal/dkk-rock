@@ -2,7 +2,7 @@ import { TUILE } from '../config';
 import { dessineSibylle } from './sibylle';
 import { ARME_CHAUFFAGE, armeRamassee } from '../entites/armes';
 import { herosDuGenre } from '../entites/heros';
-import { ANIM, G, VOLANTS, estUnTir, type EntiteVue, type Genre } from '../jeu/vue';
+import { ANIM, G, VOLANTS, estPersonnage, estUnTir, type EntiteVue, type Genre } from '../jeu/vue';
 import type { AtlasTuiles } from './atlas-tuiles';
 import { dessineAura } from './aura';
 import { dessineBulle, hauteurBulle } from './bulle-bonus';
@@ -140,14 +140,14 @@ export function dessineEntite(
   }
   // un héros invulnérable clignote ; un ennemi touché passe au blanc
   const heros = herosDuGenre(v.g);
-  const aTerre = v.e === ANIM.TERRASSE && heros === undefined && v.g < G.P_BAGUETTE;
+  const aTerre = v.e === ANIM.TERRASSE && heros === undefined && estPersonnage(v.g);
   if (v.clignote && heros) ctx.globalAlpha = 0.35;
   // le baril explosif, pendant sa mèche : il pâlit une fois sur deux
   if (v.clignote && v.g === G.BARIL) ctx.globalAlpha = 0.4;
 
   ctx.save();
   // monde sombre : un liseré lumineux détache les personnages du fond (cyan pour les héros, rose pour ceux d'en face)
-  if (lueur && v.g < G.P_BAGUETTE && !aTerre) {
+  if (lueur && estPersonnage(v.g) && !aTerre) {
     ctx.shadowColor = heros ? lueur.heros : lueur.ennemis;
     ctx.shadowBlur = heros ? 10 : 6;
   }

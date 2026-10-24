@@ -1,0 +1,208 @@
+import { G } from '../../jeu/vue';
+import type { NomTheme } from '../../rendu/themes';
+import { bouliste, charge, drone, goeland, kamikaze, tireur } from './comportements';
+import type { DefEnnemi } from './definitions';
+
+/**
+ * Les gens de l'International Tour. Dans chaque ville, les deux lettres ordinaires des cartes changent de visage : « a » (celui
+ * qui garde ses distances et chante faux) et « c » (celui qui fonce) deviennent des gens du coin ; chaque ville a en plus son
+ * spécial, une lettre à lui (voir ENNEMIS_SPECIAUX). Ils sont dessinés en code (rendu/dessins-locaux.ts) : aucune image à charger.
+ */
+
+const humain = (
+  d: Partial<DefEnnemi> & Pick<DefEnnemi, 'nom' | 'genre' | 'comportement' | 'cris'>,
+): DefEnnemi => ({
+  pv: 2,
+  w: 8,
+  h: 19,
+  vitesse: 0.9,
+  vision: 170,
+  visionVerticale: 60,
+  cadence: 80,
+  points: 100,
+  ...d,
+});
+
+/** Les spéciaux de chaque ville : la gargouille, le pilier du Munster, l'élan, le pigeon, le bouliste. */
+export const ENNEMIS_SPECIAUX: Record<string, DefEnnemi> = {
+  z: humain({
+    nom: 'Gargouille de la cathédrale',
+    genre: G.GARGOUILLE,
+    pv: 3,
+    w: 14,
+    h: 12,
+    vitesse: 1.1,
+    vision: 180,
+    visionVerticale: 140,
+    cadence: 80,
+    points: 200,
+    comportement: drone,
+    vole: true,
+    cris: ['Grrr.', 'Huit siècles que j’attends ça.'],
+  }),
+  u: humain({
+    nom: 'Pilier du Munster',
+    genre: G.PILIER,
+    pv: 9,
+    w: 12,
+    h: 22,
+    vitesse: 0.85,
+    vision: 150,
+    visionVerticale: 40,
+    cadence: 60,
+    points: 300,
+    comportement: charge,
+    contact: 1,
+    cris: ['Stand up and fight !', 'MÊLÉE !', 'Munster !'],
+  }),
+  j: humain({
+    nom: 'Élan',
+    genre: G.ELAN,
+    pv: 10,
+    w: 18,
+    h: 20,
+    vitesse: 0.8,
+    vision: 150,
+    visionVerticale: 40,
+    cadence: 60,
+    points: 300,
+    comportement: charge,
+    contact: 1,
+    cris: ['Bröööm.', '...'],
+  }),
+  n: humain({
+    nom: 'Pigeon de New York',
+    genre: G.PIGEON,
+    pv: 1,
+    w: 12,
+    h: 9,
+    vitesse: 1.3,
+    vision: 200,
+    visionVerticale: 140,
+    cadence: 130,
+    points: 120,
+    comportement: goeland,
+    vole: true,
+    contact: 1,
+    cris: ['Rou rou.'],
+  }),
+  q: humain({
+    nom: 'Bouliste',
+    genre: G.BOULISTE,
+    pv: 3,
+    w: 9,
+    h: 19,
+    vitesse: 0.6,
+    vision: 190,
+    visionVerticale: 80,
+    cadence: 95,
+    points: 200,
+    comportement: bouliste,
+    cris: ['Tu tires ou tu pointes ?', 'Elle est devant !', 'Mène pas le bouchon !'],
+  }),
+};
+
+/** Les gens du coin, ville par ville : « a » et « c ». */
+export const ENNEMIS_LOCAUX: Partial<Record<NomTheme, Record<string, DefEnnemi>>> = {
+  beauvais: {
+    a: humain({
+      nom: 'Passager perdu',
+      genre: G.PASSAGER,
+      comportement: tireur,
+      cris: ['C’est où, Paris ?', 'Il part à quelle heure, le bus ?', 'Quatre-vingt-cinq kilomètres ?!'],
+    }),
+    c: humain({
+      nom: 'Passager pressé',
+      genre: G.PRESSE,
+      pv: 2,
+      vitesse: 1,
+      comportement: charge,
+      contact: 1,
+      cris: ['PRIORITY !', 'Mon bagage fait la taille !', 'Embarquement immédiat !'],
+    }),
+  },
+  limerick: {
+    a: humain({
+      nom: 'Habitué du pub',
+      genre: G.HABITUE,
+      pv: 3,
+      comportement: tireur,
+      cris: ['Sláinte !', 'Encore une pinte !', 'Une chanson ! Une chanson !'],
+    }),
+    c: humain({
+      nom: 'Mouton',
+      genre: G.MOUTON,
+      pv: 2,
+      w: 13,
+      h: 11,
+      vitesse: 1,
+      points: 80,
+      comportement: charge,
+      contact: 1,
+      cris: ['Bêêê !', 'BÊÊÊÊ.'],
+    }),
+  },
+  lund: {
+    a: humain({
+      nom: 'Étudiant en salopette',
+      genre: G.ETUDIANT,
+      comportement: tireur,
+      cris: ['Skål !', 'Fika ?', 'C’est la nation de Smålands qui régale !'],
+    }),
+    c: humain({
+      nom: 'Cycliste',
+      genre: G.CYCLISTE,
+      pv: 1,
+      w: 12,
+      h: 19,
+      vitesse: 1.2,
+      comportement: kamikaze,
+      contact: 1,
+      cris: ['Ring ring !', 'Piste cyclable !'],
+    }),
+  },
+  newyork: {
+    a: humain({
+      nom: 'Trader de Wall Street',
+      genre: G.TRADER,
+      comportement: tireur,
+      cris: ['BUY ! BUY !', 'SELL !', 'La boucle, c’est l’avenir !'],
+    }),
+    c: humain({
+      nom: 'Rat de New York',
+      genre: G.RAT,
+      pv: 1,
+      w: 10,
+      h: 6,
+      vitesse: 1.1,
+      points: 80,
+      comportement: kamikaze,
+      contact: 1,
+      cris: ['Squiik !', 'Ma pizza !'],
+    }),
+  },
+  marseille: {
+    a: humain({
+      nom: 'Supporter de l’OM',
+      genre: G.SUPPORTER,
+      pv: 3,
+      comportement: tireur,
+      cris: ['Aux armes !', 'Allez l’OM !', 'Oh, fada !'],
+    }),
+    c: humain({
+      nom: 'Livreur en scooter',
+      genre: G.SCOOTER,
+      pv: 2,
+      w: 14,
+      h: 18,
+      vitesse: 1.3,
+      comportement: kamikaze,
+      contact: 1,
+      cris: ['Bouge, dégun passe !', 'J’suis en route !'],
+    }),
+  },
+};
+
+/** L'ennemi d'une lettre de la carte, dans un monde : celui du coin s'il y en a un, sinon l'ordinaire. */
+export const ennemiDuCoin = (lettre: string, theme: NomTheme): DefEnnemi | undefined =>
+  ENNEMIS_LOCAUX[theme]?.[lettre];

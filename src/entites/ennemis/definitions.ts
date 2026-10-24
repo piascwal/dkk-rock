@@ -17,6 +17,7 @@ import {
 import type { Contexte } from '../../jeu/contexte';
 import type { Ennemi } from './ennemi';
 import { RIDERS } from './definitions-riders';
+import { ENNEMIS_SPECIAUX } from './locaux';
 
 export interface DefEnnemi {
   nom: string;
@@ -235,4 +236,5 @@ export const ENNEMIS_PAR_LETTRE: Record<string, DefEnnemi> = {
   },
   // les riders du FISE
   ...RIDERS,
+  ...ENNEMIS_SPECIAUX,
 };

@@ -1,5 +1,6 @@
 import { FIN_BRETAGNE } from '../histoire/fin-bretagne';
 import { FIN_FISE } from '../histoire/fin-fise';
+import { FIN_INTERNATIONAL } from '../histoire/fin-international';
 import { FIN_TOURNEE } from '../histoire/fin-tournee';
 import type { Replique } from './format';
 
@@ -53,6 +54,15 @@ export const ARCS: DefArc[] = [
     niveaux: [10],
     apres: 8,
     fin: FIN_FISE,
+  },
+  {
+    id: 'international',
+    titre: 'International Tour',
+    resume: 'Une ville par membre du groupe : Beauvais, Limerick, Lund, New York, et la finale à Marseille.',
+    // les niveaux 16 à 20 de la liste ; le départ de Beauvais (son aéroport « Paris »), JBT en guide ; puis Mat, Tom, JBM, JBG
+    niveaux: [16, 17, 18, 19, 20],
+    apres: 10,
+    fin: FIN_INTERNATIONAL,
   },
 ];
 

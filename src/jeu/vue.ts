@@ -93,12 +93,34 @@ export const G = {
   P_FIGUE: 69,
   /** une carte Sibylle des fontaines cachée dans le niveau (`f` : son numéro) : elle lévite dans son aura verte */
   SIBYLLE: 70,
+  // les gens de l'International Tour (voir entites/ennemis/locaux.ts), après la plage des tirs : `estPersonnage` les compte
+  PASSAGER: 71,
+  PRESSE: 72,
+  GARGOUILLE: 73,
+  HABITUE: 74,
+  MOUTON: 75,
+  PILIER: 76,
+  ETUDIANT: 77,
+  CYCLISTE: 78,
+  ELAN: 79,
+  TRADER: 80,
+  RAT: 81,
+  PIGEON: 82,
+  SUPPORTER: 83,
+  SCOOTER: 84,
+  BOULISTE: 85,
+  /** la boule de pétanque du bouliste marseillais : un tir, hors de la plage des tirs (voir `estUnTir`) */
+  P_BOULE: 86,
 } as const;
 
 export type Genre = (typeof G)[keyof typeof G];
 
 /** Un tir (les instruments et les tirs ennemis) : la plage des tirs, plus ceux venus après qu'elle fut pleine (la figue). */
-export const estUnTir = (g: number): boolean => (g >= G.P_BAGUETTE && g < G.CAGE) || g === G.P_FIGUE;
+export const estUnTir = (g: number): boolean =>
+  (g >= G.P_BAGUETTE && g < G.CAGE) || g === G.P_FIGUE || g === G.P_BOULE;
+
+/** Un personnage (héros, ennemi, boss) : la plage d'avant les tirs, plus les gens de l'International Tour. */
+export const estPersonnage = (g: number): boolean => g < G.P_BAGUETTE || (g >= G.PASSAGER && g <= G.BOULISTE);
 
 /** États d'animation des héros (champ `e`). */
 export const ANIM = {
@@ -266,6 +288,21 @@ export const GENRES_CONVERTIS: readonly number[] = [
   G.YETI_ALPHA,
   G.CHAMPION,
   G.DJ,
+  G.PASSAGER,
+  G.PRESSE,
+  G.GARGOUILLE,
+  G.HABITUE,
+  G.MOUTON,
+  G.PILIER,
+  G.ETUDIANT,
+  G.CYCLISTE,
+  G.ELAN,
+  G.TRADER,
+  G.RAT,
+  G.PIGEON,
+  G.SUPPORTER,
+  G.SCOOTER,
+  G.BOULISTE,
 ];
 
 /** Les ennemis qui volent : un drone ou un goéland tombé n'est pas un rocker, il tombe comme un oiseau. */

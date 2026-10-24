@@ -155,6 +155,12 @@ export const DESSINS_TIRS: Partial<Record<number, Dessin>> = {
     p(-2, -3, 4, 6, '#ffffff');
     p(1, 1, 2, 1, '#c4d6ec');
   },
+  [G.P_BOULE]: (p) => {
+    p(-3, -2, 6, 4, '#8a8e96');
+    p(-2, -3, 4, 6, '#8a8e96');
+    p(-2, -2, 2, 1, '#e8ecf2');
+    p(0, 1, 3, 1, '#5a5e66');
+  },
   [G.P_LASER]: (p) => {
     p(-3, -1, 6, 2, '#ff2a2a');
     p(-2, -1, 4, 1, '#ffb3b3');

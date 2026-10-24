@@ -304,4 +304,100 @@ NIVEAUX = {
             ('vide', 64, dict()),  # la piste du Champion, devant l'Hôtel de Région (outils/genere-niveaux.py : arene_du_champion)
         ],
     ),
+    # l'International Tour, après le FISE (voir niveaux/international.py) : une ville par membre du groupe. Dans ces villes,
+    # « a » et « c » sont les ennemis du coin (voir entites/ennemis/locaux.ts) ; chacune a en plus son spécial
+    'beauvais': dict(
+        nom='Beauvais', theme='beauvais', textes='17-beauvais.ts', fichier='17-beauvais.ts', constante='CARTE_BEAUVAIS',
+        graine=171, base=36, raccord='ac', caves='ac',
+        lieux=[
+            ('plat', 12, dict(lettres='a', digit='1')),  # le centre-ville, ses voyageurs perdus
+            ('maison', 14, dict(lettres='ac')),
+            ('calade', 30, dict(lettres='ac')),  # les rues pavées
+            ('toits', 42, dict(lettres='ac')),
+            ('cathedrale_beauvais', 40, dict(lettres='ac', digit='2')),  # le chœur le plus haut du monde, sans nef
+            ('plat', 10, dict(lettres='ac', digit='3', drones=2)),  # l'horloge astronomique ; les gargouilles s'envolent
+            ('remparts', 18, dict(haut=6, lettres='ac', digit='4')),  # la place Jeanne-Hachette
+            ('forteresse', 34, dict(etages=3, lettres='ac', mat='{', cage=True)),
+            ('gouffre', 20, dict(lettres='ac', nb=4)),
+            ('tour', 18, dict(etages=3, tyro=9, apres=13, lettres='ac')),
+            ('traversee', 36, dict(lettres='ac', mode='pont')),
+            ('plat', 10, dict(lettres='ac', digit='5', drones=1)),  # le dernier appel
+            ('avion', 52, dict(lettres='c')),  # l'avion low-cost sur le tarmac de Beauvais-Tillé
+            ('arene', 40, dict(lettres='acz')),
+        ],
+    ),
+    'limerick': dict(
+        nom='Limerick', theme='limerick', textes='18-limerick.ts', fichier='18-limerick.ts', constante='CARTE_LIMERICK',
+        graine=181, base=30, raccord='ac', caves='ac',
+        lieux=[
+            ('plat', 12, dict(lettres='c', deco=3)),
+            ('pres', 30, dict(lettres='c', digit='1')),  # les prés à murets, leurs moutons
+            ('colline', 18, dict(haut=3, lettres='c')),
+            ('pres', 26, dict(lettres='cc')),
+            ('chateau_roi_jean', 44, dict(lettres='ac', digit='2')),  # le château du roi Jean
+            ('plat', 10, dict(lettres='ac', digit='3')),  # Mat récite un limerick
+            ('shannon', 30, dict(lettres='ac')),  # la Shannon, le pont de Thomond
+            ('pub', 26, dict(lettres='a', digit='4')),  # la session au pub
+            ('toits', 42, dict(lettres='ac')),
+            ('forteresse', 34, dict(etages=3, lettres='ac', mat='R', cage=True)),
+            ('gouffre', 20, dict(lettres='ac', nb=4)),
+            ('plat', 10, dict(lettres='au', digit='5')),  # Thomond Park : les supporters du Munster
+            ('gradins', 30, dict(haut=6, lettres='au', cage=True, mat='R')),  # les tribunes du stade
+            ('barrage', 20, dict(haut=12, lettres='acu', butin='+')),
+            ('arene', 40, dict(lettres='acu')),
+        ],
+    ),
+    'lund': dict(
+        nom='Lund', theme='lund', textes='19-lund.ts', fichier='19-lund.ts', constante='CARTE_LUND',
+        graine=191, base=36, raccord='ac', caves='ac',
+        lieux=[
+            ('plat', 12, dict(lettres='a', digit='1')),  # les étudiants en salopette
+            ('maisons_rouges', 36, dict(lettres='ac')),
+            ('toits', 42, dict(lettres='ac')),
+            ('cathedrale_lund', 48, dict(lettres='ac', digit='2')),  # la cathédrale romane, la crypte du géant Finn
+            ('plat', 10, dict(lettres='ac', digit='3')),  # l'horloge astronomique
+            ('forteresse', 34, dict(etages=3, lettres='ac', mat='B', cage=True)),  # l'université
+            ('maisons_rouges', 36, dict(lettres='ac', digit='4')),  # Kulturen
+            ('traversee', 36, dict(lettres='ac', mode='iles')),
+            ('plat', 12, dict(lettres='cj', digit='5')),  # un élan sur la piste cyclable
+            ('gouffre', 20, dict(lettres='acj', nb=4)),
+            ('tour', 18, dict(etages=3, tyro=9, apres=13, lettres='ac', mat='B')),
+            ('arene', 40, dict(lettres='acj')),
+        ],
+    ),
+    'newyork': dict(
+        nom='New York', theme='newyork', textes='20-new-york.ts', fichier='20-new-york.ts', constante='CARTE_NEW_YORK',
+        graine=201, base=40, raccord='ac', caves='ac',
+        lieux=[
+            ('plat', 12, dict(lettres='c', digit='1')),  # les rats, leur part de pizza
+            ('gratte_ciel', 24, dict(lettres='ac', digit='2', etages=4)),  # les escaliers de secours, les châteaux d'eau
+            ('toits', 42, dict(lettres='ac')),
+            ('gratte_ciel', 26, dict(lettres='ac', etages=5)),
+            ('plat', 10, dict(lettres='aa', digit='3', drones=2)),  # Wall Street ; les pigeons
+            ('echafaudage', 22, dict(niveaux=3, lettres='ac')),
+            ('metro', 44, dict(lettres='c', digit='4')),  # le métro sous la rue
+            ('gratte_ciel', 28, dict(lettres='ac', etages=5)),
+            ('gouffre', 20, dict(lettres='ac', nb=4)),
+            ('pont_brooklyn', 56, dict(lettres='ac', digit='5')),  # le pont de Brooklyn
+            ('arene', 40, dict(lettres='acn')),
+        ],
+    ),
+    'marseille': dict(
+        nom='Marseille', theme='marseille', textes='21-marseille.ts', fichier='21-marseille.ts', constante='CARTE_MARSEILLE',
+        graine=211, base=36, raccord='ac', caves='ac',
+        lieux=[
+            ('plat', 12, dict(lettres='a', deco=3)),
+            ('ponton', 42, dict(lettres='ac', digit='1')),  # le Vieux-Port, ses pointus ; les gabians
+            ('calade', 34, dict(lettres='ac', digit='2')),  # le Panier
+            ('toits', 42, dict(lettres='ac')),
+            ('plat', 14, dict(lettres='qq', digit='3')),  # la pétanque
+            ('forteresse', 34, dict(etages=3, lettres='ac', mat='{', cage=True)),  # le fort Saint-Jean
+            ('plat', 10, dict(lettres='aa', digit='4', drones=2)),  # les supporters de l'OM ; les gabians
+            ('traversee', 36, dict(lettres='ac', mode='pont')),
+            ('calanques', 36, dict(lettres='ac', digit='5')),  # les calanques
+            ('bonne_mere', 44, dict(lettres='acq')),  # Notre-Dame de la Garde
+            ('barrage', 20, dict(haut=12, lettres='acq', butin='+')),
+            ('arene', 40, dict(lettres='acqg')),
+        ],
+    ),
 }

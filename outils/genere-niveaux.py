@@ -24,6 +24,7 @@ from hauteurs import corniches, descente, grotte, pont_de_singe, tours, vide_par
 from signatures import falaise, glacier, parking, ponton, scene, toits
 from structures import forteresse, traversee
 from verrous import barrage, gouffre
+import international
 
 RACINE = pathlib.Path(__file__).resolve().parent.parent
 CARTES = RACINE / 'src' / 'niveaux' / 'cartes'
@@ -45,7 +46,18 @@ THEMES = {
     # Saint-Cézaire : la pierre calcaire des maisons et des remparts ; les gorges de la Siagne : la roche, le bois des cabanes
     'stc': dict(sol='#', sous='#', profond='R', mur='{', deco=['C', 'C', 'T']),
     'tuves': dict(sol='#', sous='#', profond='R', mur='{', deco=['C', 'W']),
+    # l'International Tour (voir niveaux/international.py) : la pierre de Beauvais, le calcaire gris de Limerick, la brique de
+    # Lund, le béton et la brique de New York, la pierre blanche de Marseille
+    'beauvais': dict(sol='#', sous='#', profond='R', mur='{', deco=['C', 'T']),
+    'limerick': dict(sol='#', sous='#', profond='R', mur='R', deco=['C', 'W']),
+    'lund': dict(sol='#', sous='#', profond='R', mur='B', deco=['C', 'W']),
+    'newyork': dict(sol='D', sous='D', profond='R', mur='B', deco=['C', 'T', 'M']),
+    'marseille': dict(sol='#', sous='R', profond='R', mur='{', deco=['C', 'W']),
 }
+
+# ce qui vole dans chaque monde (posé par `drones`) : le drone par défaut, le goéland en Bretagne, à Limerick, à Lund et à
+# Marseille (le gabian), la gargouille de la cathédrale de Beauvais, le pigeon de New York
+VOLANTS = {'foret': 'g', 'port': 'g', 'groix': 'g', 'mer': 'g', 'limerick': 'g', 'lund': 'g', 'marseille': 'g', 'beauvais': 'z', 'newyork': 'n'}
 
 
 # les niveaux de l'arc breton (voir docs/ARC-BRETAGNE.md) : le goéland y remplace le drone
@@ -65,8 +77,8 @@ class Recette:
         # peu de profondeur : 30 rangées sous la surface, dont 6 de vide ; le monde finit vite, on tombe vite (un niveau qui
         # descend, comme le sentier du pont des Tuves, en demande plus : `profondeur` dans son plan)
         self.nom, self.n = nom, Niveau(largeur, base + profondeur, base, graine, THEMES[theme])
-        # l'arc breton a son goéland (g) à la place du drone (e) : les autres niveaux gardent le drone
-        self.volant = 'g' if theme in BRETON else 'e'
+        # l'arc breton a son goéland (g) à la place du drone (e), chaque ville de l'International Tour son volatile
+        self.volant = VOLANTS.get(theme, 'e')
         self.x = 6
         self.digits = declencheurs(fichier_textes)
         self.pieces = []  # (x0, x1, genre)
@@ -294,6 +306,46 @@ class Recette:
     def p_ferry(self, x0, x1, lettres='a'):
         ferry(self.n, x0, x1 - x0, lettres)
 
+    # ---- l'International Tour (voir niveaux/international.py) : les monuments de chaque ville
+    def p_cathedrale_beauvais(self, x0, x1, lettres='a'):
+        international.cathedrale_beauvais(self.n, x0, x1 - x0, lettres)
+
+    def p_avion(self, x0, x1, lettres='a'):
+        international.avion_lowcost(self.n, x0, x1 - x0, lettres)
+
+    def p_chateau_roi_jean(self, x0, x1, lettres='a'):
+        international.chateau_roi_jean(self.n, x0, x1 - x0, lettres)
+
+    def p_pub(self, x0, x1, lettres='a'):
+        international.pub(self.n, x0, x1 - x0, lettres)
+
+    def p_pres(self, x0, x1, lettres='c'):
+        international.pres_a_murets(self.n, x0, x1 - x0, lettres)
+
+    def p_shannon(self, x0, x1, lettres='a'):
+        international.shannon(self.n, x0, x1 - x0, lettres)
+
+    def p_cathedrale_lund(self, x0, x1, lettres='a'):
+        international.cathedrale_lund(self.n, x0, x1 - x0, lettres)
+
+    def p_maisons_rouges(self, x0, x1, lettres='a'):
+        international.maisons_rouges(self.n, x0, x1 - x0, lettres)
+
+    def p_gratte_ciel(self, x0, x1, lettres='a', etages=5):
+        international.gratte_ciel(self.n, x0, x1 - x0, lettres, etages)
+
+    def p_metro(self, x0, x1, lettres='c'):
+        international.metro(self.n, x0, x1 - x0, lettres)
+
+    def p_pont_brooklyn(self, x0, x1, lettres='a'):
+        international.pont_brooklyn(self.n, x0, x1 - x0, lettres)
+
+    def p_bonne_mere(self, x0, x1, lettres='a'):
+        international.bonne_mere(self.n, x0, x1 - x0, lettres)
+
+    def p_calanques(self, x0, x1, lettres='a'):
+        international.calanques(self.n, x0, x1 - x0, lettres)
+
     def p_arene(self, x0, x1, lettres='ab', plus=2):
         n = self.n
         n.plat(x0, x1, 5)
@@ -427,7 +479,7 @@ def fabrique(cle):
     )
     if not cfg.get('sans_caves'):  # le ferry est un petit niveau : rien sous le quai
         souterrain(r, cfg['caves'])
-    tonneaux_de_surface(r, barils=cle in ('stc', 'ville'))
+    tonneaux_de_surface(r, barils=cle in ('stc', 'ville', 'newyork'))
     if cle == 'cimes':
         arene_du_yeti(r)
     if cle == 'club':

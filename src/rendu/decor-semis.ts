@@ -1,5 +1,6 @@
 import type { NomAccessoire } from './decor-objets';
 import { SEMIS_PROVENCE } from './decor-provence';
+import { SEMIS_INTERNATIONAL } from './decor-semis-international';
 import type { NomTheme } from './themes';
 
 /** Ce que l'on sème, par monde : dehors (sur le sol à l'air libre) et dedans (derrière un mur d'intérieur). */
@@ -258,4 +259,5 @@ export const SEMIS: Record<NomTheme, { dehors: NomAccessoire[]; dedans: NomAcces
       densite: 0.75,
     },
     ...SEMIS_PROVENCE,
+    ...SEMIS_INTERNATIONAL,
   };

@@ -14,6 +14,11 @@ import { CARTE_REVE } from './cartes/15-reve';
 import { CARTE_AVION } from './cartes/16-avion';
 import { CARTE_TUVES, DECOR_TUVES } from './cartes/13-tuves';
 import { ASSAUTS_FISE, CARTE_FISE, DECOR_FISE, ZONES_FISE } from './cartes/11-fise';
+import { CARTE_BEAUVAIS } from './cartes/17-beauvais';
+import { CARTE_LIMERICK } from './cartes/18-limerick';
+import { CARTE_LUND } from './cartes/19-lund';
+import { CARTE_NEW_YORK } from './cartes/20-new-york';
+import { CARTE_MARSEILLE } from './cartes/21-marseille';
 import { litNiveau, type DefNiveau, type NiveauLu } from './format';
 import { STC } from './textes/01-stc';
 import { ALPAGES } from './textes/02-alpages';
@@ -31,6 +36,11 @@ import { PLONGEON } from './textes/14-plongeon';
 import { REVE } from './textes/15-reve';
 import { AVION } from './textes/16-avion';
 import { TUVES } from './textes/13-tuves';
+import { BEAUVAIS } from './textes/17-beauvais';
+import { LIMERICK } from './textes/18-limerick';
+import { LUND } from './textes/19-lund';
+import { NEW_YORK } from './textes/20-new-york';
+import { MARSEILLE } from './textes/21-marseille';
 
 /** Les niveaux, arc après arc (voir arcs.ts). Pour en ajouter un : un texte, une carte, une ligne ici. */
 export const NIVEAUX: DefNiveau[] = [
@@ -58,6 +68,12 @@ export const NIVEAUX: DefNiveau[] = [
   { ...REVE, carte: CARTE_REVE },
   // l'avion de JBG (un mini-jeu), ajouté après coup : il ouvre le Breizh Tour (on prend l'avion pour la Bretagne)
   { ...AVION, carte: CARTE_AVION },
+  // l'International Tour, après le FISE : une ville par membre du groupe (voir arcs.ts)
+  { ...BEAUVAIS, carte: CARTE_BEAUVAIS },
+  { ...LIMERICK, carte: CARTE_LIMERICK },
+  { ...LUND, carte: CARTE_LUND },
+  { ...NEW_YORK, carte: CARTE_NEW_YORK },
+  { ...MARSEILLE, carte: CARTE_MARSEILLE },
 ];
 
 const lus = new Map<number, NiveauLu>();

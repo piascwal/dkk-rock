@@ -42,6 +42,16 @@ export const BOULE_NEIGE = P({
   duree: 150,
   taille: 6,
 });
+/** La boule de pétanque du bouliste : lancée en cloche, elle pèse. */
+export const BOULE = P({
+  genre: G.P_BOULE,
+  vitesse: 3.4,
+  gravite: 1,
+  degats: 1,
+  degatsTuile: 2,
+  duree: 150,
+  taille: 6,
+});
 export const LASER = P({
   genre: G.P_LASER,
   vitesse: 6.5,

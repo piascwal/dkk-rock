@@ -5,6 +5,7 @@ import { Chauffage } from '../entites/chauffage';
 import { Champion } from '../entites/ennemis/champion';
 import { DjBoucle } from '../entites/ennemis/dj';
 import { ENNEMIS_PAR_LETTRE } from '../entites/ennemis/definitions';
+import { ennemiDuCoin } from '../entites/ennemis/locaux';
 import { Ennemi } from '../entites/ennemis/ennemi';
 import { YetiAlpha } from '../entites/ennemis/yeti-alpha';
 import { Kiwi } from '../entites/kiwi';
@@ -44,7 +45,8 @@ export function peuple(p: Partie): void {
   // à la reprise sur un drapeau, les ennemis déjà dépassés ne reviennent pas
   const depart = p.drapeau >= 0 ? lu.drapeaux[p.drapeau]!.x : -Infinity;
   for (const e of lu.ennemis) {
-    const def = ENNEMIS_PAR_LETTRE[e.lettre];
+    // dans les villes de l'International Tour, « a » et « c » sont des gens du coin
+    const def = ennemiDuCoin(e.lettre, lu.def.theme) ?? ENNEMIS_PAR_LETTRE[e.lettre];
     if (def && e.x > depart) {
       const en = new Ennemi(p, def, e.x, e.y);
       en.zone = zoneDe(lu.def.zones, e.x);

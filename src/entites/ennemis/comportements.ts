@@ -4,6 +4,7 @@ import { Projectile } from '../projectile';
 import type { DefProjectile } from '../projectiles-defs';
 import {
   BOMBE_DRONE,
+  BOULE,
   BOULE_NEIGE,
   DROP,
   FIGUE,
@@ -100,6 +101,17 @@ export const lobeur: Comportement = (e, ctx, cible) => {
     lobeVers(e, ctx, DROP, cible, 55);
     e.recharge = e.def.cadence;
     ctx.son('drop', e.cx, e.cy);
+  }
+};
+
+/** Le bouliste marseillais : il ne bouge pas d'un pouce et pointe ses boules en cloche, pile sur vous. */
+export const bouliste: Comportement = (e, ctx, cible) => {
+  e.faceA(cible);
+  e.corps.vx = 0;
+  if (e.recharge === 0 && e.peutTirer(cible, ctx)) {
+    lobeVers(e, ctx, BOULE, cible, 45);
+    e.recharge = e.def.cadence;
+    ctx.son('chute', e.cx, e.cy);
   }
 };
 

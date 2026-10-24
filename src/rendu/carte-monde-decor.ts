@@ -1,5 +1,6 @@
 import type { Aleatoire } from '../moteur/maths';
 import type { Decor } from './themes';
+import * as I from './carte-monde-international';
 
 /**
  * Les tuiles de la carte du monde (8 px), façon Super Mario Bros 3 : un sol en léger damier par région, et des décors
@@ -277,6 +278,37 @@ export const SOLS: Record<Decor, Sol> = {
     sombre: '#6e9442',
     petits: [penty, menhir, caillou, buisson],
     grands: [phare, colline('#6e9442', '#5e8438', '#b8d070'), colline('#6e9442', '#5e8438', '#b8d070')],
+  },
+  // l'île de l'International Tour
+  beauvais: {
+    clair: '#a0ac6e',
+    sombre: '#94a064',
+    petits: [buisson, maison, I.avion],
+    grands: [I.cathedrale],
+  },
+  limerick: {
+    clair: '#3fa040',
+    sombre: '#36923a',
+    petits: [I.mouton, I.mouton, buisson, caillou],
+    grands: [I.chateauRond],
+  },
+  lund: {
+    clair: '#e4ecf4',
+    sombre: '#d6e0ec',
+    petits: [I.maisonRouge, I.maisonRouge, sapin],
+    grands: [I.toursJumelles],
+  },
+  newyork: {
+    clair: '#8a8a90',
+    sombre: '#7e7e86',
+    petits: [I.taxi, caillou],
+    grands: [I.gratteCiel, I.gratteCiel, I.liberte],
+  },
+  marseille: {
+    clair: '#e2d4a8',
+    sombre: '#d8c89a',
+    petits: [palmier, I.pointu, caillou],
+    grands: [I.bonneMere],
   },
 };
 

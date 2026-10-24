@@ -2,7 +2,16 @@ import { HAUTEUR_CARTE } from '../config';
 import { DUREE_CARTE, G } from '../jeu/vue';
 import { Aleatoire, borne } from '../moteur/maths';
 import { NIVEAUX } from '../niveaux';
-import { arcDe, etatsDuTrajet, MONDE, suivantDansMonde } from '../niveaux/arcs';
+import { arcDe, ARCS, etatsDuTrajet, MONDE, suivantDansMonde } from '../niveaux/arcs';
+import {
+  DEBUT_ILE_EST,
+  distancesDesEtapes,
+  HT,
+  LT,
+  ROUTE_GRANDE_ILE,
+  ROUTE_ILE_EST,
+  terre,
+} from './carte-iles';
 import { arbreDeLimite, C, limiteVillePort, SOLS, mer, type Px } from './carte-monde-decor';
 import { brouillard } from './carte-brouillard';
 import { dessineRoute, detroit, longueur, surRoute } from './carte-route';
@@ -17,8 +26,6 @@ import { THEMES, type Decor } from './themes';
  * (la Bretagne, à l'est, et Groix au large). Un nouvel arc prolonge la route ; un nouveau thème doit avoir son sol dans
  * carte-monde-decor.ts (SOLS).
  */
-const LT = 74; // largeur de la carte, en tuiles
-const HT = 27;
 
 interface Plan {
   /** la route : une ligne brisée (en tuiles), et la distance de chaque étape le long d'elle */
@@ -42,35 +49,19 @@ const AU_LARGE = new Set<Decor>(['falaises']);
 
 function plan(): Plan {
   if (monde) return monde;
-  // la route serpente : la tournée à l'ouest (trois allers-retours, avec des détours), puis la Bretagne à l'est
-  const route: [number, number][] = [
-    [4, 21],
-    [11, 21],
-    [11, 16],
-    [18, 16],
-    [18, 21],
-    [27, 21],
-    [27, 13],
-    [19, 13],
-    [19, 6],
-    [30, 6],
-    [30, 11],
-    [38, 11],
-    [38, 19],
-    [47, 19],
-    [47, 9],
-    [56, 9],
-    [56, 16],
-    [64, 16],
-    [64, 7],
-    [70, 7],
-  ];
-  let total = 0;
-  for (let i = 0; i + 1 < route.length; i++) total += longueur(route, i);
-  const n = MONDE.length;
-  const etapes = MONDE.map(
-    (niveau, i) => Math.round((i * total) / Math.max(1, n - 1)) + (DECALAGE_ETAPE[niveau] ?? 0),
+  const route: [number, number][] = [...ROUTE_GRANDE_ILE, ...ROUTE_ILE_EST];
+  // les étapes de la grande île, puis celles de l'île de l'est (l'International Tour)
+  const nEst = ARCS.find((a) => a.id === 'international')?.niveaux.length ?? 0;
+  const longueurs = (r: [number, number][]) => r.slice(1).reduce((t, _, i) => t + longueur(r, i), 0);
+  const longueurGrande = longueurs(ROUTE_GRANDE_ILE);
+  const etapes = distancesDesEtapes(
+    longueurGrande,
+    longueurs(route) - longueurGrande,
+    MONDE.length - nEst,
+    nEst,
+    (k) => DECALAGE_ETAPE[MONDE[k]!] ?? 0,
   );
+  const premiereEst = MONDE.length - nEst;
   const pos = etapes.map((d) => surRoute(route, d));
   const r = new Aleatoire(36);
 
@@ -96,16 +87,12 @@ function plan(): Plan {
     c.fillStyle = col;
     c.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
   };
-  const grandeIle = (x: number, y: number) => {
-    const nx = (x - LT / 2) / (LT / 2 - 2.2);
-    const ny = (y - HT / 2) / (HT / 2 - 2.2);
-    return nx * nx * nx * nx + ny * ny * ny * ny + Math.sin(x * 1.3 + y * 0.7) * 0.08 < 1;
-  };
   for (let y = 0; y < HT; y++)
     for (let x = 0; x < LT; x++) {
       let mieux = 0;
       let dmin = Infinity;
       pos.forEach(([px, py], k) => {
+        if (k >= premiereEst !== x >= DEBUT_ILE_EST) return; // chaque île garde ses étapes
         const d = Math.hypot(px - x, py - y) + Math.sin(x * 0.9 + k) * 0.7 + Math.cos(y * 1.1 - k) * 0.7;
         if (d < dmin) [dmin, mieux] = [d, k];
       });
@@ -114,7 +101,7 @@ function plan(): Plan {
   // une région au large (l'île de Groix) : un détroit la sépare du reste, que la route franchit en ferry
   const decorDe = (k: number) => THEMES[NIVEAUX[MONDE[k]!]!.theme].decor;
   const eau = detroit(region, (k) => AU_LARGE.has(decorDe(k)), LT, HT);
-  const ile = (x: number, y: number) => grandeIle(x, y) && !eau.has(y * LT + x);
+  const ile = (x: number, y: number) => terre(x, y) && !eau.has(y * LT + x);
   // sol, côtes et décors
   const occupe = new Set<number>();
   const limite = limiteVillePort(
@@ -165,7 +152,8 @@ function plan(): Plan {
         occupe.add(k);
       }
     }
-  dessineRoute(p, route, C, LT, eau);
+  // au-dessus de la mer (le détroit de Groix, le vol vers l'île de l'est), la route n'est plus qu'un sillage en pointillés
+  dessineRoute(p, route, C, LT, { has: (k) => !ile(k % LT, Math.floor(k / LT)) });
   const pl = { route, etapes, fond: toile, region };
   monde = pl;
   return pl;
