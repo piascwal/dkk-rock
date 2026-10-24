@@ -319,6 +319,9 @@ class Recette:
     def p_pub(self, x0, x1, lettres='a'):
         international.pub(self.n, x0, x1 - x0, lettres)
 
+    def p_universite(self, x0, x1, lettres='a'):
+        international.universite_limerick(self.n, x0, x1 - x0, lettres)
+
     def p_pres(self, x0, x1, lettres='c'):
         international.pres_a_murets(self.n, x0, x1 - x0, lettres)
 

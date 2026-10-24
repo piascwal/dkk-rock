@@ -39,7 +39,7 @@ export const SEMIS_INTERNATIONAL: Record<
       'banc',
       'enceinte34',
     ],
-    dedans: ['tonneau', 'tonneau', 'caisseDeco', 'etagere', 'enceinte34', 'flambeau'],
+    dedans: ['caisseDeco', 'etagere', 'etagere', 'enceinte34'],
     densite: 0.8,
   },
   lund: {

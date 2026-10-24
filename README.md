@@ -300,14 +300,14 @@ validé.
   puis « Le FISE », puis l'« International Tour ».
   **L'International Tour** (après le FISE, sur une seconde île à l'est de la carte du monde, qu'on rejoint par les airs : la route
   y devient des pointillés au-dessus de la mer, `rendu/carte-iles.ts`) : une ville qui a marqué chaque membre du groupe, chacun
-  en guide dans l'intro de la sienne, dans l'ordre de la tournée : Limerick (le stage de fin d'études de maths de Mat : la
+  en guide dans l'intro de la sienne, dans l'ordre de la tournée : Limerick (le stage de fin d'études d'informatique de Mat à l'Université de Limerick : la
   Shannon, le château du roi Jean, le pub, les moutons, le Munster, les Cranberries), New York (l'expérience de vie de JBM : les
   rats et leur pizza, les châteaux d'eau, Wall Street, le métro, le pont de Brooklyn), Lund (le voyage étudiant de Tom : la nuit
   d'hiver à quinze heures, la cathédrale et le géant Finn, les étudiants en salopette, les vélos, l'élan), Beauvais, l'étape la
   plus « exotique », où JBT a été prof de sport (son aéroport international, donc ville internationale ; le chœur gothique le
   plus haut du monde, jamais fini ; Jeanne Hachette ; l'avion low-cost) et la finale à Marseille, où JBG a vécu (JBG : le Vieux-Port, le Panier, la pétanque, l'OM, les calanques, la Bonne Mère), avec l'épilogue
   `histoire/fin-international.ts`. Les monuments sont des pièces du générateur (`outils/niveaux/international.py` : la
-  cathédrale sans nef et ses arcs-boutants, l'avion, le château à tours rondes, le pub, la Shannon et son pont, la cathédrale
+  cathédrale sans nef et ses arcs-boutants, l'avion, le château à tours rondes, l'université, le pub, la Shannon et son pont, la cathédrale
   romane, les maisons rouges, les gratte-ciel, le métro, le pont de Brooklyn, la colline de la Bonne Mère, les calanques). Les
   fonds sont peints en code au chargement du niveau (`rendu/fonds-international*.ts`), comme les gens du coin
   (`entites/ennemis/locaux.ts`, dessinés dans `rendu/dessins-locaux.ts`) : dans ces villes, les lettres ordinaires « a » et

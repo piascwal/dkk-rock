@@ -15,7 +15,7 @@ import { CARTE_AVION } from './cartes/16-avion';
 import { CARTE_TUVES, DECOR_TUVES } from './cartes/13-tuves';
 import { ASSAUTS_FISE, CARTE_FISE, DECOR_FISE, ZONES_FISE } from './cartes/11-fise';
 import { CARTE_BEAUVAIS } from './cartes/17-beauvais';
-import { CARTE_LIMERICK } from './cartes/18-limerick';
+import { CARTE_LIMERICK, DECOR_LIMERICK } from './cartes/18-limerick';
 import { CARTE_LUND } from './cartes/19-lund';
 import { CARTE_NEW_YORK } from './cartes/20-new-york';
 import { CARTE_MARSEILLE } from './cartes/21-marseille';
@@ -70,7 +70,7 @@ export const NIVEAUX: DefNiveau[] = [
   { ...AVION, carte: CARTE_AVION },
   // l'International Tour, après le FISE : une ville par membre du groupe (voir arcs.ts)
   { ...BEAUVAIS, carte: CARTE_BEAUVAIS },
-  { ...LIMERICK, carte: CARTE_LIMERICK },
+  { ...LIMERICK, carte: CARTE_LIMERICK, decor: DECOR_LIMERICK },
   { ...LUND, carte: CARTE_LUND },
   { ...NEW_YORK, carte: CARTE_NEW_YORK },
   { ...MARSEILLE, carte: CARTE_MARSEILLE },

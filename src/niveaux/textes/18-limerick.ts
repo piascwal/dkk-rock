@@ -3,26 +3,40 @@ import type { DefNiveau } from '../format';
 export const LIMERICK: Omit<DefNiveau, 'carte'> = {
   id: 'limerick',
   titre: 'Limerick',
-  sousTitre: 'International Tour 1 — Irlande, le stage de Mat',
+  sousTitre: 'International Tour 1 — Irlande, le stage d’informatique de Mat',
   theme: 'limerick',
+  // les postes de l'université sont placés par le générateur ; le reste du décor est semé au hasard
+  semis: true,
   intro: [
     {
       qui: 'NARRATEUR',
       texte: 'Après le FISE, le groupe part en tournée internationale. Premier vol : l’Irlande.',
     },
-    { qui: 'MAT', texte: 'Limerick ! Mon stage de fin d’études. Six mois de maths. Et de pluie.' },
-    { qui: 'TOM', texte: 'Tu calculais quoi, pendant ton stage ?' },
-    { qui: 'MAT', texte: 'La probabilité qu’il ne pleuve pas. Elle est nulle. C’est démontré.' },
+    {
+      qui: 'MAT',
+      texte:
+        'Limerick ! Mon stage de fin d’études d’informatique, à l’université. Six mois de code. Et de pluie.',
+    },
+    { qui: 'TOM', texte: 'Tu codais quoi, pendant ton stage ?' },
+    {
+      qui: 'MAT',
+      texte: 'Un programme qui prédit la pluie. Il répond toujours « oui ». Il n’a jamais eu tort.',
+    },
   ],
   dialogues: {
     1: [
       { qui: 'JBM', texte: 'Ils sont agressifs, vos moutons.' },
-      { qui: 'MAT', texte: 'Un mouton, c’est une variable aléatoire.' },
+      { qui: 'MAT', texte: 'Un mouton, c’est comme un bug : il arrive quand on s’y attend le moins.' },
     ],
     2: [{ qui: 'MAT', texte: 'Je mangeais mon sandwich ici, le midi. Avec vue sur la pluie.' }],
     3: [
-      { qui: 'JBG', texte: 'Il ne pleut plus !' },
-      { qui: 'MAT', texte: 'Attends trente secondes.' },
+      {
+        qui: 'MAT',
+        texte:
+          'L’université ! Mon bureau était au deuxième. Le café, au premier. J’étais surtout au premier.',
+      },
+      { qui: 'JBG', texte: 'Et ton code, il marchait ?' },
+      { qui: 'MAT', texte: 'Sur ma machine, oui.' },
     ],
     4: [
       {

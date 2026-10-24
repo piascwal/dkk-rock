@@ -1,7 +1,7 @@
 """Les lieux de l'International Tour (voir plans.py) : une ville par membre du groupe, chacune avec ses monuments en tuiles.
 
 - Beauvais : la cathédrale Saint-Pierre (le chœur gothique le plus haut du monde, inachevé : pas de nef), l'avion low-cost ;
-- Limerick : le château du roi Jean (ses tours rondes au bord de la Shannon), le pub, les prés à murets et la Shannon ;
+- Limerick : l'université (le stage de Mat), le château du roi Jean (ses tours rondes au bord de la Shannon), le pub, les prés à murets et la Shannon ;
 - Lund : la cathédrale romane et ses deux tours, les maisons de bois rouges de Kulturen ;
 - New York : les gratte-ciel et leurs châteaux d'eau, le métro sous la rue, le pont de Brooklyn ;
 - Marseille : la colline de la Bonne Mère, les calanques.
@@ -129,6 +129,27 @@ def pub(n, x0, largeur, lettres='a'):
         for x in range(x0 + 2 + k, x0 + largeur - 2 - k):
             n.set(x, top - k, '^')
     n.ennemis(x0 + 4, x0 + largeur - 4, lettres, 2, ymin=base - ETAGE - 2)
+
+
+def universite_limerick(n, x0, largeur, lettres='a'):
+    """L'Université de Limerick, où Mat a fait son stage d'informatique : un bâtiment moderne de métal et de verre (de grandes
+    baies vitrées aux étages), trois étages de salles, un médiator dans la salle machines du rez-de-chaussée, une arme sur le toit
+    plat."""
+    base = n.base
+    w = largeur - 4
+    top = forteresse(n, x0 + 2, w, 3, lettres, 'M', sous_sol=False, balcon=False, annexe=False, toit=False)
+    _seuils(n, x0 + 2, w)
+    for j in range(1, 3):  # les baies vitrées des étages, sur les deux façades
+        for y in range(base - (j + 1) * ETAGE + 1, base - j * ETAGE - 1):
+            n.set(x0 + 2, y, 'V')
+            n.set(x0 + 1 + w, y, 'V')
+    n.repere(x0 + 2 + w // 2 + 4, '+', ymin=base - 3)
+    n.repere(x0 + 2 + w // 2, '*', ymin=top - 1)
+    for j in range(3):  # les salles machines : des postes alignés là où le sol est libre (ni échelle, ni cloison, ni caisse)
+        sol = base - j * ETAGE
+        for x in range(x0 + 6, x0 + w - 3, 5):
+            if all(n.get(x + d, yy) == '.' for d in (-1, 0, 1) for yy in (sol - 1, sol - 2)):
+                n.decor(x, 'ordinateur', sol)
 
 
 def pres_a_murets(n, x0, largeur, lettres='a'):

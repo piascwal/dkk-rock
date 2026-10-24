@@ -9,7 +9,7 @@ import { ecrit } from './police';
  *   sans nef (un mur plat à l'ouest) ; un avion low-cost qui décolle ; devant, les maisons à colombages et la brique de la
  *   reconstruction, un panneau « BEAUVAIS INTL » ;
  * - Limerick : les collines vertes à murets de pierre sèche, les moutons, le château du roi Jean et ses tours rondes au bord de la
- *   Shannon ; devant, les maisons géorgiennes de brique rouge aux portes de couleur, et le pub ;
+ *   Shannon ; devant, l'Université de Limerick, les maisons géorgiennes de brique rouge aux portes de couleur, et le pub ;
  * - Lund : la nuit d'hiver sur la plaine de Scanie enneigée, les deux tours de la cathédrale ; devant, les maisons de bois rouge
  *   de Falun aux fenêtres allumées, la neige sur les toits, les vélos garés.
  * Bandes de 960 × 270, le sol à 238 ; `plan` 0 : le lointain, 1 et 2 : le milieu et le proche (assombri ensuite, voir fonds.ts).
@@ -188,6 +188,16 @@ function pubFacade(c: Ctx, x: number, sol: number): void {
   rect(c, x + 19, sol - 16, 6, 16, '#3a2414');
 }
 
+/** L'Université de Limerick : un long bâtiment moderne, brique et grandes baies vitrées, et son enseigne. */
+function universite(c: Ctx, x: number, sol: number): void {
+  rect(c, x, sol - 56, 140, 96, '#7e3a2c');
+  for (let k = 0; k < 3; k++) rect(c, x + 6, sol - 50 + k * 16, 128, 11, '#9ac4d8');
+  for (let fx = x + 6; fx < x + 134; fx += 16) rect(c, fx, sol - 50, 1, 43, '#3a4a5a');
+  rect(c, x + 60, sol - 14, 20, 14, '#2a3a4a'); // l'entrée
+  rect(c, x + 22, sol - 68, 96, 10, '#1a2a4a');
+  ecrit(c, 'UNIVERSITY OF LIMERICK', x + 26, sol - 66, '#ffffff');
+}
+
 const limerick: Peinture = (c, r, th, plan) => {
   if (plan === 0) {
     relief(c, r, 206, 22, 40, '#5f8a5a');
@@ -214,6 +224,7 @@ const limerick: Peinture = (c, r, th, plan) => {
     georgienne(c, r, x, 238, w, r.entier(40, 60));
     x += w;
   }
+  if (plan === 2) universite(c, 400, 238); // là où Mat a fait son stage d'informatique
 };
 
 // ———————————————————————————————————— Lund

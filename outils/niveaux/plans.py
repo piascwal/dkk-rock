@@ -335,11 +335,11 @@ NIVEAUX = {
             ('colline', 18, dict(haut=3, lettres='c')),
             ('pres', 26, dict(lettres='cc')),
             ('chateau_roi_jean', 44, dict(lettres='ac', digit='2')),  # le château du roi Jean
-            ('plat', 10, dict(lettres='ac', digit='3')),  # Mat récite un limerick
+            ('plat', 8, dict(lettres='ac')),
+            ('universite', 40, dict(lettres='ac', digit='3')),  # l'Université de Limerick, le stage de Mat
             ('shannon', 30, dict(lettres='ac')),  # la Shannon, le pont de Thomond
             ('pub', 26, dict(lettres='a', digit='4')),  # la session au pub
             ('toits', 42, dict(lettres='ac')),
-            ('forteresse', 34, dict(etages=3, lettres='ac', mat='R', cage=True)),
             ('gouffre', 20, dict(lettres='ac', nb=4)),
             ('plat', 10, dict(lettres='au', digit='5')),  # Thomond Park : les supporters du Munster
             ('gradins', 30, dict(haut=6, lettres='au', cage=True, mat='R')),  # les tribunes du stade

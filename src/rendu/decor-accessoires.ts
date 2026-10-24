@@ -187,7 +187,23 @@ const dolmen: Accessoire = (p) => {
   p(6, -2, 4, 2, '#4f7a3a');
 };
 
+/** Un poste de la salle machines (l'Université de Limerick) : un bureau, un écran allumé, un clavier, une chaise. */
+const ordinateur: Accessoire = (p, v) => {
+  p(-9, -9, 18, 2, '#c8ccd2'); // le plateau
+  p(-8, -7, 1, 7, '#8a9098');
+  p(7, -7, 1, 7, '#8a9098');
+  p(-5, -18, 10, 8, '#22262c'); // l'écran
+  p(-4, -17, 8, 6, v % 2 ? '#3fe0a0' : '#5ab0ff');
+  p(-3, -16, 4, 1, '#eaf6ff'); // une ligne de code
+  p(-3, -14, 6, 1, '#eaf6ff');
+  p(-1, -10, 2, 1, '#22262c');
+  p(-4, -10, 7, 1, '#4a4e56'); // le clavier
+  p(10, -12, 2, 12, '#2a3a5a'); // la chaise
+  p(9, -6, 5, 2, '#2a3a5a');
+};
+
 export const ACCESSOIRES_SUPPLEMENTAIRES = {
+  ordinateur,
   menhir,
   dolmen,
   tonneau,
