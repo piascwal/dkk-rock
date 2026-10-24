@@ -8,6 +8,7 @@ import { dessineAura } from './aura';
 import { dessineBulle, hauteurBulle } from './bulle-bonus';
 import { DESSINS_BOSS } from './dessins-boss';
 import { DESSINS_ENNEMIS } from './dessins-ennemis';
+import { dessineEnCache } from './dessins-en-cache';
 import { dessineDecorFeuille, dessineFeuille } from './feuilles-images';
 import { FEUILLES } from './feuilles';
 import { FEUILLES_DECOR } from './feuilles-objets';
@@ -178,7 +179,8 @@ export function dessineEntite(
   const blanc = v.clignote && !heros && !estTir;
   const pb = blanc ? (x0: number, y0: number, w: number, h: number) => p(x0, y0, w, h, '#ffffff') : p;
   // un ennemi touché passe au blanc, sprite compris : la planche est éclaircie et désaturée le temps du coup
-  const flashe = blanc && 'filter' in ctx;
+  // (une planche seulement : un dessin en code passe au blanc de lui-même, et un filtre coûte cher)
+  const flashe = blanc && FEUILLES[v.g] !== undefined && 'filter' in ctx;
   if (flashe) ctx.filter = 'grayscale(1) brightness(3)';
 
   // sprites à apparences : l'identifiant choisit l'apparence ; héros : phase d'animation ; autres : compteur
@@ -212,9 +214,11 @@ export function dessineEntite(
   } else if (heros) dessineHeros(p, v.g, v.e, v.f, ctx);
   else if (v.g === G.KIWI) dessineKiwi(p, v.e, v.f);
   else if (estTir) DESSINS_TIRS[v.g]?.(pb, v.f, v.e);
-  else if (DESSINS_ENNEMIS[v.g]) DESSINS_ENNEMIS[v.g]!(pb, v.e, v.f);
-  else if (DESSINS_BOSS[v.g]) DESSINS_BOSS[v.g]!(pb, v.e, v.f);
-  else if (v.g === G.ARME && dessineBonus(ctx, v.f)) {
+  else if (DESSINS_ENNEMIS[v.g] || DESSINS_BOSS[v.g]) {
+    // dessinés en code : mis en image une fois, puis repris du cache (voir dessins-en-cache.ts)
+    const dessin = (DESSINS_ENNEMIS[v.g] ?? DESSINS_BOSS[v.g])!;
+    dessineEnCache(ctx, (q) => dessin(blanc ? (x0, y0, w, h) => q(x0, y0, w, h, '#ffffff') : q, v.e, v.f));
+  } else if (v.g === G.ARME && dessineBonus(ctx, v.f)) {
     // une arme à icône fournie : l'icône flotte à la place de la mallette
   } else if (DESSINS_OBJETS[v.g]) {
     // l'arme à ramasser qui est le chauffage, planche pas encore chargée : son dessin de repli, sans boîte ni icône

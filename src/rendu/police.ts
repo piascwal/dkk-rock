@@ -65,16 +65,16 @@ const SANS_ACCENT = (s: string) =>
 /** Largeur d'un texte en pixels (4 par caractère, espace compris). */
 export const largeurTexte = (s: string, taille = 1): number => SANS_ACCENT(s).length * 4 * taille - taille;
 
-/** Écrit un texte, (x, y) = coin haut gauche, avec un liseré sombre pour rester lisible partout. */
-export function ecrit(
-  ctx: CanvasRenderingContext2D,
-  s: string,
-  x: number,
-  y: number,
-  couleur: string,
-  taille = 1,
-): void {
-  const texte = SANS_ACCENT(s);
+/** Les textes déjà peints (un cri, un « +100 ») : chacun faisait jusqu'à 75 rectangles par lettre, à chaque image. */
+const TEXTES_MAX = 300;
+const textes = new Map<string, HTMLCanvasElement>();
+
+/** Peint le texte sur sa petite toile, liseré compris (une marge de `taille` tout autour). */
+function peintTexte(texte: string, couleur: string, taille: number): HTMLCanvasElement {
+  const toile = document.createElement('canvas');
+  toile.width = (texte.length * 4 + 1) * taille;
+  toile.height = 7 * taille;
+  const ctx = toile.getContext('2d')!;
   for (const [dx, dy, c] of [
     [1, 0, '#000'],
     [0, 1, '#000'],
@@ -88,14 +88,36 @@ export function ecrit(
       for (let b = 0; b < 15; b++) {
         if (g[b] === '1')
           ctx.fillRect(
-            Math.round(x + dx * taille + (i * 4 + (b % 3)) * taille),
-            Math.round(y + dy * taille + Math.floor(b / 3) * taille),
+            (1 + dx + i * 4 + (b % 3)) * taille,
+            (1 + dy + Math.floor(b / 3)) * taille,
             taille,
             taille,
           );
       }
     }
   }
+  return toile;
+}
+
+/** Écrit un texte, (x, y) = coin haut gauche, avec un liseré sombre pour rester lisible partout. */
+export function ecrit(
+  ctx: CanvasRenderingContext2D,
+  s: string,
+  x: number,
+  y: number,
+  couleur: string,
+  taille = 1,
+): void {
+  const texte = SANS_ACCENT(s);
+  if (!texte) return;
+  const cle = `${taille}|${couleur}|${texte}`;
+  let toile = textes.get(cle);
+  if (!toile) {
+    if (textes.size >= TEXTES_MAX) textes.clear();
+    toile = peintTexte(texte, couleur, taille);
+    textes.set(cle, toile);
+  }
+  ctx.drawImage(toile, Math.round(x) - taille, Math.round(y) - taille);
 }
 
 /** Écrit un texte centré sur x. */
