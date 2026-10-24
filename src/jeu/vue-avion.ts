@@ -20,6 +20,8 @@ export interface VueAvion {
   voie: number;
   voieVue: number;
   z: number;
+  /** ce qui lui reste de glissade (ticks) */
+  glisse: number;
   surTapis: boolean;
   /** les ticks qui lui restent à trébucher, à être intouchable */
   trebuche: number;
@@ -35,4 +37,39 @@ export interface VueAvion {
   /** les indices des derniers objets pris ou cassés (voir OBJETS_RECENTS) */
   consommes: number[];
   scores: (number | null)[];
+}
+
+/** Ce qu'il faut du concours (jeu/avion.ts) pour en faire la vue. */
+type SourceVue = Omit<VueAvion, 'surTapis' | 'consommes' | 'scores'> & {
+  tapis: number;
+  consommes: readonly number[];
+  scores: readonly (number | null)[];
+};
+
+/** La vue d'un concours : une copie de son état, que l'écran (et le réseau) peut garder sans risque. */
+export function vueDuConcours(c: SourceVue): VueAvion {
+  return {
+    etape: c.etape,
+    siege: c.siege,
+    manche: c.manche,
+    miniJeu: c.miniJeu,
+    minuteur: c.minuteur,
+    temps: c.temps,
+    x: c.x,
+    voie: c.voie,
+    voieVue: c.voieVue,
+    z: c.z,
+    glisse: c.glisse,
+    surTapis: c.tapis >= 0,
+    trebuche: c.trebuche,
+    invulnerable: c.invulnerable,
+    bonus: c.bonus,
+    bonusReste: c.bonusReste,
+    cartes: c.cartes,
+    chutes: c.chutes,
+    embarque: c.embarque,
+    score: c.score,
+    consommes: [...c.consommes],
+    scores: [...c.scores],
+  };
 }

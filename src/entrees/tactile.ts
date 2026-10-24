@@ -1,8 +1,11 @@
 import { C } from '../jeu/commandes';
-import { BOUTON_MINI_JEU, SANS_JOYSTICK } from '../jeu/mini-jeux';
+import { AU_BALAYAGE, BOUTON_MINI_JEU, SANS_JOYSTICK } from '../jeu/mini-jeux';
 import type { Phase } from '../jeu/vue';
 
 const ZONE_MORTE = 12;
+/** Le balayage (l'avion de JBG) : la distance qui en fait un geste, et ce que dure l'appui qu'il produit (ms). */
+const BALAYAGE = 22;
+const IMPULSION = 90;
 
 /**
  * Commandes tactiles : un joystick qui apparaît sous le pouce gauche, trois
@@ -13,6 +16,9 @@ export class Tactile {
   private readonly boutons = new Map<number, number>();
   /** les doigts posés sur l'écran quand il tient lieu de bouton (voir `pilote`) */
   private readonly doigtsEcran = new Set<number>();
+  /** au balayage : le départ de chaque doigt, et s'il a déjà fait son geste ; les appuis brefs que produisent les gestes */
+  private readonly gestes = new Map<number, { x: number; y: number; fait: boolean }>();
+  private impulsions: { bit: number; fin: number }[] = [];
   readonly element: HTMLElement;
   private readonly base: HTMLElement;
   private readonly manche: HTMLElement;
@@ -33,6 +39,15 @@ export class Tactile {
 
     const zone = this.element.querySelector<HTMLElement>('.zone-joystick')!;
     zone.addEventListener('pointerdown', (e) => {
+      if (this.element.classList.contains('balayage')) {
+        try {
+          zone.setPointerCapture(e.pointerId);
+        } catch {
+          // un toucher que le navigateur ne suit déjà plus : le geste se lira sans capture
+        }
+        this.gestes.set(e.pointerId, { x: e.clientX, y: e.clientY, fait: false });
+        return;
+      }
       // sans joystick (le rêve de JBT) : toucher l'écran, n'importe où, fait l'action du bouton SAUT, tant que le doigt reste
       if (this.element.classList.contains('appui-ecran')) {
         zone.setPointerCapture(e.pointerId);
@@ -50,6 +65,16 @@ export class Tactile {
       this.place();
     });
     zone.addEventListener('pointermove', (e) => {
+      const g = this.gestes.get(e.pointerId);
+      if (g && !g.fait) {
+        const dx = e.clientX - g.x;
+        const dy = e.clientY - g.y;
+        if (Math.hypot(dx, dy) > BALAYAGE) {
+          g.fait = true;
+          const horizontal = Math.abs(dx) > Math.abs(dy);
+          this.impulsion(horizontal ? (dx < 0 ? C.GAUCHE : C.DROITE) : dy < 0 ? C.HAUT : C.BAS);
+        }
+      }
       const j = this.joystick;
       if (!j || j.id !== e.pointerId) return;
       j.dx = e.clientX - j.x;
@@ -57,6 +82,11 @@ export class Tactile {
       this.place();
     });
     const lache = (e: PointerEvent) => {
+      const g = this.gestes.get(e.pointerId);
+      if (g) {
+        this.gestes.delete(e.pointerId);
+        if (!g.fait && e.type === 'pointerup') this.impulsion(C.SAUT); // un simple toucher : le saut
+      }
       if (this.doigtsEcran.delete(e.pointerId)) {
         this.boutons.delete(e.pointerId);
         if (![...this.boutons.values()].includes(C.SAUT))
@@ -107,6 +137,12 @@ export class Tactile {
     }
   }
 
+  /** Un appui bref (un geste du balayage) : assez long pour qu'au moins un pas du jeu le voie. */
+  private impulsion(bit: number): void {
+    this.impulsions.push({ bit, fin: performance.now() + IMPULSION });
+    navigator.vibrate?.(8);
+  }
+
   private relacheJoystick(): void {
     this.joystick = null;
     this.base.classList.remove('actif');
@@ -147,15 +183,18 @@ export class Tactile {
     const libelle = BOUTON_MINI_JEU[phase] ?? null;
     const oui = libelle !== null;
     const ecran = oui && SANS_JOYSTICK.has(phase);
+    const balayage = oui && AU_BALAYAGE.has(phase);
     if (
       this.element.classList.contains('mini-jeu') === oui &&
       this.element.classList.contains('appui-ecran') === ecran &&
+      this.element.classList.contains('balayage') === balayage &&
       saut.textContent === (libelle ?? 'SAUT')
     )
       return;
     this.element.classList.toggle('mini-jeu', oui);
     this.element.classList.toggle('appui-ecran', ecran);
-    if (ecran) this.relacheJoystick();
+    this.element.classList.toggle('balayage', balayage);
+    if (ecran || balayage) this.relacheJoystick();
     const tir = this.element.querySelector<HTMLElement>('.bouton.tir')!;
     saut.textContent = libelle ?? 'SAUT';
     tir.classList.remove('avec-arme');
@@ -170,6 +209,8 @@ export class Tactile {
     this.relacheJoystick();
     this.boutons.clear();
     this.doigtsEcran.clear();
+    this.gestes.clear();
+    this.impulsions = [];
     for (const b of this.element.querySelectorAll('.bouton')) b.classList.remove('appuye');
   }
 
@@ -184,6 +225,9 @@ export class Tactile {
   get commandes(): number {
     let bits = 0;
     for (const c of this.boutons.values()) bits |= c;
+    const maintenant = performance.now();
+    this.impulsions = this.impulsions.filter((i) => i.fin > maintenant);
+    for (const i of this.impulsions) bits |= i.bit;
     const j = this.joystick;
     if (j && Math.hypot(j.dx, j.dy) > ZONE_MORTE) {
       const a = Math.atan2(j.dy, j.dx);

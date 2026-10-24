@@ -113,6 +113,8 @@ const SONS: Record<string, Son> = {
     s.bruit({ duree: 1.2, volume: 0.14 * v, passeBas: 2200 });
   },
   saut: (s, v) => s.note({ freq: 260, vers: 520, duree: 0.1, type: 'square', volume: 0.05 * v }),
+  // la glissade de JBG sous un portique : un frottement qui descend
+  glisse: (s, v) => s.bruit({ duree: 0.25, volume: 0.08 * v, passeBas: 1400 }),
   aie: (s, v) => s.note({ freq: 300, vers: 120, duree: 0.2, type: 'square', volume: 0.12 * v }),
   mort: (s, v) =>
     s.note({ freq: 440, vers: 60, duree: 0.7, type: 'sawtooth', volume: 0.12 * v, distordu: true }),

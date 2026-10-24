@@ -2,12 +2,13 @@ import { Aleatoire } from '../moteur/maths';
 
 /**
  * Le tarmac de l'aéroport de la Ville Autotunée, que JBG traverse en courant pour rattraper l'avion des DKK (le mini-jeu de
- * l'avion de JBG) : trois voies parallèles (0 : la plus proche, 2 : celle qui longe la piste de l'avion), et sur elles, tiré
+ * l'avion de JBG, vu de derrière) : trois voies parallèles (0 : à gauche, 1 : au milieu, sous l'échelle de l'avion, 2 : à droite), et sur elles, tiré
  * d'après le numéro de la course (le même pour l'hôte et pour l'écran des invités), tout ce qui encombre un tarmac. Tout est en
  * pixels du jeu, x le long du tarmac (la distance courue par JBG).
  *
  * - `bas` : on les saute (cônes, valises tombées, flaques de kérosène) ;
  * - `haut` : il faut changer de voie (agents de piste, trains de chariots à bagages, camions-escaliers), ou sauter très haut ;
+ * - le portique de hauteur : on glisse dessous (ou on change de voie) ; aucun saut ne le passe ;
  * - le camion à tapis (convoyeur) : par l'arrière, on monte sur son tapis et on court dessus, au-dessus de tout ; par le côté,
  *   on s'y cogne ;
  * - les cartes d'embarquement, à ramasser, et les bonus.
@@ -19,7 +20,16 @@ export const LONGUEUR = 15000;
 export const HAUT_TAPIS = 14;
 export const RAMPE = 20;
 
-export const OBSTACLES = ['cone', 'valise', 'flaque', 'agent', 'chariots', 'escalier', 'convoyeur'] as const;
+export const OBSTACLES = [
+  'cone',
+  'valise',
+  'flaque',
+  'agent',
+  'chariots',
+  'escalier',
+  'convoyeur',
+  'portique',
+] as const;
 export type SorteObstacle = (typeof OBSTACLES)[number];
 /** Ce qu'on peut sauter d'un saut ordinaire. */
 export const BAS: ReadonlySet<SorteObstacle> = new Set(['cone', 'valise', 'flaque']);
@@ -32,6 +42,7 @@ export const LONGUEURS: Record<SorteObstacle, number> = {
   chariots: 52,
   escalier: 34,
   convoyeur: 78,
+  portique: 8,
 };
 
 /**
@@ -76,13 +87,20 @@ function motif(r: Aleatoire, ajoute: Ajout, x: number, k: number): number {
   const libre = r.entier(0, VOIES - 1);
   const autres = [0, 1, 2].filter((v) => v !== libre);
   const t = r.suivant();
-  if (t < 0.18) {
+  if (t < 0.13) {
+    // un portique de hauteur : sur deux voies, ou plus loin sur les trois ; des cartes à prendre en glissant dessous
+    const voies = k > 0.3 && r.suivant() < 0.5 ? [0, 1, 2] : autres;
+    for (const v of voies) ajoute(x, v, 'portique');
+    cartes(ajoute, x - 6, voies[0]!, 2);
+    return 40;
+  }
+  if (t < 0.27) {
     // une rangée de cônes : une voie libre, et des cartes à prendre dessus
     for (const v of autres) ajoute(x, v, r.suivant() < 0.5 ? 'cone' : 'valise');
     cartes(ajoute, x - 24, libre, 5);
     return 40;
   }
-  if (t < 0.34) {
+  if (t < 0.41) {
     // des agents de piste, qui font de grands gestes ; plus loin, certains traversent les voies
     const mobile = k > 0.25 && r.suivant() < 0.5;
     ajoute(x, autres[0]!, 'agent', 0, mobile ? r.entre(0, 4) : -1);
@@ -90,14 +108,14 @@ function motif(r: Aleatoire, ajoute: Ajout, x: number, k: number): number {
     cartes(ajoute, x - 10, libre, 4);
     return 60;
   }
-  if (t < 0.5) {
+  if (t < 0.55) {
     // un train de chariots à bagages sur une voie, une valise tombée sur une autre
     ajoute(x, autres[0]!, 'chariots');
     ajoute(x + 20, autres[1]!, 'valise');
     cartes(ajoute, x + 14, autres[1]!, 3, 20); // au-dessus de la valise : il faut sauter
     return 70;
   }
-  if (t < 0.68) {
+  if (t < 0.71) {
     // le camion à tapis : qui monte dessus par l'arrière court au-dessus de tout, ses cartes l'y attendent
     ajoute(x, libre, 'convoyeur');
     cartes(ajoute, x + RAMPE + 6, libre, 5, HAUT_TAPIS);
@@ -105,7 +123,7 @@ function motif(r: Aleatoire, ajoute: Ajout, x: number, k: number): number {
       if (r.suivant() < 0.7) ajoute(x + r.entre(10, 50), v, r.suivant() < 0.5 ? 'escalier' : 'cone');
     return 100;
   }
-  if (t < 0.82) {
+  if (t < 0.84) {
     // un camion-escalier, et une flaque de kérosène qui fait glisser
     ajoute(x, autres[0]!, 'escalier');
     ajoute(x + 10, autres[1]!, 'flaque');

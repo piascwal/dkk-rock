@@ -22,14 +22,19 @@ export const DECOLLAGE = 62;
 export const VITESSE = 170;
 export const TROTTINETTE = 250;
 export const LENT = 40;
-/** L'échelle de la porte arrière est à portée (pixels) : il faut être sur la voie du haut, et sauter. */
+/** L'échelle de l'avion est à portée (pixels) : il faut être sur la voie du milieu, et sauter. */
 export const PORTEE = 28;
+/** L'échelle pend sous la queue de l'avion, au-dessus de la voie du milieu. */
+export const VOIE_ECHELLE = 1;
 export const TREBUCHE = Math.round(0.8 * SECONDE);
 export const INTOUCHABLE = Math.round(1.3 * SECONDE);
 /** Les sauts : ordinaire, et avec les baskets à ressorts ; la pesanteur. */
 export const SAUT = 150;
 export const SAUT_RESSORTS = 215;
 export const PESANTEUR = 560;
+/** La glissade (ticks), et la vitesse à laquelle on plonge vers le sol quand on la demande en l'air. */
+export const GLISSE = Math.round(0.7 * SECONDE);
+export const PLONGE = 260;
 /** Ce que dure chaque bonus (secondes), et la portée du solo (il casse tout devant) et de l'aimant. */
 export const DUREES: Record<(typeof BONUS)[number], number> = {
   solo: 5,

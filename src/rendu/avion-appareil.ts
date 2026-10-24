@@ -14,10 +14,11 @@ import { ecrit } from './police';
 type Ctx = CanvasRenderingContext2D;
 
 const PORTRAITS = ['jbt', 'jbm', 'mat'] as const;
-const portraits = new Map<string, HTMLImageElement>();
+/** Les portraits chargés : ceux des hublots, et Tom (à la trappe, dans la vue de derrière : voir avion-dos-decor.ts). */
+export const portraits = new Map<string, HTMLImageElement>();
 
 export function chargeAvion(base: string): void {
-  for (const nom of PORTRAITS) {
+  for (const nom of [...PORTRAITS, 'tom']) {
     const img = new Image();
     img.onload = () => portraits.set(nom, img);
     img.src = `${base}portraits/${nom}.png?v=${VERSION}`;

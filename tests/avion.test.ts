@@ -42,10 +42,9 @@ describe('l’avion de JBG', () => {
     }
   });
 
-  it('sans un faux pas, il rattrape l’avion vers la demi-minute, et saute sur l’échelle par la voie du haut', () => {
+  it('sans un faux pas, il rattrape l’avion vers la demi-minute, et saute sur l’échelle par la voie du milieu', () => {
     const c = course();
-    appuie(c, C.HAUT); // la voie du haut, celle qui longe la piste
-    expect(c.voie).toBe(2);
+    expect(c.voie).toBe(1); // la voie du milieu, sous l'échelle qui pend de la queue de l'avion
     while (xAvion(c.temps) - c.x > PORTEE - 10) pas(c);
     expect(c.temps / 60).toBeGreaterThan(25);
     expect(c.temps / 60).toBeLessThan(40);
@@ -69,6 +68,40 @@ describe('l’avion de JBG', () => {
     expect(c.trebuche).toBeGreaterThan(0);
   });
 
+  it('gauche et droite changent de voie ; haut saute ; bas glisse sous le portique, qu’aucun saut ne passe', () => {
+    const c = course();
+    appuie(c, C.GAUCHE);
+    expect(c.voie).toBe(0);
+    appuie(c, C.DROITE);
+    appuie(c, C.DROITE);
+    expect(c.voie).toBe(2);
+    appuie(c, C.HAUT);
+    expect(c.z).toBeGreaterThan(0);
+    const g = course(objet(80, 1, 'portique'));
+    while (g.x < 66) pas(g);
+    appuie(g, C.BAS);
+    expect(g.vue().glisse).toBeGreaterThan(0);
+    while (g.x < 110) pas(g);
+    expect(g.chutes).toBe(0);
+    const s = course(objet(80, 1, 'portique'));
+    while (s.x < 60) pas(s);
+    appuie(s); // en sautant, on se cogne à la barre
+    while (s.x < 110) pas(s);
+    expect(s.chutes).toBe(1);
+  });
+
+  it('l’échelle ne se prend que depuis la voie du milieu', () => {
+    const c = course();
+    appuie(c, C.GAUCHE);
+    while (xAvion(c.temps) - c.x > PORTEE - 10) pas(c);
+    appuie(c);
+    expect(c.etape).toBe('course');
+    appuie(c, C.DROITE);
+    while (c.z > 0) pas(c);
+    appuie(c);
+    expect(c.etape).toBe('embarque');
+  });
+
   it('le camion à tapis : par la rampe on court dessus et on prend ses cartes ; par le côté on s’y cogne', () => {
     const c = course(objet(80, 1, 'convoyeur'), objet(80 + RAMPE + 10, 1, 'carte', 14));
     while (c.x < 80 + RAMPE + 20) pas(c);
@@ -79,7 +112,7 @@ describe('l’avion de JBG', () => {
     expect(c.chutes).toBe(0);
     const d = course(objet(60, 2, 'convoyeur'));
     while (d.x < 60 + RAMPE + 10) pas(d);
-    appuie(d, C.HAUT); // on change de voie en plein milieu du camion
+    appuie(d, C.DROITE); // on change de voie en plein milieu du camion
     pas(d);
     expect(d.chutes).toBe(1);
   });

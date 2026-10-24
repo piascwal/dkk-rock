@@ -191,6 +191,12 @@ export function dessineObjet(c: Ctx, o: Objet, i: number, x: number, s: number, 
       return escalier(c, x, y);
     case 'convoyeur':
       return convoyeur(c, x, y, tick, i);
+    case 'portique':
+      // de profil (les cinématiques de début et de fin) : deux montants rayés, la barre de hauteur
+      rect(c, x, y - 22, 2, 22, '#e8c23a');
+      rect(c, x + 6, y - 22, 2, 22, '#e8c23a');
+      rect(c, x - 1, y - 24, 10, 3, '#d02a2a');
+      return;
     case 'carte':
       return carte(c, x, y - o.hauteur, tick, i);
     default:
