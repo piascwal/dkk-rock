@@ -155,7 +155,10 @@ tourné vers JBG : JBT, JBM et Mat collés aux hublots, Tom qui fait des signes 
 décolle au bout d'une minute. JBG change de voie (haut, bas : trois voies) et saute (un toucher sur l'écran, un clic ou le
 bouton SAUTE) par-dessus les cônes, les valises tombées et les flaques de kérosène ; il esquive les agents de piste (certains
 traversent), les trains de chariots et les camions-escaliers ; il grimpe sur les camions à tapis par leur rampe et court
-dessus. Chaque faux pas le fait trébucher et l'avion file. Il ramasse les cartes d'embarquement (5 points) et des bonus : le
+dessus. Chaque faux pas le fait trébucher et l'avion file. Pour lire le tarmac (`rendu/avion-lisibilite.ts`) :
+sa voie est éclairée, chaque obstacle de sa voie a une marque au sol de la couleur du geste à faire (rouge : changer de voie,
+jaune : sauter, cyan : monter sur le tapis), et ce qui arrive dans la seconde est annoncé au bord droit, voie par voie ; trois
+cartes montrent toujours la voie libre avant chaque obstacle, les obstacles frôlés ne comptent pas. Il ramasse les cartes d'embarquement (5 points) et des bonus : le
 solo (il pulvérise ce qui est devant lui), les ressorts (il saute plus haut), la trottinette (plus vite, et elle encaisse un
 choc), l'aimant (les cartes viennent à lui). Quand l'avion est à portée, sur la voie du haut, il saute sur l'échelle : 300
 points, plus 10 par seconde d'avance sur le décollage. Le tarmac se tire d'après le numéro de la course

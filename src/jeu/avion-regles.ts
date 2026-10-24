@@ -30,6 +30,13 @@ export const INTOUCHABLE = Math.round(1.3 * SECONDE);
 export const SAUT = 150;
 export const SAUT_RESSORTS = 215;
 export const PESANTEUR = 560;
+/**
+ * La tolérance des chocs : un obstacle frôlé de TOLERANCE pixels ne compte pas ; on passe au-dessus d'un obstacle bas à HAUT_BAS
+ * pixels de haut (presque tout le saut), au-dessus de tout le reste avec les ressorts à HAUT_RESSORTS.
+ */
+export const TOLERANCE = 3;
+export const HAUT_BAS = 4;
+export const HAUT_RESSORTS = 18;
 /** Ce que dure chaque bonus (secondes), et la portée du solo (il casse tout devant) et de l'aimant. */
 export const DUREES: Record<(typeof BONUS)[number], number> = {
   solo: 5,

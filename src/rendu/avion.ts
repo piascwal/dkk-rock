@@ -9,6 +9,7 @@ import { dessineAvion } from './avion-appareil';
 import { dessineFond, dessineTarmac, SOL_PISTE, SOL_VOIES } from './avion-decor';
 import { dessineEcranAvion } from './avion-ecrans';
 import { dessineObjet, voieDe } from './avion-objets';
+import { annonces, eclaireVoie, marqueSol } from './avion-lisibilite';
 
 /**
  * L'avion de JBG à l'écran, d'après la seule vue (comme chez un invité) : l'aéroport (avion-decor.ts), l'avion des DKK qui roule
@@ -56,6 +57,8 @@ export class RenduAvion {
     dessineFond(ctx, v.x, largeur, tick);
     this.avion(ctx, v, largeur, tick);
     dessineTarmac(ctx, v.x, largeur);
+    const course = v.etape === 'course' || v.etape === 'intro';
+    if (course) eclaireVoie(ctx, v.voieVue, largeur);
     this.objetsEtJbg(ctx, v, ex, largeur, tick);
     this.effets(ctx);
     ctx.restore();
@@ -100,11 +103,17 @@ export class RenduAvion {
           !pris.has(i) && x > -(estObstacle(o) ? LONGUEURS[o.sorte] : 10) - 10 && x < largeur + 10,
       );
     const voieJbg = v.voieVue;
+    const course = v.etape === 'course';
+    // sur la voie de JBG, devant lui : la marque au sol de ce qu'il faudra faire
+    if (course)
+      for (const { o, x } of visibles)
+        if (voieDe(o, s) === v.voie && x > JBG_X - 4) marqueSol(ctx, o, x, v.voie, tick);
     for (let voie = 2; voie >= 0; voie--) {
       for (const { o, i, x } of visibles) if (voieDe(o, s) === voie) dessineObjet(ctx, o, i, x, s, tick);
       if (Math.round(voieJbg) === voie && v.etape !== 'embarque') this.jbg(ctx, v, tick);
     }
     if (v.etape === 'embarque') this.grimpe(ctx, v, tick);
+    if (course) annonces(ctx, this.tarmac, pris, ex, largeur, s, v.voie, tick);
   }
 
   /** JBG : il court, saute, trébuche, file en trottinette, joue son solo ; ses pieds au sol de sa voie (ou sur le tapis). */

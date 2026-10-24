@@ -64,6 +64,12 @@ export const estObstacle = (o: Objet): o is Objet & { sorte: SorteObstacle } =>
 export const estBonus = (o: Objet): o is Objet & { sorte: SorteBonus } =>
   (BONUS as readonly string[]).includes(o.sorte);
 
+/** La part du tarmac (depuis le départ) où l'on ne rencontre que les motifs les plus simples. */
+const DEBUT_DOUX = 0.12;
+/** Le tirage à partir duquel le motif est un bonus gardé ; et il en vient un au moins tous les BONUS_AU_MOINS motifs. */
+const MOTIF_BONUS = 0.78;
+const BONUS_AU_MOINS = 8;
+
 type Ajout = (x: number, voie: number, sorte: Objet['sorte'], hauteur?: number, marche?: number) => void;
 
 /** Des cartes d'embarquement en ligne, sur une voie (un peu en l'air au-dessus d'un obstacle bas, à sauter pour les prendre). */
@@ -71,11 +77,15 @@ function cartes(ajoute: Ajout, x: number, voie: number, n: number, hauteur = 0):
   for (let i = 0; i < n; i++) ajoute(x + i * 12, voie, 'carte', hauteur);
 }
 
-/** Les motifs du tarmac : chacun laisse toujours une voie passable (en sautant au pire). Renvoie la longueur occupée. */
-function motif(r: Aleatoire, ajoute: Ajout, x: number, k: number): number {
+/**
+ * Les motifs du tarmac : chacun laisse toujours une voie passable (en sautant au pire), et trois cartes, juste avant, montrent
+ * le chemin vers elle. Au tout début, seulement les plus simples (des cônes, des agents qui restent sur place). Renvoie la
+ * longueur occupée.
+ */
+function motif(r: Aleatoire, ajoute: Ajout, x: number, k: number, t: number): number {
   const libre = r.entier(0, VOIES - 1);
   const autres = [0, 1, 2].filter((v) => v !== libre);
-  const t = r.suivant();
+  cartes(ajoute, x - 70, libre, 3);
   if (t < 0.18) {
     // une rangée de cônes : une voie libre, et des cartes à prendre dessus
     for (const v of autres) ajoute(x, v, r.suivant() < 0.5 ? 'cone' : 'valise');
@@ -84,7 +94,7 @@ function motif(r: Aleatoire, ajoute: Ajout, x: number, k: number): number {
   }
   if (t < 0.34) {
     // des agents de piste, qui font de grands gestes ; plus loin, certains traversent les voies
-    const mobile = k > 0.25 && r.suivant() < 0.5;
+    const mobile = k > DEBUT_DOUX && r.suivant() < 0.5;
     ajoute(x, autres[0]!, 'agent', 0, mobile ? r.entre(0, 4) : -1);
     if (k > 0.5) ajoute(x + 40, autres[1]!, 'agent');
     cartes(ajoute, x - 10, libre, 4);
@@ -105,7 +115,7 @@ function motif(r: Aleatoire, ajoute: Ajout, x: number, k: number): number {
       if (r.suivant() < 0.7) ajoute(x + r.entre(10, 50), v, r.suivant() < 0.5 ? 'escalier' : 'cone');
     return 100;
   }
-  if (t < 0.82) {
+  if (t < MOTIF_BONUS) {
     // un camion-escalier, et une flaque de kérosène qui fait glisser
     ajoute(x, autres[0]!, 'escalier');
     ajoute(x + 10, autres[1]!, 'flaque');
@@ -126,10 +136,14 @@ export function parcours(manche: number): Objet[] {
   const ajoute: Ajout = (x, voie, sorte, hauteur = 0, marche = -1) =>
     objets.push({ x: Math.round(x), voie, sorte, hauteur, marche });
   cartes(ajoute, 140, 1, 8);
-  for (let x = 420; x < LONGUEUR;) {
+  for (let x = 420, sansBonus = 0; x < LONGUEUR;) {
     const k = x / LONGUEUR;
-    x += motif(r, ajoute, x, k);
-    x += Math.round(r.entre(70, 110) - 40 * k);
+    const tire = k < DEBUT_DOUX ? r.suivant() * 0.34 : r.suivant();
+    const t = k >= DEBUT_DOUX && sansBonus >= BONUS_AU_MOINS - 1 ? 1 : tire;
+    sansBonus = t >= MOTIF_BONUS ? 0 : sansBonus + 1;
+    x += motif(r, ajoute, x, k, t);
+    // de l'air entre deux motifs, un peu moins vers la fin : le temps de lire le suivant
+    x += Math.round(r.entre(110, 150) - 30 * k);
   }
   return objets.sort((a, b) => a.x - b.x);
 }

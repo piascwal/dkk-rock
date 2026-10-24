@@ -14,7 +14,7 @@ import {
   type Objet,
 } from './avion-parcours';
 import * as R from './avion-regles';
-import { OBJETS_RECENTS, type EtapeAvion, type VueAvion } from './vue-avion';
+import { OBJETS_RECENTS, vueDuConcours, type EtapeAvion, type VueAvion } from './vue-avion';
 
 export {
   DECOLLAGE,
@@ -219,7 +219,9 @@ export class ConcoursAvion {
       const voie = o.sorte === 'agent' ? voieAgent(o, s) : o.voie;
       if (voie !== this.voie) continue;
       const long = estObstacle(o) ? LONGUEURS[o.sorte] : 8;
-      if (this.x + 4 < o.x || this.x - 4 > o.x + long) continue;
+      // un peu de tolérance : un obstacle frôlé n'est pas un faux pas
+      const marge = estObstacle(o) ? R.TOLERANCE : 0;
+      if (this.x + 4 - marge < o.x || this.x - 4 + marge > o.x + long) continue;
       if (estBonus(o)) {
         if (this.elevation > 18) continue;
         this.prend(i);
@@ -240,7 +242,12 @@ export class ConcoursAvion {
         }
       } else if (this.tapis >= 0)
         continue; // là-haut, rien ne le touche
-      else if (BAS.has(o.sorte as never) ? this.z > 7 : this.bonusEst('ressorts') && this.z > 22) continue;
+      else if (
+        BAS.has(o.sorte as never)
+          ? this.z > R.HAUT_BAS
+          : this.bonusEst('ressorts') && this.z > R.HAUT_RESSORTS
+      )
+        continue;
       this.choc(i, son);
     }
   }
@@ -310,28 +317,6 @@ export class ConcoursAvion {
   }
 
   vue(): VueAvion {
-    return {
-      etape: this.etape,
-      siege: this.siege,
-      manche: this.manche,
-      miniJeu: this.miniJeu,
-      minuteur: this.minuteur,
-      temps: this.temps,
-      x: this.x,
-      voie: this.voie,
-      voieVue: this.voieVue,
-      z: this.z,
-      surTapis: this.tapis >= 0,
-      trebuche: this.trebuche,
-      invulnerable: this.invulnerable,
-      bonus: this.bonus,
-      bonusReste: this.bonusReste,
-      cartes: this.cartes,
-      chutes: this.chutes,
-      embarque: this.embarque,
-      score: this.score,
-      consommes: [...this.consommes],
-      scores: [...this.scores],
-    };
+    return vueDuConcours(this);
   }
 }

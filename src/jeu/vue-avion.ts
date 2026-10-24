@@ -36,3 +36,37 @@ export interface VueAvion {
   consommes: number[];
   scores: (number | null)[];
 }
+
+/** Ce qu'il faut du concours (jeu/avion.ts) pour en faire la vue. */
+type SourceVue = Omit<VueAvion, 'surTapis' | 'consommes' | 'scores'> & {
+  tapis: number;
+  consommes: readonly number[];
+  scores: readonly (number | null)[];
+};
+
+/** La vue d'un concours : une copie de son état, que l'écran (et le réseau) peut garder sans risque. */
+export function vueDuConcours(c: SourceVue): VueAvion {
+  return {
+    etape: c.etape,
+    siege: c.siege,
+    manche: c.manche,
+    miniJeu: c.miniJeu,
+    minuteur: c.minuteur,
+    temps: c.temps,
+    x: c.x,
+    voie: c.voie,
+    voieVue: c.voieVue,
+    z: c.z,
+    surTapis: c.tapis >= 0,
+    trebuche: c.trebuche,
+    invulnerable: c.invulnerable,
+    bonus: c.bonus,
+    bonusReste: c.bonusReste,
+    cartes: c.cartes,
+    chutes: c.chutes,
+    embarque: c.embarque,
+    score: c.score,
+    consommes: [...c.consommes],
+    scores: [...c.scores],
+  };
+}
