@@ -16,6 +16,7 @@ import { creeModule } from './fenetres-modules';
 import { icone, type NomIcone } from './icones';
 import { trouveModule } from './modules-perso';
 import { brancheGestes } from './gestes';
+import { MenuRond } from './menu-rond';
 import { Palette } from './palette';
 
 /**
@@ -34,7 +35,7 @@ export interface ActionsEditeur {
 
 export type Outil = 'main' | 'pinceau' | 'rect' | 'gomme' | 'pipette' | 'selection';
 
-const OUTILS: readonly [Outil, NomIcone, string][] = [
+export const OUTILS: readonly [Outil, NomIcone, string][] = [
   ['main', 'main', 'Déplacer (H)'],
   ['pinceau', 'pinceau', 'Pinceau (B)'],
   ['rect', 'rectangle', 'Rectangle plein (R)'],
@@ -68,6 +69,7 @@ export class Editeur {
   readonly toile = document.createElement('canvas');
   readonly dessin = new DessinEditeur();
   readonly palette: Palette;
+  readonly rond: MenuRond;
   doc!: DocumentNiveau;
   cam: Camera = { x: 0, y: 0, zoom: 2 };
   outil: Outil = 'pinceau';
@@ -127,6 +129,7 @@ export class Editeur {
     this.message.hidden = true;
     this.racine.append(haut, this.toile, bas, this.message);
     this.palette = new Palette(this);
+    this.rond = new MenuRond(this);
     document.body.append(this.racine);
     brancheGestes(this);
     new ResizeObserver(() => this.redessine()).observe(this.toile);

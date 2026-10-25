@@ -2,6 +2,7 @@ import { TUILE } from '../config';
 import { Carte } from '../monde/carte';
 import { T } from '../monde/tuiles';
 import type { NiveauLu } from './format';
+import { chainesDeTyroliennes } from './tyroliennes';
 
 /**
  * Peut-on aller du départ à une case, sans rien détruire et sans saut contre les murs ? Modèle prudent du héros (une case de
@@ -55,6 +56,7 @@ export function parcoursAcces(
   const parent = new Int32Array(L * lu.hauteur).fill(-1);
   const file: [number, number][] = [];
   let de = -1;
+  const chaines = chainesDeTyroliennes(lu.tyroliennes);
   const ajoute = (p: [number, number] | null) => {
     if (!p || p[0] < 0 || p[0] >= L) return;
     const k = p[1] * L + p[0];
@@ -91,13 +93,18 @@ export function parcoursAcces(
       if (libre(x, y - 1) && (echelle(x, y) || echelle(x, y - 1))) ajoute([x, y - 1]);
       if (libre(x, y + 1) && echelle(x, y + 1)) ajoute([x, y + 1]);
     }
-    for (const t of lu.tyroliennes) {
-      const [ax, ay] = [Math.floor(t.x1 / TUILE), Math.floor(t.y1 / TUILE)];
-      const [bx, by] = [Math.floor(t.x2 / TUILE), Math.floor(t.y2 / TUILE)];
-      if (Math.abs(ax - x) <= 3 && y - ay >= 0 && y - ay <= 3) ajoute(chute(bx - 1, by + 1));
-      // on la prend aussi à l'envers, en remontant (le joystick vers le départ)
-      if (Math.abs(bx - x) <= 3 && y - by >= 0 && y - by <= 3) ajoute(chute(ax + 1, ay + 1));
-    }
+    // une tyrolienne se prend près de n'importe lequel de ses poteaux, dans un sens ou dans l'autre (le joystick choisit), et se
+    // lâche à n'importe quel autre : on retombe à côté de lui
+    for (const poteaux of chaines)
+      for (const [i, p] of poteaux.entries()) {
+        const [px, py] = [Math.floor(p.x / TUILE), Math.floor(p.y / TUILE)];
+        if (Math.abs(px - x) > 3 || y - py < 0 || y - py > 3) continue;
+        for (const [j, q] of poteaux.entries()) {
+          if (j === i) continue;
+          const qx = Math.floor(q.x / TUILE) + (j === 0 ? 1 : j === poteaux.length - 1 ? -1 : 0);
+          ajoute(chute(qx, Math.floor(q.y / TUILE) + 1));
+        }
+      }
   }
   return { dist, parent };
 }

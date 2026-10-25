@@ -1,6 +1,7 @@
 import { TUILE } from '../config';
 import { T, TUILES_LEGERES, tuileDuCaractere } from '../monde/tuiles';
 import type { NomTheme } from '../rendu/themes';
+import { relieTyroliennes, type Tyrolienne } from './tyroliennes';
 
 /**
  * Format des niveaux : une carte ASCII, une ligne par rangée de tuiles.
@@ -19,7 +20,8 @@ import type { NomTheme } from '../rendu/themes';
  *   & embarquement (le ferry : le pont se ferme, des vagues montent à l'abordage, voir jeu/traversee.ts)
  *   K cage (un membre du groupe à libérer)   * arme au hasard   + médiator d'or (soin + spécial)
  *   % baril explosif (s'allume au premier tir, explose deux secondes après)
- *   ( et ) : extrémités d'une tyrolienne ; chaque ( est reliée à la ) la plus proche à sa droite
+ *   ( et ) : extrémités d'une tyrolienne ; chaque ( est reliée au poteau le plus proche à sa droite
+ *   $ : jointure de tyrolienne (un poteau où le câble change de pente et repart, voir niveaux/tyroliennes.ts)
  *   1 à 9 : déclencheurs de dialogue (quand un joueur franchit la colonne)
  *   a..z : ennemis, voir ENNEMIS_PAR_LETTRE dans entites/ennemis/definitions.ts
  *   Y : le Yéti Alpha   P : le Champion du FISE   Z : DJ Boucle (boss final)
@@ -99,7 +101,7 @@ export interface NiveauLu {
   soins: Repere[];
   ennemis: (Repere & { lettre: string })[];
   boss: (Repere & { lettre: 'Y' | 'Z' | 'P' })[];
-  tyroliennes: { x1: number; y1: number; x2: number; y2: number }[];
+  tyroliennes: Tyrolienne[];
   declencheurs: (Repere & { cle: string })[];
 }
 
@@ -133,6 +135,7 @@ export function litNiveau(def: DefNiveau): NiveauLu {
   };
   const debuts: Repere[] = [];
   const bouts: Repere[] = [];
+  const jointures: Repere[] = [];
 
   for (let ty = 0; ty < hauteur; ty++) {
     const ligne = lignes[ty]!.padEnd(largeur, ' ');
@@ -161,6 +164,7 @@ export function litNiveau(def: DefNiveau): NiveauLu {
       else if (c === '+') lu.soins.push(r);
       else if (c === '(') debuts.push(r);
       else if (c === ')') bouts.push(r);
+      else if (c === '$') jointures.push(r);
       else if (c === 'Y' || c === 'Z' || c === 'P') lu.boss.push({ ...r, lettre: c });
       else if (/[1-9]/.test(c)) lu.declencheurs.push({ ...r, cle: c });
       else if (/[a-z]/.test(c)) lu.ennemis.push({ ...r, lettre: c });
@@ -174,13 +178,10 @@ export function litNiveau(def: DefNiveau): NiveauLu {
   if (!lu.depart) throw new ErreurNiveau(`${def.id} : pas de départ (@)`);
   if (!lu.fin && !lu.boss.some((b) => b.lettre === 'Z'))
     throw new ErreurNiveau(`${def.id} : ni van (F) ni boss final (Z)`);
-  for (const d of debuts) {
-    const candidats = bouts.filter((b) => b.tx > d.tx);
-    if (!candidats.length) throw new ErreurNiveau(`${def.id} : tyrolienne sans arrivée en ${d.tx},${d.ty}`);
-    const b = candidats.reduce((m, b) =>
-      Math.hypot(b.tx - d.tx, b.ty - d.ty) < Math.hypot(m.tx - d.tx, m.ty - d.ty) ? b : m,
-    );
-    lu.tyroliennes.push({ x1: d.x + TUILE / 2, y1: d.y + 4, x2: b.x + TUILE / 2, y2: b.y + 4 });
+  try {
+    lu.tyroliennes = relieTyroliennes(debuts, bouts, jointures);
+  } catch (e) {
+    throw new ErreurNiveau(`${def.id} : ${(e as Error).message}`);
   }
   for (const d of lu.declencheurs)
     if (!def.dialogues[d.cle]) throw new ErreurNiveau(`${def.id} : dialogue ${d.cle} non écrit`);

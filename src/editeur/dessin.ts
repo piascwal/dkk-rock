@@ -6,12 +6,13 @@ import { T, tuileDuCaractere } from '../monde/tuiles';
 import { AtlasTuiles } from '../rendu/atlas-tuiles';
 import { ACCESSOIRES, type NomAccessoire } from '../rendu/decor-objets';
 import { dessineSprite, SPRITES, type Sprite } from '../rendu/decor-sprites';
-import { dessineTuiles } from '../rendu/dessin-tuiles';
+import { dessineTuiles, dessineTyroliennes } from '../rendu/dessin-tuiles';
 import { DESSINS_ENNEMIS } from '../rendu/dessins-ennemis';
 import { dessineFeuille } from '../rendu/feuilles-images';
 import { pinceau } from '../rendu/pinceau';
 import { ecritCentre } from '../rendu/police';
 import { THEMES, type NomTheme } from '../rendu/themes';
+import { relieTyroliennes, type Poteau, type Tyrolienne } from '../niveaux/tyroliennes';
 import { ennemiDeLaLettre, type Choix } from './catalogue';
 import type { Decor, DocumentNiveau, ModuleEditeur } from './document';
 import { trouveModule } from './modules-perso';
@@ -49,17 +50,32 @@ const PASTILLES: Record<string, string> = {
   '%': '#c8202a',
   '(': '#6a6a78',
   ')': '#6a6a78',
+  $: '#6a6a78',
   '&': '#2a8ac8',
 };
 const BOSS_GENRE: Record<string, Genre> = { Y: G.YETI_ALPHA, P: G.CHAMPION, Z: G.DJ };
 /** ce que la police pixel ne sait pas écrire (ni @ ni &), et le van en toutes lettres */
-const SIGNES: Record<string, string> = { '@': 'GO', F: 'VAN', '&': 'B' };
+const SIGNES: Record<string, string> = { '@': 'GO', F: 'VAN', '&': 'B', $: '()' };
+
+/** Les câbles des tyroliennes posées (aucun tant qu'un poteau reste seul : le menu « Vérifier » dit lequel). */
+function tyroliennesDe(doc: DocumentNiveau): Tyrolienne[] {
+  const poteaux: Record<string, Poteau[]> = { '(': [], ')': [], $: [] };
+  doc.lignes().forEach((l, ty) => {
+    for (const m of l.matchAll(/[()$]/g)) poteaux[m[0]]!.push({ tx: m.index, ty });
+  });
+  try {
+    return relieTyroliennes(poteaux['(']!, poteaux[')']!, poteaux.$!);
+  } catch {
+    return [];
+  }
+}
 
 export class DessinEditeur {
   private theme: NomTheme | null = null;
   private atlas!: AtlasTuiles;
   /** la carte du jeu faite du document (refaite quand il change), que dessine rendu/dessin-tuiles.ts */
-  private carte: { doc: DocumentNiveau; version: number; carte: Carte } | null = null;
+  private carte: { doc: DocumentNiveau; version: number; carte: Carte; tyroliennes: Tyrolienne[] } | null =
+    null;
 
   regleTheme(theme: NomTheme): void {
     if (theme === this.theme) return;
@@ -79,7 +95,7 @@ export class DessinEditeur {
         else tuiles[y * L + x] = tuileDuCaractere(c) ?? T.VIDE;
       }
     const carte = new Carte(L, H, tuiles, fond);
-    this.carte = { doc, version: doc.version, carte };
+    this.carte = { doc, version: doc.version, carte, tyroliennes: tyroliennesDe(doc) };
     return carte;
   }
 
@@ -159,6 +175,7 @@ export class DessinEditeur {
     const tx1 = Math.min(doc.largeur, Math.ceil((cam.x + w / cam.zoom) / TUILE) + 1);
     const ty1 = Math.min(doc.hauteur, Math.ceil((cam.y + h / cam.zoom) / TUILE) + 1);
     this.terrain(ctx, doc, cam, w, h);
+    dessineTyroliennes(ctx, this.carte!.tyroliennes, this.carteDe(doc), 0, 0); // le terrain vient de refaire la carte
     for (const d of doc.decor) if (d[1] >= tx0 - 6 && d[1] < tx1 + 6) this.decor(ctx, d);
     for (let ty = ty0; ty < ty1; ty++)
       for (let tx = tx0; tx < tx1; tx++) {

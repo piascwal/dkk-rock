@@ -212,23 +212,31 @@ export class Joueur extends JoueurBase {
   }
 
   private majTyrolienne(ctx: Contexte): void {
-    const t = this.tyro!;
+    let t = this.tyro!;
     const c = this.corps;
     const k = this.commandes;
+    // une jointure : on passe au tronçon d'à côté sans lâcher
+    if (this.cx >= t.x2 && t.suivante && c.vx >= 0) t = this.tyro = t.suivante;
+    else if (this.cx <= t.x1 && t.precedente && c.vx <= 0) t = this.tyro = t.precedente;
     const pente = (t.y2 - t.y1) / (t.x2 - t.x1);
     const plate = Math.abs(pente) < 0.12;
-    // le joystick choisit le sens (même en remontant) ; lâché, on suit la pente, ou on garde son élan sur un câble plat
-    const sens = k.horizontal || (plate ? Math.sign(c.vx) : Math.sign(pente));
-    if (sens) this.dir = sens > 0 ? 1 : -1;
-    const cible = plate ? 2.2 : sens === Math.sign(pente) ? 3.8 : 1.8;
-    // à contre-sens, on freine plus fort avant de repartir
-    const frein = c.vx * sens < 0 ? 0.2 : 0.12;
-    c.vx += borne(sens * cible - c.vx, -frein, frein);
+    if (k.horizontal) {
+      // le joystick choisit le sens, même en remontant ; à contre-sens, on freine plus fort avant de repartir
+      const sens = k.horizontal;
+      const cible = plate ? 2.2 : sens === Math.sign(pente) ? 3.8 : 1.8;
+      const frein = c.vx * sens < 0 ? 0.2 : 0.12;
+      c.vx += borne(sens * cible - c.vx, -frein, frein);
+    } else if (plate) {
+      // lâché sur un câble plat : on garde son élan
+      if (c.vx) c.vx += borne(Math.sign(c.vx) * 2.2 - c.vx, -0.12, 0.12);
+    } else c.vx += borne(Math.sign(pente) * 3.8 - c.vx, -0.1, 0.1); // lâché en pente : on y glisse, l'élan fait remonter un peu
+    if (Math.abs(c.vx) > 0.3) this.dir = c.vx > 0 ? 1 : -1;
     c.x += c.vx;
     const mx = this.cx;
     c.y = t.y1 + ((mx - t.x1) / (t.x2 - t.x1)) * (t.y2 - t.y1) + 2;
     c.vy = 0;
-    const lache = k.appuye(C.SAUT) || k.tenu(C.BAS) || mx <= t.x1 || mx >= t.x2;
+    const auBout = (mx <= t.x1 && !t.precedente) || (mx >= t.x2 && !t.suivante);
+    const lache = k.appuye(C.SAUT) || k.tenu(C.BAS) || auBout;
     // on ne lâche que si le câble rentre dans un mur (la tête cogne), pas si les pieds frôlent le sol
     if (lache || ctx.carte.solideEnPixel(mx, c.y + 2)) {
       this.tyro = null;

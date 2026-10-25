@@ -43,6 +43,7 @@ const REPERES: readonly [string, string][] = [
   ['%', 'Baril explosif'],
   ['(', 'Tyrolienne : départ'],
   [')', 'Tyrolienne : arrivée'],
+  ['$', 'Tyrolienne : jointure (le câble change de pente)'],
   ...[...'123456789'].map((c): [string, string] => [c, `Dialogue ${c}`]),
 ];
 

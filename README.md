@@ -38,7 +38,8 @@ mer, puis le festival, sa foule, ses lasers, ses stroboscopes et sa grande scèn
 - Tout est destructible sauf le socle ; les caisses, le sable et la neige tombent quand on leur
   retire le sol ; les caissons de basses explosent en chaîne.
 - Échelles, tyroliennes, saut et escalade contre les murs. Une tyrolienne se descend toute seule dans le sens de la pente,
-  mais le joystick choisit le sens : on la remonte (plus lentement), ou on va où l'on veut sur un câble plat.
+  mais le joystick choisit le sens : on la remonte (plus lentement), ou on va où l'on veut sur un câble plat. Une jointure (un
+  poteau au milieu, `$` dans la carte) la fait changer de pente sans qu'on lâche : descendre, filer à plat, remonter, d'un trait.
 - **Pause :** « Recommencer le niveau » (et « Recommencer au drapeau » une fois un drapeau levé) refait la carte, détruite ou non,
   pour se sortir d'une impasse ; les vies et le score restent. Deux pressions (3 s pour confirmer) ; réservé à l'hôte.
 - **Ennemis touchés** : ils clignotent en blanc (sprite compris) pendant un instant, et ceux qui tiennent plus d'un coup montrent leur barre de vie au-dessus de la tête pendant deux secondes.
@@ -189,7 +190,8 @@ les gens (chaque apparence à part, comme les trois bigoudènes, les gens du coi
 boss), les objets (le départ, le van, les drapeaux, les cages, le butin, les tyroliennes, les déclencheurs de dialogue), le décor
 (les accessoires du jeu) et les modules (ceux du jeu : forteresses, tours, caves, gouffres, détours de pierre de taille, monuments
 des villes, rampes du FISE... et les siens). Outils : la main (déplacer), le pinceau, le rectangle plein, la gomme, la pipette et la
-sélection ; un doigt peint, deux doigts déplacent et zooment ; à la souris, clic droit ou barre d'espace pour déplacer, molette pour
+sélection ; un doigt peint, deux doigts déplacent et zooment, un doigt qui reste appuyé fait apparaître les outils (et la palette,
+et annuler) en rond autour de lui : on glisse vers l'un d'eux et on lève le doigt, ou on lève au centre puis on touche ; à la souris, clic droit ou barre d'espace pour déplacer, molette pour
 zoomer, Ctrl+Z pour annuler. **Tester** joue le niveau tout de suite (on revient à l'éditeur au bilan, ou en quittant) ; le menu
 vérifie qu'on va du départ à la fin sans rien casser, change le nom, le thème et la taille, et **exporte** le niveau (un fichier
 `.json` à partager, télécharger ou copier) : envoyez-le à Claude pour l'ajouter au jeu, tel quel ou retouché, comme nouveau niveau

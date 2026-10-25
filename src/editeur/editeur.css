@@ -358,3 +358,46 @@
   flex: 1;
   min-width: 0;
 }
+
+/* le menu en rond, autour du doigt resté appuyé */
+.ed-rond {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  background: rgba(10, 8, 20, 0.25);
+  touch-action: none;
+}
+
+.ed-rond-bouton,
+.ed-rond-centre {
+  position: fixed;
+  transform: translate(-50%, -50%);
+}
+
+.ed-rond-bouton {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  animation: ed-rond-sort 0.12s ease-out;
+}
+
+.ed-rond-bouton.vise {
+  background: #2f8f4f;
+  transform: translate(-50%, -50%) scale(1.18);
+}
+
+.ed-rond-centre {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #ffd23f;
+  background: rgba(255, 210, 63, 0.3);
+}
+
+@keyframes ed-rond-sort {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.4);
+  }
+}

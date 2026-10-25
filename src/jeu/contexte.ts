@@ -1,3 +1,4 @@
+import type { Tyrolienne } from '../niveaux/tyroliennes';
 import type { Aleatoire } from '../moteur/maths';
 import type { Carte } from '../monde/carte';
 import type { EntiteVue, Evenement } from './vue';
@@ -27,12 +28,8 @@ export interface Cible {
  * Ce que la partie offre aux entités pendant leur mise à jour. Une interface
  * plutôt que la classe Partie : les entités ne dépendent pas de la partie.
  */
-export interface Tyrolienne {
-  x1: number;
-  y1: number;
-  x2: number;
-  y2: number;
-}
+
+export type { Tyrolienne };
 
 export interface Contexte {
   readonly carte: Carte;
