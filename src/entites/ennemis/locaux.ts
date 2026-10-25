@@ -1,6 +1,6 @@
 import { G } from '../../jeu/vue';
 import type { NomTheme } from '../../rendu/themes';
-import { bouliste, charge, drone, goeland, kamikaze, tireur } from './comportements';
+import { bouliste, charge, drone, gardien, goeland, hockeyeur, kamikaze, tireur } from './comportements';
 import type { DefEnnemi } from './definitions';
 
 /**
@@ -23,7 +23,7 @@ const humain = (
   ...d,
 });
 
-/** Les spéciaux de chaque ville : la gargouille, le pilier du Munster, l'élan, le pigeon, le bouliste. */
+/** Les spéciaux de chaque ville : la gargouille, le pilier du Munster, l'élan, le pigeon, le bouliste, la bernache et le gardien de but. */
 export const ENNEMIS_SPECIAUX: Record<string, DefEnnemi> = {
   z: humain({
     nom: 'Gargouille de la cathédrale',
@@ -99,6 +99,37 @@ export const ENNEMIS_SPECIAUX: Record<string, DefEnnemi> = {
     points: 200,
     comportement: bouliste,
     cris: ['Tu tires ou tu pointes ?', 'Elle est devant !', 'Mène pas le bouchon !'],
+  }),
+  // Ottawa : la bernache du Canada, qui vole en V et pique en criant ; le gardien de but, énorme dans ses jambières
+  w: humain({
+    nom: 'Bernache du Canada',
+    genre: G.BERNACHE,
+    pv: 2,
+    w: 14,
+    h: 10,
+    vitesse: 1.2,
+    vision: 200,
+    visionVerticale: 140,
+    cadence: 120,
+    points: 150,
+    comportement: goeland,
+    vole: true,
+    contact: 1,
+    cris: ['HONK !', 'HOOONK.'],
+  }),
+  i: humain({
+    nom: 'Gardien de but',
+    genre: G.GARDIEN,
+    pv: 12,
+    w: 14,
+    h: 22,
+    vitesse: 0.5,
+    vision: 180,
+    visionVerticale: 50,
+    cadence: 110,
+    points: 400,
+    comportement: gardien,
+    cris: ['Arrêt !', 'Pas dans MA cage !', 'Blanchissage !'],
   }),
 };
 
@@ -199,6 +230,30 @@ export const ENNEMIS_LOCAUX: Partial<Record<NomTheme, Record<string, DefEnnemi>>
       comportement: kamikaze,
       contact: 1,
       cris: ['Bouge, dégun passe !', 'J’suis en route !'],
+    }),
+  },
+  ottawa: {
+    a: humain({
+      nom: 'Hockeyeur',
+      genre: G.HOCKEYEUR,
+      pv: 3,
+      w: 9,
+      vitesse: 1.1,
+      cadence: 85,
+      comportement: hockeyeur,
+      cris: ['Lâche pas la patate !', 'Sorry, eh !', 'Dans le coin !'],
+    }),
+    c: humain({
+      nom: 'Castor',
+      genre: G.CASTOR,
+      pv: 2,
+      w: 12,
+      h: 9,
+      vitesse: 1.05,
+      points: 80,
+      comportement: charge,
+      contact: 1,
+      cris: ['Tchac tchac !', 'Mon barrage !'],
     }),
   },
 };

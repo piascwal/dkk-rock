@@ -1,26 +1,11 @@
 import { TUILE } from '../config';
 import { bruit } from '../moteur/maths';
 import { NB_TUILES, T } from '../monde/tuiles';
+import { moucheture, PEINTRES_PIERRES, px, type Peintre } from './atlas-pierres';
 import { DEBORD, habille, habilleParoi } from './bords-tuiles';
 import type { Theme } from './themes';
 
 const VARIANTES = 4;
-
-type Peintre = (c: CanvasRenderingContext2D, v: number, th: Theme) => void;
-
-const px = (c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, coul: string) => {
-  c.fillStyle = coul;
-  c.fillRect(x, y, w, h);
-};
-
-/** Mouchetis : quelques pixels plus clairs ou plus sombres, toujours les mêmes pour une variante. */
-function moucheture(c: CanvasRenderingContext2D, v: number, coul: string, n: number, graine: number): void {
-  for (let i = 0; i < n; i++) {
-    const x = Math.floor(bruit(i, v, graine) * TUILE);
-    const y = Math.floor(bruit(v, i, graine + 1) * TUILE);
-    px(c, x, y, 1 + (i % 2), 1, coul);
-  }
-}
 
 function tonneau(c: CanvasRenderingContext2D, bois: string, cercle: string, pancarte: string): void {
   px(c, 3, 1, 10, 14, bois);
@@ -31,6 +16,7 @@ function tonneau(c: CanvasRenderingContext2D, bois: string, cercle: string, panc
 }
 
 const PEINTRES: Partial<Record<number, Peintre>> = {
+  ...PEINTRES_PIERRES,
   [T.TERRE]: (c, v, th) => {
     px(c, 0, 0, 16, 16, th.terre);
     moucheture(c, v, 'rgba(0,0,0,0.25)', 10, 1);
@@ -191,20 +177,6 @@ const PEINTRES: Partial<Record<number, Peintre>> = {
     px(c, 14, 0, 2, 16, '#3a3a46');
     for (const y of [2, 7, 12]) px(c, 2, y, 12, 2, '#ff4fd8');
   },
-  // le plateau rose des modules (box jump, spine, haut des quarters) : rose sur le dessus, noir dessous
-  // la pierre calcaire de Provence : des moellons clairs, inégaux, aux joints de mortier
-  [T.PIERRE]: (c, v) => {
-    px(c, 0, 0, 16, 16, '#a8987a');
-    const rangs = v % 2 ? [0, 5, 11] : [0, 6, 10];
-    rangs.forEach((y0, i) => {
-      const h = (rangs[i + 1] ?? 16) - y0 - 1;
-      for (let x = (i + v) % 2 ? -4 : 0; x < 16; x += 7 + ((i + v) % 3)) {
-        px(c, x + 1, y0 + 1, 6 + ((x + v) % 2), h, i % 2 ? '#d2c4a2' : '#c8b896');
-        px(c, x + 1, y0 + 1, 6, 1, '#e2d6b8');
-      }
-    });
-    moucheture(c, v, '#9a8a6a', 5, 7);
-  },
   // les tuiles canal des toits : des rangées de demi-tuiles rouges, l'ombre du dessous de chacune
   [T.TOIT]: (c) => {
     px(c, 0, 0, 16, 16, '#8a3020');
@@ -226,6 +198,7 @@ const PEINTRES: Partial<Record<number, Peintre>> = {
     moucheture(c, v, '#3a2818', 6, 13);
     px(c, 2 + v * 2, 1, 5, 1, '#8a6a48');
   },
+  // le plateau rose des modules (box jump, spine, haut des quarters) : rose sur le dessus, noir dessous
   [T.PLATEAU]: (c, v) => {
     px(c, 0, 0, 16, 16, '#232327');
     px(c, 0, 0, 16, 6, '#e8607a');

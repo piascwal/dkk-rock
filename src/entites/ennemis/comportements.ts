@@ -11,6 +11,7 @@ import {
   FLASH_SELFIE,
   LASER,
   NOTE_AUTOTUNE,
+  RONDELLE,
 } from '../projectiles-ennemis';
 import type { Ennemi } from './ennemi';
 
@@ -236,4 +237,24 @@ export const figueur: Comportement = (e, ctx, cible) => {
   e.recharge = e.memoire % 2 ? 16 : e.def.cadence;
   ctx.son('rebond', e.cx, e.cy);
   if (ctx.rng.suivant() < 0.15) ctx.texte(e.cx, e.corps.y - 12, 'À LA FIGUE !', '#c86ad8');
+};
+
+/** Hockeyeur d'Ottawa : il garde ses distances et décoche des lancers frappés, une rondelle qui glisse au ras du sol. */
+export const hockeyeur: Comportement = (e, ctx, cible) => {
+  gardeDistance(e, ctx, cible, 60, 140);
+  if (e.recharge > 0 || !e.peutTirer(cible, ctx)) return;
+  tireVers(e, ctx, RONDELLE, cible);
+  e.recharge = e.def.cadence;
+  ctx.son('rebond', e.cx, e.cy);
+  if (ctx.rng.suivant() < 0.2) ctx.texte(e.cx, e.corps.y - 12, 'LANCER FRAPPÉ !', '#ffffff');
+};
+
+/** Gardien de but : il ne s'éloigne guère de sa cage et dégage des rondelles par trois. */
+export const gardien: Comportement = (e, ctx, cible) => {
+  gardeDistance(e, ctx, cible, 30, 90);
+  if (e.recharge > 0 || !e.peutTirer(cible, ctx)) return;
+  tireVers(e, ctx, RONDELLE, cible);
+  e.memoire++;
+  e.recharge = e.memoire % 3 ? 12 : e.def.cadence;
+  ctx.son('rebond', e.cx, e.cy);
 };

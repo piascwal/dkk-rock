@@ -60,10 +60,10 @@ export const ARCS: DefArc[] = [
     id: 'international',
     titre: 'International Tour',
     resume:
-      'Une ville qui a marqué chaque membre du groupe : Limerick, New York, Lund, l’exotique Beauvais, et la finale à Marseille.',
-    // les niveaux 16 à 20 de la liste, dans l'ordre de la tournée : Limerick (Mat), New York (JBM), Lund (Tom), Beauvais (JBT),
-    // Marseille (JBG)
-    niveaux: [17, 19, 18, 16, 20],
+      'Une ville qui a marqué chaque membre du groupe : Limerick, New York, Ottawa, Lund, Beauvais, et la finale à Marseille.',
+    // les niveaux 16 à 20 de la liste, dans l'ordre de la tournée : Limerick (Mat), New York (JBM), Ottawa (Mat encore, niveau 22,
+    // ajouté après coup), Lund (Tom), Beauvais (JBT), Marseille (JBG)
+    niveaux: [17, 19, 22, 18, 16, 20],
     apres: 10,
     fin: FIN_INTERNATIONAL,
   },

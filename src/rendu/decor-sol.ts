@@ -32,6 +32,13 @@ export const dehors = (carte: Carte, tx: number, ty: number): boolean =>
 export const solLibre = (carte: Carte, tx: number, ty: number): boolean =>
   SOLS_DECORES.includes(carte.get(tx, ty)) && !carte.solide(tx, ty - 1) && !carte.aFond(tx, ty - 1);
 
+/** Le lit d'une rivière gelée (de l'eau au-dessus, puis de la glace) : on ne sème rien sous la glace. */
+export const sousLaGlace = (carte: Carte, tx: number, ty: number): boolean => {
+  if (carte.get(tx, ty - 1) !== T.EAU) return false;
+  for (let y = ty - 2; y >= Math.max(0, ty - 6); y--) if (carte.get(tx, y) === T.GLACE) return true;
+  return false;
+};
+
 /**
  * Une échelle à moins de deux tuiles de part et d'autre, et jusqu'à cinq tuiles au-dessus : un accessoire posé là serait
  * dessiné devant elle (ou derrière elle, en la cachant). Les accessoires les plus hauts tiennent dans cette zone.

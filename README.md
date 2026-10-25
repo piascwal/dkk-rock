@@ -320,22 +320,29 @@ validé.
   y devient des pointillés au-dessus de la mer, `rendu/carte-iles.ts`) : une ville qui a marqué chaque membre du groupe, chacun
   en guide dans l'intro de la sienne, dans l'ordre de la tournée : Limerick (le stage de fin d'études d'informatique de Mat à l'Université de Limerick : la
   Shannon, le château du roi Jean, le pub, les moutons, le Munster, les Cranberries), New York (l'expérience de vie de JBM : les
-  rats et leur pizza, les châteaux d'eau, Wall Street, le métro, le pont de Brooklyn), Lund (le voyage étudiant de Tom : la nuit
+  rats et leur pizza, les châteaux d'eau, Wall Street, le métro, le pont de Brooklyn), Ottawa (les trois mois de Mat au Canada :
+  la neige à moins vingt, le Glebe Collegiate où il a suivi des cours, la patinoire de hockey sur la rivière gelée, la colline du
+  Parlement et la tour de la Paix, le marché By, la poutine et les castors), Lund (le voyage étudiant de Tom : la nuit
   d'hiver à quinze heures, la cathédrale et le géant Finn, les étudiants en salopette, les vélos, l'élan), Beauvais, l'étape la
   plus « exotique », où JBT a été prof de sport (son aéroport international, donc ville internationale ; le chœur gothique le
   plus haut du monde, jamais fini ; Jeanne Hachette ; l'avion low-cost) et la finale à Marseille, où JBG a vécu (JBG : le Vieux-Port, le Panier, la pétanque, l'OM, les calanques, la Bonne Mère), avec l'épilogue
   `histoire/fin-international.ts`. Les monuments sont des pièces du générateur (`outils/niveaux/international.py` : la
   cathédrale sans nef et ses arcs-boutants, l'avion, le château à tours rondes, l'université, le pub, la Shannon et son pont, la cathédrale
-  romane, les maisons rouges, les gratte-ciel, le métro, le pont de Brooklyn, la colline de la Bonne Mère, les calanques), et
+  romane, les maisons rouges, les gratte-ciel, le métro, le pont de Brooklyn, la colline de la Bonne Mère, les calanques ; à Ottawa, `outils/niveaux/ottawa.py` : la patinoire, le bloc
+  du Centre qu'on ne passe qu'en montant dans la tour de la Paix, le Glebe Collegiate dont on ne ressort qu'en bas), et
   ce qui change la façon d'y jouer (`outils/niveaux/international_jeu.py` : le gymnase de JBT à Beauvais, son mur d'escalade,
-  sa corde et sa poutre ; le lac gelé de Lund, sa glace qui glisse et ses trous, et la butte de luge). Lund et Beauvais forcent
-  aussi à monter et descendre (corniches, tyroliennes, à-pics, galeries) sur près de 680 colonnes. Les
-  fonds sont peints en code au chargement du niveau (`rendu/fonds-international*.ts`), comme les gens du coin
-  (`entites/ennemis/locaux.ts`, dessinés dans `rendu/dessins-locaux.ts`) : dans ces villes, les lettres ordinaires « a » et
+  sa corde et sa poutre ; le lac gelé de Lund, sa glace qui glisse et ses trous, et la butte de luge). Toutes les villes forcent
+  à monter et descendre (corniches, grottes, tyroliennes, à-pics, galeries) sur 650 à 730 colonnes ; chaque montée est suivie d'une
+  descente, pour que les caves aient leur place. La pierre de taille (`[`, cinq fois plus dure que la pierre) barre le chemin
+  ici et là (`outils/niveaux/detours.py` : le bastion, la passe haute, le puits) : on fait le tour par-dessus ou par-dessous
+  plutôt que de la casser. Les
+  fonds sont peints en code au chargement du niveau (`rendu/fonds-international*.ts`, `rendu/fonds-ottawa.ts`), comme les gens
+  du coin (`entites/ennemis/locaux.ts`, dessinés dans `rendu/dessins-locaux.ts` et `rendu/dessins-ottawa.ts`) : dans ces villes, les lettres ordinaires « a » et
   « c » des cartes deviennent un passager perdu et un passager pressé, un habitué du pub et un mouton, un étudiant en
-  salopette et un cycliste, un trader et un rat, un supporter de l'OM et un livreur en scooter ; chaque ville a en plus son
-  spécial (z : la gargouille, u : le pilier du Munster, j : l'élan, n : le pigeon, q : le bouliste et sa boule de pétanque).
-  Aucune image en plus à télécharger : l'arc coûte 16 Ko de code compressé (protocole v28).
+  salopette et un cycliste, un trader et un rat, un hockeyeur (et sa rondelle qui glisse au sol) et un castor, un supporter de
+  l'OM et un livreur en scooter ; chaque ville a en plus son spécial (z : la gargouille, u : le pilier du Munster, j : l'élan,
+  n : le pigeon, w : la bernache du Canada, i : le gardien de but, q : le bouliste et sa boule de pétanque).
+  Aucune image en plus à télécharger (protocole v31).
   **Le FISE** (Montpellier, sur les berges du Lez) est fait à la main, zone par zone (`outils/niveaux/fise.py`) : l'entrée
   (l'arche et le logo officiel), le grand parc noir à plateaux roses (tuiles `L` et `U`), le food court à l'ombre des platanes
   et ses pissotières, le Freestyle Park de bois (half-pipe : descente, plat, remontée ; mini spine ; tuile `A`), la scène de

@@ -35,6 +35,7 @@ const STYLES: Record<Decor, Style> = {
   beauvais: { sorte: 'liane', couleurs: ['#3f6a32', '#5a8a3a', '#8aa84a'], mousse: ['#6a7a4a', '#8a9a5a'] },
   limerick: { sorte: 'liane', couleurs: ['#2f6a2a', '#3fa040', '#7cc04a'], mousse: ['#3f8f3a', '#5fb347'] },
   lund: { sorte: 'glacon', couleurs: ['#9fd8f0', '#c8f0ff', '#ffffff'] },
+  ottawa: { sorte: 'glacon', couleurs: ['#9fd8f0', '#c8f0ff', '#ffffff'] },
   newyork: { sorte: 'cable', couleurs: ['#1a1a22', '#3a3a44', '#6a6a76'] },
   marseille: { sorte: 'liane', couleurs: ['#4a6a3a', '#6a8a4a', '#d86aa8'], mousse: ['#7a8a5a', '#9aa86a'] },
 };

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { VIES_DEPART } from '../src/config';
-import { bouliste } from '../src/entites/ennemis/comportements';
+import { bouliste, hockeyeur } from '../src/entites/ennemis/comportements';
 import { Ennemi } from '../src/entites/ennemis/ennemi';
 import { ENNEMIS_PAR_LETTRE } from '../src/entites/ennemis/definitions';
 import { ENNEMIS_LOCAUX, ENNEMIS_SPECIAUX } from '../src/entites/ennemis/locaux';
@@ -12,7 +12,7 @@ import { ARCS, MONDE, niveauOuvert, suivantDansMonde } from '../src/niveaux/arcs
 import { DESSINS_ENNEMIS } from '../src/rendu/dessins-ennemis';
 import { THEMES } from '../src/rendu/themes';
 
-const VILLES = ['limerick', 'newyork', 'lund', 'beauvais', 'marseille'] as const;
+const VILLES = ['limerick', 'newyork', 'ottawa', 'lund', 'beauvais', 'marseille'] as const;
 const indice = (id: string) => NIVEAUX.findIndex((n) => n.id === id);
 
 const enJeu = (niveau: number) => {
@@ -23,7 +23,7 @@ const enJeu = (niveau: number) => {
 };
 
 describe('l’International Tour', () => {
-  it('s’ouvre après le FISE : Limerick, New York, Lund, Beauvais, Marseille, au bout de la route', () => {
+  it('s’ouvre après le FISE : Limerick, New York, Ottawa, Lund, Beauvais, Marseille, au bout de la route', () => {
     const arc = ARCS.find((a) => a.id === 'international')!;
     expect(arc.niveaux.map((n) => NIVEAUX[n]!.id)).toEqual([...VILLES]);
     const fise = indice('fise');
@@ -31,11 +31,18 @@ describe('l’International Tour', () => {
     expect(suivantDansMonde(fise)).toBe(indice('limerick'));
     expect(niveauOuvert(indice('limerick'), [])).toBe(false);
     expect(niveauOuvert(indice('limerick'), [fise])).toBe(true);
-    expect(MONDE.slice(-5)).toEqual(arc.niveaux);
+    expect(MONDE.slice(-arc.niveaux.length)).toEqual(arc.niveaux);
   });
 
   it('chaque ville a son thème, son décor, et un héros du groupe en guide dans l’intro', () => {
-    const guides = { beauvais: 'JBT', limerick: 'MAT', lund: 'TOM', newyork: 'JBM', marseille: 'JBG' };
+    const guides = {
+      beauvais: 'JBT',
+      limerick: 'MAT',
+      lund: 'TOM',
+      newyork: 'JBM',
+      marseille: 'JBG',
+      ottawa: 'MAT',
+    };
     for (const v of VILLES) {
       const def = NIVEAUX[indice(v)]!;
       expect(def.theme).toBe(v);
@@ -57,7 +64,7 @@ describe('l’International Tour', () => {
   });
 
   it('les spéciaux ont leur lettre, chaque nouveau personnage est dessiné et compté parmi les convertis', () => {
-    for (const lettre of 'zujnq') expect(ENNEMIS_PAR_LETTRE[lettre]).toBe(ENNEMIS_SPECIAUX[lettre]);
+    for (const lettre of 'zujnqwi') expect(ENNEMIS_PAR_LETTRE[lettre]).toBe(ENNEMIS_SPECIAUX[lettre]);
     const nouveaux = [
       ...Object.values(ENNEMIS_SPECIAUX),
       ...Object.values(ENNEMIS_LOCAUX).flatMap((l) => Object.values(l!)),
@@ -69,6 +76,7 @@ describe('l’International Tour', () => {
       expect(estUnTir(g)).toBe(false);
     }
     expect(estUnTir(G.P_BOULE)).toBe(true);
+    expect(estUnTir(G.P_RONDELLE)).toBe(true);
   });
 
   it('le bouliste de Marseille pointe une boule de pétanque, en cloche', () => {
@@ -84,5 +92,20 @@ describe('l’International Tour', () => {
     expect(boule).toBeDefined();
     expect(boule!.def.gravite).toBeGreaterThan(0);
     expect(b.recharge).toBe(ENNEMIS_SPECIAUX.q!.cadence);
+  });
+
+  it('le hockeyeur d’Ottawa décoche une rondelle qui glisse au ras du sol', () => {
+    const p = enJeu(indice('ottawa'));
+    const j = p.joueurs[0]!;
+    const h = new Ennemi(p, ENNEMIS_LOCAUX.ottawa!.a!, j.corps.x + 90, j.corps.y);
+    h.recharge = 0;
+    h.peutTirer = () => true;
+    hockeyeur(h, p, j);
+    const rondelle = p.entites.find(
+      (e): e is Projectile => e instanceof Projectile && e.def.genre === G.P_RONDELLE,
+    );
+    expect(rondelle).toBeDefined();
+    expect(rondelle!.def.roule).toBe(true);
+    expect(h.recharge).toBe(ENNEMIS_LOCAUX.ottawa!.a!.cadence);
   });
 });

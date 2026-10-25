@@ -120,3 +120,14 @@ export const FIGUE = P({
   duree: 90,
   taille: 5,
 });
+/** La rondelle du hockeyeur : un lancer frappé qui file au ras du sol et glisse sur la glace. */
+export const RONDELLE = P({
+  genre: G.P_RONDELLE,
+  vitesse: 4.6,
+  gravite: 1,
+  degats: 1,
+  degatsTuile: 1,
+  duree: 110,
+  taille: 5,
+  roule: true,
+});

@@ -2,7 +2,7 @@ import type { NomAccessoire } from './decor-objets';
 
 /** Ce que l'on sème dans les villes de l'International Tour (voir decor-semis.ts) : dehors, dedans, et la densité. */
 export const SEMIS_INTERNATIONAL: Record<
-  'beauvais' | 'limerick' | 'lund' | 'newyork' | 'marseille',
+  'beauvais' | 'limerick' | 'lund' | 'newyork' | 'marseille' | 'ottawa',
   { dehors: NomAccessoire[]; dedans: NomAccessoire[]; densite: number }
 > = {
   beauvais: {
@@ -94,5 +94,22 @@ export const SEMIS_INTERNATIONAL: Record<
     ],
     dedans: ['caisseDeco', 'etagere', 'enceinte34', 'tonneau', 'flambeau'],
     densite: 0.8,
+  },
+  ottawa: {
+    dehors: [
+      'erableNeige',
+      'erableNeige',
+      'sapinNeige',
+      'drapeauCanada',
+      'panneauArret',
+      'kiosquePoutine',
+      'banc',
+      'lampadaire',
+      'bonhommeDeNeige',
+      'buissonNeige',
+      'enceinte34',
+    ],
+    dedans: ['caisseDeco', 'etagere', 'enceinte34', 'tonneau'],
+    densite: 0.75,
   },
 };

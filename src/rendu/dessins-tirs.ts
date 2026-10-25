@@ -161,6 +161,12 @@ export const DESSINS_TIRS: Partial<Record<number, Dessin>> = {
     p(-2, -2, 2, 1, '#e8ecf2');
     p(0, 1, 3, 1, '#5a5e66');
   },
+  // la rondelle de hockey : un palet noir, vu de biais
+  [G.P_RONDELLE]: (p) => {
+    p(-3, -1, 6, 3, '#111116');
+    p(-3, -2, 6, 1, '#2a2a32');
+    p(-2, -2, 2, 1, '#5a5a66');
+  },
   [G.P_LASER]: (p) => {
     p(-3, -1, 6, 2, '#ff2a2a');
     p(-2, -1, 4, 1, '#ffb3b3');

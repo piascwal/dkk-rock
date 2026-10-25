@@ -341,14 +341,22 @@ NIVEAUX = {
             ('plat', 12, dict(lettres='c', deco=3)),
             ('pres', 30, dict(lettres='c', digit='1')),  # les prés à murets, leurs moutons
             ('colline', 18, dict(haut=3, lettres='c')),
+            ('bastion', 26, dict(haut=8, lettres='ac')),  # une vieille tour de garde en pierre de taille
             ('pres', 26, dict(lettres='cc')),
+            ('corniches', 22, dict(monte=6, lettres='ac')),  # on monte au château
             ('chateau_roi_jean', 44, dict(lettres='ac', digit='2')),  # le château du roi Jean
+            ('descente', 24, dict(chute=6, lettres='ac')),  # on redescend vers la ville
             ('plat', 8, dict(lettres='ac')),
             ('universite', 40, dict(lettres='ac', digit='3')),  # l'Université de Limerick, le stage de Mat
             ('shannon', 30, dict(lettres='ac')),  # la Shannon, le pont de Thomond
+            ('passe_haute', 22, dict(haut=10, lettres='ac')),
             ('pub', 26, dict(lettres='a', digit='4')),  # la session au pub
             ('toits', 42, dict(lettres='ac')),
+            ('grotte', 20, dict(monte=6, lettres='ac', butin='+')),
+            ('pont_singe', 22, dict(lettres='ac', butin='+')),
+            ('descente', 24, dict(chute=6, lettres='ac')),
             ('gouffre', 20, dict(lettres='ac', nb=4)),
+            ('puits', 24, dict(lettres='ac')),
             ('plat', 10, dict(lettres='au', digit='5')),  # Thomond Park : les supporters du Munster
             ('gradins', 30, dict(haut=6, lettres='au', cage=True, mat='R')),  # les tribunes du stade
             ('barrage', 20, dict(haut=12, lettres='acu', butin='+')),
@@ -389,10 +397,19 @@ NIVEAUX = {
             ('gratte_ciel', 24, dict(lettres='ac', digit='2', etages=4)),  # les escaliers de secours, les châteaux d'eau
             ('toits', 42, dict(lettres='ac')),
             ('gratte_ciel', 26, dict(lettres='ac', etages=5)),
+            ('bastion', 26, dict(haut=8, lettres='ac')),  # le socle de granit d'une banque
             ('plat', 10, dict(lettres='aa', digit='3', drones=2)),  # Wall Street ; les pigeons
             ('echafaudage', 22, dict(niveaux=3, lettres='ac')),
+            ('corniches', 22, dict(monte=6, lettres='ac')),  # on grimpe aux escaliers de secours...
+            ('toits', 36, dict(lettres='ac')),
+            ('descente', 24, dict(chute=6, lettres='ac')),  # ... et on redescend en tyrolienne
             ('metro', 44, dict(lettres='c', digit='4')),  # le métro sous la rue
+            ('passe_haute', 22, dict(haut=10, lettres='ac')),
             ('gratte_ciel', 28, dict(lettres='ac', etages=5)),
+            ('grotte', 20, dict(monte=6, lettres='ac', butin='+')),
+            ('pont_singe', 22, dict(lettres='ac', butin='+')),
+            ('descente', 24, dict(chute=6, lettres='ac')),
+            ('puits', 24, dict(lettres='ac')),
             ('gouffre', 20, dict(lettres='ac', nb=4)),
             ('pont_brooklyn', 56, dict(lettres='ac', digit='5')),  # le pont de Brooklyn
             ('arene', 40, dict(lettres='acn')),
@@ -406,14 +423,54 @@ NIVEAUX = {
             ('ponton', 42, dict(lettres='ac', digit='1')),  # le Vieux-Port, ses pointus ; les gabians
             ('calade', 34, dict(lettres='ac', digit='2')),  # le Panier
             ('toits', 42, dict(lettres='ac')),
+            ('bastion', 26, dict(haut=8, lettres='ac')),  # un bastion du fort Saint-Nicolas
             ('plat', 14, dict(lettres='qq', digit='3')),  # la pétanque
+            ('corniches', 22, dict(monte=6, lettres='ac')),  # on monte au fort
             ('forteresse', 34, dict(etages=3, lettres='ac', mat='{', cage=True)),  # le fort Saint-Jean
+            ('descente', 24, dict(chute=6, lettres='ac')),
             ('plat', 10, dict(lettres='aa', digit='4', drones=2)),  # les supporters de l'OM ; les gabians
             ('traversee', 36, dict(lettres='ac', mode='pont')),
+            ('passe_haute', 22, dict(haut=10, lettres='ac')),
             ('calanques', 36, dict(lettres='ac', digit='5')),  # les calanques
+            ('grotte', 20, dict(monte=6, lettres='ac', butin='+')),
+            ('pont_singe', 22, dict(lettres='ac', butin='+')),
+            ('descente', 24, dict(chute=6, lettres='ac')),
+            ('puits', 24, dict(lettres='acq')),
             ('bonne_mere', 44, dict(lettres='acq')),  # Notre-Dame de la Garde
             ('barrage', 20, dict(haut=12, lettres='acq', butin='+')),
             ('arene', 40, dict(lettres='acqg')),
+        ],
+    ),
+    # Ottawa (voir niveaux/ottawa.py), entre New York et Lund : les trois mois de Mat au Canada. On y descend (le Glebe, la
+    # tyrolienne), on y monte (la colline du Parlement, la tour de la Paix, la grotte, la tour) ; la pierre de taille (niveaux/detours.py)
+    # se contourne plutôt que de se casser
+    'ottawa': dict(
+        nom='Ottawa', theme='ottawa', textes='23-ottawa.ts', fichier='23-ottawa.ts', constante='CARTE_OTTAWA',
+        graine=231, base=40, profondeur=36, raccord='ac', caves='ac',
+        lieux=[
+            ('plat', 12, dict(lettres='c', deco=3, digit='1')),  # la neige, les castors
+            ('maison', 14, dict(lettres='ac')),
+            ('toits', 42, dict(lettres='ac')),  # les toits du Glebe
+            ('corniches', 22, dict(monte=6, lettres='ac')),  # on monte la rue en pente...
+            ('glebe', 34, dict(lettres='ac', chute=6, digit='2')),  # ... le Glebe Collegiate : on n'en sort qu'en bas
+            ('plat', 10, dict(lettres='ac', drones=2)),  # les bernaches
+            ('bastion', 26, dict(haut=8, lettres='ac')),
+            ('gouffre', 20, dict(lettres='ac', nb=4)),
+            ('patinoire', 64, dict(lettres='a', digit='3')),  # la patinoire sur la rivière gelée
+            ('corniches', 22, dict(monte=6, lettres='ac')),  # on monte sur la colline du Parlement
+            ('parlement', 46, dict(lettres='ac', digit='4')),  # la tour de la Paix
+            ('descente', 24, dict(chute=6, lettres='ac')),
+            ('passe_haute', 22, dict(haut=10, lettres='ac')),
+            ('plat', 12, dict(lettres='cw', digit='5', drones=2)),  # le marché By
+            ('grotte', 20, dict(monte=6, lettres='ac', butin='+')),
+            ('pont_singe', 22, dict(lettres='ac', butin='+')),
+            ('puits', 24, dict(lettres='ac')),
+            ('descente', 24, dict(chute=6, lettres='ac')),
+            ('traversee', 36, dict(lettres='ac', mode='iles')),
+            ('lac_gele', 36, dict(lettres='aw')),  # le canal gelé
+            ('barrage', 20, dict(haut=12, lettres='acw', butin='+')),
+            ('tour', 18, dict(etages=3, tyro=9, apres=13, lettres='ac', mat='B')),
+            ('arene', 40, dict(lettres='acwi')),
         ],
     ),
 }

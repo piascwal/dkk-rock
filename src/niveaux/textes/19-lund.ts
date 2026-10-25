@@ -3,7 +3,7 @@ import type { DefNiveau } from '../format';
 export const LUND: Omit<DefNiveau, 'carte'> = {
   id: 'lund',
   titre: 'Lund',
-  sousTitre: 'International Tour 3 — Suède, le voyage étudiant de Tom',
+  sousTitre: 'International Tour 4 — Suède, le voyage étudiant de Tom',
   theme: 'lund',
   intro: [
     {

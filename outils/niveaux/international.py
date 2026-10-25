@@ -148,7 +148,8 @@ def universite_limerick(n, x0, largeur, lettres='a'):
     for j in range(3):  # les salles machines : des postes alignés là où le sol est libre (ni échelle, ni cloison, ni caisse)
         sol = base - j * ETAGE
         for x in range(x0 + 6, x0 + w - 3, 5):
-            if all(n.get(x + d, yy) == '.' for d in (-1, 0, 1) for yy in (sol - 1, sol - 2)):
+            # le poste fait trois rangées de haut : le haut d'une cloison (dont la porte est en bas) ne doit pas le recouvrir
+            if all(n.get(x + d, yy) == '.' for d in (-1, 0, 1) for yy in (sol - 1, sol - 2, sol - 3)):
                 n.decor(x, 'ordinateur', sol)
 
 

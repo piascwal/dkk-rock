@@ -24,8 +24,10 @@ from hauteurs import corniches, descente, grotte, pont_de_singe, tours, vide_par
 from signatures import falaise, glacier, parking, ponton, scene, toits
 from structures import forteresse, traversee
 from verrous import barrage, gouffre
+from detours import bastion, passe_haute, puits
 import international
 import international_jeu
+import ottawa
 
 RACINE = pathlib.Path(__file__).resolve().parent.parent
 CARTES = RACINE / 'src' / 'niveaux' / 'cartes'
@@ -54,11 +56,13 @@ THEMES = {
     'lund': dict(sol='#', sous='#', profond='R', mur='B', deco=['C', 'W']),
     'newyork': dict(sol='D', sous='D', profond='R', mur='B', deco=['C', 'T', 'M']),
     'marseille': dict(sol='#', sous='R', profond='R', mur='{', deco=['C', 'W']),
+    # Ottawa : la terre sous la neige, la brique rouge du Glebe
+    'ottawa': dict(sol='#', sous='#', profond='R', mur='B', deco=['C', 'W']),
 }
 
 # ce qui vole dans chaque monde (posé par `drones`) : le drone par défaut, le goéland en Bretagne, à Limerick, à Lund et à
-# Marseille (le gabian), la gargouille de la cathédrale de Beauvais, le pigeon de New York
-VOLANTS = {'foret': 'g', 'port': 'g', 'groix': 'g', 'mer': 'g', 'limerick': 'g', 'lund': 'g', 'marseille': 'g', 'beauvais': 'z', 'newyork': 'n'}
+# Marseille (le gabian), la gargouille de la cathédrale de Beauvais, le pigeon de New York, la bernache du Canada à Ottawa
+VOLANTS = {'foret': 'g', 'port': 'g', 'groix': 'g', 'mer': 'g', 'limerick': 'g', 'lund': 'g', 'marseille': 'g', 'beauvais': 'z', 'newyork': 'n', 'ottawa': 'w'}
 
 
 # les niveaux de l'arc breton (voir docs/ARC-BRETAGNE.md) : le goéland y remplace le drone
@@ -307,6 +311,16 @@ class Recette:
     def p_ferry(self, x0, x1, lettres='a'):
         ferry(self.n, x0, x1 - x0, lettres)
 
+    # ---- les détours (voir niveaux/detours.py) : la pierre de taille qu'on contourne plutôt que de la casser
+    def p_bastion(self, x0, x1, haut=7, lettres='a', butin='+'):
+        bastion(self.n, x0, x1 - x0, haut, lettres, butin)
+
+    def p_passe_haute(self, x0, x1, haut=10, lettres='a', butin='+'):
+        passe_haute(self.n, x0, x1 - x0, haut, lettres, butin)
+
+    def p_puits(self, x0, x1, lettres='a', butin='*'):
+        puits(self.n, x0, x1 - x0, lettres, butin)
+
     # ---- l'International Tour (voir niveaux/international.py) : les monuments de chaque ville
     def p_cathedrale_beauvais(self, x0, x1, lettres='a'):
         international.cathedrale_beauvais(self.n, x0, x1 - x0, lettres)
@@ -358,6 +372,16 @@ class Recette:
 
     def p_calanques(self, x0, x1, lettres='a'):
         international.calanques(self.n, x0, x1 - x0, lettres)
+
+    # ---- Ottawa (voir niveaux/ottawa.py)
+    def p_patinoire(self, x0, x1, lettres='a'):
+        ottawa.patinoire(self.n, x0, x1 - x0, lettres)
+
+    def p_parlement(self, x0, x1, lettres='a'):
+        ottawa.parlement(self.n, x0, x1 - x0, lettres)
+
+    def p_glebe(self, x0, x1, lettres='a', chute=8):
+        ottawa.glebe(self.n, x0, x1 - x0, lettres, chute)
 
     def p_arene(self, x0, x1, lettres='ab', plus=2):
         n = self.n
@@ -411,7 +435,7 @@ COULEURS = {
     ' ': (30, 20, 40), '.': (60, 50, 70), '#': (122, 74, 42), 'R': (109, 109, 120), 'B': (156, 59, 46), 'M': (138, 150, 163),
     'X': (20, 20, 20), 'N': (230, 240, 251), 'G': (143, 208, 238), 'W': (168, 116, 58), '-': (210, 154, 85), 'H': (196, 154, 90),
     'E': (255, 255, 255), '=': (190, 200, 210), 'C': (176, 125, 60), 'T': (60, 60, 60), 'S': (232, 207, 138), 'V': (191, 233, 255),
-    'D': (154, 154, 146), 'L': (44, 44, 49), 'U': (232, 96, 122), 'A': (216, 168, 104), 'I': (170, 80, 220), '|': (255, 79, 216), '{': (200, 184, 150), '^': (184, 73, 46), '~': (60, 150, 190), ';': (90, 64, 40), '(': (255, 0, 255), ')': (255, 0, 255),
+    'D': (154, 154, 146), 'L': (44, 44, 49), 'U': (232, 96, 122), 'A': (216, 168, 104), 'I': (170, 80, 220), '|': (255, 79, 216), '{': (200, 184, 150), '^': (184, 73, 46), '~': (60, 150, 190), ';': (90, 64, 40), '(': (255, 0, 255), ')': (255, 0, 255), '[': (96, 96, 112),
 }
 
 

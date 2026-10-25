@@ -22,7 +22,9 @@ def place_libre(x, largeur, pris, w, n, yg, sol_max):
 
 def souterrain(r, ennemis='a'):
     n, w, yg = r.n, r.n.w, r.n.yg
-    pris = [(a - 4, b + 4) for a, b, g in r.pieces if g in ('forteresse', 'traversee', 'barrage', 'gouffre', 'parking', 'falaise', 'glacier', 'ponton', 'toits', 'pont_singe', 'descente', 'grotte', 'corniches', 'tours', 'bowl', 'gradins', 'bigair')]
+    pris = [(a - 4, b + 4) for a, b, g in r.pieces if g in ('forteresse', 'traversee', 'barrage', 'gouffre', 'parking', 'falaise', 'glacier', 'ponton', 'toits', 'pont_singe', 'descente', 'grotte', 'corniches', 'tours', 'bowl', 'gradins', 'bigair',
+                                                  # les détours de pierre de taille, et les lieux d'Ottawa : rien ne se creuse dessous
+                                                  'bastion', 'passe_haute', 'puits', 'patinoire', 'parlement', 'glebe')]
     lieux = ['complexe', 'caverne', 'complexe', 'cache', 'complexe', 'caverne']
     butins = ['K', '*', 'K', '+', 'K', '*']  # des cages : on en veut plusieurs par niveau
     nb = max(5, w // 85)

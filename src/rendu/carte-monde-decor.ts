@@ -310,6 +310,12 @@ export const SOLS: Record<Decor, Sol> = {
     petits: [palmier, I.pointu, caillou],
     grands: [I.bonneMere],
   },
+  ottawa: {
+    clair: '#eef2f8',
+    sombre: '#e0e8f2',
+    petits: [I.feuilleErable, I.castor, sapin],
+    grands: [I.parlement],
+  },
 };
 
 const VILLES = new Set<Decor>(['immeubles']);

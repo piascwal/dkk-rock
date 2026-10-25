@@ -44,6 +44,8 @@ export const T = {
   EAU: 28,
   /** la boue du lit de la rivière, sous les figuiers */
   BOUE: 29,
+  /** la pierre de taille : de gros blocs de granit, cinq fois plus durs que la pierre ; on fait le tour plutôt que de les casser */
+  GRANIT: 30,
 } as const;
 
 export type Tuile = (typeof T)[keyof typeof T];
@@ -128,6 +130,7 @@ export const PROPRIETES: Record<Tuile, ProprietesTuile> = {
   [T.TOIT]: base({ nom: 'toit de tuiles', car: '^', pv: 3, debris: '#b8492e' }),
   [T.EAU]: base({ nom: 'eau', car: '~', pv: Infinity, solide: false, debris: '#6ab8d8' }),
   [T.BOUE]: base({ nom: 'boue', car: ';', pv: 2, debris: '#5a4028' }),
+  [T.GRANIT]: base({ nom: 'pierre de taille', car: '[', pv: 30, debris: '#7a7a86' }),
 };
 
 const PAR_CARACTERE = new Map<string, Tuile>(

@@ -3,7 +3,8 @@ import type { Px } from './carte-monde-decor';
 /**
  * Les décors de l'île de l'International Tour sur la carte du monde (tuiles de 8 px ; les grands font 2 × 2 tuiles) : la
  * cathédrale de Beauvais et son avion, le château du roi Jean et les moutons de Limerick, les tours jumelles et les maisons rouges
- * de Lund, les gratte-ciel, la statue de la Liberté et les taxis de New York, la Bonne Mère et les pointus de Marseille.
+ * de Lund, les gratte-ciel, la statue de la Liberté et les taxis de New York, la Bonne Mère et les pointus de Marseille, la
+ * colline du Parlement, les feuilles d'érable et les castors d'Ottawa.
  */
 
 export const cathedrale = (p: Px, x: number, y: number) => {
@@ -100,4 +101,30 @@ export const pointu = (p: Px, x: number, y: number) => {
   p(x + 1, y + 5, 6, 2, '#3fa7f2');
   p(x + 2, y + 4, 4, 1, '#f2f2f2');
   p(x + 4, y + 1, 1, 3, '#5a3a22');
+};
+
+export const parlement = (p: Px, x: number, y: number) => {
+  p(x + 1, y + 9, 14, 6, '#2a2018');
+  p(x + 2, y + 10, 12, 5, '#c8b088'); // le bloc du Centre, en grès
+  p(x + 2, y + 9, 12, 1, '#5a9a8a'); // ses toits de cuivre
+  for (const fx of [3, 5, 10, 12]) p(x + fx, y + 11, 1, 3, '#5a4a3a');
+  p(x + 6, y + 3, 4, 7, '#2a2018');
+  p(x + 7, y + 4, 2, 6, '#c8b088'); // la tour de la Paix
+  p(x + 7, y + 5, 2, 1, '#f2ead8'); // l'horloge
+  p(x + 7, y + 1, 2, 3, '#5a9a8a'); // la flèche
+  p(x + 8, y, 1, 1, '#d52b1e');
+};
+
+export const feuilleErable = (p: Px, x: number, y: number) => {
+  p(x + 3, y + 1, 2, 6, '#d52b1e');
+  p(x + 1, y + 3, 6, 2, '#d52b1e');
+  p(x + 2, y + 2, 4, 1, '#d52b1e');
+  p(x + 4, y + 7, 1, 1, '#8a1a12');
+};
+
+export const castor = (p: Px, x: number, y: number) => {
+  p(x + 2, y + 3, 4, 3, '#7a4a26');
+  p(x + 6, y + 3, 2, 2, '#8a5a30');
+  p(x, y + 5, 2, 1, '#3a2a1e');
+  p(x + 7, y + 4, 1, 1, '#f2f2e0');
 };

@@ -20,6 +20,7 @@ import { CARTE_LIMERICK, DECOR_LIMERICK } from './cartes/18-limerick';
 import { CARTE_LUND } from './cartes/19-lund';
 import { CARTE_NEW_YORK } from './cartes/20-new-york';
 import { CARTE_MARSEILLE } from './cartes/21-marseille';
+import { CARTE_OTTAWA, DECOR_OTTAWA } from './cartes/23-ottawa';
 import { litNiveau, type DefNiveau, type NiveauLu } from './format';
 import { STC } from './textes/01-stc';
 import { ALPAGES } from './textes/02-alpages';
@@ -43,6 +44,7 @@ import { LIMERICK } from './textes/18-limerick';
 import { LUND } from './textes/19-lund';
 import { NEW_YORK } from './textes/20-new-york';
 import { MARSEILLE } from './textes/21-marseille';
+import { OTTAWA } from './textes/23-ottawa';
 
 /** Les niveaux, arc après arc (voir arcs.ts). Pour en ajouter un : un texte, une carte, une ligne ici. */
 export const NIVEAUX: DefNiveau[] = [
@@ -78,6 +80,8 @@ export const NIVEAUX: DefNiveau[] = [
   { ...MARSEILLE, carte: CARTE_MARSEILLE },
   // le Grand Prix de la Sarré (un mini-jeu), ajouté après coup : la surprise pour Mat, juste après Gréau dans la tournée
   { ...KART, carte: CARTE_KART },
+  // Ottawa, ajouté après coup : il vient entre New York et Lund dans l'International Tour (voir arcs.ts)
+  { ...OTTAWA, carte: CARTE_OTTAWA, decor: DECOR_OTTAWA },
 ];
 
 const lus = new Map<number, NiveauLu>();

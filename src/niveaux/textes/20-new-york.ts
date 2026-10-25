@@ -27,7 +27,7 @@ export const NEW_YORK: Omit<DefNiveau, 'carte'> = {
     5: [{ qui: 'JBM', texte: 'La statue lève le poing. C’est une fan.' }],
   },
   outro: [
-    { qui: 'JBM', texte: 'Thank you, New York ! Prochaine étape : Lund, le voyage étudiant de Tom.' },
-    { qui: 'TOM', texte: 'Il paraît que j’y ai été très sérieux. Il paraît.' },
+    { qui: 'JBM', texte: 'Thank you, New York ! Prochaine étape : Ottawa, les trois mois de Mat au Canada.' },
+    { qui: 'MAT', texte: 'Prenez vos tuques. Je ne plaisante pas.' },
   ],
 };

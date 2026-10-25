@@ -18,7 +18,8 @@ export type NomTheme =
   | 'limerick'
   | 'lund'
   | 'newyork'
-  | 'marseille';
+  | 'marseille'
+  | 'ottawa';
 
 export type Decor =
   | 'pavillons'
@@ -38,7 +39,8 @@ export type Decor =
   | 'limerick'
   | 'lund'
   | 'newyork'
-  | 'marseille';
+  | 'marseille'
+  | 'ottawa';
 
 export interface Theme {
   /** dégradé du ciel, du haut vers l'horizon */
@@ -272,5 +274,17 @@ export const THEMES: Record<NomTheme, Theme> = {
     decor: 'marseille',
     meteo: null,
     musique: 'plage',
+  },
+  // Ottawa : un grand ciel bleu de janvier à moins vingt, la neige partout, le grès du Parlement
+  ottawa: {
+    ciel: ['#3a7ad8', '#e8f2ff'],
+    lointain: '#9ab0c8',
+    proche: '#3a4a5a',
+    paroi: '#3a3a44',
+    dessus: '#f2f6fc',
+    terre: '#6a5444',
+    decor: 'ottawa',
+    meteo: 'neige',
+    musique: 'neige',
   },
 };

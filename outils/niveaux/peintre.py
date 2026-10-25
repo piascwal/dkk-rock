@@ -7,9 +7,9 @@ variantes ou des récompenses.
 """
 import random
 
-SOLIDES = set('#RBMNGWSDVCTOQ=-XLUAI|{^;')
+SOLIDES = set('#RBMNGWSDVCTOQ=-XLUAI|{^;[')
 # quelles tuiles servent de sol à un ennemi ou à un objet posé
-SOL_ENNEMI = set('#RBMNGWSDVCTOQ=-XLUAI|{^;')
+SOL_ENNEMI = set('#RBMNGWSDVCTOQ=-XLUAI|{^;[')
 
 
 class Niveau:
@@ -64,7 +64,7 @@ class Niveau:
         le ciel à travers la terre. Un creux est « sous le terrain » s'il y a de la matière à sa gauche et à sa droite sur
         sa rangée, encore de la matière en dessous, et qu'il est sous la surface de sa colonne (`haut`) : le vide sans fond (le
         gouffre qu'on traverse) et le ciel au-dessus d'un sol plus bas que ses voisins n'en reçoivent pas."""
-        mat = set('#RBMNGWSDVX')
+        mat = set('#RBMNGWSDVX[')
         premier = [next((x for x in range(self.w) if self.g[y][x] in mat), None) for y in range(self.h)]
         dernier = [next((x for x in range(self.w - 1, -1, -1) if self.g[y][x] in mat), None) for y in range(self.h)]
         for x in range(self.w):
@@ -147,9 +147,9 @@ class Niveau:
             x = self.rng.randrange(x0, x1)
             y = self.sol(x)
             if y is not None:
-                # le goéland vole plus bas que le drone (3 à 5 tuiles au-dessus du sol) : on doit le voir avant son attaque ;
+                # le goéland (et la bernache) vole plus bas que le drone (3 à 5 tuiles au-dessus du sol) : on doit le voir avant son attaque ;
                 # le tirage est le même, les cartes ne changent que de ces deux rangées
-                haut = self.rng.randrange(5, 8) - (2 if lettre == 'g' else 0)
+                haut = self.rng.randrange(5, 8) - (2 if lettre in 'gw' else 0)
                 self.set(x, max(2, y - haut), lettre)
 
     def repere(self, x, c, ymin=0, surface=False):

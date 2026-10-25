@@ -112,16 +112,24 @@ export const G = {
   BOULISTE: 85,
   /** la boule de pétanque du bouliste marseillais : un tir, hors de la plage des tirs (voir `estUnTir`) */
   P_BOULE: 86,
+  // Ottawa (voir entites/ennemis/locaux.ts) : `estPersonnage` les compte aussi
+  HOCKEYEUR: 87,
+  CASTOR: 88,
+  BERNACHE: 89,
+  GARDIEN: 90,
+  /** la rondelle du hockeyeur : un tir qui glisse au sol (voir `estUnTir`) */
+  P_RONDELLE: 91,
 } as const;
 
 export type Genre = (typeof G)[keyof typeof G];
 
 /** Un tir (les instruments et les tirs ennemis) : la plage des tirs, plus ceux venus après qu'elle fut pleine (la figue). */
 export const estUnTir = (g: number): boolean =>
-  (g >= G.P_BAGUETTE && g < G.CAGE) || g === G.P_FIGUE || g === G.P_BOULE;
+  (g >= G.P_BAGUETTE && g < G.CAGE) || g === G.P_FIGUE || g === G.P_BOULE || g === G.P_RONDELLE;
 
 /** Un personnage (héros, ennemi, boss) : la plage d'avant les tirs, plus les gens de l'International Tour. */
-export const estPersonnage = (g: number): boolean => g < G.P_BAGUETTE || (g >= G.PASSAGER && g <= G.BOULISTE);
+export const estPersonnage = (g: number): boolean =>
+  g < G.P_BAGUETTE || (g >= G.PASSAGER && g <= G.BOULISTE) || (g >= G.HOCKEYEUR && g <= G.GARDIEN);
 
 /** États d'animation des héros (champ `e`). */
 export const ANIM = {
@@ -306,6 +314,10 @@ export const GENRES_CONVERTIS: readonly number[] = [
   G.SUPPORTER,
   G.SCOOTER,
   G.BOULISTE,
+  G.HOCKEYEUR,
+  G.CASTOR,
+  G.BERNACHE,
+  G.GARDIEN,
 ];
 
 /** Les ennemis qui volent : un drone ou un goéland tombé n'est pas un rocker, il tombe comme un oiseau. */

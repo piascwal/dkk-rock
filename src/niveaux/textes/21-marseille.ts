@@ -3,7 +3,7 @@ import type { DefNiveau } from '../format';
 export const MARSEILLE: Omit<DefNiveau, 'carte'> = {
   id: 'marseille',
   titre: 'Marseille',
-  sousTitre: 'International Tour 5 — La finale, là où JBG a vécu',
+  sousTitre: 'International Tour 6 — La finale, là où JBG a vécu',
   theme: 'marseille',
   intro: [
     {

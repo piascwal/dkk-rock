@@ -15,6 +15,7 @@ import {
   emprise,
   solLibre,
   solPrincipal,
+  sousLaGlace,
   tientLarge,
 } from './decor-sol';
 import { dessineSprite, SPRITES, type Sprite } from './decor-sprites';
@@ -121,6 +122,7 @@ export function semeDecor(
     for (let ty = 1; ty < carte.hauteur - 1; ty++) {
       const sol = carte.get(tx, ty);
       if (!SOLS_DECORES.includes(sol) || carte.solide(tx, ty - 1) || echelleProche(carte, tx, ty)) continue;
+      if (sousLaGlace(carte, tx, ty)) continue;
       if (carte.props(tx, ty - 1).solide || tx < (libreDepuis.get(ty) ?? 0) || rng.suivant() > semis.densite)
         continue;
       const dedans = carte.aFond(tx, ty - 1);
