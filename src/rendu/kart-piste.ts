@@ -1,5 +1,6 @@
 import { CAISSES, LARGEUR_PISTE, MONDE_H, MONDE_L, TRACE, surPiste } from '../jeu/kart-piste';
 import { EFFETS_KART, type VoitureVue } from '../jeu/vue-kart';
+import { aplatissement, effetsDessous, effetsDessus, hauteurSaut, ombre } from './kart-effets';
 import { imageKart, VOITURES_KART } from './kart-images';
 import { ecrit } from './police';
 
@@ -112,7 +113,7 @@ export function dessineMonde(c: Ctx): void {
   c.drawImage(monde, 0, 0);
 }
 
-const POSITIONS = CAISSES.map(([f, d]) => surPiste(f, d));
+export const POSITIONS = CAISSES.map(([f, d]) => surPiste(f, d));
 
 /** Les caisses « ? » présentes, qui changent de couleur. */
 export function dessineCaisses(c: Ctx, masque: number, tick: number): void {
@@ -127,45 +128,35 @@ export function dessineCaisses(c: Ctx, masque: number, tick: number): void {
 }
 
 export function dessineFlaque(c: Ctx, x: number, y: number): void {
-  c.fillStyle = 'rgba(15,15,20,0.75)';
+  c.fillStyle = 'rgba(12,12,18,0.8)';
   c.beginPath();
-  c.ellipse(x, y, 10, 6, 0.4, 0, Math.PI * 2);
+  c.ellipse(x, y, 16, 10, 0.4, 0, Math.PI * 2);
   c.fill();
-  c.fillStyle = 'rgba(255,79,216,0.35)';
-  c.fillRect(x - 4, y - 2, 4, 1);
-  c.fillStyle = 'rgba(79,240,255,0.35)';
-  c.fillRect(x, y + 1, 4, 1);
+  c.fillStyle = 'rgba(40,40,60,0.7)';
+  c.beginPath();
+  c.ellipse(x - 3, y - 2, 9, 5, 0.4, 0, Math.PI * 2);
+  c.fill();
+  c.fillStyle = 'rgba(255,79,216,0.45)';
+  c.fillRect(x - 8, y - 3, 6, 1);
+  c.fillStyle = 'rgba(79,240,255,0.45)';
+  c.fillRect(x - 1, y + 2, 7, 1);
+  c.fillStyle = 'rgba(255,255,255,0.35)';
+  c.fillRect(x - 6, y - 5, 3, 1);
 }
 
-/** Une voiture et ses effets : le turbo (des flammes), le bouclier (une bulle), le saut (plus grande, l'ombre décalée), l'écrasement. */
+/** Une voiture et ses effets (voir kart-effets.ts) : clignotante après une remise en piste, plus grande en l'air, aplatie sous le marteau. */
 export function dessineVoiture(c: Ctx, v: VoitureVue, tick: number, long = 28): void {
   const img = imageKart(VOITURES_KART[v.pilote]!);
-  const e = v.effets;
-  const enLair = (e & EFFETS_KART.saut) !== 0;
-  const ecrase = (e & EFFETS_KART.ecrase) !== 0;
-  if (e & EFFETS_KART.turbo)
-    for (let k = 0; k < 6; k++) {
-      const d = 15 + k * 2.5;
-      c.fillStyle = ['#ffffff', '#ffd23f', '#ff9a3a', '#ff5a2a', '#ff5a2a', '#d02a2a'][k]!;
-      c.beginPath();
-      c.arc(
-        v.x - Math.cos(v.a) * d,
-        v.y - Math.sin(v.a) * d,
-        Math.max(0.8, 3 - k * 0.35 + (tick % 2)),
-        0,
-        Math.PI * 2,
-      );
-      c.fill();
-    }
   const h = img ? (long * img.height) / img.width : long / 2;
+  const haut = hauteurSaut(v);
+  const plat = aplatissement(v);
+  ombre(c, v, long, h);
+  effetsDessous(c, v, tick);
+  if (v.effets & EFFETS_KART.remis && tick % 6 < 3) c.globalAlpha = 0.35;
   c.save();
-  c.translate(v.x, v.y);
+  c.translate(v.x, v.y - haut * 16);
   c.rotate(v.a);
-  c.fillStyle = 'rgba(0,0,0,0.22)';
-  const o = enLair ? 6 : 1.5;
-  c.fillRect(-long / 2 + o, -h / 2 + o, long, h);
-  if (enLair) c.scale(1.25, 1.25);
-  if (ecrase) c.scale(1.15, 0.55);
+  c.scale((1 + haut * 0.5) * (1 + plat * 0.2), (1 + haut * 0.5) * (1 - plat * 0.5));
   if (img) {
     c.imageSmoothingEnabled = true;
     c.imageSmoothingQuality = 'high';
@@ -176,17 +167,6 @@ export function dessineVoiture(c: Ctx, v: VoitureVue, tick: number, long = 28): 
     c.fillRect(-long / 2, -h / 2, long, h);
   }
   c.restore();
-  if (ecrase)
-    for (let k = 0; k < 4; k++) {
-      const a = tick / 5 + (k * Math.PI) / 2;
-      c.fillStyle = '#ffd23f';
-      c.fillRect(Math.round(v.x + Math.cos(a) * 12), Math.round(v.y - 4 + Math.sin(a) * 5), 2, 2);
-    }
-  if (e & EFFETS_KART.bouclier) {
-    c.strokeStyle = `rgba(79,240,255,${tick % 10 < 5 ? 0.8 : 0.5})`;
-    c.lineWidth = 1.5;
-    c.beginPath();
-    c.arc(v.x, v.y, long * 0.62, 0, Math.PI * 2);
-    c.stroke();
-  }
+  c.globalAlpha = 1;
+  effetsDessus(c, { ...v, y: v.y - haut * 16 }, tick, long);
 }

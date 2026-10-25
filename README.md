@@ -155,9 +155,13 @@ et sa Renault 11), vue d'en haut façon Micro Machines. Chaque joueur choisit so
 voiture a ses notes (vitesse, tenue de route, poids). Gauche et droite tournent, saut (ou haut) accélère, bas freine et recule,
 tir lance le bonus pris dans les caisses « ? » : le turbo, la flaque d'huile (qui fait tourner sur soi-même), le marteau (qui
 aplatit la voiture de devant), le bouclier, le ressort (un saut par-dessus tout). Seul, on court trois tours contre les quatre
-autres (l'ordinateur, chacun avec son caractère) ; à plusieurs, c'est la règle de l'écran : la caméra suit le premier, qui en sort
-perd la manche, le dernier en piste la gagne, et le premier à huit manches remporte le Grand Prix. Le podium montre les DKK de
-face, avec leur instrument. La piste et la conduite sont dans `src/jeu/kart*.ts`, le rendu dans `src/rendu/kart*.ts` ; les
+autres (l'ordinateur, chacun avec son caractère, qui ralentit quand il sort de l'écran) ; à plusieurs, c'est la règle de l'écran :
+la caméra suit le premier, qui en sort perd la manche, le dernier en piste la gagne, et le premier à huit manches remporte le
+Grand Prix. La conduite est volontairement arcade : les voitures se heurtent et rebondissent (étincelles), et celle qui reste trop
+longtemps hors de l'asphalte est remise sur la piste, clignotante et intouchable un instant. Les bonus se voient : flammes et
+traits de vitesse du turbo, marteau qui s'abat, éclaboussures d'huile, saut en parabole avec son ombre, bulle du bouclier, et des
+textes qui jaillissent (« TURBO ! », « BAM ! »...), un coup de marteau fait trembler l'écran. Le podium montre les DKK de face,
+avec leur instrument. La piste et la conduite sont dans `src/jeu/kart*.ts`, le rendu dans `src/rendu/kart*.ts` (les effets des bonus : `kart-effets.ts` et `kart-flottants.ts`, d'après la seule vue) ; les
 voitures et les héros vus de dessus viennent de `assets-sources/kart/planche.jpg` (`outils/fixe-kart.py`).
 
 **L'avion de JBG** (entre la fin de la tournée et le Breizh Tour) : en hommage à l'avion pour Madrid que JBG a raté, il court
