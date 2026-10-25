@@ -216,10 +216,14 @@ export class Joueur extends JoueurBase {
     const c = this.corps;
     const k = this.commandes;
     const pente = (t.y2 - t.y1) / (t.x2 - t.x1);
-    const sens = Math.abs(pente) < 0.12 ? k.horizontal || Math.sign(c.vx) : Math.sign(pente);
+    const plate = Math.abs(pente) < 0.12;
+    // le joystick choisit le sens (même en remontant) ; lâché, on suit la pente, ou on garde son élan sur un câble plat
+    const sens = k.horizontal || (plate ? Math.sign(c.vx) : Math.sign(pente));
     if (sens) this.dir = sens > 0 ? 1 : -1;
-    const cible = Math.abs(pente) < 0.12 ? 2.2 : 3.8;
-    c.vx += borne(sens * cible - c.vx, -0.12, 0.12);
+    const cible = plate ? 2.2 : sens === Math.sign(pente) ? 3.8 : 1.8;
+    // à contre-sens, on freine plus fort avant de repartir
+    const frein = c.vx * sens < 0 ? 0.2 : 0.12;
+    c.vx += borne(sens * cible - c.vx, -frein, frein);
     c.x += c.vx;
     const mx = this.cx;
     c.y = t.y1 + ((mx - t.x1) / (t.x2 - t.x1)) * (t.y2 - t.y1) + 2;

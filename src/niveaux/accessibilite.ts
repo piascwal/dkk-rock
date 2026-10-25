@@ -92,12 +92,11 @@ export function parcoursAcces(
       if (libre(x, y + 1) && echelle(x, y + 1)) ajoute([x, y + 1]);
     }
     for (const t of lu.tyroliennes) {
-      const ax = Math.floor(t.x1 / TUILE);
-      const ay = Math.floor(t.y1 / TUILE);
-      if (Math.abs(ax - x) <= 3 && y - ay >= 0 && y - ay <= 3) {
-        const bx = Math.floor(t.x2 / TUILE);
-        ajoute(chute(bx - 1, Math.floor(t.y2 / TUILE) + 1));
-      }
+      const [ax, ay] = [Math.floor(t.x1 / TUILE), Math.floor(t.y1 / TUILE)];
+      const [bx, by] = [Math.floor(t.x2 / TUILE), Math.floor(t.y2 / TUILE)];
+      if (Math.abs(ax - x) <= 3 && y - ay >= 0 && y - ay <= 3) ajoute(chute(bx - 1, by + 1));
+      // on la prend aussi à l'envers, en remontant (le joystick vers le départ)
+      if (Math.abs(bx - x) <= 3 && y - by >= 0 && y - by <= 3) ajoute(chute(ax + 1, ay + 1));
     }
   }
   return { dist, parent };
