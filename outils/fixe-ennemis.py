@@ -24,6 +24,7 @@ import numpy as np
 from PIL import Image
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from marche import marche_jambes
 from prepare_instrument import natif_et_case
 
 RACINE = pathlib.Path(__file__).resolve().parent.parent
@@ -65,11 +66,17 @@ TYPES = {
     'mouton': ('MOUTON', 13, 12),
     # le Viet Cong glaireux (pont des Tuves) : une apparence, les pieds dans la boue sous les figuiers
     'glaireux': ('GLAIREUX', 20),
+    # l'habitué du pub de Limerick (voir ANIMES) : 3e valeur, durée d'une image de la marche
+    'habitue': ('HABITUE', 20, 8),
 }
 
 # les lignes de la planche par état d'animation (ANIM dans jeu/vue.ts) : le vol au repos (0), le piqué en attaque (10).
 # Une planche à lignes : chaque apparence va dans sa ligne, les autres lignes restent vides.
 ETATS = {'goeland': (0, 10), 'bmxpro': (0, 10), 'champion': (0, 10)}
+
+# les types dont la marche est tirée de la pose au repos (1er fichier : au repos, ligne 0 ; 2e : l'attaque, ligne 10) : les jambes
+# se décalent (voir marche.py), quatre images dans la ligne de la course (1)
+ANIMES = {'habitue'}
 
 
 def natif(chemin):
@@ -86,6 +93,25 @@ def agrandi(a, hauteur):
     ys = np.minimum((np.arange(nh) * h / nh).astype(int), h - 1)
     xs = np.minimum((np.arange(nw) * h / nh).astype(int), w - 1)
     return Image.fromarray(a[np.ix_(ys, xs)])
+
+
+def planche_animee(fichiers, hauteur):
+    """[repos, attaque, 4 images de marche] à la même découpe (leur union) : les pieds ne sautent pas d'une image à l'autre."""
+    repos, attaque = (natif_et_case(f)[0] for f in fichiers[:2])
+    toutes = [repos, attaque, *marche_jambes(repos)]
+    ys, xs = np.nonzero(np.any([n[..., 3] > 0 for n in toutes], axis=0))
+    boite = (slice(ys.min(), ys.max() + 1), slice(xs.min(), xs.max() + 1))
+    return [agrandi(n[boite], hauteur) for n in toutes]
+
+
+def pose_animee(images, largeur, h):
+    """La planche à lignes : le repos (0), la marche (1, quatre images), l'attaque (10)."""
+    lignes = {0: images[:1], 1: images[2:], 10: images[1:2]}
+    planche = Image.new('RGBA', (largeur * 4, h * 11), (0, 0, 0, 0))
+    for ligne, ims in lignes.items():
+        for i, im in enumerate(ims):
+            planche.alpha_composite(im, (i * largeur, ligne * h))
+    return planche, [len(lignes.get(k, [])) for k in range(11)]
 
 
 def apparences(type_):
@@ -105,14 +131,18 @@ def main():
         fichiers = apparences(type_)
         if not fichiers:
             continue
-        images = []
-        for f in fichiers:
-            nat = natif(f)
-            images.append(agrandi(nat, hauteur * DENSITE))
+        animee = type_ in ANIMES
+        images = (
+            planche_animee(fichiers, hauteur * DENSITE)
+            if animee
+            else [agrandi(natif(f), hauteur * DENSITE) for f in fichiers]
+        )
         largeur = max(im.width for im in images)
         h = max(im.height for im in images)
         nom = f'{type_}s.png'
-        if type_ in ETATS:
+        if animee:
+            planche, compte = pose_animee(images, largeur, h)
+        elif type_ in ETATS:
             # une ligne par état : images[k] va dans la ligne ETATS[type_][k], la planche a autant de lignes que l'état le plus haut
             rangees = [1 if k in ETATS[type_] else 0 for k in range(max(ETATS[type_]) + 1)]
             planche = Image.new('RGBA', (largeur, h * len(rangees)), (0, 0, 0, 0))
