@@ -41,4 +41,5 @@ export const FEUILLES_ENNEMIS: Partial<Record<Genre, Feuille>> = {
     densite: 6,
   },
   [G.BREAKER]: { fichier: 'breakers.png', w: 70, h: 126, images: [2], variantes: true, densite: 6 },
+  [G.MOUTON]: { fichier: 'moutons.png', w: 87, h: 78, images: [2], rythme: 12, densite: 6 },
 };

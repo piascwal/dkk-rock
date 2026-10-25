@@ -61,6 +61,8 @@ TYPES = {
     'champion': ('CHAMPION', 40),
     # la danseuse de breaking du FISE (ennemi) : la b-girl ; le b-boy est sa seconde apparence
     'breaker': ('BREAKER', 21),
+    # le mouton de Limerick : deux images de la marche (les pattes avant, puis arrière), une animation lente
+    'mouton': ('MOUTON', 13, 12),
 }
 
 # les lignes de la planche par état d'animation (ANIM dans jeu/vue.ts) : le vol au repos (0), le piqué en attaque (10).
