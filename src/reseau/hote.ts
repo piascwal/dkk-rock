@@ -7,9 +7,9 @@ import {
   salonsDuReseau,
   type Signal,
 } from '@piascwal/lan-kit';
-import { MAX_JOUEURS } from '../config';
 import type { Partie } from '../jeu/partie';
 import type { Evenement } from '../jeu/vue';
+import { NIVEAUX, NOMBRE_NIVEAUX_JEU } from '../niveaux';
 import { valideAnnonceDkk, type AnnonceDkk } from './annonce';
 import {
   APP_DKK,
@@ -30,7 +30,7 @@ interface Distant {
 /**
  * L'appareil qui héberge : il fait tourner la partie et l'ouvre aux autres,
  * sur le même Wi-Fi (sans rien saisir) et/ou par Internet (avec un code).
- * Les joueurs peuvent rejoindre à tout moment, jusqu'à 4.
+ * Les joueurs peuvent rejoindre à tout moment, jusqu'à 4 (8 en battle royale).
  */
 export class Hote {
   readonly distants = new Map<number, Distant>();
@@ -89,11 +89,19 @@ export class Hote {
   }
 
   private annonce(): AnnonceDkk {
-    return { nom: this.nom, niveau: this.partie().niveau, joueurs: 1 + this.distants.size };
+    const p = this.partie();
+    return {
+      nom: this.nom,
+      niveau: p.niveau,
+      joueurs: 1 + this.distants.size,
+      ...(p.arene ? { arene: true } : {}),
+    };
   }
 
   private siegeLibre(): number {
-    for (let s = 1; s < MAX_JOUEURS; s++) if (!this.distants.has(s)) return s;
+    // les sièges pris par l'ordinateur (hors ligne) ne s'ouvrent pas : une partie en ligne n'en a pas
+    const p = this.partie();
+    for (let s = 1; s < p.places; s++) if (!this.distants.has(s) && !p.joueurs[s]) return s;
     return -1;
   }
 
@@ -127,8 +135,10 @@ export class Hote {
       if (veille.recu(brut as { t: string })) return;
       const m = valideMsgClient(brut);
       if (!m) return;
-      if (m.t === 'suivant') this.partie().suivant();
-      else if (m.t === 'salut' && !distant) {
+      // au salon du battle royale, c'est l'hôte qui lance la partie
+      if (m.t === 'suivant') {
+        if (this.partie().arene?.etape !== 'salon') this.partie().suivant();
+      } else if (m.t === 'salut' && !distant) {
         if (m.v !== VERSION_PROTOCOLE) return this.envoie(liaison, { t: 'refus', raison: 'version' });
         const siege = this.siegeLibre();
         if (siege < 0) return this.envoie(liaison, { t: 'refus', raison: 'complet' });
@@ -136,6 +146,9 @@ export class Hote {
         this.distants.set(siege, distant);
         const p = this.partie();
         p.ajouteJoueur(siege, m.membre);
+        // un niveau de l'éditeur : le joueur ne l'a pas, on le lui envoie d'abord
+        if (p.niveau >= NOMBRE_NIVEAUX_JEU)
+          this.envoie(liaison, { t: 'def', niveau: p.niveau, def: NIVEAUX[p.niveau] });
         this.envoie(liaison, { t: 'bienvenue', siege, niveau: p.niveau, carte: p.carte.versTexte() });
         this.annonceJoueurs();
       }

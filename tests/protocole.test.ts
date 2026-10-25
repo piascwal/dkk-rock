@@ -108,7 +108,7 @@ describe('le protocole réseau', () => {
     expect(valideMsgClient({ t: 'salut', nom: 'LYNX', membre: 9, v: 1 })).toBeNull();
     expect(valideMsgClient({ t: 'triche' })).toBeNull();
     expect(valideMsgHote({ t: 'bienvenue', siege: 1, niveau: 0, carte: 'abc' })).toMatchObject({ siege: 1 });
-    expect(valideMsgHote({ t: 'bienvenue', siege: 7, niveau: 0, carte: 'abc' })).toBeNull();
+    expect(valideMsgHote({ t: 'bienvenue', siege: 8, niveau: 0, carte: 'abc' })).toBeNull();
     expect(valideMsgHote({ t: 'ev', l: [{ k: 'son', n: 'saut', x: 1, y: 2 }, { k: 'pirate' }] })).toEqual({
       t: 'ev',
       l: [{ k: 'son', n: 'saut', x: 1, y: 2 }],
@@ -122,7 +122,14 @@ describe('le protocole réseau', () => {
       joueurs: 2,
     });
     expect(valideAnnonceDkk({ nom: 'jbm', niveau: 3, joueurs: 2 })).toBeNull();
-    expect(valideAnnonceDkk({ nom: 'JBM', niveau: 3, joueurs: 5 })).toBeNull();
+    expect(valideAnnonceDkk({ nom: 'JBM', niveau: 3, joueurs: 9 })).toBeNull();
+    // une partie de battle royale s'annonce comme telle, jusqu'à 8 joueurs
+    expect(valideAnnonceDkk({ nom: 'JBM', niveau: 3, joueurs: 6, arene: true })).toEqual({
+      nom: 'JBM',
+      niveau: 3,
+      joueurs: 6,
+      arene: true,
+    });
   });
 
   it('la carte d’un joueur qui arrive en cours de route est celle de l’hôte', () => {

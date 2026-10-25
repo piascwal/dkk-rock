@@ -25,7 +25,8 @@ export class SuiviRecrue {
 
   maj(v: EtatVue, siege: number): void {
     const moi = v.joueurs[siege];
-    if (v.phase !== 'jeu' || !moi?.present) return;
+    // en battle royale, pas d'animation de recrue : la manche démarre tout de suite
+    if (v.phase !== 'jeu' || !moi?.present || v.arene) return;
     const avant = this.membreVu;
     const mort = this.etaitMort;
     this.membreVu = moi.membre;

@@ -23,13 +23,16 @@ import { Recrue } from './ui/recrue';
 import { prepareInstallation } from './ui/installation';
 import { Bulles, Histoire } from './ui/dialogues';
 import { Hud } from './ui/hud';
-import { controleurDeVersion, joueEvenements, nomsDesJoueurs } from './ui/app-aides';
+import { controleurDeVersion, ecouteLaFenetre, joueEvenements, nomsDesJoueurs } from './ui/app-aides';
 import { Menus, type Actions } from './ui/menus';
 import { pleinEcran } from './ui/plein-ecran';
 import { FinMiniJeu } from './ui/fin-mini-jeu';
 import { SuiviRecrue } from './ui/suivi-recrue';
 import { ajouteNiveauEssai, NIVEAUX } from './niveaux';
-import type { DefNiveau } from './niveaux/format';
+import type { ReglesArene } from './jeu/arene';
+import type { CarteArene } from './ui/menus-arene';
+import { partieArene } from './ui/app-arene';
+import { PanneauArene } from './ui/arene-ui';
 
 const PAS_MS = 1000 / 60;
 /** Les phases où SAUT et TIR servent au jeu (les mini-jeux passent leurs écrans eux-mêmes) : ils ne tournent pas les pages. */
@@ -59,6 +62,11 @@ export class App implements Actions {
   private readonly tactile = new Tactile($('jeu'));
   private readonly finMini = new FinMiniJeu($('jeu'));
   private readonly menus = new Menus($('ecran'), this);
+  private readonly arene = new PanneauArene($('jeu'), {
+    suivant: () => this.suivant(),
+    inviter: () => (this.mettreEnPause(), this.menus.inviter()),
+    quitte: () => this.quitte(),
+  });
   private partie: Partie | null = null;
   private hote: Hote | null = null;
   private client: Client | null = null;
@@ -81,6 +89,10 @@ export class App implements Actions {
     return !!this.client;
   }
 
+  get estArene(): boolean {
+    return !!this.partie?.arene || !!this.derniereVue?.arene;
+  }
+
   demarre(): void {
     this.recrue = new Recrue($('intro') as HTMLCanvasElement, this.synthe);
     chargeFeuilles(import.meta.env.BASE_URL);
@@ -88,26 +100,13 @@ export class App implements Actions {
     prepareInstallation(import.meta.env.BASE_URL, () => {
       if (!this.partie && !this.client) this.menus.rafraichitTitre();
     });
-    const geste = () => {
-      this.synthe.demarre();
-      this.appliqueOptions();
-    };
-    window.addEventListener('pointerdown', geste);
-    window.addEventListener('keydown', geste);
-    window.addEventListener('pagehide', () => this.synthe.endort()); // iOS, appli installée : pagehide avant le gel
-    const recalibre = () => this.rendu.redimensionne();
-    window.addEventListener('resize', recalibre);
-    window.addEventListener('orientationchange', recalibre);
-    window.visualViewport?.addEventListener('resize', recalibre);
-    window.addEventListener('keydown', (e) => {
-      if (e.code === 'Enter' && this.derniereVue && !EN_ACTION.has(this.derniereVue.phase)) this.suivant();
-    });
-    document.addEventListener('visibilitychange', () => {
-      // en arrière-plan : plus de son (téléphone : écran verrouillé, autre appli) ; au retour, il reprend
-      if (document.hidden) this.synthe.endort();
-      else this.synthe.demarre();
-      if (document.hidden && this.partie && !this.multijoueur) this.mettreEnPause();
-      if (!document.hidden) this.controleVersion();
+    ecouteLaFenetre({
+      synthe: this.synthe,
+      geste: () => this.appliqueOptions(),
+      recalibre: () => this.rendu.redimensionne(),
+      entree: () => this.derniereVue && !EN_ACTION.has(this.derniereVue.phase) && this.suivant(),
+      cache: () => this.partie && !this.multijoueur && this.mettreEnPause(),
+      revient: () => this.controleVersion(),
     });
     this.clavier.onPause = () => (this.enPause ? this.reprend() : this.mettreEnPause());
     $('bouton-pause').addEventListener('click', () => this.mettreEnPause());
@@ -145,13 +144,10 @@ export class App implements Actions {
   }
 
   lance(niveau: number, membre: number, reprise: Progression | null): void {
-    this.arreteTout();
-    this.suiviRecrue.oublie();
     const prog = reprise ?? { niveau, drapeau: -1, vies: VIES_DEPART, score: 0 };
     const p = partieSauvegardee(prog, this.sauvegarde, () => this.enregistre());
     p.ajouteJoueur(0, membre);
-    this.partie = p;
-    this.entreEnJeu();
+    this.joue(p);
   }
 
   /** L'éditeur de niveau, chargé à la première ouverture seulement (il ne pèse pas sur le jeu). */
@@ -159,27 +155,33 @@ export class App implements Actions {
     this.menus.ferme();
     void import('./editeur/editeur').then(({ ouvreEditeur }) =>
       ouvreEditeur({
-        teste: (def, retour) => this.testeNiveau(def, retour),
+        // l'essai d'un niveau, sans rien sauvegarder ; au bilan (ou en quittant), on revient à l'éditeur
+        teste: (def, retour) => {
+          const p = new Partie({ niveau: ajouteNiveauEssai(def), drapeau: -1, vies: VIES_DEPART, score: 0 });
+          p.ajouteJoueur(0, this.sauvegarde.membre);
+          this.joue(p, retour);
+        },
         quitte: () => this.menus.titre(),
       }),
     );
   }
 
-  /** Joue un niveau de l'éditeur, sans rien sauvegarder ; au bilan (ou en quittant), on revient à l'éditeur. */
-  private testeNiveau(def: DefNiveau, retour: () => void): void {
-    this.arreteTout();
-    this.suiviRecrue.oublie();
-    const p = new Partie({ niveau: ajouteNiveauEssai(def), drapeau: -1, vies: VIES_DEPART, score: 0 });
-    p.ajouteJoueur(0, this.sauvegarde.membre);
-    this.partie = p;
-    this.essai = retour;
-    this.entreEnJeu();
+  /** Le battle royale : contre l'ordinateur, ou (sans IA) un salon ouvert sur le Wi-Fi, en attendant les amis. */
+  lanceArene(carte: CarteArene, regles: ReglesArene, ia: number): void {
+    this.joue(partieArene(carte, regles, ia, this.sauvegarde.membre));
+    if (!ia) void this.ouvreHote()?.ouvreWifi();
   }
 
   lanceMiniJeu(quel: MiniJeu): void {
+    this.joue(nouveauMiniJeu(quel, this.sauvegarde.membre));
+  }
+
+  /** Une partie qui tourne ici ; `essai` : de quoi revenir à l'éditeur à la fin. */
+  private joue(p: Partie, essai: (() => void) | null = null): void {
     this.arreteTout();
     this.suiviRecrue.oublie();
-    this.partie = nouveauMiniJeu(quel, this.sauvegarde.membre);
+    this.partie = p;
+    this.essai = essai;
     this.entreEnJeu();
   }
 
@@ -188,6 +190,7 @@ export class App implements Actions {
     this.arreteTout();
     this.suiviRecrue.oublie();
     this.client = c;
+    if (c.niveauRecu) this.rendu.oublieNiveau();
     c.onEvenements = (l) => this.evenements(l);
     c.onFerme = () => {
       if (this.client !== c) return;
@@ -255,6 +258,7 @@ export class App implements Actions {
   }
 
   private arreteTout(): void {
+    this.arene.maj(null, 0, false, []);
     this.hote?.ferme();
     this.hote = null;
     this.client?.ferme();
@@ -332,7 +336,9 @@ export class App implements Actions {
     this.suiviRecrue.maj(v, siege);
     this.rendu.dessine(v, carte, siege);
     if (retiensRecords(this.sauvegarde, v)) this.enregistre();
-    this.hud.maj(v, siege, nomsDesJoueurs(this.client, this.hote, this.sauvegarde.pseudo));
+    const noms = nomsDesJoueurs(this.client, this.hote, this.sauvegarde.pseudo);
+    this.hud.maj(v, siege, noms);
+    this.arene.maj(v, siege, !this.client, noms);
     const moi = v.joueurs[siege];
     this.tactile.pilote(v.phase);
     this.tactile.arme(moi?.present && moi.arme ? iconeDeLArme(moi.arme, 34) : null, moi?.munitions ?? 0);

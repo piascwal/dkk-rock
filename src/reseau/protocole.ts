@@ -4,12 +4,12 @@ import { decodePlongeon, encodePlongeon, OCTETS_PLONGEON } from './protocole-plo
 import { decodeAvion, encodeAvion, OCTETS_AVION } from './protocole-avion';
 import { decodeKart, encodeKart, OCTETS_KART } from './protocole-kart';
 import { decodeReve, encodeReve, OCTETS_REVE } from './protocole-reve';
+import { decodeArene, encodeArene, OCTETS_ARENE } from './protocole-arene';
 import {
   GENRES_CONVERTIS,
   PHASES,
   type EntiteVue,
   type EtatVue,
-  type Evenement,
   type Genre,
   type JoueurVue,
 } from '../jeu/vue';
@@ -25,12 +25,12 @@ import {
  *
  * Changer ce fichier de façon incompatible : augmenter VERSION_PROTOCOLE.
  */
-export const VERSION_PROTOCOLE = 31;
+export const VERSION_PROTOCOLE = 32;
 export const APP_DKK = { id: 'dkk-rock', version: VERSION_PROTOCOLE };
 
 const TYPE_ETAT = 1;
 const TYPE_COMMANDES = 2;
-const OCTETS_ENTETE = 22 + GENRES_CONVERTIS.length;
+const OCTETS_ENTETE = 23 + GENRES_CONVERTIS.length;
 const OCTETS_JOUEUR = 10;
 const OCTETS_ENTITE = 10;
 
@@ -41,6 +41,7 @@ export function encodeEtat(v: EtatVue): ArrayBuffer {
   const reve = v.phase === 'reve' && v.reve ? v.reve : null;
   const avion = v.phase === 'avion' && v.avion ? v.avion : null;
   const kart = v.phase === 'kart' && v.kart ? v.kart : null;
+  const arene = v.arene ?? null;
   const buf = new ArrayBuffer(
     OCTETS_ENTETE +
       MAX_JOUEURS * OCTETS_JOUEUR +
@@ -50,7 +51,8 @@ export function encodeEtat(v: EtatVue): ArrayBuffer {
       (plongeon ? OCTETS_PLONGEON : 0) +
       (reve ? OCTETS_REVE : 0) +
       (avion ? OCTETS_AVION : 0) +
-      (kart ? OCTETS_KART : 0),
+      (kart ? OCTETS_KART : 0) +
+      (arene ? OCTETS_ARENE : 0),
   );
   const d = new DataView(buf);
   let o = 0;
@@ -78,6 +80,7 @@ export function encodeEtat(v: EtatVue): ArrayBuffer {
   o += 2;
   u8(v.sibylles[0]);
   u8(v.sibylles[1]);
+  u8(arene ? 1 : 0);
   for (let s = 0; s < MAX_JOUEURS; s++) {
     const j = v.joueurs[s]!;
     u8((j.present ? 1 : 0) | (j.mort ? 2 : 0));
@@ -106,6 +109,8 @@ export function encodeEtat(v: EtatVue): ArrayBuffer {
   if (reve) encodeReve(d, o, reve);
   if (avion) encodeAvion(d, o, avion);
   if (kart) encodeKart(d, o, kart);
+  // le battle royale vient en dernier : un mini-jeu ne se joue jamais en arène
+  if (arene) encodeArene(d, buf.byteLength - OCTETS_ARENE, arene);
   return buf;
 }
 
@@ -139,6 +144,7 @@ export function decodeEtat(buf: ArrayBuffer): EtatVue | null {
   const temps = d.getUint16(o);
   o += 2;
   const sibylles: [number, number] = [u8(), u8()];
+  const avecArene = (u8() & 1) !== 0;
   const joueurs: JoueurVue[] = [];
   for (let s = 0; s < MAX_JOUEURS; s++) {
     const fl = u8();
@@ -172,7 +178,7 @@ export function decodeEtat(buf: ArrayBuffer): EtatVue | null {
           : avecKart
             ? OCTETS_KART
             : 0;
-  if (buf.byteLength !== o + n * OCTETS_ENTITE + suite) return null;
+  if (buf.byteLength !== o + n * OCTETS_ENTITE + suite + (avecArene ? OCTETS_ARENE : 0)) return null;
   const entites: EntiteVue[] = [];
   for (let i = 0; i < n; i++) {
     const id = d.getUint16(o);
@@ -206,6 +212,8 @@ export function decodeEtat(buf: ArrayBuffer): EtatVue | null {
   if (avecAvion && !avion) return null;
   const kart = avecKart ? decodeKart(d, o) : null;
   if (avecKart && !kart) return null;
+  const arene = avecArene ? decodeArene(d, buf.byteLength - OCTETS_ARENE) : null;
+  if (avecArene && !arene) return null;
   return {
     tick,
     phase,
@@ -227,6 +235,7 @@ export function decodeEtat(buf: ArrayBuffer): EtatVue | null {
     ...(reve ? { reve } : {}),
     ...(avion ? { avion } : {}),
     ...(kart ? { kart } : {}),
+    ...(arene ? { arene } : {}),
   };
 }
 
@@ -246,73 +255,5 @@ export function decodeCommandes(buf: ArrayBuffer): { bits: number; seq: number }
   return { bits: d.getUint8(1) & 0x7f, seq: d.getUint16(2) };
 }
 
-// ——— messages de contrôle (JSON) ———
-
-export type MsgClient = { t: 'salut'; nom: string; membre: number; v: number } | { t: 'suivant' };
-
-export type MsgHote =
-  | { t: 'bienvenue'; siege: number; niveau: number; carte: string }
-  | { t: 'niveau'; niveau: number; carte: string }
-  | { t: 'ev'; l: Evenement[] }
-  | { t: 'joueurs'; l: { siege: number; nom: string }[] }
-  | { t: 'refus'; raison: 'complet' | 'version' };
-
-const NOM_SUR = /^[A-Z0-9 ]{1,14}$/;
-const entier = (v: unknown, min: number, max: number): v is number =>
-  typeof v === 'number' && Number.isInteger(v) && v >= min && v <= max;
-
-/** Côté hôte : un message de contrôle d'un client, validé. */
-export function valideMsgClient(o: unknown): MsgClient | null {
-  if (!o || typeof o !== 'object') return null;
-  const m = o as Record<string, unknown>;
-  if (m.t === 'suivant') return { t: 'suivant' };
-  if (
-    m.t === 'salut' &&
-    typeof m.nom === 'string' &&
-    NOM_SUR.test(m.nom) &&
-    entier(m.membre, 0, 4) &&
-    entier(m.v, 0, 999)
-  )
-    return { t: 'salut', nom: m.nom, membre: m.membre, v: m.v };
-  return null;
-}
-
-const EVENEMENTS = new Set(['son', 'explo', 'texte', 'impact', 'confettis', 'bulle', 'tuile']);
-
-/** Côté client : un message de l'hôte, validé dans ses grandes lignes (l'hôte est l'arbitre de la partie). */
-export function valideMsgHote(o: unknown): MsgHote | null {
-  if (!o || typeof o !== 'object') return null;
-  const m = o as Record<string, unknown>;
-  switch (m.t) {
-    case 'bienvenue':
-      return entier(m.siege, 0, MAX_JOUEURS - 1) && entier(m.niveau, 0, 99) && typeof m.carte === 'string'
-        ? { t: 'bienvenue', siege: m.siege, niveau: m.niveau, carte: m.carte }
-        : null;
-    case 'niveau':
-      return entier(m.niveau, 0, 99) && typeof m.carte === 'string'
-        ? { t: 'niveau', niveau: m.niveau, carte: m.carte }
-        : null;
-    case 'ev':
-      if (!Array.isArray(m.l) || m.l.length > 2000) return null;
-      return {
-        t: 'ev',
-        l: m.l.filter(
-          (e): e is Evenement => !!e && typeof e === 'object' && EVENEMENTS.has((e as { k: string }).k),
-        ),
-      };
-    case 'joueurs':
-      if (!Array.isArray(m.l)) return null;
-      return {
-        t: 'joueurs',
-        l: m.l
-          .filter(
-            (j: { siege?: unknown; nom?: unknown }) => entier(j?.siege, 0, 3) && typeof j?.nom === 'string',
-          )
-          .map((j: { siege: number; nom: string }) => ({ siege: j.siege, nom: j.nom.slice(0, 14) })),
-      };
-    case 'refus':
-      return m.raison === 'complet' || m.raison === 'version' ? { t: 'refus', raison: m.raison } : null;
-    default:
-      return null;
-  }
-}
+// les messages de contrôle (JSON) : voir protocole-ctrl.ts
+export { valideMsgClient, valideMsgHote, type MsgClient, type MsgHote } from './protocole-ctrl';

@@ -197,6 +197,10 @@ vérifie qu'on va du départ à la fin sans rien casser, change le nom, le thèm
 `.json` à partager, télécharger ou copier) : envoyez-le à Claude pour l'ajouter au jeu, tel quel ou retouché, comme nouveau niveau
 ou à la place d'un niveau existant. Le brouillon se garde tout seul dans le navigateur, et l'export se réimporte.
 
+**Mes niveaux** : Menu → Enregistrer dans Mes niveaux garde le niveau dans le navigateur (un niveau du même nom est remplacé) ;
+Menu → Mes niveaux les rouvre ou les supprime. Ils se jouent en battle royale, seul contre l'ordinateur ou en ligne (l'hôte
+envoie le niveau aux autres joueurs). « Vérifier le parcours » dit aussi pour combien de joueurs la carte est faite.
+
 **Mes modules** : l'outil sélection (le carré en pointillés) fait un module d'un rectangle de la carte (ses tuiles, ses gens, son
 décor ; le départ et le van restent dans le niveau) ; on le nomme, il rejoint la palette (Modules → Mes modules) et se pose comme
 ceux du jeu, par sa rangée de sol. Le menu → Mes modules les liste, les exporte (un par un ou tous, un fichier `dkk-modules`), en
@@ -215,12 +219,32 @@ Intégrer un export :
 - des **modules** : chacun devient une pièce du générateur (`outils/niveaux/*.py`, ses lignes telles quelles, posée par sa rangée
   de sol), placée dans les plans des villes voulues ; `outils/exporte-modules.py` la remet ensuite dans la palette.
 
+## Battle royale
+
+Menu principal → **Battle royale** : on choisit une carte (un niveau du jeu, ou un des siens enregistré dans Mes niveaux), on
+voit pour combien de joueurs elle est faite, on garde ou non les ennemis du niveau, puis :
+
+- **contre l'ordinateur** (1 à 7 adversaires) : de quoi s'entraîner ou essayer une carte ;
+- **en ligne** : un salon s'ouvre (Wi-Fi, ou code Internet via « Inviter des amis ») ; les amis le rejoignent par « Rejoindre
+  des amis », s'échauffent sans se blesser, et l'hôte lance la partie (jusqu'à 8 joueurs).
+
+Trois vies chacun ; les tirs blessent les autres joueurs (jamais soi-même) ; une élimination revient à celui qui a touché en
+dernier. On réapparaît loin des autres, avec quelques secondes de protection. La zone de départ couvre une part de la carte
+selon le nombre de joueurs, reste fixe 20 secondes puis se referme en deux minutes ; dehors, on perd un cœur par seconde. Les
+cages et les cœurs redonnent une vie (5 au plus). Le dernier en lice gagne ; le classement s'affiche, et « Rejouer » relance une
+manche sur la même carte. Plusieurs joueurs peuvent jouer le même héros : un repère de couleur au-dessus de chacun dit qui est qui.
+
+La taille conseillée vient de la surface où l'on peut aller (le même calcul que « le niveau est atteignable ») : environ 150
+cases par joueur au plus, 400 au moins, de 2 à 8. Le code : `src/jeu/arene.ts` (les règles), `src/jeu/arene-ia.ts` (les joueurs
+de l'ordinateur), `src/ui/menus-arene.ts` et `src/ui/arene-ui.ts` (menus, salon, classement), `src/rendu/arene-rendu.ts` (la
+zone), `src/niveaux/mes-niveaux.ts` (Mes niveaux, et la relecture d'un niveau reçu d'un hôte).
+
 ## À plusieurs
 
 Grâce à [lan-kit](https://github.com/piascwal/lan-kit) (figé sur `v0.2.0`), **sans serveur** :
 l'hôte ouvre sa partie depuis la pause (« Inviter des amis ») ; sur le même Wi-Fi, les autres la
 voient dans « Rejoindre des amis » ; ailleurs, l'hôte crée un **code** ou un **lien d'invitation**.
-On peut rejoindre en cours de route, jusqu'à 4.
+On peut rejoindre en cours de route, jusqu'à 4 (8 en battle royale).
 
 L'hôte fait tourner la simulation ; les autres envoient leurs commandes (1 octet, 60 fois par
 seconde) et reçoivent des instantanés (30 par seconde, moins de 4 Ko) qu'ils lissent, plus les

@@ -15,6 +15,7 @@ import { Emojis } from './emojis';
 import { Fond } from './fonds';
 import { PremierPlan } from './premier-plan';
 import { Braises } from './flammes';
+import { dessineArene } from './arene-rendu';
 import { dessineIndicateurs } from './indicateurs';
 import { Particules } from './particules';
 import { RockersRestes } from './rockers-convertis';
@@ -148,6 +149,12 @@ export class Rendu {
       this.densite = DENSITE_MIN;
       this.redimensionne();
     }
+  }
+
+  /** Un niveau reçu d'un hôte peut prendre l'indice d'un autre : on oublie ce qu'on avait préparé. */
+  oublieNiveau(): void {
+    this.niveau = -1;
+    this.carteDecor = null;
   }
 
   prepareNiveau(niveau: number): void {
@@ -325,6 +332,7 @@ export class Rendu {
     this.emojis.accompagne(vue.entites);
     this.emojis.maj();
     this.emojis.dessine(ctx, camX, camY);
+    dessineArene(ctx, vue, siegeLocal, camX, camY, this.largeur, this.tick);
     dessineIndicateurs(ctx, vue, siegeLocal, camX, camY, this.largeur, this.tick);
   }
 }

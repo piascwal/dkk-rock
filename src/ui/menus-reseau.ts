@@ -1,4 +1,5 @@
 import { lienInvitation, nettoiePseudo, normaliseCode, texteLatence, type Annonce } from '@piascwal/lan-kit';
+import { JOUEURS_HISTOIRE, MAX_JOUEURS } from '../config';
 import { NIVEAUX } from '../niveaux';
 import type { AnnonceDkk } from '../reseau/annonce';
 import { Recherche } from '../reseau/client';
@@ -141,7 +142,7 @@ export function ecranRejoindre(m: Menus, a: Actions, codeInitial: string): void 
         liste.replaceChildren(
           ...[...r.annonces.values()].map((an) =>
             bouton(
-              `${an.nom} — ${NIVEAUX[an.niveau]?.titre ?? ''} (${an.joueurs}/4)`,
+              `${an.nom} — ${an.arene ? 'Battle royale' : (NIVEAUX[an.niveau]?.titre ?? '')} (${an.joueurs}/${an.arene ? MAX_JOUEURS : JOUEURS_HISTOIRE})`,
               () => void tente(r, an),
             ),
           ),

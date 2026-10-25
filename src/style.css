@@ -1028,3 +1028,85 @@ h2 {
 .fin-bouton:focus-visible {
   background: #2a3a66;
 }
+
+/* le battle royale : le salon et le classement (voir ui/arene-ui.ts), le compte à rebours */
+.arene-panneau {
+  position: absolute;
+  left: 50%;
+  top: 12%;
+  transform: translateX(-50%);
+  z-index: 30;
+  width: min(92vw, 420px);
+  max-height: 76vh;
+  overflow-y: auto;
+  padding: 12px 14px;
+  background: rgba(14, 10, 26, 0.9);
+  border: 2px solid #ffd23f;
+  border-radius: 8px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.arene-panneau[hidden],
+.arene-compte[hidden] {
+  display: none;
+}
+
+.arene-panneau h3 {
+  margin: 0;
+  font-family: var(--titre);
+  font-size: 0.9rem;
+  color: #ffd23f;
+}
+
+.arene-panneau .aide {
+  margin: 0;
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+.arene-joueur {
+  padding: 4px 8px;
+  border-left: 6px solid var(--couleur);
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 0.85rem;
+}
+
+.arene-boutons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.fin-bouton.principal {
+  background: #2f8f4f;
+}
+
+.arene-compte {
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  transform: translate(-50%, -50%);
+  z-index: 30;
+  font-family: var(--titre);
+  font-size: 4.5rem;
+  color: #ffd23f;
+  text-shadow: 4px 4px 0 #000;
+  pointer-events: none;
+}
+
+.ligne-ia {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+}
+
+.conseil {
+  color: #7cfc7c;
+  font-weight: bold;
+}

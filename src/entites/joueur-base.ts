@@ -38,6 +38,8 @@ export abstract class JoueurBase implements Cible, EtatSpecial {
   /** la phase d'animation sur une échelle : elle n'avance que lorsque le joystick monte ou descend */
   protected animEchelle = 0;
   protected angle = 0;
+  /** en battle royale : le héros qui l'a touché en dernier (son identifiant), à qui revient l'élimination */
+  dernierTireur: number | null = null;
   /** dégâts encaissés ce pas-ci (les effets de zone ne comptent qu'une fois) */
   private dejaBlesse = -1;
 
@@ -97,6 +99,7 @@ export abstract class JoueurBase implements Cible, EtatSpecial {
   blesse(degats: number, ctx: Contexte, dx: number): void {
     if (this.mort || this.invulnerable > 0 || this.invincible > 0 || this.dejaBlesse === ctx.tick) return;
     this.dejaBlesse = ctx.tick;
+    this.dernierTireur = ctx.tireur ?? null;
     this.pv -= Math.max(1, Math.round(degats));
     this.invulnerable = INVULNERABLE;
     this.corps.vx = dx * 2.5;

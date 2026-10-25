@@ -39,6 +39,8 @@ export interface Contexte {
   /** vrai au premier tick de chaque temps (BPM) */
   readonly surLeTemps: boolean;
   readonly numeroTemps: number;
+  /** en battle royale, le héros (son identifiant) dont on met à jour un tir : celui qui blesse, s'il blesse quelqu'un */
+  readonly tireur?: number | null;
   prochainId(): number;
   ajoute(e: EntiteSimulee): void;
   /** les héros vivants */

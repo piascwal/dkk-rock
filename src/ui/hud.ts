@@ -13,9 +13,12 @@ export class Hud {
   maj(v: EtatVue, siegeLocal: number, noms: string[]): void {
     // pendant un mini-jeu (drift, plongeon), le chrono et le score sont dans le canvas : pas de HUD des héros
     this.element.hidden = PHASES_MINI_JEUX.has(v.phase);
+    const ar = v.arene;
     const joueurs = v.joueurs
       .map((j, s) => {
         if (!j.present) return '';
+        // en battle royale, à 8 : seulement son propre cartouche (les autres ont leur repère de couleur)
+        if (ar && s !== siegeLocal) return '';
         const h = HEROS[j.membre]!;
         const arme = armeRamassee(j.arme);
         const nom = noms[s] && v.joueurs.filter((x) => x.present).length > 1 ? ` · ${noms[s]}` : '';
@@ -30,7 +33,7 @@ export class Hud {
     const boss =
       v.boss >= 0 ? `<div id="barre-boss"><div style="width:${Math.round(v.boss * 100)}%"></div></div>` : '';
     const html = `<div class="hud-joueurs">${joueurs}</div>
-      <div class="hud-droite">${rangeeDIcones(icone('guitare'), 1)} × ${v.vies}<br>${v.score.toLocaleString('fr-FR')}</div>${boss}`;
+      <div class="hud-droite">${ar ? droiteArene(v, siegeLocal) : `${rangeeDIcones(icone('guitare'), 1)} × ${v.vies}<br>${v.score.toLocaleString('fr-FR')}`}</div>${boss}`;
     if (html === this.dernier) return;
     this.dernier = html;
     this.element.innerHTML = html;
@@ -40,3 +43,15 @@ export class Hud {
 /** Échappe un texte venu d'ailleurs (pseudo d'un joueur distant) avant de le mettre dans du HTML. */
 export const echappe = (s: string): string =>
   s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+
+/** En battle royale, à droite : ses vies et ses éliminations, combien sont encore en lice, le temps de combat. */
+function droiteArene(v: EtatVue, siege: number): string {
+  const ar = v.arene!;
+  const presents = v.joueurs.filter((j) => j.present).length;
+  const enLice = ar.vies.filter((n, s) => n > 0 && v.joueurs[s]?.present).length;
+  const temps =
+    ar.etape === 'combat'
+      ? ` · ${Math.floor(ar.minuteur / 60)}:${String(ar.minuteur % 60).padStart(2, '0')}`
+      : '';
+  return `${rangeeDIcones(icone('guitare'), 1)} × ${ar.vies[siege] ?? 0} · ${ar.eliminations[siege] ?? 0} élim.<br>${ar.etape === 'salon' ? 'Salon' : `En lice ${enLice}/${presents}`}${temps}`;
+}

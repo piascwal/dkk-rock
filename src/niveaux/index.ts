@@ -84,6 +84,9 @@ export const NIVEAUX: DefNiveau[] = [
   { ...OTTAWA, carte: CARTE_OTTAWA, decor: DECOR_OTTAWA },
 ];
 
+/** Les niveaux du jeu lui-même ; au-delà, des niveaux de l'éditeur (essais, Mes niveaux, ou reçus d'un hôte). */
+export const NOMBRE_NIVEAUX_JEU = NIVEAUX.length;
+
 /**
  * Ajoute un niveau d'essai (fait dans l'éditeur de niveau) à la fin de la liste, le temps d'y jouer, et renvoie son indice. Chaque
  * essai a le sien : rien de ce qui est gardé en mémoire par indice (la carte lue, les cachettes) ne vaut pour un autre.
@@ -94,6 +97,17 @@ export function ajouteNiveauEssai(def: DefNiveau): number {
 }
 
 const lus = new Map<number, NiveauLu>();
+
+/**
+ * Chez un joueur qui rejoint : le niveau de l'éditeur que l'hôte fait jouer, à l'indice que l'hôte lui donne (les indices des
+ * niveaux sont ceux de l'hôte dans tout l'instantané). Les trous éventuels reçoivent le même niveau.
+ */
+export function installeNiveau(i: number, def: DefNiveau): void {
+  if (i < NOMBRE_NIVEAUX_JEU) return;
+  while (NIVEAUX.length <= i) NIVEAUX.push(def);
+  NIVEAUX[i] = def;
+  lus.delete(i);
+}
 
 /** Le niveau lu (et gardé en mémoire : la carte d'origine ne change jamais). */
 export function niveauLu(i: number): NiveauLu {

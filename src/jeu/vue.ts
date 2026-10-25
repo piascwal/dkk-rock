@@ -1,6 +1,7 @@
 import type { VueAvion } from './vue-avion';
 import type { VueKart } from './vue-kart';
 import type { VueReve } from './vue-reve';
+import type { VueArene } from './arene';
 /**
  * Ce que l'on voit de la partie : la simulation (sur l'hôte) le produit à
  * chaque pas, le rendu le dessine et le réseau le transmet aux autres joueurs.
@@ -360,6 +361,8 @@ export interface EtatVue {
   avion?: VueAvion;
   /** le Grand Prix de la Sarré, pendant la phase `kart` */
   kart?: VueKart;
+  /** le battle royale, quand la partie en est un (voir arene.ts) */
+  arene?: VueArene;
 }
 
 /** Ce qui se passe une fois (son, explosion, texte flottant, dialogue) : envoyé de façon fiable. */

@@ -7,7 +7,17 @@ import { ecritCentre } from './police';
  * En multijoueur, chacun a sa caméra et on peut perdre les autres de vue : une petite flèche au bord de l'écran montre,
  * pour chaque équipier hors champ, la direction où le retrouver. Côté rendu seulement, d'après la vue.
  */
-const COULEURS = ['#ff6b6b', '#4fc3ff', '#ffd23f', '#7cfc7c'];
+/** la couleur de chaque siège (flèches, repères du battle royale, salon) */
+export const COULEURS_SIEGES = [
+  '#ff6b6b',
+  '#4fc3ff',
+  '#ffd23f',
+  '#7cfc7c',
+  '#ff9ff3',
+  '#ff9f43',
+  '#b8f2ff',
+  '#c39bff',
+];
 /** les marges qui laissent libres la barre du haut et les bords : gauche, droite, haut, bas (pixels du jeu) */
 const MARGES = { gauche: 12, droite: 12, haut: 26, bas: 16 };
 /** une flèche qui regarde vers la droite ; X : plein */
@@ -53,7 +63,7 @@ export function dessineIndicateurs(
     if (siege === siegeLocal || !j.present || j.mort) return;
     const ind = indicateurVers(j.x - camX, j.y - camY, largeur, HAUTEUR_VUE);
     if (!ind) return;
-    const couleur = COULEURS[siege % COULEURS.length]!;
+    const couleur = COULEURS_SIEGES[siege % COULEURS_SIEGES.length]!;
     // la flèche bat doucement : on la remarque sans qu'elle gêne
     const pas = Math.round(Math.sin(tick / 8) * 1.5);
     ctx.save();

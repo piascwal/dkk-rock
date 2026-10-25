@@ -11,6 +11,8 @@ export class Projectile implements EntiteSimulee {
   private rebonds: number;
   private colle = false;
   private readonly touches = new Map<number, number>();
+  /** en battle royale : le héros qui l'a lancé (son identifiant) ; ses tirs blessent les autres héros, jamais lui */
+  tireur: number | null = null;
 
   constructor(
     ctx: Contexte,

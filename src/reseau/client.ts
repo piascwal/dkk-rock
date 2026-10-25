@@ -1,7 +1,8 @@
 import { Annuaire, Liaison, Veille, salonEnLigne, salonsDuReseau, type Annonce } from '@piascwal/lan-kit';
 import { Carte } from '../monde/carte';
 import { NB_TUILES, type Tuile } from '../monde/tuiles';
-import { niveauLu } from '../niveaux';
+import { installeNiveau, niveauLu } from '../niveaux';
+import { valideDef } from '../niveaux/mes-niveaux';
 import type { EntiteVue, EtatVue, Evenement } from '../jeu/vue';
 import { valideAnnonceDkk, type AnnonceDkk } from './annonce';
 import {
@@ -79,6 +80,8 @@ export class Client {
   private recuA = 0;
   private intervalle = 33;
   private seq = 0;
+  /** l'hôte nous a envoyé son niveau de l'éditeur : le rendu doit oublier ce qu'il avait gardé pour cet indice */
+  niveauRecu = false;
   readonly veille: Veille;
 
   private constructor(
@@ -133,6 +136,15 @@ export class Client {
         if (m.t === 'refus') {
           clearTimeout(garde);
           ko(new Error(m.raison));
+        } else if (m.t === 'def') {
+          // un niveau de l'éditeur de l'hôte : on le relit (il vient d'ailleurs) avant de le jouer
+          const def = valideDef(m.def, `hote-${m.niveau}`);
+          if (!def) {
+            clearTimeout(garde);
+            return ko(new Error('niveau'));
+          }
+          installeNiveau(m.niveau, def);
+          this.niveauRecu = true;
         } else if (m.t === 'bienvenue') {
           clearTimeout(garde);
           this.siege = m.siege;

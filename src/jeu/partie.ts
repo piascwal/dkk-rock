@@ -1,13 +1,12 @@
-import { BPM, DELAI_REAPPARITION, HEROS_HAUTEUR, HEROS_LARGEUR } from '../config';
-import { MAX_JOUEURS, TICKS_PAR_SECONDE, TUILE } from '../config';
+import { BPM, HEROS_HAUTEUR, HEROS_LARGEUR } from '../config';
+import { JOUEURS_HISTOIRE, MAX_JOUEURS, TICKS_PAR_SECONDE, TUILE } from '../config';
 import { Aleatoire } from '../moteur/maths';
 import { Carte } from '../monde/carte';
 import { Joueur } from '../entites/joueur';
 import { Projectile } from '../entites/projectile';
 import { corpsDesBarils } from '../entites/baril';
 import { Boss } from '../entites/ennemis/boss';
-import { DjBoucle } from '../entites/ennemis/dj';
-import { ATTENTE_VAN, Objet } from '../entites/objets';
+import type { Objet } from '../entites/objets';
 import { niveauLu } from '../niveaux';
 import { suivantDansMonde } from '../niveaux/arcs';
 import type { NiveauLu } from '../niveaux/format';
@@ -26,6 +25,9 @@ import { CARNET_VIDE, type Carnet } from './sibylles';
 import type { Progression } from './sauvegarde';
 import { CACHE_VIDE, calculeCibles, type CacheCibles } from './cibles';
 import { construitVue } from './vue-partie';
+import { finDeNiveau, gereMort, lanceDepart, majDepart, termineNiveau } from './fin-niveau';
+import { Arene, type ReglesArene } from './arene';
+import { IAArene } from './arene-ia';
 import { DUREE_CARTE, G, GENRES_CONVERTIS, type EtatVue, type Evenement, type Phase } from './vue';
 
 /**
@@ -33,8 +35,6 @@ import { DUREE_CARTE, G, GENRES_CONVERTIS, type EtatVue, type Evenement, type Ph
  * les commandes de chaque siège, avance d'un pas, et produit une vue
  * (EtatVue) et des évènements que le rendu dessine et que le réseau transmet.
  */
-/** Le van file : ticks entre le démarrage de l'accélération et le bilan (il a alors quitté l'écran). */
-const DUREE_FUITE = 100;
 
 export class Partie implements Contexte {
   tick = 0;
@@ -56,6 +56,10 @@ export class Partie implements Contexte {
   avion: ConcoursAvion | null = null;
   kart: ConcoursKart | null = null;
   entites: EntiteSimulee[] = [];
+  /** le battle royale, si c'en est un (voir arene.ts) */
+  arene: Arene | null = null;
+  /** en battle royale : le héros dont on met à jour un tir ou un geste (ses tirs visent aussi les autres héros) */
+  tireur: number | null = null;
   readonly joueurs: (Joueur | null)[] = Array<Joueur | null>(MAX_JOUEURS).fill(null);
   readonly rng = new Aleatoire(Date.now() & 0xffff);
   surLeTemps = false;
@@ -69,8 +73,8 @@ export class Partie implements Contexte {
   /** les explosions de caissons en attente : (image, x, y, sorte : « rose » pour le caisson violet) */
   enAttente: [number, number, number, string?][] = [];
   finDans = -1;
-  /** le van qui part, et le nombre de ticks avant le bilan (-1 : il n'est pas parti) */
-  private van: Objet | null = null;
+  /** le van qui part, et le nombre de ticks avant le bilan (-1 : il n'est pas parti ; voir fin-niveau.ts) */
+  van: Objet | null = null;
   departDans = -1;
   /** les ennemis convertis au rock depuis le début du niveau (voir GENRES_CONVERTIS) */
   convertis: number[] = GENRES_CONVERTIS.map(() => 0);
@@ -110,6 +114,9 @@ export class Partie implements Contexte {
   ajoute(e: EntiteSimulee): void {
     // un ennemi hors de la zone visible ne tire pas
     if (e instanceof Projectile && e.camp === 'ennemis' && !this.visible(e.x, e.y)) return;
+    // en battle royale, un tir de héros garde la trace de qui l'a lancé
+    if (this.arene && this.tireur !== null && e instanceof Projectile && e.camp === 'heros')
+      e.tireur ??= this.tireur;
     this.entites.push(e);
   }
   heros(): readonly Cible[] {
@@ -119,6 +126,8 @@ export class Partie implements Contexte {
     return zoneVisible(this.cache.heros, x, y);
   }
   cibles(camp: Camp): readonly Cible[] {
+    if (camp === 'ennemis' && this.arene?.enJeu && this.tireur !== null)
+      return this.arene.ciblesDuTireur(this.cache, this.tireur);
     return this.cache[camp];
   }
   props(): readonly Cible[] {
@@ -155,20 +164,46 @@ export class Partie implements Contexte {
     const [x, y] = this.pointApparition();
     const j = new Joueur(this.prochainId(), siege, membreLibre(this, membrePrefere), x, y);
     this.joueurs[siege] = j;
+    this.arene?.rejoint(j);
     if (this.tick > 0) this.evenement({ k: 'bulle', qui: j.def.qui, texte: this.rng.choix(j.def.rejoint) });
   }
 
   retireJoueur(siege: number): void {
     this.joueurs[siege] = null;
     this.commandes[siege] = 0;
+    this.arene?.retire(this, siege);
+  }
+
+  /** Les places : 8 en battle royale, 4 sinon. */
+  get places(): number {
+    return this.arene ? MAX_JOUEURS : JOUEURS_HISTOIRE;
+  }
+
+  /** Fait de cette partie un battle royale sur sa carte ; hors ligne, la manche commence (les joueurs et l'IA sont déjà là). */
+  ouvreArene(regles: ReglesArene, enLigne: boolean, ia: readonly number[] = []): void {
+    this.arene = new Arene(regles, enLigne);
+    if (ia.length) this.arene.ia = new IAArene(ia);
+    this.phase = 'jeu';
+    this.arene.prepare(this);
+    if (!enLigne) this.arene.demarre(this);
+  }
+
+  /** Une nouvelle manche sur la même carte, refaite à neuf. */
+  relanceArene(): void {
+    const a = this.arene!;
+    this.charge(this.niveau, -1);
+    a.prepare(this);
+    a.demarre(this);
   }
 
   commande(siege: number, bits: number): void {
-    if (siege >= 0 && siege < MAX_JOUEURS) this.commandes[siege] = bits;
+    // pendant le compte à rebours du battle royale, tout le monde attend
+    if (siege >= 0 && siege < MAX_JOUEURS) this.commandes[siege] = this.arene?.gele ? 0 : bits;
   }
 
   /** Un joueur veut passer la page d'histoire (ou recommencer après une défaite) ; le drift passe ses écrans lui-même. */
   suivant(): void {
+    if (this.arene) return this.arene.suivant(this);
     if (this.phase === 'jeu' || PHASES_MINI_JEUX.has(this.phase)) return;
     if (this.phase === 'carte') {
       this.chargeNiveauSuivant(); // on peut passer le trajet
@@ -194,6 +229,7 @@ export class Partie implements Contexte {
   pointApparition(): [number, number] {
     // en pleine traversée, le pont est fermé : on revient à bord, pas sur le quai
     if (this.traversee) return this.traversee.pointApparition;
+    if (this.arene) return this.arene.pointLibre(this, -1);
     const vivant = this.joueurs.find((j) => j && !j.mort);
     if (vivant) return [vivant.corps.x, vivant.corps.y - 4];
     return this.pointDeDepart();
@@ -256,14 +292,17 @@ export class Partie implements Contexte {
     majMiniJeux(this);
     if (this.phase !== 'jeu') return;
     this.tempsNiveau++;
+    this.arene?.maj(this);
 
     this.recalculeCibles();
     for (let s = 0; s < MAX_JOUEURS; s++) {
       const j = this.joueurs[s];
       if (!j) continue;
+      this.tireur = this.arene ? j.id : null;
       j.maj(this, this.commandes[s]!);
-      if (j.mort) this.gereMort(j);
+      if (j.mort) gereMort(this, j);
     }
+    this.tireur = null;
     this.recalculeCibles();
     declencheAssauts(this);
     const actifs = this.joueurs.filter((j): j is Joueur => !!j && !j.mort);
@@ -274,80 +313,31 @@ export class Partie implements Contexte {
       if (pos !== undefined && actifs.length && !('def' in e && 'age' in e)) {
         if (actifs.every((j) => Math.abs(j.corps.x - pos) > 640)) continue;
       }
+      this.tireur = this.arene ? ((e as { tireur?: number | null }).tireur ?? null) : null;
       e.maj(this);
     }
+    this.tireur = null;
     majTraversee(this);
     this.recalculeCibles();
     interactions(this);
     this.entites = this.entites.filter((e) => !e.fini);
     releveCarte(this);
-    this.finDeNiveau();
-    this.majDepart();
+    finDeNiveau(this);
+    majDepart(this);
   }
 
-  private gereMort(j: Joueur): void {
-    if (j.delaiReapparition === 0) {
-      j.delaiReapparition = DELAI_REAPPARITION;
-      return;
-    }
-    if (--j.delaiReapparition > 1) return;
-    if (this.vies > 0) {
-      this.vies--;
-      const [x, y] = this.pointApparition();
-      j.reapparait(x, y, membreLibre(this, (j.membre + 1) % 5, j.siege));
-      j.delaiReapparition = 0;
-    } else if (this.joueurs.every((o) => !o || o.mort)) {
-      this.phase = 'perdu';
-      this.page = 0;
-    } else j.delaiReapparition = 2;
-  }
-
-  private finDeNiveau(): void {
-    const dj = this.entites.find((e) => e instanceof DjBoucle);
-    if (this.lu.boss.some((b) => b.lettre === 'Z') && !dj && this.finDans < 0) this.finDans = 180;
-    if (this.finDans > 0 && --this.finDans === 0) this.termineNiveau();
-  }
-
-  /** Les héros montent dans le van : il démarre, la caméra le suit, le bilan vient quand il a disparu. */
+  /** Les héros montent dans le van (voir fin-niveau.ts). */
   lanceDepart(van: Objet): void {
-    if (this.phase !== 'jeu' || this.departDans >= 0) return;
-    // sur le ferry, c'est la traversée qui conduit le van (il descend tout seul à Groix, voir traversee.ts)
-    if (this.traversee) return;
-    van.demarre();
-    this.van = van;
-    this.departDans = ATTENTE_VAN + DUREE_FUITE;
-    for (const j of this.joueurs) if (j) j.embarque = true;
-    this.son('demarrage', van.corps.x, van.corps.y);
-  }
-
-  private majDepart(): void {
-    if (this.departDans < 0) return;
-    // les héros (invisibles) restent dans le van : la caméra le suit
-    const v = this.van!.corps;
-    for (const j of this.joueurs)
-      if (j) {
-        j.corps.x = v.x + v.w / 2 - j.corps.w / 2;
-        j.corps.y = v.y + v.h - j.corps.h;
-      }
-    if (--this.departDans === 0) {
-      this.departDans = -1;
-      this.termineNiveau();
-    }
+    lanceDepart(this, van);
   }
 
   termineNiveau(): void {
-    if (this.phase !== 'jeu') return;
-    this.score += 1000 + this.vies * 200;
-    this.phase = 'convertis';
-    this.page = 0;
-    this.drapeau = -1;
-    this.son('victoire', 0, 0);
-    const suivant = suivantDansMonde(this.niveau) ?? this.niveau;
-    this.onProgression({ ...this.progression(), niveau: suivant }, true, this.niveau);
+    termineNiveau(this);
   }
 
   private recalculeCibles(): void {
     this.cache = calculeCibles(this.joueurs, this.entites);
+    this.arene?.oublieCibles();
     this.carte.obstacles = corpsDesBarils(this.entites);
   }
 

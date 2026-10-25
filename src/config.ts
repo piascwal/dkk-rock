@@ -30,7 +30,9 @@ export const BPM = 124;
 export const HEROS_LARGEUR = 9;
 export const HEROS_HAUTEUR = 15;
 
-export const MAX_JOUEURS = 4;
+/** les sièges d'une partie : 8 en battle royale (voir jeu/arene.ts), 4 dans l'histoire et les mini-jeux */
+export const MAX_JOUEURS = 8;
+export const JOUEURS_HISTOIRE = 4;
 
 /**
  * La zone de jeu visible, autour d'un héros (la simulation ne connaît pas la caméra) : ce qui est hors de cette zone ne

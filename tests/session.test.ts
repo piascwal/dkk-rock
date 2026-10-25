@@ -1,55 +1,11 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import type { Liaison } from '@piascwal/lan-kit';
 import { VIES_DEPART } from '../src/config';
 import { C } from '../src/jeu/commandes';
 import { Partie } from '../src/jeu/partie';
 import { T } from '../src/monde/tuiles';
 import { Client } from '../src/reseau/client';
 import { Hote } from '../src/reseau/hote';
-
-/**
- * Deux bouts de liaison reliés en mémoire, qui se comportent comme une
- * Liaison de lan-kit une fois ouverte (JSON sur `ctrl`, binaire sur `jeu`).
- */
-interface Bout {
-  onCtrl: (m: unknown) => void;
-  onJeu: (d: ArrayBuffer) => void;
-  onFerme: () => void;
-  autre: Bout | null;
-  ferme_: boolean;
-  envoieCtrl(m: unknown): void;
-  envoieJeu(d: ArrayBuffer): void;
-  ferme(): void;
-}
-
-function paire(): [Liaison, Liaison] {
-  const bout = (): Bout => ({
-    onCtrl: (_m: unknown) => {},
-    onJeu: (_d: ArrayBuffer) => {},
-    onFerme: () => {},
-    autre: null,
-    ferme_: false,
-    envoieCtrl(m: unknown) {
-      const copie = JSON.parse(JSON.stringify(m));
-      queueMicrotask(() => this.autre?.onCtrl(copie));
-    },
-    envoieJeu(d: ArrayBuffer) {
-      const copie = d.slice(0);
-      queueMicrotask(() => this.autre?.onJeu(copie));
-    },
-    ferme() {
-      if (this.ferme_) return;
-      this.ferme_ = true;
-      this.onFerme();
-      this.autre?.ferme();
-    },
-  });
-  const a = bout();
-  const b = bout();
-  a.autre = b;
-  b.autre = a;
-  return [a as unknown as Liaison, b as unknown as Liaison];
-}
+import { paire } from './liaison-memoire';
 
 const attendre = () => new Promise((r) => setTimeout(r, 0));
 const aFermer: { ferme(): void }[] = [];

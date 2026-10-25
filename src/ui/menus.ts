@@ -14,6 +14,8 @@ import { Recherche } from '../reseau/client';
 import type { Hote } from '../reseau/hote';
 import { ajusteColonnes, bouton, el } from './elements';
 import { ecranInviter, ecranRejoindre } from './menus-reseau';
+import { ecranArene, type CarteArene } from './menus-arene';
+import type { ReglesArene } from '../jeu/arene';
 import { texteVersion } from '../version';
 import { estInstallee, installe, peutInstaller, surIPhone } from './installation';
 import { pleinEcran } from './plein-ecran';
@@ -36,8 +38,11 @@ export interface Actions {
   ouvreHote(): Hote | null;
   readonly estClient: boolean;
   appliqueOptions(): void;
-  /** l'éditeur de niveau (Options) */
+  /** l'éditeur de niveau (menu principal) */
   ouvreEditeur(): void;
+  /** le battle royale : contre `ia` joueurs de l'ordinateur, ou (0) un salon en ligne */
+  lanceArene(carte: CarteArene, regles: ReglesArene, ia: number): void;
+  readonly estArene: boolean;
   diagnostic(): string;
 }
 
@@ -81,6 +86,7 @@ export class Menus {
       bouton('Continuer', () => this.carte(), 'principal'),
       bouton('Rejoindre des amis', () => this.rejoindre()),
       bouton('Mini-jeux', () => this.miniJeux()),
+      bouton('Battle royale', () => ecranArene(this, this.a)),
       bouton('Éditeur de niveau', () => this.a.ouvreEditeur()),
       bouton('Options', () => this.options()),
     );
@@ -249,7 +255,9 @@ export class Menus {
   pause(): void {
     const boutons = el('div', '', 'boutons-menu');
     boutons.append(bouton('Reprendre', () => this.a.reprend(), 'principal'));
-    if (!this.a.estClient) {
+    if (!this.a.estClient && this.a.estArene)
+      boutons.append(bouton('Inviter des amis', () => this.inviter()));
+    else if (!this.a.estClient) {
       if (this.a.aUnDrapeau)
         boutons.append(this.confirme('Recommencer au drapeau', () => this.a.recommence(false)));
       boutons.append(

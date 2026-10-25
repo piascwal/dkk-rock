@@ -7,6 +7,7 @@ import { Projectile } from '../entites/projectile';
 import { chevauche } from '../moteur/maths';
 import type { Partie } from './partie';
 import { prendSibylle } from './sibylles';
+import { lanceDepart } from './fin-niveau';
 
 /** Un membre du groupe que personne d'autre ne joue, si possible le préféré. */
 export function membreLibre(p: Partie, prefere: number, siege = -1): number {
@@ -28,8 +29,9 @@ export function interactions(p: Partie): void {
         case 'cage':
           if (e.active) break;
           e.active = true;
-          const gagne = p.vies < VIES_MAX;
-          if (gagne) p.vies++;
+          // en battle royale, la vie revient à celui qui libère (voir arene.ts)
+          const gagne = p.arene ? p.arene.gagneVie(j.siege) : p.vies < VIES_MAX;
+          if (gagne && !p.arene) p.vies++;
           p.score += 500;
           j.membre = membreLibre(p, (j.membre + 1 + p.rng.entier(0, 3)) % HEROS.length, j.siege);
           j.invulnerable = 60;
@@ -47,15 +49,19 @@ export function interactions(p: Partie): void {
           p.onProgression(p.progression(), false);
           break;
         case 'van':
-          p.lanceDepart(e);
+          lanceDepart(p, e);
           break;
         case 'arme': {
           const a = armeRamassee(e.variante);
           if (!a) break;
           j.ramasseArme(e.variante);
           // l'arme-compagnon : le chauffage apparaît à côté du héros (s'il est déjà là, on lui refait le plein)
-          if (a.compagnon && !(j.compagnon && !j.compagnon.fini))
-            p.ajoute(new Chauffage(p, j.corps.x, j.corps.y, j));
+          if (a.compagnon && !(j.compagnon && !j.compagnon.fini)) {
+            const chauffage = new Chauffage(p, j.corps.x, j.corps.y, j);
+            // en battle royale, ses tirs sont ceux du héros qu'il accompagne
+            if (p.arene) (chauffage as { tireur?: number }).tireur = j.id;
+            p.ajoute(chauffage);
+          }
           e.fini = true;
           p.son('ramasse', e.corps.x, e.corps.y);
           p.texte(e.corps.x, e.corps.y - 10, a.nom.toUpperCase(), '#ffd23f');
@@ -66,8 +72,8 @@ export function interactions(p: Partie): void {
           // le cœur d'un tonneau WOG : un cœur de plus dans le HUD de celui qui le ramasse (s'il en a perdu), et une vie de plus
           const soigne = j.pv < PV_HEROS;
           if (soigne) j.pv++;
-          const gagne = p.vies < VIES_MAX;
-          if (gagne) p.vies++;
+          const gagne = p.arene ? p.arene.gagneVie(j.siege) : p.vies < VIES_MAX;
+          if (gagne && !p.arene) p.vies++;
           e.fini = true;
           p.son('liberation', e.corps.x, e.corps.y);
           const [texte, couleur] = gagne
@@ -97,7 +103,8 @@ export function interactions(p: Partie): void {
           break;
       }
     }
-    for (const d of p.lu.declencheurs) {
+    // en battle royale, pas de dialogues de l'histoire
+    for (const d of p.arene ? [] : p.lu.declencheurs) {
       if (p.dejaDit.has(d.tx) || j.corps.x < d.x) continue;
       p.dejaDit.add(d.tx);
       for (const r of p.lu.def.dialogues[d.cle] ?? [])
@@ -122,6 +129,8 @@ function collisionsTirs(p: Partie): void {
         autre.termine(p);
         if (!tir.def.perce) tir.termine(p);
       }
+    // en battle royale, le tir d'un héros vise aussi les autres héros (voir Partie.cibles)
+    p.tireur = p.arene && tir.camp === 'heros' ? tir.tireur : null;
     const visees = tir.camp === 'heros' ? p.cibles('ennemis') : p.cibles('heros');
     const b = tir.boite;
     for (const c of visees) {
@@ -137,4 +146,5 @@ function collisionsTirs(p: Partie): void {
       if (c.vivant() && chevauche(b, c)) tir.touche(p, c);
     }
   }
+  p.tireur = null;
 }

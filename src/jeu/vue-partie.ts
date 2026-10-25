@@ -77,5 +77,6 @@ export function construitVue(p: Partie): EtatVue {
     ...(p.phase === 'reve' && p.reve ? { reve: p.reve.vue() } : {}),
     ...(p.phase === 'avion' && p.avion ? { avion: p.avion.vue() } : {}),
     ...(p.phase === 'kart' && p.kart ? { kart: p.kart.vue() } : {}),
+    ...(p.arene ? { arene: p.arene.vue() } : {}),
   };
 }

@@ -19,6 +19,7 @@ ICONES = {
     'reglages': 'settings', 'verifier': 'circle-check', 'exporter': 'share-2', 'importer': 'upload',
     'modules': 'boxes', 'quitter': 'log-out', 'telecharger': 'download', 'copier': 'copy', 'supprimer': 'trash-2',
     'creer': 'package-plus', 'palette': 'layout-grid',
+    'enregistrer': 'save', 'bibliotheque': 'library', 'arene': 'swords',
 }
 
 

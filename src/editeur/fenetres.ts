@@ -4,6 +4,7 @@ import { DocumentNiveau, TAILLE_MAX, TAILLE_MIN } from './document';
 import type { Editeur } from './editeur';
 import { bouton, demandeFichier, element, fenetre, nomDeFichier, offreFichier } from './fenetre';
 import { mesModules } from './fenetres-modules';
+import { conseilArene, enregistre, mesNiveauxEditeur } from './fenetres-niveaux';
 
 /**
  * Les fenêtres du menu de l'éditeur : un nouveau niveau, partir d'un niveau du jeu, le nom, le thème et la taille, vérifier le
@@ -48,8 +49,10 @@ export function menuPrincipal(ed: Editeur): void {
     bouton('verifier', 'Vérifier le parcours', () => {
       ferme();
       const v = ed.doc.verifie();
-      ed.dit(v.message, !v.ok);
+      ed.dit([v.message, conseilArene(ed)].filter(Boolean).join(' '), !v.ok);
     }),
+    bouton('enregistrer', 'Enregistrer dans Mes niveaux', () => (ferme(), enregistre(ed))),
+    bouton('bibliotheque', 'Mes niveaux', () => (ferme(), mesNiveauxEditeur(ed))),
     bouton('exporter', 'Exporter le niveau', () => (ferme(), exporte(ed))),
     bouton('importer', 'Importer un niveau', () => (ferme(), importe(ed))),
     bouton('modules', 'Mes modules', () => (ferme(), mesModules(ed))),
