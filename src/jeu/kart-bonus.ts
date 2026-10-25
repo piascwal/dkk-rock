@@ -10,10 +10,10 @@ import { FLAQUES_MAX } from './vue-kart';
  * sur soi-même ceux qui roulent dedans.
  */
 
-const REAPPARITION = 5 * TICKS_PAR_SECONDE;
+const REAPPARITION = 3 * TICKS_PAR_SECONDE;
 const VIE_FLAQUE = 20 * TICKS_PAR_SECONDE;
 /** La portée du marteau : la voiture juste devant, pas plus loin. */
-const PORTEE_MARTEAU = 110;
+const PORTEE_MARTEAU = 150;
 
 export class Bonus {
   /** pour chaque caisse, les ticks avant qu'elle ne réapparaisse (0 : elle est là) */
@@ -40,7 +40,7 @@ export class Bonus {
           son('ramasse');
         }
       });
-      const f = this.flaques.findIndex((f) => Math.hypot(f.x - v.x, f.y - v.y) < RAYON + 3);
+      const f = this.flaques.findIndex((f) => Math.hypot(f.x - v.x, f.y - v.y) < RAYON + 8);
       if (f >= 0 && v.subit('glisse')) {
         this.flaques.splice(f, 1);
         son('chute');

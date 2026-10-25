@@ -161,10 +161,7 @@ export class ConcoursKart {
         cmd = r.k;
         lance = r.lance;
       }
-      // les pilotes de l'ordinateur ne lâchent pas le joueur, sans le dépasser de trop loin
-      const pouce =
-        siege >= 0 || this.multi ? 1 : v.avance < tete - 300 ? 1.07 : v.avance > tete + 400 ? 0.94 : 1;
-      v.avanceUnPas(cmd, pouce);
+      v.avanceUnPas(cmd, siege >= 0 || this.multi ? 1 : this.pouce(v, tete));
       if (lance) this.bonus.lance(v, this.voitures, son);
     });
     for (let a = 0; a < this.voitures.length; a++)
@@ -179,6 +176,17 @@ export class ConcoursKart {
     this.suitLaCamera();
     if (this.multi) this.regleDeLEcran(presents, son);
     else this.arrivees(son);
+  }
+
+  /**
+   * Seul, le coup de pouce (ou de frein) d'un pilote de l'ordinateur : ils roulent un peu moins vite que le joueur ; sorti de
+   * l'écran devant lui, un pilote lève franchement le pied ; resté loin derrière, il remonte. Le peloton reste groupé.
+   */
+  private pouce(v: VoitureKart, tete: number): number {
+    const dehors = Math.abs(v.x - this.camX) > DEMI_VUE[0] || Math.abs(v.y - this.camY) > DEMI_VUE[1];
+    if (dehors && v.avance > tete) return 0.7;
+    if (v.avance < tete - 300) return 1.05;
+    return 0.92;
   }
 
   /** Seul : les tours, les arrivées ; le joueur arrivé, les autres ont quelques secondes pour finir. */
@@ -296,10 +304,14 @@ export class ConcoursKart {
           (v.saut > 0 ? EFFETS_KART.saut : 0) |
           (v.bouclier > 0 ? EFFETS_KART.bouclier : 0) |
           (v.elimine ? EFFETS_KART.elimine : 0) |
-          (v.arrivee >= 0 ? EFFETS_KART.arrive : 0),
+          (v.arrivee >= 0 ? EFFETS_KART.arrive : 0) |
+          (v.remis > 0 ? EFFETS_KART.remis : 0),
         tour: Math.min(TOURS, Math.max(1, Math.floor(v.avance / LONGUEUR_TOUR) + 1)),
         place: ordre.indexOf(k) + 1,
         points: this.points[k] ?? 0,
+        saut: v.saut,
+        ecrase: v.ecrase,
+        cogne: v.cogne,
       })),
       choix: this.choix.map((c) => ({ ...c })),
       flaques: this.bonus.flaques.map((f) => ({ x: f.x, y: f.y })),

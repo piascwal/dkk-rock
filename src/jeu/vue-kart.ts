@@ -18,6 +18,8 @@ export const EFFETS_KART = {
   bouclier: 16,
   elimine: 32,
   arrive: 64,
+  /** remis sur la piste : il clignote */
+  remis: 128,
 } as const;
 
 export interface VoitureVue {
@@ -35,6 +37,10 @@ export interface VoitureVue {
   place: number;
   /** les points (à plusieurs) */
   points: number;
+  /** ce qui reste (ticks) du saut du ressort, de l'écrasement par le marteau, des étincelles d'un choc : de quoi les animer */
+  saut: number;
+  ecrase: number;
+  cogne: number;
 }
 
 export interface VueKart {

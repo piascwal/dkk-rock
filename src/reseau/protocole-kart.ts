@@ -3,7 +3,7 @@ import { ETAPES_KART, FLAQUES_MAX, type VueKart } from '../jeu/vue-kart';
 
 /** Le Grand Prix de la Sarré dans l'instantané réseau (voir protocole.ts), à la suite des entités pendant la phase `kart`. */
 const VOITURES_MAX = 5;
-const OCTETS_VOITURE = 15;
+const OCTETS_VOITURE = 17;
 export const OCTETS_KART =
   16 + VOITURES_MAX * OCTETS_VOITURE + 1 + 3 * MAX_JOUEURS + 1 + 4 * FLAQUES_MAX + 1 + VOITURES_MAX;
 
@@ -44,7 +44,9 @@ export function encodeKart(d: DataView, o: number, v: VueKart): void {
     b(c.place);
     b(c.points);
     w((v.arrivees[k] ?? -1) + 1);
-    o += OCTETS_VOITURE - 14;
+    b(c.saut);
+    b(c.ecrase);
+    b(c.cogne);
   }
   b(Math.min(MAX_JOUEURS, v.choix.length));
   for (let k = 0; k < MAX_JOUEURS; k++) {
@@ -96,7 +98,8 @@ export function decodeKart(d: DataView, o: number): VueKart | null {
       const place = b();
       const points = b();
       arrivees.push(w() - 1);
-      voitures.push({ pilote, siege, x, y, a, bonus, effets, tour, place, points });
+      const [saut, ecrase, cogne] = [b(), b(), b()];
+      voitures.push({ pilote, siege, x, y, a, bonus, effets, tour, place, points, saut, ecrase, cogne });
     }
     o = debut + OCTETS_VOITURE;
   }

@@ -42,7 +42,10 @@ export const DUREES_KART = {
   bouclier: 6 * SECONDE,
 };
 /** Le rayon d'une voiture, pour les chocs entre elles. */
-export const RAYON = 9;
+export const RAYON = 11;
+/** Hors de l'asphalte plus longtemps que ça (ticks), on est remis au milieu de la piste ; puis on clignote, intouchable. */
+const HORS_PISTE_MAX = SECONDE;
+export const DUREE_REMISE = SECONDE;
 
 export interface CommandesKart {
   gauche: boolean;
@@ -73,6 +76,11 @@ export class VoitureKart {
   elimine = false;
   /** un coup reçu, à faire sonner par le concours (et à oublier) */
   choc = false;
+  /** depuis combien de temps il roule hors de l'asphalte ; le temps qui lui reste à clignoter après une remise en piste */
+  horsPiste = 0;
+  remis = 0;
+  /** les étincelles d'un choc contre une autre voiture (ticks) */
+  cogne = 0;
 
   constructor(readonly pilote: number) {}
 
@@ -94,7 +102,20 @@ export class VoitureKart {
 
   /** Pose la voiture (la grille, ou le regroupement d'une manche) : immobile, cap donné, la distance courue au point du tracé. */
   pose(x: number, y: number, a: number, i: number, avance: number): void {
-    Object.assign(this, { x, y, a, i, avance, vx: 0, vy: 0, ecrase: 0, glisse: 0, saut: 0, turbo: 0 });
+    Object.assign(this, {
+      x,
+      y,
+      a,
+      i,
+      avance,
+      vx: 0,
+      vy: 0,
+      ecrase: 0,
+      glisse: 0,
+      saut: 0,
+      turbo: 0,
+      horsPiste: 0,
+    });
     this.d = projette(x, y, i).d;
   }
 
@@ -106,13 +127,14 @@ export class VoitureKart {
     let cote = -this.vx * sa + this.vy * ca; // de côté : la glisse
     const libre = this.ecrase === 0 && this.glisse === 0;
     const surface = this.saut > 0 ? 0 : Math.abs(this.d);
-    const freinSol = surface > BORD_GRAVIER ? 2.4 : surface > BORD_VIBREUR ? 1.5 : 0;
+    // de l'arcade : l'herbe et le gravier freinent, sans clouer sur place
+    const freinSol = surface > BORD_GRAVIER ? 1.6 : surface > BORD_VIBREUR ? 1 : 0;
     const vmax =
       this.vitesseMax *
       coupDePouce *
-      (this.turbo > 0 ? 1.45 : 1) *
-      (freinSol > 2 ? 0.45 : freinSol > 1 ? 0.6 : 1);
-    const accel = (this.turbo > 0 ? 320 : 200 - 10 * this.poids) * (freinSol ? 0.7 : 1);
+      (this.turbo > 0 ? 1.6 : 1) *
+      (freinSol > 1.5 ? 0.6 : freinSol > 0 ? 0.78 : 1);
+    const accel = (this.turbo > 0 ? 440 : 250 - 10 * this.poids) * (freinSol ? 0.8 : 1);
     if (libre && k.gaz) av = Math.min(Math.max(av, 0) + accel * DT, Math.max(av, vmax));
     else if (libre && k.frein) av = Math.max(av - 320 * DT, -60);
     av -= av * (0.7 + freinSol) * DT;
@@ -120,7 +142,7 @@ export class VoitureKart {
     // tourner : d'autant plus vite qu'on roule (pas sur place), à l'envers en marche arrière
     if (libre) {
       const sens = (k.droite ? 1 : 0) - (k.gauche ? 1 : 0);
-      this.a += sens * 3.1 * DT * Math.min(1, Math.abs(av) / 70) * Math.sign(av || 1);
+      this.a += sens * 3.7 * DT * Math.min(1, 0.35 + Math.abs(av) / 80) * Math.sign(av || 1);
     }
     if (this.glisse > 0) this.a += 9 * DT; // la voiture tourne sur elle-même, dans l'huile
     if (this.ecrase > 0) av *= 0.9;
@@ -131,8 +153,19 @@ export class VoitureKart {
     this.vy = av * nb + cote * na;
     this.x += this.vx * DT;
     this.y += this.vy * DT;
-    for (const n of ['turbo', 'ecrase', 'glisse', 'saut', 'bouclier'] as const) if (this[n] > 0) this[n]--;
+    for (const n of ['turbo', 'ecrase', 'glisse', 'saut', 'bouclier', 'remis', 'cogne'] as const)
+      if (this[n] > 0) this[n]--;
     this.suitLaPiste();
+    // trop longtemps hors de l'asphalte : remis au milieu de la piste, dans le bon sens, avec un peu d'élan
+    this.horsPiste = Math.abs(this.d) > BORD_VIBREUR && this.saut === 0 ? this.horsPiste + 1 : 0;
+    if (this.horsPiste > HORS_PISTE_MAX) this.remetEnPiste();
+  }
+
+  remetEnPiste(): void {
+    const t = surTrace(this.i, 0);
+    Object.assign(this, { x: t.x, y: t.y, a: t.a, d: 0, horsPiste: 0, remis: DUREE_REMISE, glisse: 0 });
+    this.vx = Math.cos(t.a) * 70;
+    this.vy = Math.sin(t.a) * 70;
   }
 
   /** Où il en est sur la piste : la distance courue (d'un point du tracé au suivant), et le mur de pneus, qui le renvoie. */
@@ -175,9 +208,12 @@ export class VoitureKart {
   }
 }
 
-/** Deux voitures qui se touchent : chacune est repoussée selon son poids, et elles échangent un peu de leur vitesse. */
+/**
+ * Deux voitures qui se touchent : de l'arcade, elles rebondissent l'une sur l'autre (selon leur poids), avec des étincelles ; une
+ * voiture sous bouclier ne bouge pas et envoie l'autre valser.
+ */
 export function heurte(a: VoitureKart, b: VoitureKart): boolean {
-  if (a.saut > 0 || b.saut > 0 || a.elimine || b.elimine) return false;
+  if (a.saut > 0 || b.saut > 0 || a.elimine || b.elimine || a.remis > 0 || b.remis > 0) return false;
   const dx = b.x - a.x;
   const dy = b.y - a.y;
   const d = Math.hypot(dx, dy);
@@ -185,17 +221,23 @@ export function heurte(a: VoitureKart, b: VoitureKart): boolean {
   const nx = dx / d;
   const ny = dy / d;
   const recouvre = 2 * RAYON - d;
-  const ka = b.poids / (a.poids + b.poids);
+  let ka = b.poids / (a.poids + b.poids);
+  if (a.bouclier > 0 && b.bouclier === 0) ka = 0;
+  if (b.bouclier > 0 && a.bouclier === 0) ka = 1;
   a.x -= nx * recouvre * ka;
   a.y -= ny * recouvre * ka;
   b.x += nx * recouvre * (1 - ka);
   b.y += ny * recouvre * (1 - ka);
   const vr = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
-  if (vr < 0) {
-    a.vx += vr * nx * ka;
-    a.vy += vr * ny * ka;
-    b.vx -= vr * nx * (1 - ka);
-    b.vy -= vr * ny * (1 - ka);
-  }
-  return -vr > 50;
+  if (vr >= 0 && recouvre < 3) return false;
+  // le rebond : au moins une petite poussée, même à l'arrêt ; bien plus fort contre un bouclier
+  const bouclier = a.bouclier > 0 || b.bouclier > 0 ? 2.4 : 1;
+  const j = Math.max(-vr * 1.4, 70) * bouclier;
+  a.vx -= j * nx * ka;
+  a.vy -= j * ny * ka;
+  b.vx += j * nx * (1 - ka);
+  b.vy += j * ny * (1 - ka);
+  const nouveau = a.cogne === 0 && b.cogne === 0;
+  a.cogne = b.cogne = 12;
+  return nouveau && j > 90;
 }

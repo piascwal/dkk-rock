@@ -104,6 +104,9 @@ const voitureFixe = (pilote: number, x: number, y: number) => ({
   tour: 1,
   place: 1,
   points: 0,
+  saut: 0,
+  ecrase: 0,
+  cogne: 0,
 });
 
 /** Le bonus en réserve, dans sa case : une icône par bonus. */
