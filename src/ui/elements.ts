@@ -22,7 +22,8 @@ export const bouton = (texte: string, action: () => void, classe = ''): HTMLButt
  * hauteur : le moins de colonnes possible. À rappeler quand l'écran change de taille.
  */
 export function ajusteColonnes(ecran: HTMLElement): void {
-  for (const c of ecran.querySelectorAll<HTMLElement>('.boutons-menu, .ligne')) {
+  // le menu principal reste toujours en une colonne (classe `une-colonne`) : il ne se coupe jamais
+  for (const c of ecran.querySelectorAll<HTMLElement>('.boutons-menu:not(.une-colonne), .ligne')) {
     const n = c.children.length;
     let lignes = n;
     c.style.setProperty('--lignes', String(lignes));

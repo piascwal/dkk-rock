@@ -76,7 +76,7 @@ export class Menus {
   }
 
   titre(): void {
-    const boutons = el('div', '', 'boutons-menu');
+    const boutons = el('div', '', 'boutons-menu une-colonne');
     boutons.append(
       bouton('Continuer', () => this.carte(), 'principal'),
       bouton('Rejoindre des amis', () => this.rejoindre()),

@@ -160,7 +160,7 @@ export class App implements Actions {
     void import('./editeur/editeur').then(({ ouvreEditeur }) =>
       ouvreEditeur({
         teste: (def, retour) => this.testeNiveau(def, retour),
-        quitte: () => this.menus.options(),
+        quitte: () => this.menus.titre(),
       }),
     );
   }

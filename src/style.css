@@ -185,6 +185,12 @@ h2 {
   align-items: stretch;
 }
 
+/* le menu principal : toujours une seule colonne, quelle que soit la taille de l'écran */
+.boutons-menu.une-colonne {
+  display: flex;
+  flex-direction: column;
+}
+
 /* le menu des mini-jeux : un mini-jeu par ligne, son bouton à gauche et son record en face, à droite */
 .mini-jeux {
   display: grid;
