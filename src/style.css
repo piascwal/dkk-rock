@@ -971,3 +971,35 @@ h2 {
   bottom: max(10px, env(safe-area-inset-bottom));
   margin: 0;
 }
+
+/* le podium d'un mini-jeu de l'histoire : rejouer, ou continuer vers le niveau suivant */
+.fin-mini {
+  position: absolute;
+  left: 50%;
+  bottom: 2%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  z-index: 30;
+}
+
+.fin-mini[hidden] {
+  display: none;
+}
+
+.fin-bouton {
+  font-family: var(--titre);
+  font-size: 0.8rem;
+  color: #fff;
+  background: #1a2440;
+  border: 2px solid #ffd23f;
+  border-radius: 6px;
+  padding: 8px 14px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.fin-bouton:hover,
+.fin-bouton:focus-visible {
+  background: #2a3a66;
+}

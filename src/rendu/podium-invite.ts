@@ -1,8 +1,8 @@
 import { ecritCentre } from './police';
 
 /**
- * L'invite du podium, clignotante : à la suite de l'histoire, SAUT passe au niveau suivant et BAS rejoue le mini-jeu ;
- * depuis le menu des mini-jeux, SAUT rejoue.
+ * L'invite du podium, clignotante : à la suite de l'histoire, SAUT passe au niveau suivant (les boutons de ui/fin-mini-jeu.ts
+ * proposent aussi de rejouer) ; depuis le menu des mini-jeux, SAUT rejoue.
  */
 export function invitePodium(
   ctx: CanvasRenderingContext2D,
@@ -13,5 +13,4 @@ export function invitePodium(
 ): void {
   if (miniJeu) return ecritCentre(ctx, 'SAUT : REJOUER', x, y, '#ffffff');
   ecritCentre(ctx, `SAUT : ${suite}`, x, y, '#ffffff');
-  ecritCentre(ctx, 'BAS : RÉESSAYER', x, y + 10, '#ffffff');
 }

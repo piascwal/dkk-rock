@@ -27,6 +27,7 @@ import { Hud } from './ui/hud';
 import { afficheNouvelleVersion } from './ui/maj';
 import { Menus, type Actions } from './ui/menus';
 import { pleinEcran } from './ui/plein-ecran';
+import { FinMiniJeu } from './ui/fin-mini-jeu';
 import { verifieVersion } from './version';
 
 const PAS_MS = 1000 / 60;
@@ -55,6 +56,7 @@ export class App implements Actions {
   );
   private readonly clavier = new Clavier();
   private readonly tactile = new Tactile($('jeu'));
+  private readonly finMini = new FinMiniJeu($('jeu'));
   private readonly menus = new Menus($('ecran'), this);
   private partie: Partie | null = null;
   private hote: Hote | null = null;
@@ -245,7 +247,7 @@ export class App implements Actions {
   // ——— la boucle ———
   private commandes(): number {
     if (this.enPause || this.menus.ouvert || this.recrue.enCours) return 0;
-    return this.clavier.commandes | this.tactile.commandes | commandesManette();
+    return this.clavier.commandes | this.tactile.commandes | commandesManette() | this.finMini.commandes;
   }
 
   private boucle(t: number): void {
@@ -327,6 +329,7 @@ export class App implements Actions {
 
   private affiche(v: EtatVue, carte: Carte, siege: number): void {
     this.derniereVue = v;
+    this.finMini.maj(v);
     this.annonceRecrue(v, siege);
     this.rendu.dessine(v, carte, siege);
     const noms: string[] = Array<string>(MAX_JOUEURS).fill('');
