@@ -107,7 +107,12 @@ export function valideDef(o: unknown, id: string): DefNiveau | null {
   const brut = d.dialogues && typeof d.dialogues === 'object' ? (d.dialogues as Record<string, unknown>) : {};
   for (const c of '123456789') {
     const l = brut[c];
-    if (!Array.isArray(l)) continue;
+    // un chiffre de la carte sans texte (un export de l'éditeur n'en a pas) : une réplique d'attente, pour que le niveau se lise
+    if (!Array.isArray(l)) {
+      if ((carte as string[]).some((ligne) => ligne.includes(c)))
+        dialogues[c] = [{ qui: 'NARRATEUR', texte: `Dialogue ${c} : à écrire.` }];
+      continue;
+    }
     dialogues[c] = l
       .filter((r: { qui?: unknown; texte?: unknown }) => QUI.has(String(r?.qui)) && chaine(r?.texte, 300))
       .slice(0, 12)
@@ -124,6 +129,8 @@ export function valideDef(o: unknown, id: string): DefNiveau | null {
     decor,
     gens,
     semis: true,
+    // ni van ni DJ Boucle : une carte de battle royale
+    ...((carte as string[]).some((l) => /[FZ]/.test(l)) ? {} : { arene: true }),
     carte: carte as string[],
   };
   try {
@@ -132,4 +139,20 @@ export function valideDef(o: unknown, id: string): DefNiveau | null {
     return null;
   }
   return def;
+}
+
+/** Un niveau exporté de l'éditeur (le texte d'un fichier .json) : il rejoint Mes niveaux ; null s'il n'est pas jouable. */
+export function importeNiveau(texte: string): NiveauSauve | null {
+  try {
+    const o = JSON.parse(texte) as Record<string, unknown>;
+    if (o.format !== 'dkk-niveau' || typeof o.nom !== 'string') return null;
+    const nom = o.nom.slice(0, 40) || 'Niveau importé';
+    const def = valideDef(
+      { titre: nom, theme: o.theme, carte: o.carte, decor: o.decor, gens: o.gens },
+      'import',
+    );
+    return def ? enregistreNiveau(nom, def, o) : null;
+  } catch {
+    return null;
+  }
 }

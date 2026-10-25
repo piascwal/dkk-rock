@@ -53,6 +53,8 @@ export interface DefNiveau {
   dialogues: Partial<Record<string, Replique[]>>;
   /** répliques à la fin du niveau */
   outro: Replique[];
+  /** une carte de battle royale (voir jeu/arene.ts) : pas de van, pas d'histoire ; on s'y affronte jusqu'au dernier */
+  arene?: boolean;
   /** le van décolle à la fin du niveau, à la force de son réacteur, au lieu de partir sur la route (un sommet) */
   envol?: boolean;
   /** un mini-jeu à la place du niveau de plateforme (l'intro lue, il commence ; voir jeu/drift.ts) */
@@ -176,7 +178,7 @@ export function litNiveau(def: DefNiveau): NiveauLu {
   lu.drapeaux.sort((a, b) => a.x - b.x); // l'ordre des drapeaux est celui du niveau, pas celui des rangées
   scelleLesEchelles(tuiles, largeur, hauteur);
   if (!lu.depart) throw new ErreurNiveau(`${def.id} : pas de départ (@)`);
-  if (!lu.fin && !lu.boss.some((b) => b.lettre === 'Z'))
+  if (!lu.fin && !lu.boss.some((b) => b.lettre === 'Z') && !def.arene)
     throw new ErreurNiveau(`${def.id} : ni van (F) ni boss final (Z)`);
   try {
     lu.tyroliennes = relieTyroliennes(debuts, bouts, jointures);

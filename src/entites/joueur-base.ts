@@ -92,6 +92,10 @@ export abstract class JoueurBase implements Cible, EtatSpecial {
     return this.echelle;
   }
 
+  get surTyrolienne(): boolean {
+    return this.tyro !== null;
+  }
+
   vivant(): boolean {
     return !this.mort;
   }

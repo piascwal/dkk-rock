@@ -8,6 +8,8 @@ describe('les niveaux', () => {
   it.each(NIVEAUX.map((n, i) => [n.id, i] as const))('%s se lit sans erreur', (_id, i) => {
     const lu = niveauLu(i);
     for (const e of lu.ennemis) expect(ENNEMIS_PAR_LETTRE[e.lettre], `ennemi ${e.lettre}`).toBeDefined();
+    // une arène du battle royale n'a ni histoire ni fin (voir arene.test.ts)
+    if (lu.def.arene) return;
     expect(lu.def.intro.length).toBeGreaterThan(0);
     // un mini-jeu (le pré du Clos) n'a ni niveau de plateforme à parcourir ni bilan
     if (lu.def.miniJeu) return;
@@ -15,7 +17,7 @@ describe('les niveaux', () => {
     expect(lu.def.outro.length).toBeGreaterThan(0);
   });
 
-  it.each(NIVEAUX.map((n, i) => [n.id, i] as const))(
+  it.each(NIVEAUX.flatMap((n, i) => (n.arene ? [] : [[n.id, i] as const])))(
     '%s : on atteint la fin sans rien détruire',
     (_id, i) => {
       const lu = niveauLu(i);

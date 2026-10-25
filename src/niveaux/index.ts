@@ -45,6 +45,7 @@ import { LUND } from './textes/19-lund';
 import { NEW_YORK } from './textes/20-new-york';
 import { MARSEILLE } from './textes/21-marseille';
 import { OTTAWA } from './textes/23-ottawa';
+import { ARENES } from './arenes';
 
 /** Les niveaux, arc après arc (voir arcs.ts). Pour en ajouter un : un texte, une carte, une ligne ici. */
 export const NIVEAUX: DefNiveau[] = [
@@ -82,6 +83,8 @@ export const NIVEAUX: DefNiveau[] = [
   { ...KART, carte: CARTE_KART },
   // Ottawa, ajouté après coup : il vient entre New York et Lund dans l'International Tour (voir arcs.ts)
   { ...OTTAWA, carte: CARTE_OTTAWA, decor: DECOR_OTTAWA },
+  // les cartes du battle royale, hors de tout arc (voir arenes.ts)
+  ...ARENES,
 ];
 
 /** Les niveaux du jeu lui-même ; au-delà, des niveaux de l'éditeur (essais, Mes niveaux, ou reçus d'un hôte). */

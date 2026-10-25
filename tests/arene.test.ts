@@ -7,14 +7,17 @@ import { Partie } from '../src/jeu/partie';
 import { T } from '../src/monde/tuiles';
 import { NIVEAUX, installeNiveau, niveauLu, NOMBRE_NIVEAUX_JEU } from '../src/niveaux';
 import { litNiveau } from '../src/niveaux/format';
+import { accessibles } from '../src/niveaux/accessibilite';
+import { Carte } from '../src/monde/carte';
 import { valideDef } from '../src/niveaux/mes-niveaux';
 import { decodeEtat, encodeEtat } from '../src/reseau/protocole';
 
-const STC = NIVEAUX.findIndex((d) => d.id === 'stc');
+const TOUR = NIVEAUX.findIndex((d) => d.id === 'arene-tour-de-mixage');
+const ARENES_DU_JEU = NIVEAUX.flatMap((d, i) => (d.arene ? [[d.id, i] as const] : []));
 
 /** Un battle royale à `n` joueurs ; `enLigne` : il commence au salon. */
 function arene(n: number, enLigne = false, ia: number[] = []): Partie {
-  const p = new Partie({ niveau: STC, drapeau: -1, vies: 0, score: 0 });
+  const p = new Partie({ niveau: TOUR, drapeau: -1, vies: 0, score: 0 });
   for (let s = 0; s < n; s++) p.ajouteJoueur(s, s);
   p.ouvreArene({ ennemis: false }, enLigne, ia);
   return p;
@@ -88,23 +91,49 @@ describe('le battle royale', () => {
     expect(b.mort).toBe(true);
   });
 
-  it('dehors, la zone fait perdre de la vie', () => {
-    const p = arene(2);
-    pas(p, 190);
-    const a = p.joueurs[0]!;
-    // hors de la zone (elle couvre une partie de la carte seulement, à deux)
-    const [g, d] = p.arene!.zone;
-    a.corps.x = g > 4 * TUILE ? TUILE : d + 4 * TUILE;
-    a.invulnerable = 0;
-    const pv = a.pv;
-    pas(p, 61);
-    expect(a.pv).toBeLessThan(pv);
+  it.each(ARENES_DU_JEU)('%s : petite, close, en hauteur, et tout se rejoint depuis le départ', (_id, i) => {
+    const lu = niveauLu(i);
+    expect(lu.largeur * lu.hauteur).toBeLessThan(4000);
+    expect(lu.fin).toBeNull();
+    expect(lu.tyroliennes.length).toBeGreaterThanOrEqual(2);
+    // là où l'on peut se tenir (une case libre, sa voisine du dessus aussi, un appui dessous), presque tout est accessible
+    const c = new Carte(lu.largeur, lu.hauteur, lu.tuiles, lu.fond);
+    const acces = accessibles(lu);
+    let debout = 0;
+    let atteint = 0;
+    for (let y = 1; y < lu.hauteur - 1; y++)
+      for (let x = 1; x < lu.largeur - 1; x++) {
+        if (c.solide(x, y) || c.solide(x, y - 1) || c.props(x, y).echelle || c.props(x, y).traversable)
+          continue;
+        const dessous = c.props(x, y + 1);
+        if (!dessous.solide && !dessous.echelle) continue;
+        debout++;
+        if (acces[y * lu.largeur + x]) atteint++;
+      }
+    expect(atteint / debout).toBeGreaterThan(0.9);
+    // et des étages : on se tient sur au moins cinq hauteurs différentes
+    const hauteurs = new Set<number>();
+    acces.forEach((v, k) => v && hauteurs.add(Math.floor(k / lu.largeur)));
+    expect(hauteurs.size).toBeGreaterThanOrEqual(5);
   });
 
+  it('les joueurs de l’ordinateur finissent une manche sur chaque arène', () => {
+    for (const [, i] of ARENES_DU_JEU) {
+      const p = new Partie({ niveau: i, drapeau: -1, vies: 0, score: 0 });
+      for (let s = 0; s < 4; s++) p.ajouteJoueur(s, s);
+      p.ouvreArene({ ennemis: false }, false, [0, 1, 2, 3]);
+      for (let t = 0; t < 60 * 240 && p.arene!.etape !== 'fin'; t++) pas(p, 1);
+      expect(p.arene!.etape, NIVEAUX[i]!.id).toBe('fin');
+    }
+  }, 120_000);
+
   it('estime pour combien de joueurs est faite une carte', () => {
-    const [min, max] = joueursConseilles(niveauLu(STC));
-    expect(max).toBe(8);
-    expect(min).toBeGreaterThanOrEqual(3);
+    for (const [id, i] of ARENES_DU_JEU) {
+      const [min, max] = joueursConseilles(niveauLu(i));
+      expect(max, id).toBeGreaterThanOrEqual(6);
+      expect(min, id).toBeGreaterThanOrEqual(2);
+      expect(min, id).toBeLessThanOrEqual(4);
+    }
     expect(joueursConseilles(litNiveau(DocumentNiveau.vierge(60, 30).versDef('petit')))).toEqual([2, 2]);
   });
 
@@ -128,5 +157,20 @@ describe('le battle royale', () => {
     const i = NOMBRE_NIVEAUX_JEU + 40;
     installeNiveau(i, relu);
     expect(niveauLu(i).largeur).toBe(60);
+  });
+
+  it('une arène de l’éditeur : sans van, elle se lit, se vérifie et s’importe comme carte de battle royale', () => {
+    const d = DocumentNiveau.arene();
+    expect(d.estArene).toBe(true);
+    expect(d.verifie().ok).toBe(true);
+    const def = d.versDef('perso');
+    expect(def.arene).toBe(true);
+    expect(litNiveau(def).fin).toBeNull();
+    // un export de l'éditeur, relu : la même carte, marquée arène
+    const relu = valideDef({ titre: 'X', theme: def.theme, carte: d.versJSON().carte }, 'import')!;
+    expect(relu.arene).toBe(true);
+    expect(
+      valideDef({ titre: 'X', theme: 'club', carte: DocumentNiveau.vierge().versJSON().carte }, 'v')!.arene,
+    ).toBeUndefined();
   });
 });

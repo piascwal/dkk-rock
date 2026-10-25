@@ -19,8 +19,8 @@ import type { Cible } from './contexte';
 import type { Partie } from './partie';
 
 /**
- * Le battle royale : jusqu'à 8 joueurs sur une carte, 3 vies chacun, et les tirs des héros blessent les autres héros. On réapparaît
- * loin des autres ; une zone se referme peu à peu (on perd de la vie dehors) ; le dernier en lice gagne.
+ * Le battle royale : jusqu'à 8 joueurs sur une petite carte faite pour ça (voir niveaux/arenes.ts, ou un niveau de l'éditeur),
+ * 3 vies chacun, et les tirs des héros blessent les autres héros. On réapparaît loin des autres ; le dernier en lice gagne.
  *
  * Les étapes : le salon (en ligne, on attend les joueurs en se dégourdissant les jambes, sans dégâts), le compte à rebours (tout
  * le monde est placé, figé), le combat, la fin (le classement ; « suivant » relance une manche sur la même carte).
@@ -33,14 +33,6 @@ export const ETAPES_ARENE = ['salon', 'compte', 'combat', 'fin'] as const;
 export type EtapeArene = (typeof ETAPES_ARENE)[number];
 
 const COMPTE = 3 * TICKS_PAR_SECONDE;
-/** la zone ne bouge pas tout de suite : le temps de se trouver */
-const ZONE_FIXE = 20 * TICKS_PAR_SECONDE;
-const ZONE_RESSERRE = 120 * TICKS_PAR_SECONDE;
-/** la largeur de la zone à la fin (en tuiles), et la largeur de départ par joueur */
-const ZONE_FINALE = 14;
-const ZONE_PAR_JOUEUR = 45;
-/** dehors, on perd un cœur toutes les secondes */
-const DEGATS_ZONE = TICKS_PAR_SECONDE;
 /** à la réapparition, quelques secondes sans dégâts */
 const PROTECTION = 150;
 /** on ne relance pas la manche d'un appui maladroit juste après la fin */
@@ -56,8 +48,6 @@ export interface VueArene {
   etape: EtapeArene;
   /** compte à rebours et fin : les ticks écoulés dans l'étape ; combat : les secondes de combat */
   minuteur: number;
-  /** la zone, en pixels du monde (bord gauche, bord droit) */
-  zone: [number, number];
   /** par siège : les vies qui restent, les éliminations faites, le rang final (1 : vainqueur ; 0 : encore en lice) */
   vies: number[];
   eliminations: number[];
@@ -65,25 +55,25 @@ export interface VueArene {
   ennemis: boolean;
 }
 
-/** Combien de joueurs pour cette carte : la surface où l'on peut aller, en cases, donne une fourchette (2 à 8). */
+/**
+ * Combien de joueurs pour cette carte : la surface où l'on peut se tenir, en cases, donne une fourchette (2 à 8). Une arène du
+ * jeu (72 × 36, plusieurs étages) en a 240 à 460 : de quoi être 2 à 4 au moins, 7 ou 8 au plus.
+ */
 export function joueursConseilles(lu: NiveauLu): [number, number] {
   const n = parcoursAcces(lu).dist.reduce((s, d) => s + (d >= 0 ? 1 : 0), 0);
-  const max = Math.max(2, Math.min(MAX_JOUEURS, Math.floor(n / 150)));
-  const min = Math.max(2, Math.min(max, Math.round(n / 400)));
+  const max = Math.max(2, Math.min(MAX_JOUEURS, Math.floor(n / 30)));
+  const min = Math.max(2, Math.min(max, Math.round(n / 110)));
   return [min, max];
 }
 
 export class Arene {
   etape: EtapeArene;
   minuteur = 0;
-  zone: [number, number] = [0, 0];
   readonly vies = new Array<number>(MAX_JOUEURS).fill(0);
   readonly eliminations = new Array<number>(MAX_JOUEURS).fill(0);
   readonly rangs = new Array<number>(MAX_JOUEURS).fill(0);
   /** les cases où l'on peut se tenir (y × largeur + x) : là où l'on réapparaît */
   private cases: number[] = [];
-  private depart: [number, number] = [0, 0];
-  private arrivee: [number, number] = [0, 0];
   private cibles = new Map<number, Cible[]>();
   /** les joueurs de l'ordinateur (hors ligne) */
   ia: IAArene | null = null;
@@ -120,22 +110,12 @@ export class Arene {
     this.cases = [];
     dist.forEach((d, k) => d >= 0 && this.cases.push(k));
     if (!this.cases.length) this.cases.push(p.lu.depart.ty * p.lu.largeur + p.lu.depart.tx);
-    this.zone = [0, p.lu.largeur * TUILE];
     this.cibles.clear();
   }
 
-  /** Le début d'une manche : chacun a ses vies, la zone de départ est tirée selon le nombre de joueurs, puis le compte à rebours. */
+  /** Le début d'une manche : chacun a ses vies et sa place, loin des autres, puis le compte à rebours. */
   demarre(p: Partie): void {
     const joueurs = p.joueurs.filter((j): j is Joueur => !!j);
-    const L = p.lu.largeur * TUILE;
-    const largeur = Math.min(L, (40 + ZONE_PAR_JOUEUR * joueurs.length) * TUILE);
-    const centre = this.caseAuHasard(p, this.cases)[0] + HEROS_LARGEUR / 2;
-    const g = Math.max(0, Math.min(L - largeur, centre - largeur / 2));
-    this.depart = [g, g + largeur];
-    const fin = this.caseAuHasard(p, this.casesDans(p, [g, g + largeur]))[0] + HEROS_LARGEUR / 2;
-    const demi = (ZONE_FINALE * TUILE) / 2;
-    this.arrivee = [Math.max(g, fin - demi), Math.min(g + largeur, fin + demi)];
-    this.zone = [...this.depart];
     this.vies.fill(0);
     this.eliminations.fill(0);
     this.rangs.fill(0);
@@ -172,22 +152,6 @@ export class Arene {
       this.etape = 'combat';
       this.minuteur = 0;
       p.son('demarrage', 0, 0);
-    }
-    if (this.etape !== 'combat') return;
-    // la zone : fixe un moment, puis elle se referme vers l'arrivée
-    const t = Math.max(0, Math.min(1, (this.minuteur - ZONE_FIXE) / ZONE_RESSERRE));
-    this.zone = [
-      this.depart[0] + (this.arrivee[0] - this.depart[0]) * t,
-      this.depart[1] + (this.arrivee[1] - this.depart[1]) * t,
-    ];
-    if (this.minuteur % DEGATS_ZONE !== 0) return;
-    for (const j of p.joueurs) {
-      if (!j || j.mort || j.invincible > 0 || (j.cx >= this.zone[0] && j.cx <= this.zone[1])) continue;
-      j.pv--;
-      j.dernierTireur = null;
-      p.son('aie', j.cx, j.cy);
-      p.texte(j.cx, j.corps.y - 6, 'ZONE !', '#ff5a5a');
-      if (j.pv <= 0) j.meurt(p);
     }
   }
 
@@ -242,10 +206,10 @@ export class Arene {
     } else if (this.etape === 'fin' && this.minuteur >= FIN_MIN) p.relanceArene();
   }
 
-  /** Où réapparaître : une case libre dans la zone, la plus loin possible des autres joueurs (parmi quelques-unes tirées au sort). */
+  /** Où réapparaître : une case libre de la carte, la plus loin possible des autres joueurs (parmi quelques-unes tirées au sort). */
   pointLibre(p: Partie, siege: number): [number, number] {
     const autres = p.joueurs.filter((o) => o && !o.mort && o.siege !== siege);
-    const liste = this.casesDans(p, this.zone);
+    const liste = this.cases;
     let meilleur = this.caseAuHasard(p, liste);
     let score = -1;
     for (let i = 0; i < 40; i++) {
@@ -261,7 +225,6 @@ export class Arene {
     return {
       etape: this.etape,
       minuteur: this.etape === 'combat' ? Math.floor(this.minuteur / TICKS_PAR_SECONDE) : this.minuteur,
-      zone: [Math.round(this.zone[0]), Math.round(this.zone[1])],
       vies: [...this.vies],
       eliminations: [...this.eliminations],
       rangs: [...this.rangs],
@@ -269,14 +232,9 @@ export class Arene {
     };
   }
 
-  /** Les cases où se tenir entre deux bords (en pixels) ; toutes, s'il n'y en a aucune. */
-  private casesDans(p: Partie, [g, d]: [number, number]): number[] {
-    const L = p.lu.largeur;
-    const dans = this.cases.filter((k) => {
-      const x = (k % L) * TUILE + TUILE / 2;
-      return x >= g + TUILE && x <= d - TUILE;
-    });
-    return dans.length ? dans : this.cases;
+  /** Une case où se tenir, au hasard : la position du héros, pieds sur le sol (l'IA y erre quand elle tourne en rond). */
+  caseQuelconque(p: Partie): [number, number] {
+    return this.caseAuHasard(p, this.cases);
   }
 
   /** Une case de la liste, au hasard : la position du héros, pieds sur le sol. */

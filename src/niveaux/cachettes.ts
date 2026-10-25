@@ -185,7 +185,8 @@ const memoire = new Map<number, Repere[]>();
 export function cachettesDuNiveau(i: number): Repere[] {
   let c = memoire.get(i);
   if (!c) {
-    c = i >= 0 && i < NIVEAUX.length ? cachettes(niveauLu(i)) : [];
+    // une arène du battle royale n'en a pas : on n'y cherche pas de cartes
+    c = i >= 0 && i < NIVEAUX.length && !NIVEAUX[i]!.arene ? cachettes(niveauLu(i)) : [];
     memoire.set(i, c);
   }
   return c;

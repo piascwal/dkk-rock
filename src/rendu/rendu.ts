@@ -332,7 +332,7 @@ export class Rendu {
     this.emojis.accompagne(vue.entites);
     this.emojis.maj();
     this.emojis.dessine(ctx, camX, camY);
-    dessineArene(ctx, vue, siegeLocal, camX, camY, this.largeur, this.tick);
+    dessineArene(ctx, vue, siegeLocal, camX, camY, this.largeur);
     dessineIndicateurs(ctx, vue, siegeLocal, camX, camY, this.largeur, this.tick);
   }
 }

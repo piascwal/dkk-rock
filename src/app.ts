@@ -157,6 +157,9 @@ export class App implements Actions {
       ouvreEditeur({
         // l'essai d'un niveau, sans rien sauvegarder ; au bilan (ou en quittant), on revient à l'éditeur
         teste: (def, retour) => {
+          // une carte de battle royale s'essaie contre l'ordinateur
+          if (def.arene)
+            return this.joue(partieArene({ def }, { ennemis: false }, 3, this.sauvegarde.membre), retour);
           const p = new Partie({ niveau: ajouteNiveauEssai(def), drapeau: -1, vies: VIES_DEPART, score: 0 });
           p.ajouteJoueur(0, this.sauvegarde.membre);
           this.joue(p, retour);

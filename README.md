@@ -221,23 +221,35 @@ Intégrer un export :
 
 ## Battle royale
 
-Menu principal → **Battle royale** : on choisit une carte (un niveau du jeu, ou un des siens enregistré dans Mes niveaux), on
-voit pour combien de joueurs elle est faite, on garde ou non les ennemis du niveau, puis :
+Menu principal → **Battle royale** : on choisit une carte, on voit pour combien de joueurs elle est faite, on garde ou non les
+ennemis, puis :
 
 - **contre l'ordinateur** (1 à 7 adversaires) : de quoi s'entraîner ou essayer une carte ;
 - **en ligne** : un salon s'ouvre (Wi-Fi, ou code Internet via « Inviter des amis ») ; les amis le rejoignent par « Rejoindre
   des amis », s'échauffent sans se blesser, et l'hôte lance la partie (jusqu'à 8 joueurs).
 
-Trois vies chacun ; les tirs blessent les autres joueurs (jamais soi-même) ; une élimination revient à celui qui a touché en
-dernier. On réapparaît loin des autres, avec quelques secondes de protection. La zone de départ couvre une part de la carte
-selon le nombre de joueurs, reste fixe 20 secondes puis se referme en deux minutes ; dehors, on perd un cœur par seconde. Les
-cages et les cœurs redonnent une vie (5 au plus). Le dernier en lice gagne ; le classement s'affiche, et « Rejouer » relance une
-manche sur la même carte. Plusieurs joueurs peuvent jouer le même héros : un repère de couleur au-dessus de chacun dit qui est qui.
+Les cartes sont faites pour ce mode, pas celles de l'histoire : petites (72 × 36 tuiles), closes, tout en hauteur, pour se
+chercher en haut, en bas, à gauche et à droite par les échelles, les plateformes et les tyroliennes (certaines à jointures). Quatre
+arènes : **la Tour de Mixage** (le club), **les Échafaudages** (un chantier), **le Port** (deux bateaux et leurs mâts), **le
+Sommet** (une montagne creusée de grottes). S'y ajoutent les siennes : dans l'éditeur, Menu → **Nouvelle arène** (une page close,
+sans van), puis Enregistrer dans Mes niveaux ; ou « Importer un niveau (.json) » depuis le menu du battle royale (un export de
+l'éditeur, le sien ou celui d'un ami). Une carte sans van ni DJ Boucle est une carte de battle royale ; « Tester » dans l'éditeur la
+joue contre l'ordinateur.
 
-La taille conseillée vient de la surface où l'on peut aller (le même calcul que « le niveau est atteignable ») : environ 150
-cases par joueur au plus, 400 au moins, de 2 à 8. Le code : `src/jeu/arene.ts` (les règles), `src/jeu/arene-ia.ts` (les joueurs
-de l'ordinateur), `src/ui/menus-arene.ts` et `src/ui/arene-ui.ts` (menus, salon, classement), `src/rendu/arene-rendu.ts` (la
-zone), `src/niveaux/mes-niveaux.ts` (Mes niveaux, et la relecture d'un niveau reçu d'un hôte).
+Trois vies chacun ; les tirs blessent les autres joueurs (jamais soi-même) ; une élimination revient à celui qui a touché en
+dernier. On réapparaît loin des autres, avec quelques secondes de protection. Les cages et les cœurs redonnent une vie (5 au plus).
+Le dernier en lice gagne ; le classement s'affiche, et « Rejouer » relance une manche sur la même carte. Plusieurs joueurs peuvent
+jouer le même héros : un repère de couleur au-dessus de chacun dit qui est qui.
+
+Les joueurs de l'ordinateur suivent le chemin que trouve le parcours d'accessibilité vers l'adversaire le plus proche (sur la
+carte telle qu'elle est : sauts, échelles, tyroliennes qu'ils vont attraper sous leur poteau), tirent à hauteur, creusent quand
+ils sont coincés, et partent errer ailleurs s'ils tournent en rond.
+
+La taille conseillée vient de la surface où l'on peut se tenir (le même calcul que « le niveau est atteignable ») : environ 30
+cases par joueur au plus, 110 au moins, de 2 à 8. Le code : `src/jeu/arene.ts` (les règles), `src/jeu/arene-ia.ts` (l'IA),
+`src/niveaux/arenes.ts` et `outils/arenes.py` (les arènes : le script vérifie les liens des tyroliennes et leurs câbles ;
+`tests/arene.test.ts`, que tout s'atteint depuis le départ), `src/ui/menus-arene.ts` et `src/ui/arene-ui.ts` (menus, salon,
+classement), `src/niveaux/mes-niveaux.ts` (Mes niveaux, l'import, et la relecture d'un niveau reçu d'un hôte).
 
 ## À plusieurs
 

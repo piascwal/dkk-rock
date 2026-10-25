@@ -44,6 +44,14 @@ export function menuPrincipal(ed: Editeur): void {
       ferme();
       ed.remplace(DocumentNiveau.vierge(160, 40, ed.doc.theme));
     }),
+    bouton('arene', 'Nouvelle arène (battle royale)', () => {
+      if (!remplacer()) return;
+      ferme();
+      ed.remplace(DocumentNiveau.arene(72, 36, ed.doc.theme));
+      ed.dit(
+        'Une arène vide : montez des étages, des échelles, des tyroliennes. « Tester » la joue contre l’ordinateur.',
+      );
+    }),
     bouton('ouvrir', 'Partir d’un niveau du jeu', () => (ferme(), choisitNiveau(ed))),
     bouton('reglages', 'Nom, thème et taille', () => (ferme(), reglages(ed))),
     bouton('verifier', 'Vérifier le parcours', () => {

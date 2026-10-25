@@ -30,10 +30,10 @@ const prend = (p: Partie, o: Objet) => {
 
 describe('les cachettes des cartes Sibylle', () => {
   it.each(NIVEAUX.map((n, i) => [n.id, i] as const))(
-    '%s : des cartes partout sauf dans les mini-jeux',
+    '%s : des cartes partout sauf dans les mini-jeux et les arènes',
     (_id, i) => {
       const c = cachettesDuNiveau(i);
-      if (NIVEAUX[i]!.miniJeu) expect(c).toEqual([]);
+      if (NIVEAUX[i]!.miniJeu || NIVEAUX[i]!.arene) expect(c).toEqual([]);
       else expect(c.length).toBeGreaterThanOrEqual(2);
     },
   );
@@ -61,7 +61,7 @@ describe('les cachettes des cartes Sibylle', () => {
   it('assez nombreuses, et à l’écart du chemin direct (hors le ferry, tout plat, et le parc du FISE, tout en plaine)', () => {
     expect(cachettesDuNiveau(STC).length).toBeGreaterThanOrEqual(25);
     NIVEAUX.forEach((n, i) => {
-      if (n.miniJeu || n.id === 'ferry' || n.id === 'fise') return;
+      if (n.miniJeu || n.arene || n.id === 'ferry' || n.id === 'fise') return;
       const lu = niveauLu(i);
       const detour = detourDuTrace(lu);
       const cartes = cachettesDuNiveau(i);

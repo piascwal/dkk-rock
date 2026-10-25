@@ -85,6 +85,25 @@ export class DocumentNiveau {
     return d;
   }
 
+  /**
+   * Une arène de battle royale vierge : petite, close (du socle au fond et sur les bords, personne ne tombe dehors), un départ
+   * et pas de van ; reste à y monter des étages, des échelles, des tyroliennes.
+   */
+  static arene(largeur = 72, hauteur = 36, theme: NomTheme = 'club'): DocumentNiveau {
+    const sol = hauteur - 5;
+    const lignes = Array.from({ length: hauteur }, (_, y) =>
+      y === hauteur - 1 ? 'X'.repeat(largeur) : `X${(y < sol ? ' ' : '#').repeat(largeur - 2)}X`,
+    );
+    const d = new DocumentNiveau('Mon arène', theme, lignes);
+    d.g[sol - 1]![3] = '@';
+    return d;
+  }
+
+  /** Une carte de battle royale : ni van ni DJ Boucle (voir DefNiveau.arene). */
+  get estArene(): boolean {
+    return !this.g.some((r) => r.includes('F') || r.includes('Z'));
+  }
+
   /** Une copie d'un niveau du jeu, pour le modifier. */
   static depuisNiveau(def: DefNiveau): DocumentNiveau {
     const decor = (def.decor ?? []).map(([n, x, y]) => [n, x, y] as Decor);
@@ -271,6 +290,7 @@ export class DocumentNiveau {
       decor: j.decor,
       gens: j.gens,
       semis: true,
+      ...(this.estArene ? { arene: true } : {}),
       carte: j.carte,
     };
   }
@@ -283,6 +303,7 @@ export class DocumentNiveau {
     } catch (e) {
       return { ok: false, message: (e as Error).message.replace(/^verification : /, '') };
     }
+    if (lu.def.arene) return { ok: true, message: 'Carte de battle royale (sans van) : elle se lit.' };
     // la fin : le van, ou DJ Boucle (le club finit sur lui)
     const cible = lu.boss.find((b) => b.lettre === 'Z') ?? lu.fin;
     if (!cible) return { ok: false, message: 'Il manque le van (F) : le niveau ne finit jamais.' };

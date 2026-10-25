@@ -3,10 +3,10 @@ import { ARCS, arcDe, MONDE, niveauOuvert, suivantDansArc, suivantDansMonde } fr
 import { NIVEAUX } from '../src/niveaux';
 
 describe('les arcs de l’histoire', () => {
-  it('chaque niveau appartient à un seul arc, et tous les niveaux sont dans un arc', () => {
+  it('chaque niveau appartient à un seul arc, et tous les niveaux sont dans un arc (sauf les arènes du battle royale)', () => {
     const tous = ARCS.flatMap((a) => a.niveaux);
     expect(new Set(tous).size).toBe(tous.length);
-    expect([...tous].sort((a, b) => a - b)).toEqual(NIVEAUX.map((_, i) => i));
+    expect([...tous].sort((a, b) => a - b)).toEqual(NIVEAUX.flatMap((n, i) => (n.arene ? [] : [i])));
   });
 
   it('on passe d’un niveau au suivant de son arc, puis l’arc se termine', () => {
