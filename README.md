@@ -183,7 +183,7 @@ points, plus 10 par seconde d'avance sur le décollage. Le tarmac se tire d'apr�
 
 ## L'éditeur de niveau
 
-Options → **Éditeur de niveau** : on peint une carte au doigt (téléphone, en portrait comme en paysage) ou à la souris. On part
+Menu principal → **Éditeur de niveau** : on peint une carte au doigt (téléphone, en portrait comme en paysage) ou à la souris. On part
 d'une page blanche ou d'un niveau du jeu ; la carte se dessine comme en jeu (l'herbe ou la neige sur la terre, les coins
 arrondis, la végétation). La palette (le bouton en bas) range tout ce qu'on peut poser : les tuiles avec les textures du thème,
 les gens (chaque apparence à part, comme les trois bigoudènes, les gens du coin de chaque ville, qu'on peut poser ailleurs, et les

@@ -15,10 +15,15 @@ const imagesDecor = new Map<string, HTMLImageElement>();
 
 /** Les planches dont l'intro a besoin dès sa première image : les cinq héros et Fadatchi. Elles passent avant toutes les autres. */
 const ESSENTIELLES: readonly Genre[] = [G.JBT, G.JBM, G.JBG, G.MAT, G.TOM, G.KIWI];
-let essentiellesRestantes = ESSENTIELLES.length;
+/** Leurs images de saut, d'accroche à la paroi et d'échelle : sans elles, le héros s'afficherait en dessin de secours en plein jeu. */
+const ESSENTIELLES_DECOR = Object.keys(FEUILLES_DECOR).filter((nom) =>
+  /^(jbt|jbm|jbg|mat|tom)-(saut|mur|echelle)$/.test(nom),
+);
+const TOTAL_ESSENTIELLES = ESSENTIELLES.length + ESSENTIELLES_DECOR.length;
+let essentiellesRestantes = TOTAL_ESSENTIELLES;
 
 /** Où en est le chargement des planches essentielles, de 0 à 1 (une planche en échec compte : le jeu a son dessin de repli). */
-export const progresEssentielles = (): number => 1 - essentiellesRestantes / ESSENTIELLES.length;
+export const progresEssentielles = (): number => 1 - essentiellesRestantes / TOTAL_ESSENTIELLES;
 
 function chargeImage(src: string, charge: (img: HTMLImageElement) => void, fini?: () => void): void {
   const img = new Image();
@@ -51,13 +56,16 @@ export function chargeFeuilles(base: string): void {
       if (!ESSENTIELLES.includes(Number(genre) as Genre))
         chargeImage(`${base}sprites/${f.fichier}`, (img) => images.set(Number(genre) as Genre, img));
     for (const [nom, f] of Object.entries(FEUILLES_DECOR))
-      chargeImage(`${base}sprites/${f.fichier}`, (img) => imagesDecor.set(nom, img));
+      if (!ESSENTIELLES_DECOR.includes(nom))
+        chargeImage(`${base}sprites/${f.fichier}`, (img) => imagesDecor.set(nom, img));
   };
+  const fini = () => {
+    if (--essentiellesRestantes <= 0) suite();
+  };
+  for (const nom of ESSENTIELLES_DECOR)
+    chargeImage(`${base}sprites/${FEUILLES_DECOR[nom]!.fichier}`, (img) => imagesDecor.set(nom, img), fini);
   for (const g of ESSENTIELLES) {
     const f = FEUILLES[g];
-    const fini = () => {
-      if (--essentiellesRestantes <= 0) suite();
-    };
     if (f) chargeImage(`${base}sprites/${f.fichier}`, (img) => images.set(g, img), fini);
     else fini();
   }

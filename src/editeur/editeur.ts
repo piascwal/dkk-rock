@@ -20,7 +20,7 @@ import { MenuRond } from './menu-rond';
 import { Palette } from './palette';
 
 /**
- * L'éditeur de niveau (Options → Éditeur de niveau), chargé seulement quand on l'ouvre : une carte qu'on peint au doigt ou à la
+ * L'éditeur de niveau (menu principal → Éditeur de niveau), chargé seulement quand on l'ouvre : une carte qu'on peint au doigt ou à la
  * souris, avec les tuiles, les gens, les objets, le décor et les modules préconstruits du jeu ; on part d'une page blanche ou d'un
  * niveau existant, on l'essaie aussitôt, et on l'exporte (un fichier .json à envoyer, pour l'ajouter au jeu). Le brouillon se garde
  * tout seul dans le navigateur.

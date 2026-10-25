@@ -81,6 +81,7 @@ export class Menus {
       bouton('Continuer', () => this.carte(), 'principal'),
       bouton('Rejoindre des amis', () => this.rejoindre()),
       bouton('Mini-jeux', () => this.miniJeux()),
+      bouton('Éditeur de niveau', () => this.a.ouvreEditeur()),
       bouton('Options', () => this.options()),
     );
     if (peutInstaller())
@@ -239,7 +240,6 @@ export class Menus {
       qualite,
       el('p', `Affichage actuel : ${this.a.diagnostic()}`, 'aide'),
       pseudo,
-      bouton('Éditeur de niveau', () => this.a.ouvreEditeur(), 'principal'),
       efface,
       tests,
       bouton('Retour', () => this.titre()),
