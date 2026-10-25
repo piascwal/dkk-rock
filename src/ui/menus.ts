@@ -36,6 +36,8 @@ export interface Actions {
   ouvreHote(): Hote | null;
   readonly estClient: boolean;
   appliqueOptions(): void;
+  /** l'éditeur de niveau (Options) */
+  ouvreEditeur(): void;
   diagnostic(): string;
 }
 
@@ -237,6 +239,7 @@ export class Menus {
       qualite,
       el('p', `Affichage actuel : ${this.a.diagnostic()}`, 'aide'),
       pseudo,
+      bouton('Éditeur de niveau', () => this.a.ouvreEditeur(), 'principal'),
       efface,
       tests,
       bouton('Retour', () => this.titre()),

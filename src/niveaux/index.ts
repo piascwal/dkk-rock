@@ -84,6 +84,15 @@ export const NIVEAUX: DefNiveau[] = [
   { ...OTTAWA, carte: CARTE_OTTAWA, decor: DECOR_OTTAWA },
 ];
 
+/**
+ * Ajoute un niveau d'essai (fait dans l'éditeur de niveau) à la fin de la liste, le temps d'y jouer, et renvoie son indice. Chaque
+ * essai a le sien : rien de ce qui est gardé en mémoire par indice (la carte lue, les cachettes) ne vaut pour un autre.
+ */
+export function ajouteNiveauEssai(def: DefNiveau): number {
+  NIVEAUX.push(def);
+  return NIVEAUX.length - 1;
+}
+
 const lus = new Map<number, NiveauLu>();
 
 /** Le niveau lu (et gardé en mémoire : la carte d'origine ne change jamais). */

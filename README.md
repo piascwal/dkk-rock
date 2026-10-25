@@ -179,6 +179,25 @@ choc), l'aimant (les cartes viennent à lui). Quand l'avion est à portée, sur 
 points, plus 10 par seconde d'avance sur le décollage. Le tarmac se tire d'après le numéro de la course
 (`jeu/avion-parcours.ts`) ; la simulation est dans `src/jeu/avion*.ts`, le rendu dans `src/rendu/avion*.ts`.
 
+## L'éditeur de niveau
+
+Options → **Éditeur de niveau** : on peint une carte au doigt (téléphone, en portrait comme en paysage) ou à la souris. On part
+d'une page blanche ou d'un niveau du jeu ; la palette (le bouton en bas) range tout ce qu'on peut poser : les tuiles avec les
+textures du thème, les gens (les ennemis de chaque lettre, qui changent de visage selon la ville, et les boss), les objets (le
+départ, le van, les drapeaux, les cages, le butin, les tyroliennes, les déclencheurs de dialogue), le décor (les accessoires du
+jeu) et les modules préconstruits (forteresses, tours, caves, gouffres, détours de pierre de taille, monuments des villes, rampes
+du FISE...). Outils : la main (déplacer), le pinceau, le rectangle, la gomme, la pipette ; un doigt peint, deux doigts déplacent et
+zoomement ; à la souris, clic droit ou barre d'espace pour déplacer, molette pour zoomer, Ctrl+Z pour annuler. **▶ Tester** joue le
+niveau tout de suite (on revient à l'éditeur au bilan, ou en quittant) ; le menu vérifie qu'on va du départ à la fin sans rien
+casser, change le nom, le thème et la taille, et **exporte** le niveau (un fichier `.json` à partager, télécharger ou copier) :
+envoyez-le à Claude pour l'ajouter au jeu, tel quel ou retouché, comme nouveau niveau ou à la place d'un niveau existant. Le
+brouillon se garde tout seul dans le navigateur, et l'export se réimporte.
+
+Le code est dans `src/editeur/` (chargé seulement à l'ouverture de l'éditeur) ; les modules sont les pièces du générateur,
+exportées par `python3 outils/exporte-modules.py` dans `src/editeur/modules.json`. Pour ajouter un niveau exporté : sa `carte`
+devient `src/niveaux/cartes/NN-*.ts`, son `decor` le décor placé, son `theme` celui du niveau ; puis un texte et une ligne dans
+`src/niveaux/index.ts` (voir « Ajouter du contenu »).
+
 ## À plusieurs
 
 Grâce à [lan-kit](https://github.com/piascwal/lan-kit) (figé sur `v0.2.0`), **sans serveur** :

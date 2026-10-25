@@ -2,7 +2,7 @@ import type { Annonce } from '@piascwal/lan-kit';
 import { Musique } from './audio/musique';
 import { Bruitages } from './audio/sons';
 import { Synthe } from './audio/synthe';
-import { MAX_JOUEURS, VIES_DEPART } from './config';
+import { VIES_DEPART } from './config';
 import { Clavier, commandesManette } from './entrees/clavier';
 import { Tactile } from './entrees/tactile';
 import { iconeDeLArme } from './ui/icones-hud';
@@ -12,7 +12,6 @@ import { Partie } from './jeu/partie';
 import { charge, enregistre, retiensRecords, type Progression, type Sauvegarde } from './jeu/sauvegarde';
 import { partieSauvegardee } from './jeu/partie-sauvegardee';
 import type { EtatVue, Evenement } from './jeu/vue';
-import { NIVEAUX } from './niveaux';
 import type { AnnonceDkk } from './reseau/annonce';
 import { Client, type Recherche } from './reseau/client';
 import { Hote } from './reseau/hote';
@@ -24,11 +23,13 @@ import { Recrue } from './ui/recrue';
 import { prepareInstallation } from './ui/installation';
 import { Bulles, Histoire } from './ui/dialogues';
 import { Hud } from './ui/hud';
-import { afficheNouvelleVersion } from './ui/maj';
+import { controleurDeVersion, joueEvenements, nomsDesJoueurs } from './ui/app-aides';
 import { Menus, type Actions } from './ui/menus';
 import { pleinEcran } from './ui/plein-ecran';
 import { FinMiniJeu } from './ui/fin-mini-jeu';
-import { verifieVersion } from './version';
+import { SuiviRecrue } from './ui/suivi-recrue';
+import { ajouteNiveauEssai, NIVEAUX } from './niveaux';
+import type { DefNiveau } from './niveaux/format';
 
 const PAS_MS = 1000 / 60;
 /** Les phases où SAUT et TIR servent au jeu (les mini-jeux passent leurs écrans eux-mêmes) : ils ne tournent pas les pages. */
@@ -67,9 +68,14 @@ export class App implements Actions {
   private bitsAvant = 0;
   private derniereVue: EtatVue | null = null;
   private recrue!: Recrue;
-  /** le membre que l'on jouait à la dernière image, et si on était à terre : pour savoir qu'une recrue arrive */
-  private membreVu: number | null = null;
-  private etaitMort = false;
+  private readonly suiviRecrue = new SuiviRecrue(
+    () => this.recrue,
+    this.sauvegarde,
+    () => this.enregistre(),
+    () => this.appliqueOptions(),
+  );
+  /** l'essai d'un niveau de l'éditeur : de quoi y revenir, à la fin du niveau ou en le quittant */
+  private essai: (() => void) | null = null;
 
   get estClient(): boolean {
     return !!this.client;
@@ -101,14 +107,14 @@ export class App implements Actions {
       if (document.hidden) this.synthe.endort();
       else this.synthe.demarre();
       if (document.hidden && this.partie && !this.multijoueur) this.mettreEnPause();
-      if (!document.hidden) void this.controleVersion();
+      if (!document.hidden) this.controleVersion();
     });
     this.clavier.onPause = () => (this.enPause ? this.reprend() : this.mettreEnPause());
     $('bouton-pause').addEventListener('click', () => this.mettreEnPause());
     this.tactile.montre(false);
     // après un rechargement de mise à jour, on retire le paramètre ?v= de l'adresse
     if (location.search.includes('v=')) history.replaceState(null, '', location.pathname + location.hash);
-    void this.controleVersion();
+    this.controleVersion();
     if (location.hash.startsWith('#salon=')) this.menus.rejoindre();
     else {
       this.menus.titre();
@@ -117,15 +123,7 @@ export class App implements Actions {
     requestAnimationFrame((t) => this.boucle(t));
   }
 
-  private derniereVerification = 0;
-
-  /** À l'ouverture et au retour sur l'onglet (au plus une fois par minute) : une version plus récente est-elle publiée ? */
-  private async controleVersion(): Promise<void> {
-    if (Date.now() - this.derniereVerification < 60_000) return;
-    this.derniereVerification = Date.now();
-    const r = await verifieVersion(import.meta.env.BASE_URL);
-    if (r.etat === 'nouvelle' && r.derniere) afficheNouvelleVersion($('maj'), r.derniere);
-  }
+  private readonly controleVersion = controleurDeVersion($('maj'));
 
   private get multijoueur(): boolean {
     return !!this.client || (this.hote?.distants.size ?? 0) > 0;
@@ -148,7 +146,7 @@ export class App implements Actions {
 
   lance(niveau: number, membre: number, reprise: Progression | null): void {
     this.arreteTout();
-    this.membreVu = null;
+    this.suiviRecrue.oublie();
     const prog = reprise ?? { niveau, drapeau: -1, vies: VIES_DEPART, score: 0 };
     const p = partieSauvegardee(prog, this.sauvegarde, () => this.enregistre());
     p.ajouteJoueur(0, membre);
@@ -156,9 +154,31 @@ export class App implements Actions {
     this.entreEnJeu();
   }
 
+  /** L'éditeur de niveau, chargé à la première ouverture seulement (il ne pèse pas sur le jeu). */
+  ouvreEditeur(): void {
+    this.menus.ferme();
+    void import('./editeur/editeur').then(({ ouvreEditeur }) =>
+      ouvreEditeur({
+        teste: (def, retour) => this.testeNiveau(def, retour),
+        quitte: () => this.menus.options(),
+      }),
+    );
+  }
+
+  /** Joue un niveau de l'éditeur, sans rien sauvegarder ; au bilan (ou en quittant), on revient à l'éditeur. */
+  private testeNiveau(def: DefNiveau, retour: () => void): void {
+    this.arreteTout();
+    this.suiviRecrue.oublie();
+    const p = new Partie({ niveau: ajouteNiveauEssai(def), drapeau: -1, vies: VIES_DEPART, score: 0 });
+    p.ajouteJoueur(0, this.sauvegarde.membre);
+    this.partie = p;
+    this.essai = retour;
+    this.entreEnJeu();
+  }
+
   lanceMiniJeu(quel: MiniJeu): void {
     this.arreteTout();
-    this.membreVu = null;
+    this.suiviRecrue.oublie();
     this.partie = nouveauMiniJeu(quel, this.sauvegarde.membre);
     this.entreEnJeu();
   }
@@ -166,7 +186,7 @@ export class App implements Actions {
   async rejoins(r: Recherche, a: Annonce<AnnonceDkk>, pseudo: string, membre: number): Promise<void> {
     const c = await Client.rejoins(r, a, pseudo, membre);
     this.arreteTout();
-    this.membreVu = null;
+    this.suiviRecrue.oublie();
     this.client = c;
     c.onEvenements = (l) => this.evenements(l);
     c.onFerme = () => {
@@ -207,7 +227,12 @@ export class App implements Actions {
     this.musique.joue(null);
     this.tactile.montre(false);
     for (const id of ['hud', 'bouton-pause', 'histoire', 'bulle']) $(id).hidden = true;
-    this.menus.titre();
+    const essai = this.essai;
+    this.essai = null;
+    if (essai) {
+      this.menus.ferme();
+      essai();
+    } else this.menus.titre();
   }
 
   private mettreEnPause(): void {
@@ -297,49 +322,17 @@ export class App implements Actions {
 
   private evenements(l: readonly Evenement[]): void {
     this.rendu.evenements(l);
-    const v = this.derniereVue;
-    const siege = this.client?.siege ?? 0;
-    const moi = v?.joueurs[siege];
-    for (const e of l) {
-      if (e.k === 'son') {
-        const d = moi && (e.x || e.y) ? Math.hypot(e.x - moi.x, e.y - moi.y) : 0;
-        this.bruitages.joue(e.n, d);
-      } else if (e.k === 'bulle') this.bulles.ajoute(e.qui, e.texte);
-    }
-  }
-
-  /**
-   * Une recrue : le membre que l'on joue vient de changer. Au début de la partie (premier tour de jeu) et quand une cage
-   * s'ouvre, on coupe la scène pour le présenter ; le remplaçant d'un héros tombé arrive sans cérémonie.
-   */
-  private annonceRecrue(v: EtatVue, siege: number): void {
-    const moi = v.joueurs[siege];
-    if (v.phase !== 'jeu' || !moi?.present) return;
-    const avant = this.membreVu;
-    const mort = this.etaitMort;
-    this.membreVu = moi.membre;
-    this.etaitMort = moi.mort;
-    if (this.sauvegarde.membre !== moi.membre) {
-      this.sauvegarde.membre = moi.membre;
-      this.enregistre();
-    }
-    if (avant === null) this.recrue.joue(moi.membre, 'depart', () => this.appliqueOptions());
-    else if (avant !== moi.membre && !mort && !moi.mort) this.recrue.joue(moi.membre, 'cage', () => {});
+    joueEvenements(l, this.derniereVue, this.client?.siege ?? 0, this.bruitages, this.bulles);
   }
 
   private affiche(v: EtatVue, carte: Carte, siege: number): void {
+    if (this.essai && v.phase === 'bilan') return this.quitte(); // l'essai d'un niveau de l'éditeur est fini
     this.derniereVue = v;
     this.finMini.maj(v);
-    this.annonceRecrue(v, siege);
+    this.suiviRecrue.maj(v, siege);
     this.rendu.dessine(v, carte, siege);
-    const noms: string[] = Array<string>(MAX_JOUEURS).fill('');
-    if (this.client) for (const j of this.client.joueurs) noms[j.siege] = j.nom;
-    else if (this.hote) {
-      noms[0] = this.sauvegarde.pseudo || 'DKK';
-      for (const d of this.hote.distants.values()) noms[d.siege] = d.nom;
-    }
     if (retiensRecords(this.sauvegarde, v)) this.enregistre();
-    this.hud.maj(v, siege, noms);
+    this.hud.maj(v, siege, nomsDesJoueurs(this.client, this.hote, this.sauvegarde.pseudo));
     const moi = v.joueurs[siege];
     this.tactile.pilote(v.phase);
     this.tactile.arme(moi?.present && moi.arme ? iconeDeLArme(moi.arme, 34) : null, moi?.munitions ?? 0);
