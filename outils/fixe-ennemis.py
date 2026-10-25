@@ -74,7 +74,8 @@ TYPES = {
 # Une planche à lignes : chaque apparence va dans sa ligne, les autres lignes restent vides.
 ETATS = {'goeland': (0, 10), 'bmxpro': (0, 10), 'champion': (0, 10)}
 
-# les types dont la marche est tirée de la pose au repos (1er fichier : au repos, ligne 0 ; 2e : l'attaque, ligne 10) : les jambes
+# les types dont la marche est tirée de la pose au repos (1er fichier : au repos, ligne 0 ; 2e : l'alerte, la recherche et l'attaque,
+# lignes 7, 8 et 10) : les jambes
 # se décalent (voir marche.py), quatre images dans la ligne de la course (1)
 ANIMES = {'habitue'}
 
@@ -105,8 +106,8 @@ def planche_animee(fichiers, hauteur):
 
 
 def pose_animee(images, largeur, h):
-    """La planche à lignes : le repos (0), la marche (1, quatre images), l'attaque (10)."""
-    lignes = {0: images[:1], 1: images[2:], 10: images[1:2]}
+    """La planche à lignes : le repos (0), la marche (1, quatre images), la pinte levée dès l'alerte (7), la recherche (8) et à l'attaque (10)."""
+    lignes = {0: images[:1], 1: images[2:], 7: images[1:2], 8: images[1:2], 10: images[1:2]}
     planche = Image.new('RGBA', (largeur * 4, h * 11), (0, 0, 0, 0))
     for ligne, ims in lignes.items():
         for i, im in enumerate(ims):

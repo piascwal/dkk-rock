@@ -47,7 +47,7 @@ export const FEUILLES_ENNEMIS: Partial<Record<Genre, Feuille>> = {
     fichier: 'habitues.png',
     w: 96,
     h: 120,
-    images: [1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    images: [1, 4, 0, 0, 0, 0, 0, 1, 1, 0, 1],
     rythme: 8,
     densite: 6,
   },
