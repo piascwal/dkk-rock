@@ -63,6 +63,8 @@ TYPES = {
     'breaker': ('BREAKER', 21),
     # le mouton de Limerick : deux images de la marche (les pattes avant, puis arrière), une animation lente
     'mouton': ('MOUTON', 13, 12),
+    # le Viet Cong glaireux (pont des Tuves) : une apparence, les pieds dans la boue sous les figuiers
+    'glaireux': ('GLAIREUX', 20),
 }
 
 # les lignes de la planche par état d'animation (ANIM dans jeu/vue.ts) : le vol au repos (0), le piqué en attaque (10).
