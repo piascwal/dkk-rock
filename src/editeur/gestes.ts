@@ -213,8 +213,7 @@ export function brancheGestes(ed: Editeur): void {
     else if (k === 'escape') {
       ed.palette.ferme();
       ed.rond.ferme();
-    }
-    else if (k === ' ') espace = true;
+    } else if (k === ' ') espace = true;
     else if (TOUCHES[k]) ed.choisitOutil(TOUCHES[k]);
     else if (k === '+' || k === '=') ed.zoome(1.4);
     else if (k === '-') ed.zoome(1 / 1.4);
