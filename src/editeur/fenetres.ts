@@ -2,10 +2,12 @@ import { NIVEAUX } from '../niveaux';
 import { THEMES, type NomTheme } from '../rendu/themes';
 import { DocumentNiveau, TAILLE_MAX, TAILLE_MIN } from './document';
 import type { Editeur } from './editeur';
+import { bouton, demandeFichier, element, fenetre, nomDeFichier, offreFichier } from './fenetre';
+import { mesModules } from './fenetres-modules';
 
 /**
  * Les fenêtres du menu de l'éditeur : un nouveau niveau, partir d'un niveau du jeu, le nom, le thème et la taille, vérifier le
- * parcours, exporter (partager, télécharger, copier) et importer.
+ * parcours, exporter (partager, télécharger, copier) et importer ; les modules à soi sont dans fenetres-modules.ts.
  */
 
 const NOMS_THEMES: Record<NomTheme, string> = {
@@ -30,57 +32,33 @@ const NOMS_THEMES: Record<NomTheme, string> = {
   ottawa: 'Ottawa',
 };
 
-const element = <K extends keyof HTMLElementTagNameMap>(tag: K, texte = '', classe = '') => {
-  const e = document.createElement(tag);
-  if (texte) e.textContent = texte;
-  if (classe) e.className = classe;
-  return e;
-};
-
-const bouton = (texte: string, action: () => void, classe = 'ed-large') => {
-  const b = element('button', texte, classe);
-  b.addEventListener('click', action);
-  return b;
-};
-
-/** Une fenêtre par-dessus l'éditeur ; renvoie de quoi la fermer. */
-function fenetre(ed: Editeur, titre: string, ...enfants: HTMLElement[]): () => void {
-  const fond = element('div', '', 'ed-fenetre-fond');
-  const f = element('div', '', 'ed-fenetre');
-  const ferme = () => fond.remove();
-  f.append(element('h3', titre), ...enfants, bouton('Fermer', ferme, 'ed-large ed-discret'));
-  fond.append(f);
-  fond.addEventListener('pointerdown', (e) => e.target === fond && ferme());
-  ed.racine.append(fond);
-  return ferme;
-}
-
 const remplacer = () => confirm('Le niveau en cours sera remplacé (pensez à l’exporter avant). Continuer ?');
 
 export function menuPrincipal(ed: Editeur): void {
   const ferme = fenetre(
     ed,
     'Éditeur de niveau',
-    bouton('Nouveau niveau (page blanche)', () => {
+    bouton('nouveau', 'Nouveau niveau (page blanche)', () => {
       if (!remplacer()) return;
       ferme();
       ed.remplace(DocumentNiveau.vierge(160, 40, ed.doc.theme));
     }),
-    bouton('Partir d’un niveau du jeu', () => (ferme(), choisitNiveau(ed))),
-    bouton('Nom, thème et taille', () => (ferme(), reglages(ed))),
-    bouton('Vérifier le parcours', () => {
+    bouton('ouvrir', 'Partir d’un niveau du jeu', () => (ferme(), choisitNiveau(ed))),
+    bouton('reglages', 'Nom, thème et taille', () => (ferme(), reglages(ed))),
+    bouton('verifier', 'Vérifier le parcours', () => {
       ferme();
       const v = ed.doc.verifie();
       ed.dit(v.message, !v.ok);
     }),
-    bouton('Exporter', () => (ferme(), exporte(ed))),
-    bouton('Importer un fichier', () => (ferme(), importe(ed))),
+    bouton('exporter', 'Exporter le niveau', () => (ferme(), exporte(ed))),
+    bouton('importer', 'Importer un niveau', () => (ferme(), importe(ed))),
+    bouton('modules', 'Mes modules', () => (ferme(), mesModules(ed))),
     element(
       'p',
-      'Un doigt peint, deux doigts déplacent et zooment. À la souris : clic droit ou barre d’espace pour déplacer, molette pour zoomer.',
+      'Un doigt peint, deux doigts déplacent et zooment. À la souris : clic droit ou barre d’espace pour déplacer, molette pour zoomer. L’outil sélection (le carré en pointillés) fait un module réutilisable d’un morceau de carte.',
       'ed-aide',
     ),
-    bouton('Quitter l’éditeur', () => {
+    bouton('quitter', 'Quitter l’éditeur', () => {
       ferme();
       ed.ferme();
       ed.actions.quitte();
@@ -94,7 +72,7 @@ function choisitNiveau(ed: Editeur): void {
   for (const def of NIVEAUX) {
     if (def.miniJeu || def.id.startsWith('essai-')) continue;
     liste.append(
-      bouton(def.titre, () => {
+      bouton(null, def.titre, () => {
         if (!remplacer()) return;
         ferme();
         ed.remplace(DocumentNiveau.depuisNiveau(def));
@@ -136,6 +114,7 @@ function reglages(ed: Editeur): void {
     champ('Largeur (en tuiles)', largeur),
     champ('Hauteur (en tuiles : les rangées s’ajoutent en haut)', hauteur),
     bouton(
+      'verifier',
       'Appliquer',
       () => {
         d.nom = nom.value.trim() || d.nom;
@@ -154,83 +133,24 @@ function reglages(ed: Editeur): void {
 
 function exporte(ed: Editeur): void {
   const j = ed.doc.versJSON();
-  const texte = JSON.stringify(j, null, 2);
-  const nomFichier = `${
-    j.nom
-      .normalize('NFD')
-      .replace(/[^\w]+/g, '-')
-      .replace(/^-|-$/g, '')
-      .toLowerCase() || 'niveau'
-  }.json`;
-  const fichier = new File([texte], nomFichier, { type: 'application/json' });
   const depart = j.depart ? NIVEAUX.find((n) => n.id === j.depart)?.titre : null;
-  const zone = element('textarea', '', 'ed-texte');
-  zone.value = texte;
-  zone.readOnly = true;
-  const actions: HTMLElement[] = [];
-  if (navigator.canShare?.({ files: [fichier] }))
-    actions.push(
-      bouton(
-        'Partager…',
-        () => void navigator.share({ files: [fichier], title: j.nom }).catch(() => {}),
-        'ed-large ed-principal',
-      ),
-    );
-  actions.push(
-    bouton('Télécharger le fichier', () => {
-      const a = element('a');
-      a.href = URL.createObjectURL(fichier);
-      a.download = nomFichier;
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(a.href), 10_000);
-    }),
-    bouton('Copier le texte', () => {
-      navigator.clipboard
-        .writeText(texte)
-        .then(() => ed.dit('Copié : collez-le dans la conversation.'))
-        .catch(() => {
-          zone.select();
-          ed.dit('Sélectionné : copiez-le à la main.', true);
-        });
-    }),
-  );
-  fenetre(
+  offreFichier(
     ed,
-    'Exporter',
-    element(
-      'p',
-      depart
-        ? `Ce niveau part de « ${depart} ». Envoyez ce fichier à Claude en disant s’il remplace « ${depart} » ou s’il devient un nouveau niveau (et où le mettre).`
-        : 'Envoyez ce fichier à Claude pour l’ajouter au jeu : comme nouveau niveau (dites où le mettre), ou à la place d’un niveau existant.',
-    ),
-    ...actions,
-    zone,
+    'Exporter le niveau',
+    depart
+      ? `Ce niveau part de « ${depart} ». Envoyez ce fichier à Claude en disant s’il remplace « ${depart} » ou s’il devient un nouveau niveau (et où le mettre).`
+      : 'Envoyez ce fichier à Claude pour l’ajouter au jeu : comme nouveau niveau (dites où le mettre), ou à la place d’un niveau existant.',
+    j,
+    nomDeFichier(j.nom, 'niveau'),
   );
 }
 
 function importe(ed: Editeur): void {
-  const choix = element('input');
-  choix.type = 'file';
-  choix.accept = '.json,application/json';
-  const zone = element('textarea', '', 'ed-texte');
-  zone.placeholder = 'Ou collez ici le texte d’un niveau exporté';
-  const charge = (texte: string) => {
-    try {
-      const doc = DocumentNiveau.depuisJSON(texte);
-      if (!remplacer()) return;
-      ferme();
-      ed.remplace(doc);
-      ed.dit(`« ${doc.nom} » importé.`);
-    } catch (e) {
-      ed.dit(e instanceof SyntaxError ? 'Ce texte n’est pas un niveau exporté.' : (e as Error).message, true);
-    }
-  };
-  choix.addEventListener('change', () => void choix.files?.[0]?.text().then(charge));
-  const ferme = fenetre(
-    ed,
-    'Importer',
-    choix,
-    zone,
-    bouton('Importer le texte collé', () => charge(zone.value), 'ed-large ed-principal'),
-  );
+  demandeFichier(ed, 'Importer un niveau', 'Ou collez ici le texte d’un niveau exporté', (texte) => {
+    const doc = DocumentNiveau.depuisJSON(texte);
+    if (!remplacer()) return false;
+    ed.remplace(doc);
+    ed.dit(`« ${doc.nom} » importé.`);
+    return true;
+  });
 }

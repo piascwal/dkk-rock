@@ -1,5 +1,6 @@
 import { catalogue, FAMILLES, type Choix, type Famille } from './catalogue';
 import type { Editeur } from './editeur';
+import { icone } from './icones';
 
 /**
  * La palette : un panneau qui monte du bas de l'écran (le pouce y arrive sur un téléphone), un onglet par famille, une recherche,
@@ -32,7 +33,8 @@ export class Palette {
     }
     const ferme = document.createElement('button');
     ferme.className = 'ed-onglet ed-fermer';
-    ferme.textContent = '✕';
+    ferme.append(icone('fermer'));
+    ferme.title = 'Fermer';
     ferme.setAttribute('aria-label', 'Fermer');
     ferme.addEventListener('click', () => this.ferme());
     tete.append(ferme);
@@ -52,6 +54,12 @@ export class Palette {
 
   ferme(): void {
     this.panneau.hidden = true;
+  }
+
+  /** Les vignettes des modules à soi sont à refaire (un module créé, importé ou supprimé). */
+  oublie(): void {
+    for (const k of this.vignettes.keys()) if (k.includes('|modules|perso-')) this.vignettes.delete(k);
+    if (!this.panneau.hidden) this.remplit();
   }
 
   private montre(f: Famille): void {
@@ -96,10 +104,7 @@ export class Palette {
     const nom = document.createElement('span');
     nom.textContent = c.nom;
     b.append(toile, nom);
-    b.title =
-      c.famille === 'gens' || c.famille === 'objets' || c.famille === 'tuiles'
-        ? `${c.nom} (« ${c.cle} »)`
-        : c.nom;
+    b.title = c.famille === 'objets' || c.famille === 'tuiles' ? `${c.nom} (« ${c.cle} »)` : c.nom;
     b.addEventListener('click', () => {
       this.ed.choisit(c);
       this.ferme();

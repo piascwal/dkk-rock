@@ -5,6 +5,7 @@ import { Chauffage } from '../entites/chauffage';
 import { Champion } from '../entites/ennemis/champion';
 import { DjBoucle } from '../entites/ennemis/dj';
 import { ENNEMIS_PAR_LETTRE } from '../entites/ennemis/definitions';
+import { aligneIdentifiant, lisPersonnage } from '../entites/ennemis/gens';
 import { ennemiDuCoin } from '../entites/ennemis/locaux';
 import { Ennemi } from '../entites/ennemis/ennemi';
 import { YetiAlpha } from '../entites/ennemis/yeti-alpha';
@@ -44,10 +45,15 @@ export function peuple(p: Partie): void {
   peupleSibylles(p);
   // à la reprise sur un drapeau, les ennemis déjà dépassés ne reviennent pas
   const depart = p.drapeau >= 0 ? lu.drapeaux[p.drapeau]!.x : -Infinity;
+  // les gens choisis dans l'éditeur de niveau : un autre visage que celui de la lettre, ou une apparence précise
+  const choisis = new Map((lu.def.gens ?? []).map(([x, y, cle]) => [`${x},${y}`, cle]));
   for (const e of lu.ennemis) {
+    const cle = choisis.get(`${e.tx},${e.ty}`);
+    const perso = cle ? lisPersonnage(cle, lu.def.theme) : null;
     // dans les villes de l'International Tour, « a » et « c » sont des gens du coin
-    const def = ennemiDuCoin(e.lettre, lu.def.theme) ?? ENNEMIS_PAR_LETTRE[e.lettre];
+    const def = perso?.def ?? ennemiDuCoin(e.lettre, lu.def.theme) ?? ENNEMIS_PAR_LETTRE[e.lettre];
     if (def && e.x > depart) {
+      if (perso?.apparence != null) aligneIdentifiant(() => p.prochainId(), perso.apparence);
       const en = new Ennemi(p, def, e.x, e.y);
       en.zone = zoneDe(lu.def.zones, e.x);
       p.ajoute(en);

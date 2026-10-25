@@ -9,6 +9,8 @@ import { THEMES, type NomTheme } from '../rendu/themes';
  */
 
 export type Decor = [string, number, number];
+/** un personnage choisi sur la case d'une lettre : [colonne, rangée, clé] (voir entites/ennemis/gens.ts) */
+export type Gens = [number, number, string];
 
 /** Un module préconstruit (voir outils/exporte-modules.py) : un rectangle de carte, sa rangée de sol, son décor. */
 export interface ModuleEditeur {
@@ -18,6 +20,7 @@ export interface ModuleEditeur {
   sol: number;
   lignes: string[];
   decor: Decor[];
+  gens?: Gens[];
 }
 
 /** Ce qu'on exporte (et réimporte) : de quoi refaire le niveau tel quel, ou en faire un niveau du jeu. */
@@ -30,11 +33,13 @@ export interface NiveauExporte {
   depart: string | null;
   carte: string[];
   decor: Decor[];
+  gens?: Gens[];
 }
 
 interface Instantane {
   lignes: string[];
   decor: Decor[];
+  gens: Gens[];
 }
 
 const HISTOIRE_MAX = 80;
@@ -50,6 +55,10 @@ export class DocumentNiveau {
   dialogues: Partial<Record<string, Replique[]>> = {};
   /** à chaque changement (le rendu, la sauvegarde automatique) */
   onChange: () => void = () => {};
+  /** les personnages choisis, par case (« x,y ») : une autre ville, une apparence */
+  gens = new Map<string, string>();
+  /** change à chaque modification : le rendu sait quand refaire sa carte */
+  version = 0;
 
   constructor(
     public nom: string,
@@ -57,9 +66,11 @@ export class DocumentNiveau {
     lignes: readonly string[],
     public decor: Decor[] = [],
     public depart: string | null = null,
+    gens: readonly (readonly [number, number, string])[] = [],
   ) {
     const largeur = Math.max(TAILLE_MIN[0], ...lignes.map((l) => l.length));
     this.g = lignes.map((l) => l.padEnd(largeur).split(''));
+    for (const [x, y, cle] of gens) this.gens.set(`${x},${y}`, cle);
   }
 
   /** Une page blanche : du ciel, un sol plat de terre sur de la roche, le départ à gauche et le van à droite. */
@@ -77,7 +88,7 @@ export class DocumentNiveau {
   /** Une copie d'un niveau du jeu, pour le modifier. */
   static depuisNiveau(def: DefNiveau): DocumentNiveau {
     const decor = (def.decor ?? []).map(([n, x, y]) => [n, x, y] as Decor);
-    const d = new DocumentNiveau(def.titre, def.theme, def.carte, decor, def.id);
+    const d = new DocumentNiveau(def.titre, def.theme, def.carte, decor, def.id, def.gens);
     d.dialogues = def.dialogues;
     return d;
   }
@@ -92,7 +103,11 @@ export class DocumentNiveau {
       (d): d is Decor =>
         Array.isArray(d) && typeof d[0] === 'string' && Number.isInteger(d[1]) && Number.isInteger(d[2]),
     );
-    return new DocumentNiveau(o.nom || 'Niveau importé', theme, o.carte, decor, o.depart ?? null);
+    const gens = (o.gens ?? []).filter(
+      (g): g is Gens =>
+        Array.isArray(g) && Number.isInteger(g[0]) && Number.isInteger(g[1]) && typeof g[2] === 'string',
+    );
+    return new DocumentNiveau(o.nom || 'Niveau importé', theme, o.carte, decor, o.depart ?? null, gens);
   }
 
   get largeur(): number {
@@ -144,7 +159,21 @@ export class DocumentNiveau {
     const r = this.g[y];
     if (!r || x < 0 || x >= r.length || r[x] === c) return;
     r[x] = c;
+    this.gens.delete(`${x},${y}`); // une autre lettre : le personnage choisi s'en va avec l'ancienne
     this.change();
+  }
+
+  /** Le personnage choisi sur une case (null : celui de sa lettre). */
+  choisitGens(x: number, y: number, cle: string | null): void {
+    const k = `${x},${y}`;
+    if ((this.gens.get(k) ?? null) === cle) return;
+    if (cle) this.gens.set(k, cle);
+    else this.gens.delete(k);
+    this.change();
+  }
+
+  gensEn(x: number, y: number): string | undefined {
+    return this.gens.get(`${x},${y}`);
   }
 
   rect(x0: number, y0: number, x1: number, y1: number, c: string): void {
@@ -157,6 +186,7 @@ export class DocumentNiveau {
     const y0 = ySol - m.sol;
     m.lignes.forEach((l, dy) => [...l].forEach((c, dx) => this.pose(x + dx, y0 + dy, c)));
     for (const [n, dx, dy] of m.decor) this.ajouteDecor(n, x + dx, y0 + dy);
+    for (const [dx, dy, cle] of m.gens ?? []) this.choisitGens(x + dx, y0 + dy, cle);
   }
 
   /** Un accessoire de décor posé sur la rangée de sol `ySol` (il se dessine au-dessus) ; un seul par case. */
@@ -191,6 +221,12 @@ export class DocumentNiveau {
     this.decor = this.decor
       .map(([n, x, y]): Decor => [n, x, y + dh])
       .filter(([, x, y]) => x < largeur && y >= 1 && y < hauteur);
+    this.gens = new Map(
+      this.listeGens()
+        .map(([x, y, cle]): Gens => [x, y + dh, cle])
+        .filter(([x, y]) => x < largeur && y >= 0 && y < hauteur)
+        .map(([x, y, cle]) => [`${x},${y}`, cle]),
+    );
     this.change();
   }
 
@@ -217,6 +253,7 @@ export class DocumentNiveau {
       depart: this.depart,
       carte: this.lignes().map((l) => l.replace(/\s+$/, '')),
       decor: this.decor.map(([n, x, y]): Decor => [n, x, y]),
+      gens: this.listeGens(),
     };
   }
 
@@ -232,6 +269,7 @@ export class DocumentNiveau {
       dialogues: this.dialoguesDeLaCarte(j.carte),
       outro: [],
       decor: j.decor,
+      gens: j.gens,
       semis: true,
       carte: j.carte,
     };
@@ -277,16 +315,31 @@ export class DocumentNiveau {
 
   private change(): void {
     this.modifie = true;
+    this.version++;
     this.onChange();
   }
 
+  /** Les personnages choisis, en liste ([colonne, rangée, clé]). */
+  listeGens(): Gens[] {
+    return [...this.gens].map(([k, cle]): Gens => {
+      const [x, y] = k.split(',').map(Number) as [number, number];
+      return [x, y, cle];
+    });
+  }
+
   private instantane(): Instantane {
-    return { lignes: this.lignes(), decor: this.decor.map(([n, x, y]): Decor => [n, x, y]) };
+    return {
+      lignes: this.lignes(),
+      decor: this.decor.map(([n, x, y]): Decor => [n, x, y]),
+      gens: this.listeGens(),
+    };
   }
 
   private restaure(i: Instantane): void {
     this.g = i.lignes.map((l) => l.split(''));
     this.decor = i.decor;
+    this.gens = new Map(i.gens.map(([x, y, cle]) => [`${x},${y}`, cle]));
+    this.version++;
     this.onChange();
   }
 }

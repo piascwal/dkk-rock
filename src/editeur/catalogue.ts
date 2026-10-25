@@ -1,10 +1,12 @@
 import { ENNEMIS_PAR_LETTRE } from '../entites/ennemis/definitions';
-import { ennemiDuCoin } from '../entites/ennemis/locaux';
+import { lisPersonnage } from '../entites/ennemis/gens';
+import { ennemiDuCoin, ENNEMIS_LOCAUX } from '../entites/ennemis/locaux';
+import { G, type Genre } from '../jeu/vue';
 import { PROPRIETES, tuileDuCaractere } from '../monde/tuiles';
 import { ACCESSOIRES } from '../rendu/decor-objets';
+import { FEUILLES } from '../rendu/feuilles';
 import type { NomTheme } from '../rendu/themes';
-import type { ModuleEditeur } from './document';
-import MODULES_JSON from './modules.json';
+import { MODULES, modulesPerso } from './modules-perso';
 
 /**
  * Tout ce que l'éditeur sait poser, par famille : les tuiles (la matière, l'eau, les échelles...), les gens (les ennemis de chaque
@@ -30,8 +32,6 @@ export const FAMILLES: readonly [Famille, string][] = [
   ['decor', 'Décor'],
   ['modules', 'Modules'],
 ];
-
-export const MODULES = MODULES_JSON as ModuleEditeur[];
 
 const REPERES: readonly [string, string][] = [
   ['@', 'Départ'],
@@ -60,7 +60,67 @@ const lisible = (nom: string) => majuscule(nom.replace(/([a-z])([A-Z0-9])/g, '$1
 export const ennemiDeLaLettre = (lettre: string, theme: NomTheme) =>
   ennemiDuCoin(lettre, theme) ?? ENNEMIS_PAR_LETTRE[lettre];
 
-export function catalogue(famille: Famille, theme: NomTheme): Choix[] {
+const VILLES: Record<string, string> = {
+  beauvais: 'Beauvais',
+  limerick: 'Limerick',
+  newyork: 'New York',
+  ottawa: 'Ottawa',
+  lund: 'Lund',
+  marseille: 'Marseille',
+};
+/** le nom des apparences qu'on connaît (les autres sont numérotées) */
+const APPARENCES: Partial<Record<number, string[]>> = {
+  [G.BIGOUDEN]: ['à la cornemuse', 'à la harpe', 'à la harpe (bis)'],
+  [G.MARIN]: ['à l’accordéon', 'à la clarinette'],
+  [G.BREAKER]: ['b-girl', 'b-boy'],
+};
+
+/** Le nombre d'apparences d'un personnage (sa planche en a plusieurs : `variantes`), 1 sinon. */
+export function nombreApparences(genre: Genre): number {
+  const f = FEUILLES[genre];
+  return f?.variantes ? Math.max(1, f.images[0] ?? 1) : 1;
+}
+
+/** La lettre d'un choix de la famille des gens (« ottawa/a#1 » → « a ») ; un boss est sa propre lettre. */
+export const lettreDe = (cle: string): string => /([a-zA-Z])(?:#\d+)?$/.exec(cle)![1]!;
+
+function gens(): Choix[] {
+  const famille = 'gens';
+  const liste: Choix[] = [];
+  for (const l of Object.keys(ENNEMIS_PAR_LETTRE).sort()) {
+    const def = ENNEMIS_PAR_LETTRE[l]!;
+    const n = nombreApparences(def.genre);
+    if (n === 1) liste.push({ famille, cle: `_/${l}`, nom: def.nom, groupe: 'Partout' });
+    for (let k = 0; n > 1 && k < n; k++) {
+      const quoi = APPARENCES[def.genre]?.[k] ?? `n° ${k + 1}`;
+      liste.push({ famille, cle: `_/${l}#${k}`, nom: `${def.nom} ${quoi}`, groupe: 'Partout' });
+    }
+  }
+  for (const [ville, locaux] of Object.entries(ENNEMIS_LOCAUX))
+    for (const [l, def] of Object.entries(locaux ?? {}))
+      liste.push({ famille, cle: `${ville}/${l}`, nom: def.nom, groupe: VILLES[ville] ?? ville });
+  return [...liste, ...BOSS.map(([cle, nom]) => ({ famille, cle, nom, groupe: 'Boss' }) as Choix)];
+}
+
+/**
+ * Le choix qui correspond à un personnage de la carte (la pipette) : celui choisi sur la case s'il y en a un, sinon celui de sa
+ * lettre dans ce thème (un gens du coin, ou l'ordinaire, dans sa première apparence).
+ */
+export function choixDuPersonnage(lettre: string, cle: string | undefined, theme: NomTheme): Choix | null {
+  const liste = gens();
+  if (cle) return liste.find((c) => c.cle === cle || c.cle === `_/${cle}`) ?? null;
+  if (ENNEMIS_LOCAUX[theme]?.[lettre]) return liste.find((c) => c.cle === `${theme}/${lettre}`) ?? null;
+  return liste.find((c) => c.cle === `_/${lettre}` || c.cle === `_/${lettre}#0` || c.cle === lettre) ?? null;
+}
+
+/** La clé à garder sur la case pour ce choix dans ce thème : null si la lettre seule donne déjà ce personnage. */
+export function cleAGarder(cle: string, theme: NomTheme): string | null {
+  const p = lisPersonnage(cle, theme);
+  if (!p || /^[A-Z]$/.test(cle)) return null;
+  return p.apparence === null && p.def === ennemiDeLaLettre(lettreDe(cle), theme) ? null : cle;
+}
+
+export function catalogue(famille: Famille, _theme?: NomTheme): Choix[] {
   switch (famille) {
     case 'tuiles':
       return [
@@ -70,24 +130,25 @@ export function catalogue(famille: Famille, theme: NomTheme): Choix[] {
           .map((p) => ({ famille, cle: p.car, nom: majuscule(p.nom) })),
       ];
     case 'gens':
-      return [
-        ...Object.keys(ENNEMIS_PAR_LETTRE)
-          .sort()
-          .map((l) => ({ famille, cle: l, nom: ennemiDeLaLettre(l, theme)!.nom })),
-        ...BOSS.map(([cle, nom]) => ({ famille, cle, nom })),
-      ];
+      return gens();
     case 'objets':
       return REPERES.map(([cle, nom]) => ({ famille, cle, nom }));
     case 'decor':
       return Object.keys(ACCESSOIRES).map((cle) => ({ famille, cle, nom: lisible(cle) }));
     case 'modules':
-      return MODULES.map((m) => ({ famille, cle: m.id, nom: m.nom, groupe: m.famille }));
+      return [...modulesPerso(), ...MODULES].map((m) => ({
+        famille,
+        cle: m.id,
+        nom: m.nom,
+        groupe: m.famille,
+      }));
   }
 }
 
-/** Le choix qui pose ce caractère de carte (la pipette). */
+/** Le choix qui pose ce caractère de carte (la pipette ; pour un personnage, voir `choixDuPersonnage`). */
 export function choixDuCaractere(c: string, theme: NomTheme): Choix | null {
   if (c === ' ') return null;
+  if (/[a-z]/.test(c) || BOSS.some(([b]) => b === c)) return choixDuPersonnage(c, undefined, theme);
   const famille: Famille =
     c === '.' || tuileDuCaractere(c) !== null
       ? 'tuiles'

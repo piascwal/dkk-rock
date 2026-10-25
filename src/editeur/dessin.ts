@@ -1,20 +1,25 @@
-import { TUILE } from '../config';
+import { HAUTEUR_VUE, TUILE } from '../config';
+import { lisPersonnage } from '../entites/ennemis/gens';
+import { Carte } from '../monde/carte';
 import { ANIM, G, type Genre } from '../jeu/vue';
-import { tuileDuCaractere } from '../monde/tuiles';
+import { T, tuileDuCaractere } from '../monde/tuiles';
 import { AtlasTuiles } from '../rendu/atlas-tuiles';
 import { ACCESSOIRES, type NomAccessoire } from '../rendu/decor-objets';
 import { dessineSprite, SPRITES, type Sprite } from '../rendu/decor-sprites';
+import { dessineTuiles } from '../rendu/dessin-tuiles';
 import { DESSINS_ENNEMIS } from '../rendu/dessins-ennemis';
 import { dessineFeuille } from '../rendu/feuilles-images';
 import { pinceau } from '../rendu/pinceau';
 import { ecritCentre } from '../rendu/police';
 import { THEMES, type NomTheme } from '../rendu/themes';
-import { ennemiDeLaLettre, MODULES, type Choix } from './catalogue';
+import { ennemiDeLaLettre, type Choix } from './catalogue';
 import type { Decor, DocumentNiveau, ModuleEditeur } from './document';
+import { trouveModule } from './modules-perso';
 
 /**
- * Le rendu de l'éditeur, au plus près du jeu : le ciel du thème, les tuiles avec leurs textures (celles du jeu, pour ce thème), les
- * gens avec leur planche ou leur dessin en code, les accessoires du décor ; les repères (départ, van, drapeaux...) en pastilles
+ * Le rendu de l'éditeur, au plus près du jeu : le ciel du thème, le terrain dessiné par le jeu lui-même (rendu/dessin-tuiles.ts : les
+ * textures du thème, l'herbe ou la neige sur le dessus, les coins arrondis, la paroi de fond, les lianes et les glaçons), les gens
+ * avec leur planche ou leur dessin en code (le visage et l'apparence choisis sur leur case), les accessoires du décor ; les repères (départ, van, drapeaux...) en pastilles
  * lisibles. Une grille légère quand on zoome, et l'aperçu du geste en cours (la case visée, le rectangle, le module à poser).
  */
 
@@ -30,7 +35,7 @@ export interface Camera {
 
 export type Apercu =
   | { genre: 'case'; x: number; y: number }
-  | { genre: 'rect'; x0: number; y0: number; x1: number; y1: number }
+  | { genre: 'rect'; x0: number; y0: number; x1: number; y1: number; pointille?: boolean }
   | { genre: 'module'; m: ModuleEditeur; x: number; ySol: number }
   | { genre: 'decor'; nom: string; x: number; ySol: number };
 
@@ -53,6 +58,8 @@ const SIGNES: Record<string, string> = { '@': 'GO', F: 'VAN', '&': 'B' };
 export class DessinEditeur {
   private theme: NomTheme | null = null;
   private atlas!: AtlasTuiles;
+  /** la carte du jeu faite du document (refaite quand il change), que dessine rendu/dessin-tuiles.ts */
+  private carte: { doc: DocumentNiveau; version: number; carte: Carte } | null = null;
 
   regleTheme(theme: NomTheme): void {
     if (theme === this.theme) return;
@@ -60,8 +67,24 @@ export class DessinEditeur {
     this.atlas = new AtlasTuiles(THEMES[theme]);
   }
 
-  /** Une case de la carte, son coin haut gauche en (x, y) (pixels du monde). */
-  case(ctx: Ctx, c: string, x: number, y: number, tx: number, ty: number): void {
+  private carteDe(doc: DocumentNiveau): Carte {
+    if (this.carte?.doc === doc && this.carte.version === doc.version) return this.carte.carte;
+    const [L, H] = [doc.largeur, doc.hauteur];
+    const tuiles = new Uint8Array(L * H);
+    const fond = new Uint8Array(L * H);
+    for (let y = 0; y < H; y++)
+      for (let x = 0; x < L; x++) {
+        const c = doc.get(x, y);
+        if (c === '.') fond[y * L + x] = 1;
+        else tuiles[y * L + x] = tuileDuCaractere(c) ?? T.VIDE;
+      }
+    const carte = new Carte(L, H, tuiles, fond);
+    this.carte = { doc, version: doc.version, carte };
+    return carte;
+  }
+
+  /** Une case de la carte, son coin haut gauche en (x, y) (pixels du monde) ; `cle` : le personnage choisi sur la case. */
+  case(ctx: Ctx, c: string, x: number, y: number, tx: number, ty: number, cle?: string): void {
     if (c === ' ') return;
     if (c === '.') return ctx.drawImage(this.atlas.paroi, x, y, TUILE, TUILE);
     const t = tuileDuCaractere(c);
@@ -70,17 +93,20 @@ export class DessinEditeur {
       if (toile) ctx.drawImage(toile, x, y, TUILE, TUILE);
       return;
     }
-    const def = /[a-z]/.test(c) ? ennemiDeLaLettre(c, this.theme!) : undefined;
+    const choisi = cle ? lisPersonnage(cle, this.theme!) : null;
+    const def = choisi?.def ?? (/[a-z]/.test(c) ? ennemiDeLaLettre(c, this.theme!) : undefined);
     const genre = def?.genre ?? BOSS_GENRE[c];
-    if (genre !== undefined && this.personnage(ctx, genre, x + TUILE / 2, y + TUILE)) return;
+    if (genre !== undefined && this.personnage(ctx, genre, x + TUILE / 2, y + TUILE, choisi?.apparence ?? 0))
+      return;
     this.pastille(ctx, c, x, y);
   }
 
   /** Un personnage, pieds en (x, y) : sa planche si elle est chargée, sinon son dessin en code. */
-  personnage(ctx: Ctx, genre: Genre, x: number, y: number): boolean {
+  personnage(ctx: Ctx, genre: Genre, x: number, y: number, apparence = 0): boolean {
     ctx.save();
     ctx.translate(x, y);
-    let ok = dessineFeuille(ctx, genre, ANIM.DEBOUT, 0, false);
+    // une planche à apparences prend la sienne d'après le « compteur » (l'identifiant, en jeu) : voir rendu/feuilles.ts
+    let ok = dessineFeuille(ctx, genre, ANIM.DEBOUT, apparence, false);
     const dessin = DESSINS_ENNEMIS[genre];
     if (!ok && dessin) {
       dessin(pinceau(ctx), ANIM.DEBOUT, 0);
@@ -132,16 +158,14 @@ export class DessinEditeur {
     const ty0 = Math.max(0, Math.floor(cam.y / TUILE));
     const tx1 = Math.min(doc.largeur, Math.ceil((cam.x + w / cam.zoom) / TUILE) + 1);
     const ty1 = Math.min(doc.hauteur, Math.ceil((cam.y + h / cam.zoom) / TUILE) + 1);
-    const personnages: [string, number, number][] = [];
+    this.terrain(ctx, doc, cam, w, h);
+    for (const d of doc.decor) if (d[1] >= tx0 - 6 && d[1] < tx1 + 6) this.decor(ctx, d);
     for (let ty = ty0; ty < ty1; ty++)
       for (let tx = tx0; tx < tx1; tx++) {
         const c = doc.get(tx, ty);
-        if (c === ' ') continue;
-        if (c === '.' || tuileDuCaractere(c) !== null) this.case(ctx, c, tx * TUILE, ty * TUILE, tx, ty);
-        else personnages.push([c, tx, ty]);
+        if (c !== ' ' && c !== '.' && tuileDuCaractere(c) === null)
+          this.case(ctx, c, tx * TUILE, ty * TUILE, tx, ty, doc.gensEn(tx, ty));
       }
-    for (const d of doc.decor) if (d[1] >= tx0 - 6 && d[1] < tx1 + 6) this.decor(ctx, d);
-    for (const [c, tx, ty] of personnages) this.case(ctx, c, tx * TUILE, ty * TUILE, tx, ty);
     if (cam.zoom >= 1.5) this.grille(ctx, tx0, ty0, tx1, ty1);
     // hors de la carte : un voile sombre, et le bord
     ctx.fillStyle = 'rgba(10,8,20,0.7)';
@@ -157,6 +181,24 @@ export class DessinEditeur {
     ctx.restore();
   }
 
+  /**
+   * Le terrain, dessiné par le jeu (rendu/dessin-tuiles.ts), par bandes de la hauteur de sa vue (il ne dessine que celle-là) : chaque
+   * bande est découpée à sa hauteur, une rangée à cheval sur deux bandes n'est pas dessinée deux fois.
+   */
+  private terrain(ctx: Ctx, doc: DocumentNiveau, cam: Camera, w: number, h: number): void {
+    const carte = this.carteDe(doc);
+    const largeur = w / cam.zoom + TUILE;
+    for (let b = Math.floor(cam.y / TUILE) * TUILE; b < cam.y + h / cam.zoom; b += HAUTEUR_VUE) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(cam.x - TUILE, b, largeur + 2 * TUILE, HAUTEUR_VUE);
+      ctx.clip();
+      ctx.translate(Math.round(cam.x), b);
+      dessineTuiles(ctx, carte, this.atlas, Math.round(cam.x), b, largeur, 0);
+      ctx.restore();
+    }
+  }
+
   private grille(ctx: Ctx, tx0: number, ty0: number, tx1: number, ty1: number): void {
     ctx.fillStyle = 'rgba(255,255,255,0.08)';
     for (let tx = tx0; tx <= tx1; tx++) ctx.fillRect(tx * TUILE, ty0 * TUILE, 0.5, (ty1 - ty0) * TUILE);
@@ -170,9 +212,12 @@ export class DessinEditeur {
     else if (a.genre === 'rect') {
       const [x0, x1] = [Math.min(a.x0, a.x1), Math.max(a.x0, a.x1)];
       const [y0, y1] = [Math.min(a.y0, a.y1), Math.max(a.y0, a.y1)];
-      ctx.fillStyle = 'rgba(255,210,63,0.18)';
+      // la sélection (un module à faire) en pointillés ; le rectangle plein, teinté
+      ctx.fillStyle = a.pointille ? 'rgba(120,200,255,0.12)' : 'rgba(255,210,63,0.18)';
       ctx.fillRect(x0 * TUILE, y0 * TUILE, (x1 - x0 + 1) * TUILE, (y1 - y0 + 1) * TUILE);
+      if (a.pointille) ctx.setLineDash([4 / cam.zoom, 3 / cam.zoom]);
       ctx.strokeRect(x0 * TUILE, y0 * TUILE, (x1 - x0 + 1) * TUILE, (y1 - y0 + 1) * TUILE);
+      ctx.setLineDash([]);
     } else if (a.genre === 'module') {
       const y0 = a.ySol - a.m.sol;
       ctx.globalAlpha = 0.7;
@@ -202,13 +247,16 @@ export class DessinEditeur {
       const z = choix.famille === 'gens' ? Math.min(w, h) / 26 : Math.min(w, h) / TUILE;
       c.translate(w / 2, h);
       c.scale(z, z);
-      this.case(c, choix.cle, -TUILE / 2, -TUILE, 0, 0);
+      const boss = /^[A-Z]$/.test(choix.cle);
+      if (choix.famille === 'gens' && !boss) this.case(c, 'a', -TUILE / 2, -TUILE, 0, 0, choix.cle);
+      else this.case(c, choix.cle, -TUILE / 2, -TUILE, 0, 0);
     } else if (choix.famille === 'decor') {
       c.translate(w / 2 - TUILE / 2, h);
       c.scale(0.7, 0.7);
       this.decor(c, [choix.cle, 0, 0]);
     } else {
-      const m = MODULES.find((o) => o.id === choix.cle)!;
+      const m = trouveModule(choix.cle);
+      if (!m) return c.restore();
       const z = Math.min(w / (m.lignes[0]!.length * TUILE), h / (m.lignes.length * TUILE));
       c.translate((w - m.lignes[0]!.length * TUILE * z) / 2, (h - m.lignes.length * TUILE * z) / 2);
       c.scale(z, z);

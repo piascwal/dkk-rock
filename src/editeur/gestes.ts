@@ -8,7 +8,7 @@ import { ZOOM, type Editeur, type Outil } from './editeur';
  *   et le trait commencé par le premier doigt est oublié ; un module ou un accessoire suit le doigt et se pose quand on le lève ;
  * - à la souris : le bouton gauche peint, le droit, celui du milieu ou la barre d'espace déplacent, la molette zoome (un pavé
  *   tactile fait défiler, ou zoome en pinçant) ; le survol montre ce qui sera posé ;
- * - au clavier : Ctrl+Z / Ctrl+Y, B pinceau, R rectangle, E gomme, I pipette, H main, + et − pour zoomer, les flèches déplacent.
+ * - au clavier : Ctrl+Z / Ctrl+Y, B pinceau, R rectangle, E gomme, I pipette, S sélection, H main, + et − pour zoomer, les flèches déplacent.
  */
 
 interface Point {
@@ -31,7 +31,14 @@ function segment(a: Point, b: Point, f: (x: number, y: number) => void): void {
   }
 }
 
-const TOUCHES: Record<string, Outil> = { b: 'pinceau', r: 'rect', e: 'gomme', i: 'pipette', h: 'main' };
+const TOUCHES: Record<string, Outil> = {
+  b: 'pinceau',
+  r: 'rect',
+  e: 'gomme',
+  i: 'pipette',
+  h: 'main',
+  s: 'selection',
+};
 
 export function brancheGestes(ed: Editeur): void {
   const t = ed.toile;
@@ -42,7 +49,9 @@ export function brancheGestes(ed: Editeur): void {
   let espace = false;
   /** un module ou un accessoire : il suit le doigt, et se pose au lâcher */
   const auLacher = () =>
-    ed.outil !== 'gomme' && (ed.choix.famille === 'decor' || ed.choix.famille === 'modules');
+    ed.outil !== 'gomme' &&
+    ed.outil !== 'selection' &&
+    (ed.choix.famille === 'decor' || ed.choix.famille === 'modules');
   const milieu = (): [Point, number] => {
     const [a, b] = [...doigts.values()] as [Point, Point];
     return [{ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, Math.hypot(a.x - b.x, a.y - b.y)];
@@ -72,7 +81,8 @@ export function brancheGestes(ed: Editeur): void {
     ed.doc.commence();
     trait = { derniere: c };
     if (auLacher()) ed.apercoit(c.x, c.y);
-    else if (ed.outil === 'rect') ed.apercu = { genre: 'rect', x0: c.x, y0: c.y, x1: c.x, y1: c.y };
+    else if (ed.outil === 'rect' || ed.outil === 'selection')
+      ed.apercu = { genre: 'rect', x0: c.x, y0: c.y, x1: c.x, y1: c.y, pointille: ed.outil === 'selection' };
     else ed.peint(c.x, c.y);
     ed.redessine();
   });
@@ -122,7 +132,8 @@ export function brancheGestes(ed: Editeur): void {
     if (annule) ed.doc.abandonne();
     else {
       const a = ed.apercu;
-      if (a?.genre === 'rect') ed.doc.rect(a.x0, a.y0, a.x1, a.y1, ed.outil === 'gomme' ? ' ' : ed.choix.cle);
+      if (a?.genre === 'rect' && a.pointille) ed.selectionne(a.x0, a.y0, a.x1, a.y1);
+      else if (a?.genre === 'rect') ed.remplit(a.x0, a.y0, a.x1, a.y1);
       else if (auLacher()) ed.poseAuLacher(c.x, c.y);
       ed.doc.termine();
     }

@@ -182,21 +182,35 @@ points, plus 10 par seconde d'avance sur le décollage. Le tarmac se tire d'apr�
 ## L'éditeur de niveau
 
 Options → **Éditeur de niveau** : on peint une carte au doigt (téléphone, en portrait comme en paysage) ou à la souris. On part
-d'une page blanche ou d'un niveau du jeu ; la palette (le bouton en bas) range tout ce qu'on peut poser : les tuiles avec les
-textures du thème, les gens (les ennemis de chaque lettre, qui changent de visage selon la ville, et les boss), les objets (le
-départ, le van, les drapeaux, les cages, le butin, les tyroliennes, les déclencheurs de dialogue), le décor (les accessoires du
-jeu) et les modules préconstruits (forteresses, tours, caves, gouffres, détours de pierre de taille, monuments des villes, rampes
-du FISE...). Outils : la main (déplacer), le pinceau, le rectangle, la gomme, la pipette ; un doigt peint, deux doigts déplacent et
-zoomement ; à la souris, clic droit ou barre d'espace pour déplacer, molette pour zoomer, Ctrl+Z pour annuler. **▶ Tester** joue le
-niveau tout de suite (on revient à l'éditeur au bilan, ou en quittant) ; le menu vérifie qu'on va du départ à la fin sans rien
-casser, change le nom, le thème et la taille, et **exporte** le niveau (un fichier `.json` à partager, télécharger ou copier) :
-envoyez-le à Claude pour l'ajouter au jeu, tel quel ou retouché, comme nouveau niveau ou à la place d'un niveau existant. Le
-brouillon se garde tout seul dans le navigateur, et l'export se réimporte.
+d'une page blanche ou d'un niveau du jeu ; la carte se dessine comme en jeu (l'herbe ou la neige sur la terre, les coins
+arrondis, la végétation). La palette (le bouton en bas) range tout ce qu'on peut poser : les tuiles avec les textures du thème,
+les gens (chaque apparence à part, comme les trois bigoudènes, les gens du coin de chaque ville, qu'on peut poser ailleurs, et les
+boss), les objets (le départ, le van, les drapeaux, les cages, le butin, les tyroliennes, les déclencheurs de dialogue), le décor
+(les accessoires du jeu) et les modules (ceux du jeu : forteresses, tours, caves, gouffres, détours de pierre de taille, monuments
+des villes, rampes du FISE... et les siens). Outils : la main (déplacer), le pinceau, le rectangle plein, la gomme, la pipette et la
+sélection ; un doigt peint, deux doigts déplacent et zooment ; à la souris, clic droit ou barre d'espace pour déplacer, molette pour
+zoomer, Ctrl+Z pour annuler. **Tester** joue le niveau tout de suite (on revient à l'éditeur au bilan, ou en quittant) ; le menu
+vérifie qu'on va du départ à la fin sans rien casser, change le nom, le thème et la taille, et **exporte** le niveau (un fichier
+`.json` à partager, télécharger ou copier) : envoyez-le à Claude pour l'ajouter au jeu, tel quel ou retouché, comme nouveau niveau
+ou à la place d'un niveau existant. Le brouillon se garde tout seul dans le navigateur, et l'export se réimporte.
 
-Le code est dans `src/editeur/` (chargé seulement à l'ouverture de l'éditeur) ; les modules sont les pièces du générateur,
-exportées par `python3 outils/exporte-modules.py` dans `src/editeur/modules.json`. Pour ajouter un niveau exporté : sa `carte`
-devient `src/niveaux/cartes/NN-*.ts`, son `decor` le décor placé, son `theme` celui du niveau ; puis un texte et une ligne dans
-`src/niveaux/index.ts` (voir « Ajouter du contenu »).
+**Mes modules** : l'outil sélection (le carré en pointillés) fait un module d'un rectangle de la carte (ses tuiles, ses gens, son
+décor ; le départ et le van restent dans le niveau) ; on le nomme, il rejoint la palette (Modules → Mes modules) et se pose comme
+ceux du jeu, par sa rangée de sol. Le menu → Mes modules les liste, les exporte (un par un ou tous, un fichier `dkk-modules`), en
+importe et en supprime.
+
+Le code est dans `src/editeur/` (chargé seulement à l'ouverture de l'éditeur) ; les modules du jeu sont les pièces du générateur,
+exportées par `python3 outils/exporte-modules.py` dans `src/editeur/modules.json`. Les icônes viennent de
+[Lucide](https://lucide.dev) (licence ISC), tirées par `outils/icones-editeur.py` dans `src/editeur/icones.ts`.
+
+Intégrer un export :
+
+- un **niveau** : sa `carte` devient `src/niveaux/cartes/NN-*.ts`, son `decor` le décor placé, ses `gens` la liste `gens` du
+  niveau (sur la case d'une lettre : `ottawa/a` pour le gens d'une ville, `_/h#2` pour une apparence précise, voir
+  `src/entites/ennemis/gens.ts`), son `theme` celui du niveau ; puis un texte et une ligne dans `src/niveaux/index.ts` (voir
+  « Ajouter du contenu ») ;
+- des **modules** : chacun devient une pièce du générateur (`outils/niveaux/*.py`, ses lignes telles quelles, posée par sa rangée
+  de sol), placée dans les plans des villes voulues ; `outils/exporte-modules.py` la remet ensuite dans la palette.
 
 ## À plusieurs
 

@@ -289,7 +289,7 @@
 
 .ed-champ input,
 .ed-champ select,
-.ed-fenetre input[type='file'] {
+.ed-fenetre > input {
   font: inherit;
   font-size: 16px;
   padding: 8px;
@@ -303,4 +303,58 @@
   font-size: 12px;
   white-space: pre;
   border-radius: 6px;
+}
+
+/* les icônes (Lucide, licence ISC) : un trait de la couleur du texte */
+.ed-icone {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vertical-align: middle;
+}
+
+.ed-bouton,
+.ed-large,
+.ed-fermer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.ed-large {
+  justify-content: flex-start;
+}
+
+.ed-large .ed-icone {
+  width: 20px;
+  height: 20px;
+}
+
+.ed-principal .ed-icone {
+  width: 18px;
+  height: 18px;
+}
+
+.ed-modules {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+.ed-module {
+  display: flex;
+  gap: 6px;
+}
+
+.ed-module > .ed-large {
+  flex: 1;
+  min-width: 0;
 }

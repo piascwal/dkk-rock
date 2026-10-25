@@ -1,10 +1,20 @@
 import { TUILE } from '../config';
 import type { DefNiveau } from '../niveaux/format';
-import { catalogue, choixDuCaractere, MODULES, type Choix } from './catalogue';
+import {
+  catalogue,
+  choixDuCaractere,
+  choixDuPersonnage,
+  cleAGarder,
+  lettreDe,
+  type Choix,
+} from './catalogue';
 import { DessinEditeur, type Apercu, type Camera } from './dessin';
 import { DocumentNiveau } from './document';
 import './editeur.css';
 import { menuPrincipal } from './fenetres';
+import { creeModule } from './fenetres-modules';
+import { icone, type NomIcone } from './icones';
+import { trouveModule } from './modules-perso';
 import { brancheGestes } from './gestes';
 import { Palette } from './palette';
 
@@ -22,22 +32,31 @@ export interface ActionsEditeur {
   quitte(): void;
 }
 
-export type Outil = 'main' | 'pinceau' | 'rect' | 'gomme' | 'pipette';
+export type Outil = 'main' | 'pinceau' | 'rect' | 'gomme' | 'pipette' | 'selection';
 
-const OUTILS: readonly [Outil, string, string][] = [
-  ['main', '✋', 'Déplacer (H)'],
-  ['pinceau', '✏️', 'Pinceau (B)'],
-  ['rect', '▭', 'Rectangle (R)'],
-  ['gomme', '🧽', 'Gomme (E)'],
-  ['pipette', '💧', 'Pipette (I)'],
+const OUTILS: readonly [Outil, NomIcone, string][] = [
+  ['main', 'main', 'Déplacer (H)'],
+  ['pinceau', 'pinceau', 'Pinceau (B)'],
+  ['rect', 'rectangle', 'Rectangle plein (R)'],
+  ['gomme', 'gomme', 'Gomme (E)'],
+  ['pipette', 'pipette', 'Pipette : reprendre ce qui est sur la carte (I)'],
+  ['selection', 'selection', 'Sélection : faire un module de ce rectangle (S)'],
 ];
 const BROUILLON = 'dkk-editeur-brouillon';
 export const ZOOM: [number, number] = [0.35, 6];
 
-const bouton = (texte: string, titre: string, action: () => void, classe = 'ed-bouton') => {
+/** Un bouton à icône (et à texte, s'il y en a un) ; le titre s'affiche au survol et se lit au lecteur d'écran. */
+export const bouton = (
+  nom: NomIcone,
+  texte: string,
+  titre: string,
+  action: () => void,
+  classe = 'ed-bouton',
+) => {
   const b = document.createElement('button');
   b.className = classe;
-  b.textContent = texte;
+  b.append(icone(nom));
+  if (texte) b.append(texte);
   b.title = titre;
   b.setAttribute('aria-label', titre);
   b.addEventListener('click', action);
@@ -71,22 +90,22 @@ export class Editeur {
     const haut = document.createElement('header');
     haut.className = 'ed-haut';
     this.nom.className = 'ed-nom';
-    this.annuler = bouton('↶', 'Annuler (Ctrl+Z)', () => this.doc.annule());
-    this.refaire = bouton('↷', 'Refaire (Ctrl+Y)', () => this.doc.refait());
+    this.annuler = bouton('annuler', '', 'Annuler (Ctrl+Z)', () => this.doc.annule());
+    this.refaire = bouton('refaire', '', 'Refaire (Ctrl+Y)', () => this.doc.refait());
     haut.append(
-      bouton('☰', 'Menu', () => menuPrincipal(this)),
+      bouton('menu', '', 'Menu', () => menuPrincipal(this)),
       this.nom,
       this.annuler,
       this.refaire,
-      bouton('▶ Tester', 'Jouer ce niveau', () => this.teste(), 'ed-bouton ed-principal'),
+      bouton('tester', 'Tester', 'Jouer ce niveau', () => this.teste(), 'ed-bouton ed-principal'),
     );
     this.toile.className = 'ed-toile';
     const bas = document.createElement('footer');
     bas.className = 'ed-bas';
     const outils = document.createElement('div');
     outils.className = 'ed-outils';
-    for (const [o, icone, titre] of OUTILS) {
-      const b = bouton(icone, titre, () => this.choisitOutil(o));
+    for (const [o, ic, titre] of OUTILS) {
+      const b = bouton(ic, '', titre, () => this.choisitOutil(o));
       this.boutonsOutils.set(o, b);
       outils.append(b);
     }
@@ -100,8 +119,8 @@ export class Editeur {
     const zoom = document.createElement('div');
     zoom.className = 'ed-outils';
     zoom.append(
-      bouton('−', 'Dézoomer (-)', () => this.zoome(1 / 1.4)),
-      bouton('+', 'Zoomer (+)', () => this.zoome(1.4)),
+      bouton('dezoomer', '', 'Dézoomer (-)', () => this.zoome(1 / 1.4)),
+      bouton('zoomer', '', 'Zoomer (+)', () => this.zoome(1.4)),
     );
     bas.append(outils, choix, zoom);
     this.message.className = 'ed-message';
@@ -167,8 +186,7 @@ export class Editeur {
       catalogue(choix.famille, this.doc?.theme ?? 'garage').find((c) => c.cle === choix.cle) ?? choix;
     this.nomChoix.textContent = this.choix.nom;
     this.dessin.vignette(this.vignette.getContext('2d')!, this.choix, this.doc?.theme ?? 'garage', 40, 40);
-    if (this.outil === 'gomme' || this.outil === 'pipette' || this.outil === 'main')
-      this.choisitOutil('pinceau');
+    if (this.outil !== 'pinceau' && this.outil !== 'rect') this.choisitOutil('pinceau');
   }
 
   zoome(facteur: number, sx = this.toile.clientWidth / 2, sy = this.toile.clientHeight / 2): void {
@@ -193,8 +211,23 @@ export class Editeur {
     if (this.outil === 'gomme') {
       this.doc.pose(x, y, ' ');
       this.doc.retireDecor(x, y);
+    } else if (this.choix.famille === 'gens') {
+      // un personnage : sa lettre sur la carte, et sa ville ou son apparence sur la case si la lettre seule ne suffit pas
+      this.poseCaractere(x, y, lettreDe(this.choix.cle));
+      this.doc.choisitGens(x, y, cleAGarder(this.choix.cle, this.doc.theme));
     } else if (this.choix.famille !== 'decor' && this.choix.famille !== 'modules')
       this.poseCaractere(x, y, this.choix.cle);
+  }
+
+  /** Remplit un rectangle avec ce qu'on pose (ou l'efface). */
+  remplit(x0: number, y0: number, x1: number, y1: number): void {
+    for (let y = Math.min(y0, y1); y <= Math.max(y0, y1); y++)
+      for (let x = Math.min(x0, x1); x <= Math.max(x0, x1); x++) this.peint(x, y);
+  }
+
+  /** La sélection lâchée : on en fait un module à soi. */
+  selectionne(x0: number, y0: number, x1: number, y1: number): void {
+    creeModule(this, [x0, y0, x1, y1]);
   }
 
   /** Le départ et le van sont uniques : en poser un ailleurs retire l'ancien. */
@@ -207,8 +240,8 @@ export class Editeur {
   /** Le geste qui se pose quand on lève le doigt : un module, un accessoire. */
   poseAuLacher(x: number, y: number): void {
     if (this.choix.famille === 'modules') {
-      const m = MODULES.find((o) => o.id === this.choix.cle)!;
-      this.doc.tampon(m, x - Math.floor(m.lignes[0]!.length / 2), y + 1);
+      const m = trouveModule(this.choix.cle);
+      if (m) this.doc.tampon(m, x - Math.floor(m.lignes[0]!.length / 2), y + 1);
     } else if (this.choix.famille === 'decor') this.doc.ajouteDecor(this.choix.cle, x, y + 1);
   }
 
@@ -216,8 +249,10 @@ export class Editeur {
   apercoit(x: number, y: number): void {
     if (this.outil === 'main') this.apercu = null;
     else if (this.outil === 'pinceau' && this.choix.famille === 'modules') {
-      const m = MODULES.find((o) => o.id === this.choix.cle)!;
-      this.apercu = { genre: 'module', m, x: x - Math.floor(m.lignes[0]!.length / 2), ySol: y + 1 };
+      const m = trouveModule(this.choix.cle);
+      this.apercu = m
+        ? { genre: 'module', m, x: x - Math.floor(m.lignes[0]!.length / 2), ySol: y + 1 }
+        : null;
     } else if (this.outil === 'pinceau' && this.choix.famille === 'decor')
       this.apercu = { genre: 'decor', nom: this.choix.cle, x, ySol: y + 1 };
     else this.apercu = { genre: 'case', x, y };
@@ -226,9 +261,12 @@ export class Editeur {
 
   pipette(x: number, y: number): void {
     const d = this.doc.decorEn(x, y);
+    const car = this.doc.get(x, y);
     const c = d
-      ? catalogue('decor', this.doc.theme).find((o) => o.cle === d[0])
-      : choixDuCaractere(this.doc.get(x, y), this.doc.theme);
+      ? catalogue('decor').find((o) => o.cle === d[0])
+      : /[a-z]/.test(car)
+        ? choixDuPersonnage(car, this.doc.gensEn(x, y), this.doc.theme)
+        : choixDuCaractere(car, this.doc.theme);
     if (c) this.choisit(c);
     else this.choisitOutil('pinceau');
   }

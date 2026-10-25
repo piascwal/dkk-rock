@@ -63,6 +63,11 @@ export interface DefNiveau {
   assauts?: readonly number[];
   /** les modules du niveau (colonnes de début et de fin) : les riders au repos y restent (voir jeu/chargement.ts) */
   zones?: readonly (readonly [number, number])[];
+  /**
+   * les gens choisis dans l'éditeur de niveau, case par case ([colonne, rangée, clé] sur la case d'une lettre) : un autre visage
+   * (« ottawa/a », « _/a ») ou une apparence précise (« b#2 ») ; voir entites/ennemis/gens.ts
+   */
+  gens?: readonly (readonly [number, number, string])[];
   carte: string[];
 }
 
