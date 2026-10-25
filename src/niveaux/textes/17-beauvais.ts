@@ -3,7 +3,7 @@ import type { DefNiveau } from '../format';
 export const BEAUVAIS: Omit<DefNiveau, 'carte'> = {
   id: 'beauvais',
   titre: 'Beauvais',
-  sousTitre: 'International Tour 4 — L’étape exotique, chez l’ancien prof de sport',
+  sousTitre: 'International Tour 4 — Là où JBT a débuté comme prof de sport',
   theme: 'beauvais',
   intro: [
     {
