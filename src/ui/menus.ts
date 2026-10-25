@@ -126,13 +126,9 @@ export class Menus {
     const kart = niveauOuvert(NIVEAU_KART, s.faits);
     const avion = niveauOuvert(NIVEAU_AVION, s.faits);
     const recordAvion = `Record du tarmac : ${s.recordAvion} points.`;
-    this.montre(
-      el('h2', 'Mini-jeux'),
-      el(
-        'p',
-        'Les mini-jeux croisés en chemin, à rejouer seul ou à plusieurs (Pause → Inviter des amis).',
-        'aide',
-      ),
+    // une ligne par mini-jeu : son bouton à gauche, son record en face, à droite (voir .mini-jeux)
+    const jeux = el('div', '', 'mini-jeux');
+    jeux.append(
       drift
         ? bouton('Concours de drift — le pré du Clos', () => this.a.lanceMiniJeu('drift'), 'principal')
         : el('p', 'Concours de drift : se débloque après Saint-Cézaire.', 'aide'),
@@ -148,6 +144,7 @@ export class Menus {
             'principal',
           )
         : el('p', 'Le Grand Prix de la Sarré : se débloque après Gréau.', 'aide'),
+      el('span'),
       reve
         ? bouton('Le rêve de JBT — la pleine lune', () => this.a.lanceMiniJeu('reve'), 'principal')
         : el('p', 'Le rêve de JBT : se débloque après la Ville Autotunée.', 'aide'),
@@ -156,7 +153,16 @@ export class Menus {
         ? bouton('L’avion de JBG — dernier appel', () => this.a.lanceMiniJeu('avion'), 'principal')
         : el('p', 'L’avion de JBG : se débloque après le Club Infini.', 'aide'),
       avion && s.recordAvion > 0 ? el('p', recordAvion, 'aide') : el('span'),
-      bouton('Retour', () => this.titre()),
+      bouton('Retour', () => this.titre(), 'pleine'),
+    );
+    this.montre(
+      el('h2', 'Mini-jeux'),
+      el(
+        'p',
+        'Les mini-jeux croisés en chemin, à rejouer seul ou à plusieurs (Pause → Inviter des amis).',
+        'aide',
+      ),
+      jeux,
     );
   }
 

@@ -185,6 +185,25 @@ h2 {
   align-items: stretch;
 }
 
+/* le menu des mini-jeux : un mini-jeu par ligne, son bouton à gauche et son record en face, à droite */
+.mini-jeux {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 0.5rem 1.25rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.mini-jeux p {
+  max-width: 24rem;
+  text-align: left;
+}
+
+.mini-jeux .pleine {
+  grid-column: 1 / -1;
+  justify-self: center;
+}
+
 .ecran button,
 .ecran input,
 .ecran select {
