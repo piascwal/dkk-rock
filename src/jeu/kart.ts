@@ -89,7 +89,9 @@ export class ConcoursKart {
         if (this.minuteur === 0) this.mancheSuivante();
         return;
       case 'podium':
-        if (this.minuteur === 0 && presents.some((s) => this.commandes[s]!.appuye(VALIDE))) {
+        // BAS : on rejoue la course ; SAUT : on passe au niveau suivant (l'histoire) ou on rejoue (le menu)
+        if (this.minuteur === 0 && presents.some((s) => this.commandes[s]!.appuye(C.BAS))) this.recommence();
+        else if (this.minuteur === 0 && presents.some((s) => this.commandes[s]!.appuye(VALIDE))) {
           if (this.miniJeu) this.recommence();
           else this.fini = true;
         }

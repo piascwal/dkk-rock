@@ -70,6 +70,9 @@ export function dessineLune(ctx: Ctx, cx: number, cy: number, tick: number, choc
   ctx.drawImage(t, Math.round(cx - t.width / 2 + s), Math.round(cy - t.height / 2));
 }
 
+/** Combien JBT s'enfonce dans la lune (pixels du jeu, vers son centre) : la tête et les épaules disparaissent sous le bord. */
+const ENFONCE = 22;
+
 /**
  * JBT planté dans la lune : la tête et les épaules dedans (on ne dessine que ce qui dépasse), les jambes qui gigotent ; autour,
  * les fissures, la poussière de lune, des étoiles qui tournent. `p` : de 0 (le choc) à 1.
@@ -88,7 +91,7 @@ export function jbtPlante(
   ctx.rect(-50, -50, 2000, HAUTEUR_VUE + 100);
   ctx.arc(cx, cy, LUNE_R - 1, 0, Math.PI * 2);
   ctx.clip('evenodd');
-  dessineJbt(ctx, x, y, Math.sin(tick / 4) * 0.05 * (1 - p * 0.6), tick);
+  dessineJbt(ctx, x + ENFONCE, y, Math.sin(tick / 4) * 0.05 * (1 - p * 0.6), tick);
   ctx.restore();
   const ix = cx - Math.sqrt(Math.max(0, LUNE_R * LUNE_R - (y - cy) * (y - cy)));
   // les fissures, en étoile depuis le point d'impact

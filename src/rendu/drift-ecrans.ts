@@ -3,6 +3,7 @@ import { PILOTES } from '../jeu/drift';
 import type { VueDrift } from '../jeu/vue';
 import { dessineVignette } from './drift-voitures';
 import { ecrit, ecritCentre, largeurTexte } from './police';
+import { invitePodium } from './podium-invite';
 
 /** Les écrans du concours de drift, par-dessus le pré : choix du pilote, compte à rebours, chrono, score, podium. */
 
@@ -111,6 +112,5 @@ function podium(ctx: CanvasRenderingContext2D, largeur: number, v: VueDrift, tic
     ecritCentre(ctx, ligne, m, 36 + i * 14, i === 0 ? JAUNE : BLANC, i === 0 ? 2 : 1);
   });
   if (classement[0]) ecritCentre(ctx, verdict(classement[0].pourcent), m, 100, ROSE);
-  if (v.minuteur === 0 && tick % 50 < 36)
-    ecritCentre(ctx, v.miniJeu ? 'SAUT : REJOUER' : 'SAUT : EN ROUTE POUR LA TOURNÉE', m, 132, BLANC);
+  if (v.minuteur === 0 && tick % 50 < 36) invitePodium(ctx, m, 132, v.miniJeu, 'EN ROUTE POUR LA TOURNÉE');
 }

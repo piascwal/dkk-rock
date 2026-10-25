@@ -8,6 +8,7 @@ import { dessineFeuille } from './feuilles-images';
 import { HEROS_KART, imageKart } from './kart-images';
 import { dessineVoiture } from './kart-piste';
 import { ecrit, ecritCentre, largeurTexte } from './police';
+import { invitePodium } from './podium-invite';
 
 /**
  * Les écrans du Grand Prix de la Sarré, par-dessus la piste : le choix des pilotes, le compte à rebours, la course (seul : la
@@ -266,6 +267,5 @@ export function ecranPodium(c: Ctx, largeur: number, v: VueKart, tick: number): 
       : `${PILOTES[x.pilote]} ${t >= 0 ? `+${((t - t0) / 60).toFixed(1)} S` : '-'}`;
   });
   ecritCentre(c, lignes.join('   '), m, 152, BLANC);
-  if (v.minuteur === 0 && tick % 50 < 36)
-    ecritCentre(c, v.miniJeu ? 'SAUT : REJOUER' : 'SAUT : CAP SUR LES PLAGES', m, 141, BLANC);
+  if (v.minuteur === 0 && tick % 50 < 36) invitePodium(c, m, 132, v.miniJeu, 'CAP SUR LES PLAGES');
 }

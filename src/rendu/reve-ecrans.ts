@@ -4,6 +4,7 @@ import { LONGUEUR } from '../jeu/reve-parcours';
 import type { VueReve } from '../jeu/vue-reve';
 import { disque } from './formes-pixels';
 import { ecrit, ecritCentre, largeurTexte } from './police';
+import { invitePodium } from './podium-invite';
 import { dessineImage } from './reve-jbt';
 
 /** Les écrans du rêve de JBT, par-dessus le ciel : le décollage, le compteur de piles, les vies, la route jusqu'à la lune, la fin. */
@@ -130,13 +131,7 @@ export function dessineEcranReve(ctx: Ctx, largeur: number, v: VueReve, tick: nu
         ecritCentre(ctx, ligne, m, 36 + i * 14, i === 0 ? JAUNE : BLANC, i === 0 ? 2 : 1);
       });
       if (v.minuteur === 0 && tick % 50 < 36)
-        ecritCentre(
-          ctx,
-          v.miniJeu ? 'SAUT : REJOUER' : 'SAUT : DEBOUT, ON MONTE DANS LA TOUR',
-          m,
-          132,
-          BLANC,
-        );
+        invitePodium(ctx, m, 132, v.miniJeu, 'DEBOUT, ON MONTE DANS LA TOUR');
       return;
     }
   }

@@ -2,6 +2,7 @@ import { HAUTEUR_VUE } from '../config';
 import { DUREE_SURVOL, HAUTEUR, ZONE } from '../jeu/plongeon';
 import type { VuePlongeon } from '../jeu/vue';
 import { ecrit, ecritCentre, largeurTexte } from './police';
+import { invitePodium } from './podium-invite';
 
 /** Les écrans du concours de plongeon, par-dessus les gorges : le survol, le parapet, la chute, l'arrivée, la note, le podium. */
 
@@ -110,8 +111,7 @@ export function dessineEcranPlongeon(
         const ligne = `${i + 1}. ${joueur(s.siege)} TOM   ${s.score} %`;
         ecritCentre(ctx, ligne, m, 36 + i * 14, i === 0 ? JAUNE : BLANC, i === 0 ? 2 : 1);
       });
-      if (v.minuteur === 0 && tick % 50 < 36)
-        ecritCentre(ctx, v.miniJeu ? 'SAUT : REJOUER' : 'SAUT : EN ROUTE POUR LES ALPES', m, 132, BLANC);
+      if (v.minuteur === 0 && tick % 50 < 36) invitePodium(ctx, m, 132, v.miniJeu, 'EN ROUTE POUR LES ALPES');
       return;
     }
   }

@@ -96,7 +96,10 @@ export class ConcoursDrift {
         break;
       case 'podium':
         // au podium, n'importe quel joueur présent passe (ou relance)
-        if (this.minuteur === 0 && presents.some((s) => this.commandes[s]!.appuye(VALIDE))) {
+        // BAS : on rejoue la manche ; SAUT : on passe au niveau suivant (l'histoire) ou on rejoue (le menu)
+        if (this.minuteur === 0 && presents.some((s) => this.commandes[s]!.appuye(C.BAS)))
+          this.recommence(presents);
+        else if (this.minuteur === 0 && presents.some((s) => this.commandes[s]!.appuye(VALIDE))) {
           if (this.miniJeu) this.recommence(presents);
           else this.fini = true;
         }

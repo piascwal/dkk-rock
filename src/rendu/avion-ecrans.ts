@@ -3,6 +3,7 @@ import { BONUS } from '../jeu/avion-parcours';
 import { DECOLLAGE, PORTEE, envolApresEmbarquement, xAvion } from '../jeu/avion';
 import type { VueAvion } from '../jeu/vue-avion';
 import { ecrit, ecritCentre, largeurTexte } from './police';
+import { invitePodium } from './podium-invite';
 import { iconeBonus } from './avion-objets';
 
 /** Les écrans de l'avion de JBG, par-dessus le tarmac : l'arrivée, la course (l'avion, le décollage, les cartes, le bonus), la fin. */
@@ -138,8 +139,7 @@ export function dessineEcranAvion(ctx: Ctx, largeur: number, v: VueAvion, tick: 
         const ligne = `${i + 1}. ${joueur(s.siege)} JBG   ${s.score} POINTS`;
         ecritCentre(ctx, ligne, m, 36 + i * 14, i === 0 ? JAUNE : BLANC, i === 0 ? 2 : 1);
       });
-      if (v.minuteur === 0 && tick % 50 < 36)
-        ecritCentre(ctx, v.miniJeu ? 'SAUT : REJOUER' : 'SAUT : CAP SUR LA BRETAGNE', m, 132, BLANC);
+      if (v.minuteur === 0 && tick % 50 < 36) invitePodium(ctx, m, 132, v.miniJeu, 'CAP SUR LA BRETAGNE');
       return;
     }
   }
