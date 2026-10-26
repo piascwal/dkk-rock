@@ -26,7 +26,14 @@ function replique(el: HTMLElement, qui: Qui, texte: string): void {
   el.append(img, p);
 }
 
-/** Les répliques pendant le jeu : une à la fois, en bas de l'écran, sans arrêter l'action. */
+/**
+ * Les répliques pendant le jeu : une à la fois, en bas de l'écran, sans arrêter l'action. Chacune reste assez longtemps pour
+ * être lue : au moins 4 secondes, et environ 80 ms par caractère (une lecture posée, pas au pas de course).
+ */
+const DUREE_MIN_MS = 4000;
+const MS_PAR_CARACTERE = 80;
+const FILE_MAX = 10;
+
 export class Bulles {
   private file: { qui: Qui; texte: string }[] = [];
   private finA = 0;
@@ -36,7 +43,7 @@ export class Bulles {
   ajoute(qui: string, texte: string): void {
     if (!estQui(qui) || typeof texte !== 'string') return;
     // une file trop longue (beaucoup de morts d'affilée) : on garde les plus récentes
-    if (this.file.length > 6) this.file.shift();
+    if (this.file.length >= FILE_MAX) this.file.shift();
     this.file.push({ qui, texte: texte.slice(0, 300) });
   }
 
@@ -55,7 +62,7 @@ export class Bulles {
     }
     replique(this.element, r.qui, r.texte);
     this.element.hidden = false;
-    this.finA = maintenant + Math.max(2200, r.texte.length * 48);
+    this.finA = maintenant + Math.max(DUREE_MIN_MS, r.texte.length * MS_PAR_CARACTERE);
   }
 }
 
