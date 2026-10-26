@@ -60,6 +60,12 @@ export const BOSS: readonly [string, string][] = [
   ['Z', 'DJ Boucle (boss final)'],
 ];
 
+/** les tuiles qu'on confondait : la croix, ce sont les bonus qui sortent */
+const NOMS_TUILES: Record<string, string> = {
+  C: 'Caisse à croix (livre des bonus)',
+  W: 'Bois (planches, sans bonus)',
+};
+
 const majuscule = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 /** « sapinNeige » → « Sapin neige » */
 const lisible = (nom: string) => majuscule(nom.replace(/([a-z])([A-Z0-9])/g, '$1 $2').toLowerCase());
@@ -135,7 +141,7 @@ export function catalogue(famille: Famille, _theme?: NomTheme): Choix[] {
         { famille, cle: '.', nom: 'Mur de fond' },
         ...Object.values(PROPRIETES)
           .filter((p) => p.car !== ' ')
-          .map((p) => ({ famille, cle: p.car, nom: majuscule(p.nom) })),
+          .map((p) => ({ famille, cle: p.car, nom: NOMS_TUILES[p.car] ?? majuscule(p.nom) })),
       ];
     case 'gens':
       return gens();
