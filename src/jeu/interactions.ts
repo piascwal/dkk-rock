@@ -1,4 +1,4 @@
-import { DUREE_INVINCIBLE, PV_HEROS, VIES_MAX } from '../config';
+import { DUREE_INVINCIBLE, PV_HEROS, VIES_MAX_RESEAU } from '../config';
 import { armeRamassee } from '../entites/armes';
 import { Chauffage } from '../entites/chauffage';
 import { HEROS } from '../entites/heros';
@@ -29,8 +29,8 @@ export function interactions(p: Partie): void {
         case 'cage':
           if (e.active) break;
           e.active = true;
-          // en battle royale, la vie revient à celui qui libère (voir arene.ts)
-          const gagne = p.arene ? p.arene.gagneVie(j.siege) : p.vies < VIES_MAX;
+          // en battle royale, la vie revient à celui qui libère (voir arene.ts) ; dans l'histoire, pas de plafond
+          const gagne = p.arene ? p.arene.gagneVie(j.siege) : p.vies < VIES_MAX_RESEAU;
           if (gagne && !p.arene) p.vies++;
           p.score += 500;
           j.membre = membreLibre(p, (j.membre + 1 + p.rng.entier(0, 3)) % HEROS.length, j.siege);
@@ -69,17 +69,18 @@ export function interactions(p: Partie): void {
           break;
         }
         case 'coeur': {
-          // le cœur d'un tonneau WOG : un cœur de plus dans le HUD de celui qui le ramasse (s'il en a perdu), et une vie de plus
+          // le cœur d'un tonneau WOG : un cœur de plus dans le HUD de celui qui le ramasse, 3 au plus ; pas de vie en plus
+          // (seules les cages en donnent)
           const soigne = j.pv < PV_HEROS;
           if (soigne) j.pv++;
-          const gagne = p.arene ? p.arene.gagneVie(j.siege) : p.vies < VIES_MAX;
-          if (gagne && !p.arene) p.vies++;
           e.fini = true;
           p.son('liberation', e.corps.x, e.corps.y);
-          const [texte, couleur] = gagne
-            ? [soigne ? '+1 CŒUR +1 VIE' : '+1 VIE', '#ff6b8a']
-            : [soigne ? '+1 CŒUR' : 'VIES AU MAX', soigne ? '#ff6b8a' : '#ffd23f'];
-          p.texte(e.corps.x, e.corps.y - 10, texte, couleur);
+          p.texte(
+            e.corps.x,
+            e.corps.y - 10,
+            soigne ? '+1 CŒUR' : 'CŒURS AU MAX',
+            soigne ? '#ff6b8a' : '#ffd23f',
+          );
           break;
         }
         case 'coeurOr':

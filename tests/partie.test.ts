@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DUREE_INVINCIBLE, PV_HEROS, TUILE, VIES_DEPART, VIES_MAX } from '../src/config';
+import { DUREE_INVINCIBLE, PV_HEROS, TUILE, VIES_DEPART } from '../src/config';
 import { C } from '../src/jeu/commandes';
 import { Partie } from '../src/jeu/partie';
 import { PHASES_MINI_JEUX } from '../src/jeu/mini-jeux';
@@ -115,30 +115,21 @@ describe('la partie', () => {
     expect(p.carte.get(x, y)).toBe(T.VIDE);
   });
 
-  it('libérer une cage donne une vie et change de membre', () => {
-    const p = nouvelle();
-    const j = p.joueurs[0]!;
-    const cage = p.entites.find((e): e is Objet => e instanceof Objet && e.sorte === 'cage')!;
-    const membre = j.membre;
-    p.vies = 3;
-    Object.assign(j.corps, { x: cage.corps.x, y: cage.corps.y });
-    avance(p, 2);
-    expect(p.vies).toBe(4);
-    expect(j.membre).not.toBe(membre);
-    expect(cage.active).toBe(true);
-  });
-
-  it('au maximum de vies, une cage change seulement de membre', () => {
-    const p = nouvelle();
-    const j = p.joueurs[0]!;
-    const cage = p.entites.find((e): e is Objet => e instanceof Objet && e.sorte === 'cage')!;
-    const membre = j.membre;
-    p.vies = VIES_MAX;
-    Object.assign(j.corps, { x: cage.corps.x, y: cage.corps.y });
-    avance(p, 2);
-    expect(p.vies).toBe(VIES_MAX);
-    expect(j.membre).not.toBe(membre);
-  });
+  it.each([3, 5, 12])(
+    'libérer une cage donne une vie (sans plafond : %i → +1) et change de membre',
+    (vies) => {
+      const p = nouvelle();
+      const j = p.joueurs[0]!;
+      const cage = p.entites.find((e): e is Objet => e instanceof Objet && e.sorte === 'cage')!;
+      const membre = j.membre;
+      p.vies = vies;
+      Object.assign(j.corps, { x: cage.corps.x, y: cage.corps.y });
+      avance(p, 2);
+      expect(p.vies).toBe(vies + 1);
+      expect(j.membre).not.toBe(membre);
+      expect(cage.active).toBe(true);
+    },
+  );
 
   it('les ennemis vaincus sont comptés par type, remis à zéro à chaque niveau', () => {
     const p = nouvelle();
@@ -201,19 +192,21 @@ describe('la partie', () => {
       avance(p, 2);
     };
 
-    it('un tonneau WOG libère un cœur qui redonne une vie', () => {
+    it('un tonneau WOG libère un cœur qui redonne un point de vie à qui en a perdu', () => {
       const { p, j, coeur } = casse(T.TONNEAU_WOG, 'coeur');
-      p.vies = 3;
+      j.pv = 1;
       ramasse(p, j, coeur);
-      expect(p.vies).toBe(4);
+      expect(j.pv).toBe(2);
       expect(coeur.fini).toBe(true);
     });
 
-    it('jamais plus de vies que le maximum', () => {
+    it('un cœur rend un point de vie (3 au plus) et ne donne jamais de vie : seules les cages en donnent', () => {
       const { p, j, coeur } = casse(T.TONNEAU_WOG, 'coeur');
-      p.vies = VIES_MAX;
+      const vies = p.vies;
+      j.pv = PV_HEROS;
       ramasse(p, j, coeur);
-      expect(p.vies).toBe(VIES_MAX);
+      expect(p.vies).toBe(vies);
+      expect(j.pv).toBe(PV_HEROS);
     });
 
     it("un tonneau d'or libère un cœur d'or : toute la vie, et dix secondes d'invincibilité", () => {

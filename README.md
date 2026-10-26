@@ -47,7 +47,7 @@ mer, puis le festival, sa foule, ses lasers, ses stroboscopes et sa grande scèn
 - **Barils explosifs** (Saint-Cézaire et ville, marqueur `%`) : rouges, à terre. Le premier tir qui les touche (le leur comme celui d'une explosion voisine) les allume ; deux secondes plus tard, ils explosent (rayon 48 px, 5 dégâts aux héros comme aux ennemis : un cinquième de plus qu'un caisson de basses) et cassent ce qui se casse autour. Personne ne les vise, mais les tirs des ennemis les allument aussi. Ils sont pleins : héros et ennemis butent contre eux et peuvent monter dessus (`Carte.obstacles`, tenu à jour par la partie ; `monde/physique.ts`).
 - **Tonneaux WOG** (le WOG, une passion magique pour les membres des DKK ; l'histoire sera retravaillée) : ce sont des tuiles
   (`O` bois, `Q` or ; `outils/fixe-tuiles.py`), semées par le générateur (un raccord sur deux en bois, et un tonneau d'or bien en vue au milieu du parcours, posé seul, jamais sur un tonneau en bois, en plus de celui d'une cache).
-  Cassé, un tonneau en bois libère un **cœur** (un cœur de plus dans le HUD de celui qui le ramasse, s'il en a perdu, et +1 vie, 5 au plus) ; un tonneau d'or, un **cœur d'or** : tous les points de vie
+  Cassé, un tonneau en bois libère un **cœur** (un cœur de plus dans le HUD de celui qui le ramasse, s'il en a perdu, 3 au maximum ; pas de vie en plus : seules les cages en donnent) ; un tonneau d'or, un **cœur d'or** : tous les points de vie
   et `DUREE_INVINCIBLE` (10 s) d'invincibilité, avec une forte aura (`rendu/aura.ts`, portée par `EntiteVue.aura`, protocole v4).
   Le tonneau sans pancarte est le décor ordinaire de l'arrière-plan.
 - **Zone visible et traits de personnages :** la simulation ne connaît pas la caméra ; `ZONE_VISIBLE` (config) approxime
@@ -73,7 +73,7 @@ mer, puis le festival, sa foule, ses lasers, ses stroboscopes et sa grande scèn
   niveau, ni en le rejouant. L'écran de fin de niveau affiche les cartes trouvées sur le total du niveau (`EtatVue.sibylles`,
   protocole v27) ; la carte du monde du menu, une fois le van arrivé sur un niveau, aussi (en bas à droite). L'histoire s'en
   mêle dès l'intro de Saint-Cézaire : Mat a perdu la sienne, JBM se fixe pour objectif de récupérer toutes les Sibylles du monde.
-- **Cages** : un membre du groupe y est enfermé. Le libérer donne une vie (cinq au plus : au maximum, on change seulement de personnage), et on prend sa place. Chaque niveau en cache quatre ou cinq.
+- **Cages** : un membre du groupe y est enfermé. Le libérer donne une vie (sans limite : on commence à cinq, et chaque cage fait monter le compteur ; une bulle « +1 VIE » flotte au-dessus tant qu'elle est fermée), et on prend sa place. Chaque niveau en cache quatre ou cinq.
 - **Chaos visuel** (sans dégât en plus) : quand la tuile qui porte un accessoire de décor est détruite, des morceaux colorés
   s'envolent (`rendu/debris-decor.ts`, notes en plus pour les enceintes) ; les bonus (armes, médiators, cœurs) sont enfermés dans
   une boîte de verre qui ondule et brille (`rendu/bulle-bonus.ts`) ; dans les mondes sombres (ville, club), un liseré lumineux

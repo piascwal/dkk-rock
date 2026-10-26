@@ -329,7 +329,7 @@ export class Rendu {
       this.braises.dessine(ctx, camX, camY);
     }
     this.premierPlan.dessine(ctx, camX, camY, this.largeur, this.tick);
-    dessineBullesCages(ctx, vue.entites, camX, camY, this.largeur, this.tick);
+    dessineBullesCages(ctx, vue, siegeLocal, camX, camY, this.largeur, this.tick);
     this.traits.maj(vue, this.decor, carte, { emojis: this.emojis });
     this.emojis.accompagne(vue.entites);
     this.emojis.maj();

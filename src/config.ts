@@ -40,8 +40,8 @@ export const JOUEURS_HISTOIRE = 4;
  */
 export const ZONE_VISIBLE = { demiLargeur: 185, haut: 100, bas: 75 };
 export const VIES_DEPART = 5;
-/** Au-delà, une cage ne donne plus de vie : on change seulement de personnage. */
-export const VIES_MAX = 5;
+/** Les cages donnent une vie sans plafond (l'instantané réseau les garde sur un octet : 255 au plus). */
+export const VIES_MAX_RESEAU = 255;
 /** La durée de l'invincibilité du cœur d'or WOG : dix secondes (en ticks). */
 export const DUREE_INVINCIBLE = 600;
 export const PV_HEROS = 3;
