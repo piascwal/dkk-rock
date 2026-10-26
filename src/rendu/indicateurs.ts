@@ -59,6 +59,8 @@ export function dessineIndicateurs(
   largeur: number,
   tick: number,
 ): void {
+  // en battle royale, on cherche ses adversaires soi-même : pas de flèches
+  if (vue.arene) return;
   vue.joueurs.forEach((j, siege) => {
     if (siege === siegeLocal || !j.present || j.mort) return;
     const ind = indicateurVers(j.x - camX, j.y - camY, largeur, HAUTEUR_VUE);

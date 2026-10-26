@@ -11,7 +11,33 @@ import type { Partie } from './partie';
  * l'adversaire le plus proche et s'y rend par le chemin que trouve le parcours d'accessibilité (niveaux/accessibilite.ts, sur
  * la carte telle qu'elle est maintenant : marcher, sauter, grimper aux échelles, prendre les tyroliennes) ; il tire quand il
  * est à hauteur, et creuse quand il est coincé. Il n'a que les commandes d'un joueur.
+ *
+ * Trois niveaux : facile (il voit moins loin, met du temps à réagir, tire par petites rafales et rate souvent son tir), moyen,
+ * difficile (il réagit tout de suite et ne lâche pas la gâchette).
  */
+
+export type NiveauIA = 'facile' | 'moyen' | 'difficile';
+export const NIVEAUX_IA: readonly NiveauIA[] = ['facile', 'moyen', 'difficile'];
+
+interface Profil {
+  /** à cette distance (px), on tire si l'on est à hauteur */
+  portee: number;
+  /** le temps de réaction (ticks) quand un adversaire entre en vue, tiré entre ces bornes */
+  reaction: [number, number];
+  /** les rafales : tant de ticks de tir, puis tant de pause ; et la chance de presser la gâchette à chaque tick d'une rafale */
+  rafale: number;
+  pause: number;
+  tir: number;
+  /** le chemin se refait tous les tant de pas (plus lentement : il suit moins bien) */
+  recalcul: number;
+  special: boolean;
+}
+
+const PROFILS: Record<NiveauIA, Profil> = {
+  facile: { portee: 110, reaction: [45, 80], rafale: 20, pause: 70, tir: 0.35, recalcul: 45, special: false },
+  moyen: { portee: 150, reaction: [20, 40], rafale: 35, pause: 40, tir: 0.6, recalcul: 30, special: true },
+  difficile: { portee: 190, reaction: [0, 8], rafale: 1, pause: 0, tir: 0.9, recalcul: 20, special: true },
+};
 
 interface Memoire {
   /** la prochaine case du chemin (colonne, rangée des pieds), refaite de temps en temps */
@@ -32,8 +58,9 @@ interface Memoire {
   sensTyro: number;
   /** le sens prévu sur la prochaine tyrolienne du chemin (vers son arrivée) */
   sensPrevu: number;
-  /** un peu d'hésitation : tous ne tirent pas au même instant */
-  vise: number;
+  /** le temps de réaction qui reste avant de tirer sur l'adversaire en vue, et le compteur des rafales */
+  reaction: number;
+  rafale: number;
   /** pour voir qu'on tourne en rond : où l'on était au dernier bilan, et depuis quand ; puis, un moment, on erre ailleurs */
   ancre: [number, number];
   bilan: number;
@@ -41,10 +68,6 @@ interface Memoire {
   but: [number, number];
 }
 
-/** à cette distance (px), on tire si l'on est à hauteur */
-const PORTEE = 190;
-/** le chemin se refait tous les tant de pas */
-const RECALCUL = 20;
 /** tous les tant de pas, on regarde si l'on a bougé ; sinon, on erre ailleurs ce temps-là */
 const BILAN = 8 * 60;
 const ERRANCE = 4 * 60;
@@ -63,7 +86,25 @@ const BUT_FICTIF: Cible = {
 export class IAArene {
   private readonly memoires = new Map<number, Memoire>();
 
-  constructor(readonly sieges: readonly number[]) {}
+  private readonly profil: Profil;
+
+  readonly sieges: number[];
+
+  constructor(sieges: readonly number[], niveau: NiveauIA = 'moyen') {
+    this.sieges = [...sieges];
+    this.profil = PROFILS[niveau];
+  }
+
+  /** Un joueur de l'ordinateur de plus (en ligne, l'hôte comble le salon), ou de moins. */
+  ajoute(siege: number): void {
+    if (!this.sieges.includes(siege)) this.sieges.push(siege);
+  }
+
+  retire(siege: number): void {
+    const i = this.sieges.indexOf(siege);
+    if (i >= 0) this.sieges.splice(i, 1);
+    this.memoires.delete(siege);
+  }
 
   /** Les commandes de chaque joueur de l'ordinateur pour ce pas. */
   pilote(p: Partie): void {
@@ -85,7 +126,8 @@ export class IAArene {
           special: 200,
           sensTyro: 0,
           sensPrevu: 0,
-          vise: 0,
+          reaction: 0,
+          rafale: 0,
           ancre: [j.cx, j.cy],
           bilan: 0,
           errance: 0,
@@ -93,7 +135,8 @@ export class IAArene {
         };
         this.memoires.set(s, m);
       }
-      p.commandes[s] = j.mort || p.arene?.gele ? 0 : this.commandes(p, j, m);
+      // au salon (en ligne), ils attendent le début de la partie sans bouger
+      p.commandes[s] = j.mort || p.arene?.gele || p.arene?.etape === 'salon' ? 0 : this.commandes(p, j, m);
     }
   }
 
@@ -120,7 +163,7 @@ export class IAArene {
       m.sensTyro = m.sensPrevu || (cible ? Math.sign(cible.x + cible.w / 2 - j.cx) || 1 : j.dir);
     // le chemin se refait les pieds quelque part (pas suspendu à un câble : depuis le vide, il ne veut rien dire)
     if (!j.surTyrolienne && (--m.recalcul <= 0 || (m.etape && m.etape[0] === tx && m.etape[1] === pieds))) {
-      m.recalcul = RECALCUL;
+      m.recalcul = this.profil.recalcul;
       m.etape = cible ? this.prochaineCase(p, tx, pieds, cible) : null;
     }
     let bits = 0;
@@ -195,22 +238,27 @@ export class IAArene {
       bits |= C.SAUT;
     }
 
-    // le tir : à hauteur et à portée (en se tournant vers elle), à la verticale, ou pour creuser quand on est coincé
+    // le tir : à hauteur et à portée (en se tournant vers elle), à la verticale, ou pour creuser quand on est coincé ; après un
+    // temps de réaction, par rafales, selon le niveau
+    const pr = this.profil;
     const dy = adversaire ? adversaire.y + adversaire.h / 2 - j.cy : 0;
     const dx = adversaire ? adversaire.x + adversaire.w / 2 - j.cx : 0;
-    if (m.vise > 0) m.vise--;
-    if (adversaire && Math.abs(dx) < PORTEE) {
-      if (Math.abs(dy) < 18) {
-        bits = (bits & ~(C.GAUCHE | C.DROITE)) | (dx > 0 ? C.DROITE : C.GAUCHE);
-        if (m.vise === 0 && p.rng.entre(0, 1) < 0.9) bits |= C.TIR;
-      } else if (dy < -24 && Math.abs(dx) < 40) bits |= C.HAUT | C.TIR;
-      else if (dy > 24 && Math.abs(dx) < 40 && !c.auSol) bits |= C.BAS | C.TIR;
-      if (Math.abs(dx) < 70 && Math.abs(dy) < 30 && m.special-- <= 0) {
+    const aHauteur = Math.abs(dy) < 18;
+    const enVue =
+      !!adversaire && Math.abs(dx) < pr.portee && (aHauteur || (Math.abs(dx) < 40 && Math.abs(dy) > 24));
+    if (!enVue) m.reaction = p.rng.entier(pr.reaction[0], pr.reaction[1]);
+    else if (m.reaction > 0) m.reaction--;
+    m.rafale = (m.rafale + 1) % (pr.rafale + pr.pause);
+    const gachette = enVue && m.reaction === 0 && m.rafale < pr.rafale && p.rng.entre(0, 1) < pr.tir;
+    if (enVue) {
+      if (aHauteur) bits = (bits & ~(C.GAUCHE | C.DROITE)) | (dx > 0 ? C.DROITE : C.GAUCHE);
+      else bits |= dy < 0 ? C.HAUT : c.auSol ? 0 : C.BAS;
+      if (gachette) bits |= C.TIR;
+      if (pr.special && m.reaction === 0 && Math.abs(dx) < 70 && Math.abs(dy) < 30 && m.special-- <= 0) {
         bits |= C.SPECIAL;
         m.special = 300 + p.rng.entier(0, 300);
       }
     } else if (m.detour > 0 || (mur && m.immobile > 15)) bits |= C.TIR;
-    if (!adversaire && m.vise === 0) m.vise = p.rng.entier(5, 25);
     return bits;
   }
 

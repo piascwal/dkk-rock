@@ -1,6 +1,7 @@
 import { HEROS } from '../entites/heros';
 import { joueursConseilles } from '../jeu/arene';
 import type { EtatVue } from '../jeu/vue';
+import type { Partie } from '../jeu/partie';
 import { NIVEAUX, niveauLu } from '../niveaux';
 import { COULEURS_SIEGES } from '../rendu/indicateurs';
 import { el } from './elements';
@@ -17,6 +18,8 @@ export interface ActionsArene {
   suivant(): void;
   inviter(): void;
   quitte(): void;
+  /** la partie, chez l'hôte : il y comble le salon avec des joueurs de l'ordinateur */
+  partie(): Partie | null;
 }
 
 export class PanneauArene {
@@ -64,6 +67,8 @@ export class PanneauArene {
       if (hote)
         boutons.append(
           this.bouton('Inviter des amis', () => this.a.inviter()),
+          this.bouton('+ IA', () => this.a.partie()?.ajouteIA(Math.floor(Math.random() * HEROS.length))),
+          this.bouton('− IA', () => this.a.partie()?.retireIA()),
           this.bouton(`Lancer la partie (${presents.length})`, () => this.a.suivant(), true),
         );
       this.element.replaceChildren(

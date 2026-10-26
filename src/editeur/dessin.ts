@@ -10,6 +10,7 @@ import { dessineTuiles, dessineTyroliennes } from '../rendu/dessin-tuiles';
 import { DESSINS_ENNEMIS } from '../rendu/dessins-ennemis';
 import { dessineFeuille } from '../rendu/feuilles-images';
 import { pinceau } from '../rendu/pinceau';
+import { COULEURS_SIEGES } from '../rendu/indicateurs';
 import { ecritCentre } from '../rendu/police';
 import { THEMES, type NomTheme } from '../rendu/themes';
 import { relieTyroliennes, type Poteau, type Tyrolienne } from '../niveaux/tyroliennes';
@@ -52,6 +53,8 @@ const PASTILLES: Record<string, string> = {
   ')': '#6a6a78',
   $: '#6a6a78',
   '&': '#2a8ac8',
+  // les départs du battle royale : la couleur de chaque joueur
+  ...Object.fromEntries(COULEURS_SIEGES.map((c, i) => [`J${i + 1}`, c])),
 };
 const BOSS_GENRE: Record<string, Genre> = { Y: G.YETI_ALPHA, P: G.CHAMPION, Z: G.DJ };
 /** ce que la police pixel ne sait pas écrire (ni @ ni &), et le van en toutes lettres */
@@ -183,6 +186,8 @@ export class DessinEditeur {
         if (c !== ' ' && c !== '.' && tuileDuCaractere(c) === null)
           this.case(ctx, c, tx * TUILE, ty * TUILE, tx, ty, doc.gensEn(tx, ty));
       }
+    // les départs du battle royale, rangés à part : une pastille de la couleur du joueur
+    doc.departs.forEach((d, i) => d && this.pastille(ctx, `J${i + 1}`, d[0] * TUILE, d[1] * TUILE));
     if (cam.zoom >= 1.5) this.grille(ctx, tx0, ty0, tx1, ty1);
     // hors de la carte : un voile sombre, et le bord
     ctx.fillStyle = 'rgba(10,8,20,0.7)';

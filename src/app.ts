@@ -66,6 +66,7 @@ export class App implements Actions {
     suivant: () => this.suivant(),
     inviter: () => (this.mettreEnPause(), this.menus.inviter()),
     quitte: () => this.quitte(),
+    partie: () => this.partie,
   });
   private partie: Partie | null = null;
   private hote: Hote | null = null;
@@ -346,7 +347,6 @@ export class App implements Actions {
     this.tactile.pilote(v.phase);
     this.tactile.arme(moi?.present && moi.arme ? iconeDeLArme(moi.arme, 34) : null, moi?.munitions ?? 0);
     this.histoire.maj(v);
-    const theme = this.rendu.theme.musique;
-    this.musique.joue(v.boss >= 0 ? 'boss' : theme);
+    this.musique.joue(v.boss >= 0 ? 'boss' : this.rendu.theme.musique);
   }
 }

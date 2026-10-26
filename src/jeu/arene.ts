@@ -14,7 +14,7 @@ import { T } from '../monde/tuiles';
 import { parcoursAcces } from '../niveaux/accessibilite';
 import type { NiveauLu } from '../niveaux/format';
 import type { CacheCibles } from './cibles';
-import type { IAArene } from './arene-ia';
+import type { IAArene, NiveauIA } from './arene-ia';
 import type { Cible } from './contexte';
 import type { Partie } from './partie';
 
@@ -41,6 +41,8 @@ const FIN_MIN = 2 * TICKS_PAR_SECONDE;
 export interface ReglesArene {
   /** les ennemis du niveau restent (sinon : seulement les joueurs, les caisses, les armes, les soins) */
   ennemis: boolean;
+  /** le niveau des joueurs de l'ordinateur (hors ligne), moyen par défaut */
+  niveauIA?: NiveauIA;
 }
 
 /** Le battle royale tel qu'on le voit (voir vue.ts : `EtatVue.arene`). */
@@ -74,6 +76,8 @@ export class Arene {
   readonly rangs = new Array<number>(MAX_JOUEURS).fill(0);
   /** les cases où l'on peut se tenir (y × largeur + x) : là où l'on réapparaît */
   private cases: number[] = [];
+  /** les départs placés dans la carte, par siège (case y × largeur + x ; -1 : aucun) : on y commence, et on y réapparaît */
+  private departs: number[] = [];
   private cibles = new Map<number, Cible[]>();
   /** les joueurs de l'ordinateur (hors ligne) */
   ia: IAArene | null = null;
@@ -110,6 +114,13 @@ export class Arene {
     this.cases = [];
     dist.forEach((d, k) => d >= 0 && this.cases.push(k));
     if (!this.cases.length) this.cases.push(p.lu.depart.ty * p.lu.largeur + p.lu.depart.tx);
+    // les départs de l'éditeur : seulement ceux qui sont dans la carte, sur une case où l'on tient debout
+    const L = p.lu.largeur;
+    this.departs = Array.from({ length: MAX_JOUEURS }, (_, s) => {
+      const d = p.lu.def.departs?.[s];
+      if (!d || d[0] < 1 || d[1] < 1 || d[0] >= L || d[1] >= p.lu.hauteur) return -1;
+      return p.carte.solide(d[0], d[1]) || p.carte.solide(d[0], d[1] - 1) ? -1 : d[1] * L + d[0];
+    });
     this.cibles.clear();
   }
 
@@ -121,7 +132,9 @@ export class Arene {
     this.rangs.fill(0);
     for (const j of joueurs) {
       this.vies[j.siege] = VIES_ARENE;
-      const [x, y] = this.pointLibre(p, j.siege);
+      // chacun sur son départ, s'il est placé ; sinon loin des autres
+      const k = this.departs[j.siege] ?? -1;
+      const [x, y] = k >= 0 ? this.position(p, k) : this.pointLibre(p, j.siege);
       j.reapparait(x, y, j.membre);
       j.invulnerable = COMPTE + PROTECTION;
       j.delaiReapparition = 0;
@@ -206,10 +219,14 @@ export class Arene {
     } else if (this.etape === 'fin' && this.minuteur >= FIN_MIN) p.relanceArene();
   }
 
-  /** Où réapparaître : une case libre de la carte, la plus loin possible des autres joueurs (parmi quelques-unes tirées au sort). */
+  /**
+   * Où réapparaître : la plus loin possible des autres joueurs, parmi les départs placés dans la carte (s'il y en a au moins
+   * deux), sinon parmi quelques cases libres tirées au sort.
+   */
   pointLibre(p: Partie, siege: number): [number, number] {
     const autres = p.joueurs.filter((o) => o && !o.mort && o.siege !== siege);
-    const liste = this.cases;
+    const departs = this.departs.filter((k) => k >= 0);
+    const liste = departs.length >= 2 ? departs : this.cases;
     let meilleur = this.caseAuHasard(p, liste);
     let score = -1;
     for (let i = 0; i < 40; i++) {
@@ -239,8 +256,12 @@ export class Arene {
 
   /** Une case de la liste, au hasard : la position du héros, pieds sur le sol. */
   private caseAuHasard(p: Partie, liste: readonly number[]): [number, number] {
+    return this.position(p, liste[p.rng.entier(0, liste.length - 1)]!);
+  }
+
+  /** La position du héros sur une case (y × largeur + x), pieds sur le sol. */
+  private position(p: Partie, k: number): [number, number] {
     const L = p.lu.largeur;
-    const k = liste[p.rng.entier(0, liste.length - 1)]!;
     return [(k % L) * TUILE + (TUILE - HEROS_LARGEUR) / 2, Math.floor(k / L) * TUILE + TUILE - HEROS_HAUTEUR];
   }
 

@@ -224,9 +224,10 @@ Intégrer un export :
 Menu principal → **Battle royale** : on choisit une carte, on voit pour combien de joueurs elle est faite, on garde ou non les
 ennemis, puis :
 
-- **contre l'ordinateur** (1 à 7 adversaires) : de quoi s'entraîner ou essayer une carte ;
+- **contre l'ordinateur** (1 à 7 adversaires, de niveau facile, moyen ou difficile) : de quoi s'entraîner ou essayer une carte ;
 - **en ligne** : un salon s'ouvre (Wi-Fi, ou code Internet via « Inviter des amis ») ; les amis le rejoignent par « Rejoindre
-  des amis », s'échauffent sans se blesser, et l'hôte lance la partie (jusqu'à 8 joueurs).
+  des amis », s'échauffent sans se blesser ; l'hôte peut combler avec des joueurs de l'ordinateur (« + IA », « − IA ») puis lance
+  la partie (jusqu'à 8 joueurs). Pas de flèches vers les adversaires : on se cherche.
 
 Les cartes sont faites pour ce mode, pas celles de l'histoire : petites (72 × 36 tuiles), closes, tout en hauteur, pour se
 chercher en haut, en bas, à gauche et à droite par les échelles, les plateformes et les tyroliennes (certaines à jointures). Quatre
@@ -234,7 +235,8 @@ arènes : **la Tour de Mixage** (le club), **les Échafaudages** (un chantier), 
 Sommet** (une montagne creusée de grottes). S'y ajoutent les siennes : dans l'éditeur, Menu → **Nouvelle arène** (une page close,
 sans van), puis Enregistrer dans Mes niveaux ; ou « Importer un niveau (.json) » depuis le menu du battle royale (un export de
 l'éditeur, le sien ou celui d'un ami). Une carte sans van ni DJ Boucle est une carte de battle royale ; « Tester » dans l'éditeur la
-joue contre l'ordinateur.
+joue contre l'ordinateur. Dans les objets de l'éditeur, les **8 départs** (un par joueur, de sa couleur) : chacun commence sur le
+sien, et l'on réapparaît sur le départ le plus loin des autres (sans départs placés, au hasard sur la carte).
 
 Trois vies chacun ; les tirs blessent les autres joueurs (jamais soi-même) ; une élimination revient à celui qui a touché en
 dernier. On réapparaît loin des autres, avec quelques secondes de protection. Les cages et les cœurs redonnent une vie (5 au plus).
@@ -243,7 +245,9 @@ jouer le même héros : un repère de couleur au-dessus de chacun dit qui est qu
 
 Les joueurs de l'ordinateur suivent le chemin que trouve le parcours d'accessibilité vers l'adversaire le plus proche (sur la
 carte telle qu'elle est : sauts, échelles, tyroliennes qu'ils vont attraper sous leur poteau), tirent à hauteur, creusent quand
-ils sont coincés, et partent errer ailleurs s'ils tournent en rond.
+ils sont coincés, et partent errer ailleurs s'ils tournent en rond. Leur niveau règle leur portée, leur temps de réaction et
+leurs rafales : facile (110 px, près d'une seconde pour réagir, des rafales courtes et ratées), moyen (le niveau par défaut),
+difficile (190 px, aucune hésitation).
 
 La taille conseillée vient de la surface où l'on peut se tenir (le même calcul que « le niveau est atteignable ») : environ 30
 cases par joueur au plus, 110 au moins, de 2 à 8. Le code : `src/jeu/arene.ts` (les règles), `src/jeu/arene-ia.ts` (l'IA),

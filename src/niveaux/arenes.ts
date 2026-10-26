@@ -1,4 +1,4 @@
-import { CARTES_ARENES } from './cartes/arenes';
+import { CARTES_ARENES, DEPARTS_ARENES } from './cartes/arenes';
 import type { DefNiveau } from './format';
 import type { NomTheme } from '../rendu/themes';
 
@@ -15,6 +15,7 @@ const arene = (id: string, titre: string, sousTitre: string, theme: NomTheme): D
   dialogues: {},
   outro: [],
   arene: true,
+  departs: DEPARTS_ARENES[id],
   carte: CARTES_ARENES[id]!,
 });
 

@@ -1,5 +1,6 @@
 import { MAX_JOUEURS } from '../config';
 import { joueursConseilles, type ReglesArene } from '../jeu/arene';
+import { NIVEAUX_IA, type NiveauIA } from '../jeu/arene-ia';
 import { NIVEAUX, NOMBRE_NIVEAUX_JEU, niveauLu } from '../niveaux';
 import { litNiveau, type DefNiveau } from '../niveaux/format';
 import { importeNiveau, mesNiveaux } from '../niveaux/mes-niveaux';
@@ -15,7 +16,11 @@ import type { Actions, Menus } from './menus';
 export type CarteArene = { niveau: number } | { def: DefNiveau };
 
 /** Les réglages, gardés d'une partie à l'autre (le temps de la session). */
-const reglages = { ennemis: false, ia: 3 };
+const reglages: { ennemis: boolean; ia: number; niveauIA: NiveauIA } = {
+  ennemis: false,
+  ia: 3,
+  niveauIA: 'moyen',
+};
 
 /** Les cartes du battle royale du jeu (voir niveaux/arenes.ts), par leur indice dans NIVEAUX. */
 export const niveauxArene = (): number[] =>
@@ -67,7 +72,12 @@ export function ecranArene(m: Menus, a: Actions): void {
 function reglagesArene(m: Menus, a: Actions, carte: CarteArene, nom: string): void {
   const lu = 'def' in carte ? litNiveau(carte.def) : niveauLu(carte.niveau);
   const [min, max] = joueursConseilles(lu);
-  const regles = (): ReglesArene => ({ ennemis: reglages.ennemis });
+  const regles = (): ReglesArene => ({ ennemis: reglages.ennemis, niveauIA: reglages.niveauIA });
+  const texteNiveau = () => `Niveau de l’ordinateur : ${reglages.niveauIA}`;
+  const niveau = bouton(texteNiveau(), () => {
+    reglages.niveauIA = NIVEAUX_IA[(NIVEAUX_IA.indexOf(reglages.niveauIA) + 1) % NIVEAUX_IA.length]!;
+    niveau.textContent = texteNiveau();
+  });
   const ennemis = bouton(`Ennemis du niveau : ${reglages.ennemis ? 'oui' : 'non'}`, () => {
     reglages.ennemis = !reglages.ennemis;
     ennemis.textContent = `Ennemis du niveau : ${reglages.ennemis ? 'oui' : 'non'}`;
@@ -87,6 +97,7 @@ function reglagesArene(m: Menus, a: Actions, carte: CarteArene, nom: string): vo
     ennemis,
     el('h3', 'Contre l’ordinateur'),
     ia,
+    niveau,
     bouton('Jouer contre l’ordinateur', () => a.lanceArene(carte, regles(), reglages.ia), 'principal'),
     el('h3', 'En ligne'),
     el(

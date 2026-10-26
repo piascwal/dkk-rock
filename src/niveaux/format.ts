@@ -55,6 +55,8 @@ export interface DefNiveau {
   outro: Replique[];
   /** une carte de battle royale (voir jeu/arene.ts) : pas de van, pas d'histoire ; on s'y affronte jusqu'au dernier */
   arene?: boolean;
+  /** battle royale : le départ de chaque joueur (siège 0 à 7 : colonne, rangée où il se tient ; null : au hasard) */
+  departs?: readonly (readonly [number, number] | null)[];
   /** le van décolle à la fin du niveau, à la force de son réacteur, au lieu de partir sur la route (un sommet) */
   envol?: boolean;
   /** un mini-jeu à la place du niveau de plateforme (l'intro lue, il commence ; voir jeu/drift.ts) */

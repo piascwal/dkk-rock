@@ -58,6 +58,17 @@ class Arene:
         self.pose(xf, yf, ')')
         self.tyros.append(poteaux)
 
+    def departs(self, n=8):
+        """Les départs des joueurs : des cases où l'on tient debout, bien réparties (la plus loin des précédentes, à chaque fois),
+        en partant du départ de la carte."""
+        appui = set('#RBMXNGWCTSVDEJLUAI|{^;[=-HE')
+        cases = [(x, y) for y in range(2, H - 1) for x in range(1, L - 1)
+                 if self.g[y][x] in ' .' and self.g[y - 1][x] in ' .' and self.g[y + 1][x] in appui]
+        choix = [next((x, y) for y, r in enumerate(self.g) for x, c in enumerate(r) if c == '@')]
+        while len(choix) < n:
+            choix.append(max(cases, key=lambda c: min(math.hypot(c[0] - o[0], 1.6 * (c[1] - o[1])) for o in choix)))
+        return choix
+
     def texte(self):
         return [''.join(r) for r in self.g]
 
@@ -174,7 +185,7 @@ def port():
     a.tyrolienne((21, 12), (35, 16), (50, 8))
     for x, y, c in ((8, 29, '*'), (63, 29, '*'), (36, 16, '+'), (9, 24, '%'), (62, 24, '%'), (24, 28, 'K')):
         a.pose(x, y, c)
-    a.pose(30, 30, '@')
+    a.pose(26, 30, '@')  # sur le quai, entre la coque et le bassin
     return a
 
 
@@ -217,14 +228,18 @@ ARENES = {
 
 def main():
     sorties = []
+    departs = []
     for nom, f in ARENES.items():
         a = f()
         a.verifie(nom)
         lignes = '\n'.join(f"    '{l}'," for l in a.texte())
         sorties.append(f"  '{nom}': [\n{lignes}\n  ],")
+        departs.append(f"  '{nom}': [{', '.join(f'[{x}, {y}]' for x, y in a.departs())}],")
     SORTIE.write_text(
         '// Fichier généré par outils/arenes.py : les cartes du battle royale (modifiables à la main, le script les écrase).\n'
-        'export const CARTES_ARENES: Record<string, string[]> = {\n' + '\n'.join(sorties) + '\n};\n'
+        'export const CARTES_ARENES: Record<string, string[]> = {\n' + '\n'.join(sorties) + '\n};\n\n'
+        '/** les départs des joueurs (siège 0 à 7 : colonne, rangée où il se tient) */\n'
+        'export const DEPARTS_ARENES: Record<string, [number, number][]> = {\n' + '\n'.join(departs) + '\n};\n'
     )
     print(f'{len(ARENES)} arènes écrites dans {SORTIE.relative_to(RACINE)}')
 

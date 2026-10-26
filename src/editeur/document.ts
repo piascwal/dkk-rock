@@ -1,5 +1,6 @@
-import { accessibles } from '../niveaux/accessibilite';
-import { litNiveau, type DefNiveau, type Replique } from '../niveaux/format';
+import { type DefNiveau, type Replique } from '../niveaux/format';
+import { lisDeparts, type Depart } from './departs';
+import { verifieNiveau } from './verification';
 import { THEMES, type NomTheme } from '../rendu/themes';
 
 /**
@@ -34,12 +35,15 @@ export interface NiveauExporte {
   carte: string[];
   decor: Decor[];
   gens?: Gens[];
+  /** battle royale : le départ de chaque joueur (siège 0 à 7), ou null */
+  departs?: Depart[];
 }
 
 interface Instantane {
   lignes: string[];
   decor: Decor[];
   gens: Gens[];
+  departs: Depart[];
 }
 
 const HISTOIRE_MAX = 80;
@@ -59,6 +63,8 @@ export class DocumentNiveau {
   gens = new Map<string, string>();
   /** change à chaque modification : le rendu sait quand refaire sa carte */
   version = 0;
+  /** battle royale : le départ de chaque joueur (voir DefNiveau.departs) */
+  departs: Depart[] = lisDeparts();
 
   constructor(
     public nom: string,
@@ -109,6 +115,7 @@ export class DocumentNiveau {
     const decor = (def.decor ?? []).map(([n, x, y]) => [n, x, y] as Decor);
     const d = new DocumentNiveau(def.titre, def.theme, def.carte, decor, def.id, def.gens);
     d.dialogues = def.dialogues;
+    d.departs = lisDeparts(def.departs);
     return d;
   }
 
@@ -126,7 +133,28 @@ export class DocumentNiveau {
       (g): g is Gens =>
         Array.isArray(g) && Number.isInteger(g[0]) && Number.isInteger(g[1]) && typeof g[2] === 'string',
     );
-    return new DocumentNiveau(o.nom || 'Niveau importé', theme, o.carte, decor, o.depart ?? null, gens);
+    const d = new DocumentNiveau(o.nom || 'Niveau importé', theme, o.carte, decor, o.depart ?? null, gens);
+    d.departs = lisDeparts(Array.isArray(o.departs) ? o.departs : []);
+    return d;
+  }
+
+  /** Pose le départ du joueur `n` (0 à 7) sur une case ; un autre départ qui y était s'en va. */
+  placeDepart(n: number, x: number, y: number): void {
+    if (x < 0 || y < 0 || x >= this.largeur || y >= this.hauteur) return;
+    this.departs = this.departs.map((d, i) => (i === n ? [x, y] : d && d[0] === x && d[1] === y ? null : d));
+    this.change();
+  }
+
+  /** Le joueur dont le départ est sur cette case, ou -1. */
+  departEn(x: number, y: number): number {
+    return this.departs.findIndex((d) => d && d[0] === x && d[1] === y);
+  }
+
+  retireDepart(x: number, y: number): void {
+    const n = this.departEn(x, y);
+    if (n < 0) return;
+    this.departs = this.departs.map((d, i) => (i === n ? null : d));
+    this.change();
   }
 
   get largeur(): number {
@@ -246,6 +274,9 @@ export class DocumentNiveau {
         .filter(([x, y]) => x < largeur && y >= 0 && y < hauteur)
         .map(([x, y, cle]) => [`${x},${y}`, cle]),
     );
+    this.departs = this.departs.map((d) =>
+      d && d[0] < largeur && d[1] + dh >= 1 ? [d[0], d[1] + dh] : null,
+    );
     this.change();
   }
 
@@ -273,6 +304,7 @@ export class DocumentNiveau {
       carte: this.lignes().map((l) => l.replace(/\s+$/, '')),
       decor: this.decor.map(([n, x, y]): Decor => [n, x, y]),
       gens: this.listeGens(),
+      ...(this.departs.some(Boolean) ? { departs: this.departs } : {}),
     };
   }
 
@@ -289,6 +321,7 @@ export class DocumentNiveau {
       outro: [],
       decor: j.decor,
       gens: j.gens,
+      ...(j.departs ? { departs: j.departs } : {}),
       semis: true,
       ...(this.estArene ? { arene: true } : {}),
       carte: j.carte,
@@ -296,32 +329,9 @@ export class DocumentNiveau {
   }
 
   /** Le niveau se lit-il, et va-t-on du départ au van sans rien casser ? (le même test que les niveaux du jeu) */
+  /** Le niveau se lit-il, et va-t-on du départ au van sans rien casser ? (voir verification.ts) */
   verifie(): { ok: boolean; message: string } {
-    let lu;
-    try {
-      lu = litNiveau(this.versDef('verification'));
-    } catch (e) {
-      return { ok: false, message: (e as Error).message.replace(/^verification : /, '') };
-    }
-    if (lu.def.arene) return { ok: true, message: 'Carte de battle royale (sans van) : elle se lit.' };
-    // la fin : le van, ou DJ Boucle (le club finit sur lui)
-    const cible = lu.boss.find((b) => b.lettre === 'Z') ?? lu.fin;
-    if (!cible) return { ok: false, message: 'Il manque le van (F) : le niveau ne finit jamais.' };
-    const a = accessibles(lu);
-    const L = lu.largeur;
-    const { tx, ty } = cible;
-    const atteint = a.some(
-      (v, k) => v === 1 && Math.abs((k % L) - tx) <= 2 && Math.abs(Math.floor(k / L) - ty) <= 1,
-    );
-    if (!atteint)
-      return { ok: false, message: 'La fin n’est pas atteignable sans rien casser depuis le départ.' };
-    const perdus = lu.drapeaux.filter((d) => !a[d.ty * L + d.tx]).length;
-    return {
-      ok: true,
-      message: perdus
-        ? `La fin est atteignable, mais ${perdus} drapeau(x) ne le sont pas.`
-        : 'Parfait : on va du départ à la fin sans rien casser.',
-    };
+    return verifieNiveau(this.versDef('verification'));
   }
 
   private dialoguesDeLaCarte(carte: readonly string[]): Partial<Record<string, Replique[]>> {
@@ -353,6 +363,7 @@ export class DocumentNiveau {
       lignes: this.lignes(),
       decor: this.decor.map(([n, x, y]): Decor => [n, x, y]),
       gens: this.listeGens(),
+      departs: [...this.departs],
     };
   }
 
@@ -360,6 +371,7 @@ export class DocumentNiveau {
     this.g = i.lignes.map((l) => l.split(''));
     this.decor = i.decor;
     this.gens = new Map(i.gens.map(([x, y, cle]) => [`${x},${y}`, cle]));
+    this.departs = i.departs;
     this.version++;
     this.onChange();
   }

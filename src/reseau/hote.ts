@@ -93,7 +93,7 @@ export class Hote {
     return {
       nom: this.nom,
       niveau: p.niveau,
-      joueurs: 1 + this.distants.size,
+      joueurs: Math.max(1, p.joueurs.filter(Boolean).length),
       ...(p.arene ? { arene: true } : {}),
     };
   }

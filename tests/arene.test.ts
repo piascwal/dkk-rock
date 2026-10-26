@@ -111,6 +111,10 @@ describe('le battle royale', () => {
         if (acces[y * lu.largeur + x]) atteint++;
       }
     expect(atteint / debout).toBeGreaterThan(0.9);
+    // huit départs, chacun sur une case accessible, tous différents
+    const departs = lu.def.departs!;
+    expect(new Set(departs.map((d) => `${d![0]},${d![1]}`)).size).toBe(8);
+    for (const d of departs) expect(acces[d![1] * lu.largeur + d![0]], `départ ${d}`).toBe(1);
     // et des étages : on se tient sur au moins cinq hauteurs différentes
     const hauteurs = new Set<number>();
     acces.forEach((v, k) => v && hauteurs.add(Math.floor(k / lu.largeur)));
@@ -172,5 +176,69 @@ describe('le battle royale', () => {
     expect(
       valideDef({ titre: 'X', theme: 'club', carte: DocumentNiveau.vierge().versJSON().carte }, 'v')!.arene,
     ).toBeUndefined();
+  });
+
+  it('chacun commence sur son départ (placé dans la carte), et réapparaît sur un départ', () => {
+    const p = arene(4);
+    const departs = NIVEAUX[TOUR]!.departs!;
+    expect(departs.length).toBe(8);
+    p.joueurs.slice(0, 4).forEach((j, s) => {
+      expect(Math.floor(j!.cx / TUILE)).toBe(departs[s]![0]);
+      expect(Math.floor((j!.corps.y + j!.corps.h - 1) / TUILE)).toBe(departs[s]![1]);
+    });
+    const [x, y] = p.arene!.pointLibre(p, 0);
+    expect(
+      departs.some((d) => d![0] === Math.floor((x + 4) / TUILE) && d![1] === Math.floor((y + 14) / TUILE)),
+    ).toBe(true);
+  });
+
+  it('les départs de l’éditeur : posés, déplacés, effacés, annulés, exportés, relus', () => {
+    const d = DocumentNiveau.arene();
+    d.commence();
+    d.placeDepart(2, 10, 30);
+    d.placeDepart(5, 10, 30); // la même case : le départ 3 laisse la place au 6
+    d.termine();
+    expect(d.departs[2]).toBeNull();
+    expect(d.departEn(10, 30)).toBe(5);
+    d.commence();
+    d.retireDepart(10, 30);
+    d.termine();
+    expect(d.departEn(10, 30)).toBe(-1);
+    d.annule();
+    expect(d.departEn(10, 30)).toBe(5);
+    const e = DocumentNiveau.depuisJSON(JSON.stringify(d.versJSON()));
+    expect(e.departs[5]).toEqual([10, 30]);
+    expect(valideDef(d.versDef('x'), 'y')!.departs![5]).toEqual([10, 30]);
+  });
+
+  it('le niveau de l’ordinateur : un joueur facile tire bien moins qu’un difficile', () => {
+    const tirs = (niveau: 'facile' | 'difficile') => {
+      const p = new Partie({ niveau: TOUR, drapeau: -1, vies: 0, score: 0 });
+      for (let s = 0; s < 2; s++) p.ajouteJoueur(s, s);
+      p.ouvreArene({ ennemis: false, niveauIA: niveau }, false, [1]);
+      pas(p, 190);
+      faceAFace(p);
+      let n = 0;
+      for (let t = 0; t < 300; t++) {
+        p.joueurs[0]!.pv = 3; // la cible tient le coup
+        pas(p, 1);
+        if (p.commandes[1]! & C.TIR) n++;
+      }
+      return n;
+    };
+    expect(tirs('facile')).toBeLessThan(tirs('difficile') / 2);
+  });
+
+  it('en ligne, l’hôte comble le salon avec des joueurs de l’ordinateur, et peut en retirer', () => {
+    const p = arene(1, true);
+    expect(p.ajouteIA(2)).toBe(1);
+    expect(p.ajouteIA(3)).toBe(2);
+    expect(p.joueurs.filter(Boolean).length).toBe(3);
+    p.retireIA();
+    expect(p.joueurs[2]).toBeNull();
+    p.suivant();
+    pas(p, 400);
+    expect(p.arene!.etape).toBe('combat');
+    expect(p.joueurs[1]!.mort || p.commandes[1] !== undefined).toBe(true);
   });
 });

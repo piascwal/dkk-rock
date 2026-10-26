@@ -103,6 +103,12 @@ export function valideDef(o: unknown, id: string): DefNiveau | null {
     (x): x is [number, number, string] =>
       Array.isArray(x) && entier(x[0]) && entier(x[1]) && chaine(x[2], 16),
   );
+  // les départs du battle royale : huit au plus, chacun une case ou null
+  const departs = (Array.isArray(d.departs) ? d.departs : [])
+    .slice(0, 8)
+    .map((x): [number, number] | null =>
+      Array.isArray(x) && entier(x[0]) && entier(x[1]) ? [x[0], x[1]] : null,
+    );
   const dialogues: Partial<Record<string, Replique[]>> = {};
   const brut = d.dialogues && typeof d.dialogues === 'object' ? (d.dialogues as Record<string, unknown>) : {};
   for (const c of '123456789') {
@@ -128,6 +134,7 @@ export function valideDef(o: unknown, id: string): DefNiveau | null {
     outro: [],
     decor,
     gens,
+    ...(departs.some(Boolean) ? { departs } : {}),
     semis: true,
     // ni van ni DJ Boucle : une carte de battle royale
     ...((carte as string[]).some((l) => /[FZ]/.test(l)) ? {} : { arene: true }),
@@ -148,7 +155,7 @@ export function importeNiveau(texte: string): NiveauSauve | null {
     if (o.format !== 'dkk-niveau' || typeof o.nom !== 'string') return null;
     const nom = o.nom.slice(0, 40) || 'Niveau importé';
     const def = valideDef(
-      { titre: nom, theme: o.theme, carte: o.carte, decor: o.decor, gens: o.gens },
+      { titre: nom, theme: o.theme, carte: o.carte, decor: o.decor, gens: o.gens, departs: o.departs },
       'import',
     );
     return def ? enregistreNiveau(nom, def, o) : null;

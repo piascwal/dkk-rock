@@ -44,6 +44,11 @@ const REPERES: readonly [string, string][] = [
   ['(', 'Tyrolienne : départ'],
   [')', 'Tyrolienne : arrivée'],
   ['$', 'Tyrolienne : jointure (le câble change de pente)'],
+  // les départs du battle royale : un par joueur (rangés à part dans le document, pas dans la carte)
+  ...Array.from({ length: 8 }, (_, i): [string, string] => [
+    `J${i + 1}`,
+    `Départ du joueur ${i + 1} (battle royale)`,
+  ]),
   ...[...'123456789'].map((c): [string, string] => [c, `Dialogue ${c}`]),
 ];
 

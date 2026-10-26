@@ -107,7 +107,7 @@ export const CARTES_ARENES: Record<string, string[]> = {
     'X  EWW........E........WWE         E          EWW........E........WWE  X',
     'X  EWW........E........WKE         E          EWW........E........WWE  X',
     'X  EWW..*.....E........WWE         E          EWW........E.....*..WWE  X',
-    'X  EWWWWWWWWWWWWWWWWWWWWWE    @    E          EWWWWWWWWWWWWWWWWWWWWWE  X',
+    'X  EWWWWWWWWWWWWWWWWWWWWWE@        E          EWWWWWWWWWWWWWWWWWWWWWE  X',
     'XWWWWWWWWWWWWWWWWWWWWWWWWWW~~~~~~~~W~~~~~~~~~WWWWWWWWWWWWWWWWWWWWWWWWWWX',
     'XWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWX',
     'XRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRX',
@@ -151,5 +151,49 @@ export const CARTES_ARENES: Record<string, string[]> = {
     'XRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRX',
     'XRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRX',
     'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  ],
+};
+
+/** les départs des joueurs (siège 0 à 7 : colonne, rangée où il se tient) */
+export const DEPARTS_ARENES: Record<string, [number, number][]> = {
+  'tour-de-mixage': [
+    [10, 30],
+    [68, 9],
+    [29, 6],
+    [49, 30],
+    [3, 9],
+    [39, 18],
+    [70, 30],
+    [29, 30],
+  ],
+  echafaudages: [
+    [3, 30],
+    [70, 6],
+    [25, 6],
+    [47, 30],
+    [1, 12],
+    [67, 21],
+    [45, 15],
+    [25, 24],
+  ],
+  port: [
+    [26, 30],
+    [64, 12],
+    [7, 8],
+    [70, 30],
+    [39, 16],
+    [1, 30],
+    [49, 29],
+    [13, 24],
+  ],
+  sommet: [
+    [3, 30],
+    [70, 30],
+    [37, 6],
+    [37, 30],
+    [61, 14],
+    [11, 14],
+    [20, 30],
+    [56, 24],
   ],
 };

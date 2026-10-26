@@ -182,10 +182,28 @@ export class Partie implements Contexte {
   /** Fait de cette partie un battle royale sur sa carte ; hors ligne, la manche commence (les joueurs et l'IA sont déjà là). */
   ouvreArene(regles: ReglesArene, enLigne: boolean, ia: readonly number[] = []): void {
     this.arene = new Arene(regles, enLigne);
-    if (ia.length) this.arene.ia = new IAArene(ia);
+    if (ia.length) this.arene.ia = new IAArene(ia, regles.niveauIA);
     this.phase = 'jeu';
     this.arene.prepare(this);
     if (!enLigne) this.arene.demarre(this);
+  }
+
+  /** Battle royale en ligne : l'hôte comble le salon avec un joueur de l'ordinateur (renvoie son siège, ou -1 s'il est plein). */
+  ajouteIA(membre: number): number {
+    const a = this.arene;
+    const s = this.joueurs.findIndex((j, i) => !j && i < this.places);
+    if (!a || s < 0) return -1;
+    this.ajouteJoueur(s, membre);
+    (a.ia ??= new IAArene([], a.regles.niveauIA)).ajoute(s);
+    return s;
+  }
+
+  /** Retire le dernier joueur de l'ordinateur ajouté (s'il y en a un). */
+  retireIA(): void {
+    const s = this.arene?.ia?.sieges.at(-1);
+    if (s === undefined) return;
+    this.arene!.ia!.retire(s);
+    this.retireJoueur(s);
   }
 
   /** Une nouvelle manche sur la même carte, refaite à neuf. */

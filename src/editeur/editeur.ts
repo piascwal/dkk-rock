@@ -214,7 +214,9 @@ export class Editeur {
     if (this.outil === 'gomme') {
       this.doc.pose(x, y, ' ');
       this.doc.retireDecor(x, y);
-    } else if (this.choix.famille === 'gens') {
+      this.doc.retireDepart(x, y);
+    } else if (/^J\d$/.test(this.choix.cle)) this.doc.placeDepart(Number(this.choix.cle[1]) - 1, x, y);
+    else if (this.choix.famille === 'gens') {
       // un personnage : sa lettre sur la carte, et sa ville ou son apparence sur la case si la lettre seule ne suffit pas
       this.poseCaractere(x, y, lettreDe(this.choix.cle));
       this.doc.choisitGens(x, y, cleAGarder(this.choix.cle, this.doc.theme));
@@ -265,11 +267,15 @@ export class Editeur {
   pipette(x: number, y: number): void {
     const d = this.doc.decorEn(x, y);
     const car = this.doc.get(x, y);
-    const c = d
-      ? catalogue('decor').find((o) => o.cle === d[0])
-      : /[a-z]/.test(car)
-        ? choixDuPersonnage(car, this.doc.gensEn(x, y), this.doc.theme)
-        : choixDuCaractere(car, this.doc.theme);
+    const depart = this.doc.departEn(x, y);
+    const c =
+      depart >= 0
+        ? catalogue('objets').find((o) => o.cle === `J${depart + 1}`)
+        : d
+          ? catalogue('decor').find((o) => o.cle === d[0])
+          : /[a-z]/.test(car)
+            ? choixDuPersonnage(car, this.doc.gensEn(x, y), this.doc.theme)
+            : choixDuCaractere(car, this.doc.theme);
     if (c) this.choisit(c);
     else this.choisitOutil('pinceau');
   }
