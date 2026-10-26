@@ -16,6 +16,7 @@ import { Fond } from './fonds';
 import { PremierPlan } from './premier-plan';
 import { Braises } from './flammes';
 import { dessineArene } from './arene-rendu';
+import { dessineBullesCages } from './bulle-cage';
 import { dessineIndicateurs } from './indicateurs';
 import { Particules } from './particules';
 import { RockersRestes } from './rockers-convertis';
@@ -328,6 +329,7 @@ export class Rendu {
       this.braises.dessine(ctx, camX, camY);
     }
     this.premierPlan.dessine(ctx, camX, camY, this.largeur, this.tick);
+    dessineBullesCages(ctx, vue.entites, camX, camY, this.largeur, this.tick);
     this.traits.maj(vue, this.decor, carte, { emojis: this.emojis });
     this.emojis.accompagne(vue.entites);
     this.emojis.maj();
