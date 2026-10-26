@@ -5,6 +5,9 @@ import { TUILE } from '../config';
  * Chaque départ est relié au poteau le plus proche à sa droite (une arrivée ou une jointure) ; une jointure repart vers le suivant,
  * jusqu'à une arrivée. Une tyrolienne peut ainsi descendre, filer à plat, puis remonter, d'un seul tenant : chaque tronçon connaît
  * le précédent et le suivant, et le héros passe de l'un à l'autre sans lâcher.
+ *
+ * Les tyroliennes tracées poteau par poteau dans l'éditeur (DefNiveau.tyroliennes) ne sont pas déduites : chacune donne ses
+ * poteaux dans l'ordre, et peut croiser ou chevaucher une autre, commencer avant qu'une autre ne finisse.
  */
 
 export interface Tyrolienne {
@@ -23,11 +26,12 @@ export interface Poteau {
   ty: number;
 }
 
+const point = (p: Poteau) => ({ x: p.tx * TUILE + TUILE / 2, y: p.ty * TUILE + 4 });
+
 /** Relie les poteaux ; lève une erreur lisible (sans le nom du niveau) si l'un reste seul. */
 export function relieTyroliennes(debuts: Poteau[], bouts: Poteau[], jointures: Poteau[]): Tyrolienne[] {
   const liste: Tyrolienne[] = [];
   const libres = new Set(jointures);
-  const point = (p: Poteau) => ({ x: p.tx * TUILE + TUILE / 2, y: p.ty * TUILE + 4 });
   for (const d of debuts) {
     let de = d;
     let avant: Tyrolienne | undefined;
@@ -52,6 +56,28 @@ export function relieTyroliennes(debuts: Poteau[], bouts: Poteau[], jointures: P
   }
   const seule = [...libres][0];
   if (seule) throw new Error(`jointure de tyrolienne reliée à aucun départ en ${seule.tx},${seule.ty}`);
+  return liste;
+}
+
+/**
+ * Une tyrolienne tracée poteau par poteau ([colonne, rangée] comme les caractères `(` `)` `$`) : au moins deux poteaux, toujours
+ * dans le même sens (le câble se parcourt de gauche à droite, quel que soit le sens où on l'a tracé).
+ */
+export function chaineDeTyroliennes(poteaux: readonly (readonly [number, number])[]): Tyrolienne[] {
+  const p = poteaux.map(([tx, ty]) => ({ tx, ty }));
+  if (p.length > 1 && p[0]!.tx > p[p.length - 1]!.tx) p.reverse();
+  const [d] = p;
+  if (!d || p.length < 2) throw new Error(`tyrolienne d'un seul poteau${d ? ` en ${d.tx},${d.ty}` : ''}`);
+  const liste: Tyrolienne[] = [];
+  for (let i = 1; i < p.length; i++) {
+    const [a, z] = [p[i - 1]!, p[i]!];
+    if (z.tx <= a.tx) throw new Error(`tyrolienne qui revient en arrière en ${z.tx},${z.ty}`);
+    const [pa, pz] = [point(a), point(z)];
+    const t: Tyrolienne = { x1: pa.x, y1: pa.y, x2: pz.x, y2: pz.y };
+    const avant = liste[liste.length - 1];
+    if (avant) [t.precedente, avant.suivante] = [avant, t];
+    liste.push(t);
+  }
   return liste;
 }
 

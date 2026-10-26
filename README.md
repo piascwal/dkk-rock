@@ -197,6 +197,13 @@ vérifie qu'on va du départ à la fin sans rien casser, change le nom, le thèm
 `.json` à partager, télécharger ou copier) : envoyez-le à Claude pour l'ajouter au jeu, tel quel ou retouché, comme nouveau niveau
 ou à la place d'un niveau existant. Le brouillon se garde tout seul dans le navigateur, et l'export se réimporte.
 
+**Tyroliennes poteau par poteau** (objet « Tyrolienne : poteau par poteau ») : on touche la case du premier poteau, puis celle
+de chaque poteau suivant (toujours dans le même sens) ; on retouche le dernier poteau pour finir (il est orange tant qu'on trace).
+Rien n'est déduit : chaque tyrolienne garde ses poteaux, elle peut en croiser une autre, passer au-dessus ou en dessous, commencer
+avant qu'une autre ne finisse. Toucher le bout d'une tyrolienne finie la reprend ; la gomme retire un poteau. Elles sont rangées à
+part dans l'export et dans le niveau (`tyroliennes` : les poteaux de chacune). Les caractères `(` `)` `$` restent pour les cartes
+du jeu : chaque départ y est relié au poteau le plus proche à sa droite.
+
 **Mes niveaux** : Menu → Enregistrer dans Mes niveaux garde le niveau dans le navigateur (un niveau du même nom est remplacé) ;
 Menu → Mes niveaux les rouvre ou les supprime. Ils se jouent en battle royale, seul contre l'ordinateur ou en ligne (l'hôte
 envoie le niveau aux autres joueurs). « Vérifier le parcours » dit aussi pour combien de joueurs la carte est faite.

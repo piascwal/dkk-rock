@@ -1,7 +1,7 @@
 import { TUILE } from '../config';
 import { T, TUILES_LEGERES, tuileDuCaractere } from '../monde/tuiles';
 import type { NomTheme } from '../rendu/themes';
-import { relieTyroliennes, type Tyrolienne } from './tyroliennes';
+import { chaineDeTyroliennes, relieTyroliennes, type Tyrolienne } from './tyroliennes';
 
 /**
  * Format des niveaux : une carte ASCII, une ligne par rangée de tuiles.
@@ -74,6 +74,11 @@ export interface DefNiveau {
    * (« ottawa/a », « _/a ») ou une apparence précise (« b#2 ») ; voir entites/ennemis/gens.ts
    */
   gens?: readonly (readonly [number, number, string])[];
+  /**
+   * les tyroliennes tracées poteau par poteau dans l'éditeur ([colonne, rangée] de chaque poteau, dans l'ordre) : en plus de
+   * celles de la carte, sans rien déduire ; elles peuvent se croiser (voir niveaux/tyroliennes.ts)
+   */
+  tyroliennes?: readonly (readonly (readonly [number, number])[])[];
   carte: string[];
 }
 
@@ -184,6 +189,7 @@ export function litNiveau(def: DefNiveau): NiveauLu {
     throw new ErreurNiveau(`${def.id} : ni van (F) ni boss final (Z)`);
   try {
     lu.tyroliennes = relieTyroliennes(debuts, bouts, jointures);
+    for (const c of def.tyroliennes ?? []) lu.tyroliennes.push(...chaineDeTyroliennes(c));
   } catch (e) {
     throw new ErreurNiveau(`${def.id} : ${(e as Error).message}`);
   }

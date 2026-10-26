@@ -13,11 +13,14 @@ import { DocumentNiveau } from './document';
 import './editeur.css';
 import { menuPrincipal } from './fenetres';
 import { creeModule } from './fenetres-modules';
-import { icone, type NomIcone } from './icones';
+import { bouton } from './bouton-icone';
+import { departEn, placeDepart, retireDepart } from './departs';
+import type { NomIcone } from './icones';
 import { trouveModule } from './modules-perso';
 import { brancheGestes } from './gestes';
 import { MenuRond } from './menu-rond';
 import { Palette } from './palette';
+import { TraceTyrolienne } from './tyroliennes-tracees';
 
 /**
  * L'éditeur de niveau (menu principal → Éditeur de niveau), chargé seulement quand on l'ouvre : une carte qu'on peint au doigt ou à la
@@ -46,24 +49,6 @@ export const OUTILS: readonly [Outil, NomIcone, string][] = [
 const BROUILLON = 'dkk-editeur-brouillon';
 export const ZOOM: [number, number] = [0.35, 6];
 
-/** Un bouton à icône (et à texte, s'il y en a un) ; le titre s'affiche au survol et se lit au lecteur d'écran. */
-export const bouton = (
-  nom: NomIcone,
-  texte: string,
-  titre: string,
-  action: () => void,
-  classe = 'ed-bouton',
-) => {
-  const b = document.createElement('button');
-  b.className = classe;
-  b.append(icone(nom));
-  if (texte) b.append(texte);
-  b.title = titre;
-  b.setAttribute('aria-label', titre);
-  b.addEventListener('click', action);
-  return b;
-};
-
 export class Editeur {
   readonly racine = document.createElement('div');
   readonly toile = document.createElement('canvas');
@@ -75,6 +60,8 @@ export class Editeur {
   outil: Outil = 'pinceau';
   choix: Choix;
   apercu: Apercu | null = null;
+  /** la tyrolienne qu'on trace poteau par poteau */
+  readonly trace = new TraceTyrolienne();
   private readonly nom = document.createElement('span');
   private readonly boutonsOutils = new Map<Outil, HTMLButtonElement>();
   private readonly annuler: HTMLButtonElement;
@@ -177,6 +164,7 @@ export class Editeur {
   }
 
   choisitOutil(o: Outil): void {
+    if (o !== this.outil) this.trace.finit(this.doc);
     this.outil = o;
     for (const [k, b] of this.boutonsOutils) b.classList.toggle('actif', k === o);
     this.apercu = null;
@@ -184,6 +172,7 @@ export class Editeur {
   }
 
   choisit(choix: Choix): void {
+    if (choix.cle !== this.choix.cle) this.trace.finit(this.doc);
     // la lettre « a » change de nom selon la ville : on relit le choix dans le catalogue du thème
     this.choix =
       catalogue(choix.famille, this.doc?.theme ?? 'garage').find((c) => c.cle === choix.cle) ?? choix;
@@ -214,8 +203,9 @@ export class Editeur {
     if (this.outil === 'gomme') {
       this.doc.pose(x, y, ' ');
       this.doc.retireDecor(x, y);
-      this.doc.retireDepart(x, y);
-    } else if (/^J\d$/.test(this.choix.cle)) this.doc.placeDepart(Number(this.choix.cle[1]) - 1, x, y);
+      retireDepart(this.doc, x, y);
+      this.trace.gomme(this.doc, x, y);
+    } else if (/^J\d$/.test(this.choix.cle)) placeDepart(this.doc, Number(this.choix.cle[1]) - 1, x, y);
     else if (this.choix.famille === 'gens') {
       // un personnage : sa lettre sur la carte, et sa ville ou son apparence sur la case si la lettre seule ne suffit pas
       this.poseCaractere(x, y, lettreDe(this.choix.cle));
@@ -248,6 +238,7 @@ export class Editeur {
       const m = trouveModule(this.choix.cle);
       if (m) this.doc.tampon(m, x - Math.floor(m.lignes[0]!.length / 2), y + 1);
     } else if (this.choix.famille === 'decor') this.doc.ajouteDecor(this.choix.cle, x, y + 1);
+    else if (this.choix.cle === 'tyro') this.trace.poteau(this.doc, x, y);
   }
 
   /** L'aperçu du geste en cours, pour une case visée. */
@@ -267,10 +258,10 @@ export class Editeur {
   pipette(x: number, y: number): void {
     const d = this.doc.decorEn(x, y);
     const car = this.doc.get(x, y);
-    const depart = this.doc.departEn(x, y);
+    const depart = departEn(this.doc, x, y);
     const c =
-      depart >= 0
-        ? catalogue('objets').find((o) => o.cle === `J${depart + 1}`)
+      depart >= 0 || this.doc.tyroliennes.some((t) => t.some(([px, py]) => px === x && py === y))
+        ? catalogue('objets').find((o) => o.cle === (depart >= 0 ? `J${depart + 1}` : 'tyro'))
         : d
           ? catalogue('decor').find((o) => o.cle === d[0])
           : /[a-z]/.test(car)
@@ -314,7 +305,7 @@ export class Editeur {
       }
       const ctx = this.toile.getContext('2d')!;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      this.dessin.dessine(ctx, this.doc, this.cam, w, h, this.apercu);
+      this.dessin.dessine(ctx, this.doc, this.cam, w, h, this.apercu, this.trace.dernier(this.doc));
     });
   }
 

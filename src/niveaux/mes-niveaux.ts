@@ -109,6 +109,16 @@ export function valideDef(o: unknown, id: string): DefNiveau | null {
     .map((x): [number, number] | null =>
       Array.isArray(x) && entier(x[0]) && entier(x[1]) ? [x[0], x[1]] : null,
     );
+  // les tyroliennes tracées poteau par poteau : des cases entières, deux poteaux au moins
+  const tyroliennes = (Array.isArray(d.tyroliennes) ? d.tyroliennes : [])
+    .slice(0, 200)
+    .map((t: unknown) =>
+      (Array.isArray(t) ? t : [])
+        .slice(0, 100)
+        .filter((x): x is [number, number] => Array.isArray(x) && entier(x[0]) && entier(x[1]))
+        .map(([x, y]): [number, number] => [x, y]),
+    )
+    .filter((t) => t.length > 1);
   const dialogues: Partial<Record<string, Replique[]>> = {};
   const brut = d.dialogues && typeof d.dialogues === 'object' ? (d.dialogues as Record<string, unknown>) : {};
   for (const c of '123456789') {
@@ -135,6 +145,7 @@ export function valideDef(o: unknown, id: string): DefNiveau | null {
     decor,
     gens,
     ...(departs.some(Boolean) ? { departs } : {}),
+    ...(tyroliennes.length ? { tyroliennes } : {}),
     semis: true,
     // ni van ni DJ Boucle : une carte de battle royale
     ...((carte as string[]).some((l) => /[FZ]/.test(l)) ? {} : { arene: true }),
@@ -155,7 +166,15 @@ export function importeNiveau(texte: string): NiveauSauve | null {
     if (o.format !== 'dkk-niveau' || typeof o.nom !== 'string') return null;
     const nom = o.nom.slice(0, 40) || 'Niveau importé';
     const def = valideDef(
-      { titre: nom, theme: o.theme, carte: o.carte, decor: o.decor, gens: o.gens, departs: o.departs },
+      {
+        titre: nom,
+        theme: o.theme,
+        carte: o.carte,
+        decor: o.decor,
+        gens: o.gens,
+        departs: o.departs,
+        tyroliennes: o.tyroliennes,
+      },
       'import',
     );
     return def ? enregistreNiveau(nom, def, o) : null;

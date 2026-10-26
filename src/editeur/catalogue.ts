@@ -41,9 +41,11 @@ const REPERES: readonly [string, string][] = [
   ['*', 'Arme au hasard'],
   ['+', 'Médiator d’or'],
   ['%', 'Baril explosif'],
-  ['(', 'Tyrolienne : départ'],
-  [')', 'Tyrolienne : arrivée'],
-  ['$', 'Tyrolienne : jointure (le câble change de pente)'],
+  // tracée poteau par poteau, rangée à part dans le document : elle peut en croiser une autre (voir tyroliennes-tracees.ts)
+  ['tyro', 'Tyrolienne : poteau par poteau (retoucher le dernier pour finir)'],
+  ['(', 'Tyrolienne auto : départ (reliée au poteau le plus proche à droite)'],
+  [')', 'Tyrolienne auto : arrivée'],
+  ['$', 'Tyrolienne auto : jointure (le câble change de pente)'],
   // les départs du battle royale : un par joueur (rangés à part dans le document, pas dans la carte)
   ...Array.from({ length: 8 }, (_, i): [string, string] => [
     `J${i + 1}`,

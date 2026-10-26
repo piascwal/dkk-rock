@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { HEROS_HAUTEUR, TUILE } from '../src/config';
+import { departEn, placeDepart, retireDepart } from '../src/editeur/departs';
 import { DocumentNiveau } from '../src/editeur/document';
 import { joueursConseilles, VIES_ARENE } from '../src/jeu/arene';
 import { C } from '../src/jeu/commandes';
@@ -195,17 +196,17 @@ describe('le battle royale', () => {
   it('les départs de l’éditeur : posés, déplacés, effacés, annulés, exportés, relus', () => {
     const d = DocumentNiveau.arene();
     d.commence();
-    d.placeDepart(2, 10, 30);
-    d.placeDepart(5, 10, 30); // la même case : le départ 3 laisse la place au 6
+    placeDepart(d, 2, 10, 30);
+    placeDepart(d, 5, 10, 30); // la même case : le départ 3 laisse la place au 6
     d.termine();
     expect(d.departs[2]).toBeNull();
-    expect(d.departEn(10, 30)).toBe(5);
+    expect(departEn(d, 10, 30)).toBe(5);
     d.commence();
-    d.retireDepart(10, 30);
+    retireDepart(d, 10, 30);
     d.termine();
-    expect(d.departEn(10, 30)).toBe(-1);
+    expect(departEn(d, 10, 30)).toBe(-1);
     d.annule();
-    expect(d.departEn(10, 30)).toBe(5);
+    expect(departEn(d, 10, 30)).toBe(5);
     const e = DocumentNiveau.depuisJSON(JSON.stringify(d.versJSON()));
     expect(e.departs[5]).toEqual([10, 30]);
     expect(valideDef(d.versDef('x'), 'y')!.departs![5]).toEqual([10, 30]);

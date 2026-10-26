@@ -64,7 +64,7 @@ export function brancheGestes(ed: Editeur): void {
   const auLacher = () =>
     ed.outil !== 'gomme' &&
     ed.outil !== 'selection' &&
-    (ed.choix.famille === 'decor' || ed.choix.famille === 'modules');
+    (ed.choix.famille === 'decor' || ed.choix.famille === 'modules' || ed.choix.cle === 'tyro');
   const milieu = (): [Point, number] => {
     const [a, b] = [...doigts.values()] as [Point, Point];
     return [{ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, Math.hypot(a.x - b.x, a.y - b.y)];

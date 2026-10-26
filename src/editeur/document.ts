@@ -1,5 +1,6 @@
 import { type DefNiveau, type Replique } from '../niveaux/format';
 import { lisDeparts, type Depart } from './departs';
+import { lisTraces, type Trace } from './tyroliennes-tracees';
 import { verifieNiveau } from './verification';
 import { THEMES, type NomTheme } from '../rendu/themes';
 
@@ -37,6 +38,8 @@ export interface NiveauExporte {
   gens?: Gens[];
   /** battle royale : le départ de chaque joueur (siège 0 à 7), ou null */
   departs?: Depart[];
+  /** les tyroliennes tracées poteau par poteau (voir tyroliennes-tracees.ts) */
+  tyroliennes?: Trace[];
 }
 
 interface Instantane {
@@ -44,6 +47,7 @@ interface Instantane {
   decor: Decor[];
   gens: Gens[];
   departs: Depart[];
+  tyroliennes: Trace[];
 }
 
 const HISTOIRE_MAX = 80;
@@ -65,6 +69,8 @@ export class DocumentNiveau {
   version = 0;
   /** battle royale : le départ de chaque joueur (voir DefNiveau.departs) */
   departs: Depart[] = lisDeparts();
+  /** les tyroliennes tracées poteau par poteau (voir DefNiveau.tyroliennes) */
+  tyroliennes: Trace[] = [];
 
   constructor(
     public nom: string,
@@ -116,6 +122,7 @@ export class DocumentNiveau {
     const d = new DocumentNiveau(def.titre, def.theme, def.carte, decor, def.id, def.gens);
     d.dialogues = def.dialogues;
     d.departs = lisDeparts(def.departs);
+    d.tyroliennes = lisTraces(def.tyroliennes);
     return d;
   }
 
@@ -135,25 +142,13 @@ export class DocumentNiveau {
     );
     const d = new DocumentNiveau(o.nom || 'Niveau importé', theme, o.carte, decor, o.depart ?? null, gens);
     d.departs = lisDeparts(Array.isArray(o.departs) ? o.departs : []);
+    d.tyroliennes = lisTraces(o.tyroliennes);
     return d;
   }
 
-  /** Pose le départ du joueur `n` (0 à 7) sur une case ; un autre départ qui y était s'en va. */
-  placeDepart(n: number, x: number, y: number): void {
-    if (x < 0 || y < 0 || x >= this.largeur || y >= this.hauteur) return;
-    this.departs = this.departs.map((d, i) => (i === n ? [x, y] : d && d[0] === x && d[1] === y ? null : d));
-    this.change();
-  }
-
-  /** Le joueur dont le départ est sur cette case, ou -1. */
-  departEn(x: number, y: number): number {
-    return this.departs.findIndex((d) => d && d[0] === x && d[1] === y);
-  }
-
-  retireDepart(x: number, y: number): void {
-    const n = this.departEn(x, y);
-    if (n < 0) return;
-    this.departs = this.departs.map((d, i) => (i === n ? null : d));
+  /** Un changement fait ailleurs (les départs, les tyroliennes tracées) : il compte dans le geste en cours. */
+  applique(f: () => void): void {
+    f();
     this.change();
   }
 
@@ -277,6 +272,9 @@ export class DocumentNiveau {
     this.departs = this.departs.map((d) =>
       d && d[0] < largeur && d[1] + dh >= 1 ? [d[0], d[1] + dh] : null,
     );
+    this.tyroliennes = this.tyroliennes
+      .map((t) => t.map(([x, y]): [number, number] => [x, y + dh]).filter(([x, y]) => x < largeur && y >= 0))
+      .filter((t) => t.length > 1);
     this.change();
   }
 
@@ -305,6 +303,7 @@ export class DocumentNiveau {
       decor: this.decor.map(([n, x, y]): Decor => [n, x, y]),
       gens: this.listeGens(),
       ...(this.departs.some(Boolean) ? { departs: this.departs } : {}),
+      ...(this.tyroliennes.length ? { tyroliennes: lisTraces(this.tyroliennes) } : {}),
     };
   }
 
@@ -322,13 +321,14 @@ export class DocumentNiveau {
       decor: j.decor,
       gens: j.gens,
       ...(j.departs ? { departs: j.departs } : {}),
+      // une tyrolienne d'un seul poteau (celle qu'on trace) ne compte pas encore
+      ...(j.tyroliennes ? { tyroliennes: j.tyroliennes.filter((t) => t.length > 1) } : {}),
       semis: true,
       ...(this.estArene ? { arene: true } : {}),
       carte: j.carte,
     };
   }
 
-  /** Le niveau se lit-il, et va-t-on du départ au van sans rien casser ? (le même test que les niveaux du jeu) */
   /** Le niveau se lit-il, et va-t-on du départ au van sans rien casser ? (voir verification.ts) */
   verifie(): { ok: boolean; message: string } {
     return verifieNiveau(this.versDef('verification'));
@@ -364,6 +364,7 @@ export class DocumentNiveau {
       decor: this.decor.map(([n, x, y]): Decor => [n, x, y]),
       gens: this.listeGens(),
       departs: [...this.departs],
+      tyroliennes: lisTraces(this.tyroliennes), // une copie : le tracé change les poteaux sur place
     };
   }
 
@@ -372,6 +373,7 @@ export class DocumentNiveau {
     this.decor = i.decor;
     this.gens = new Map(i.gens.map(([x, y, cle]) => [`${x},${y}`, cle]));
     this.departs = i.departs;
+    this.tyroliennes = i.tyroliennes;
     this.version++;
     this.onChange();
   }

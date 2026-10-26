@@ -13,7 +13,7 @@ import { pinceau } from '../rendu/pinceau';
 import { COULEURS_SIEGES } from '../rendu/indicateurs';
 import { ecritCentre } from '../rendu/police';
 import { THEMES, type NomTheme } from '../rendu/themes';
-import { relieTyroliennes, type Poteau, type Tyrolienne } from '../niveaux/tyroliennes';
+import { chaineDeTyroliennes, relieTyroliennes, type Poteau, type Tyrolienne } from '../niveaux/tyroliennes';
 import { ennemiDeLaLettre, type Choix } from './catalogue';
 import type { Decor, DocumentNiveau, ModuleEditeur } from './document';
 import { trouveModule } from './modules-perso';
@@ -52,25 +52,44 @@ const PASTILLES: Record<string, string> = {
   '(': '#6a6a78',
   ')': '#6a6a78',
   $: '#6a6a78',
+  tyro: '#6a6a78',
+  // le dernier poteau de la tyrolienne qu'on trace
+  tyroEnCours: '#e8702a',
   '&': '#2a8ac8',
   // les départs du battle royale : la couleur de chaque joueur
   ...Object.fromEntries(COULEURS_SIEGES.map((c, i) => [`J${i + 1}`, c])),
 };
 const BOSS_GENRE: Record<string, Genre> = { Y: G.YETI_ALPHA, P: G.CHAMPION, Z: G.DJ };
 /** ce que la police pixel ne sait pas écrire (ni @ ni &), et le van en toutes lettres */
-const SIGNES: Record<string, string> = { '@': 'GO', F: 'VAN', '&': 'B', $: '()' };
+const SIGNES: Record<string, string> = {
+  '@': 'GO',
+  F: 'VAN',
+  '&': 'B',
+  $: '()',
+  tyro: 'T',
+  tyroEnCours: 'T',
+};
 
-/** Les câbles des tyroliennes posées (aucun tant qu'un poteau reste seul : le menu « Vérifier » dit lequel). */
+/**
+ * Les câbles des tyroliennes posées : celles de la carte (aucune tant qu'un poteau reste seul : le menu « Vérifier » dit lequel),
+ * puis celles tracées poteau par poteau.
+ */
 function tyroliennesDe(doc: DocumentNiveau): Tyrolienne[] {
   const poteaux: Record<string, Poteau[]> = { '(': [], ')': [], $: [] };
   doc.lignes().forEach((l, ty) => {
     for (const m of l.matchAll(/[()$]/g)) poteaux[m[0]]!.push({ tx: m.index, ty });
   });
-  try {
-    return relieTyroliennes(poteaux['(']!, poteaux[')']!, poteaux.$!);
-  } catch {
-    return [];
-  }
+  const essaie = (f: () => Tyrolienne[]) => {
+    try {
+      return f();
+    } catch {
+      return [];
+    }
+  };
+  return [
+    ...essaie(() => relieTyroliennes(poteaux['(']!, poteaux[')']!, poteaux.$!)),
+    ...doc.tyroliennes.flatMap((t) => (t.length > 1 ? essaie(() => chaineDeTyroliennes(t)) : [])),
+  ];
 }
 
 export class DessinEditeur {
@@ -159,7 +178,16 @@ export class DessinEditeur {
     ctx.restore();
   }
 
-  dessine(ctx: Ctx, doc: DocumentNiveau, cam: Camera, w: number, h: number, apercu: Apercu | null): void {
+  /** `enCours` : le dernier poteau de la tyrolienne qu'on trace, s'il y en a une. */
+  dessine(
+    ctx: Ctx,
+    doc: DocumentNiveau,
+    cam: Camera,
+    w: number,
+    h: number,
+    apercu: Apercu | null,
+    enCours: [number, number] | null = null,
+  ): void {
     this.regleTheme(doc.theme);
     const th = THEMES[doc.theme];
     const ciel = ctx.createLinearGradient(0, 0, 0, h);
@@ -188,6 +216,15 @@ export class DessinEditeur {
       }
     // les départs du battle royale, rangés à part : une pastille de la couleur du joueur
     doc.departs.forEach((d, i) => d && this.pastille(ctx, `J${i + 1}`, d[0] * TUILE, d[1] * TUILE));
+    // les poteaux des tyroliennes tracées, rangés à part eux aussi
+    for (const t of doc.tyroliennes)
+      for (const [x, y] of t)
+        this.pastille(
+          ctx,
+          enCours?.[0] === x && enCours[1] === y ? 'tyroEnCours' : 'tyro',
+          x * TUILE,
+          y * TUILE,
+        );
     if (cam.zoom >= 1.5) this.grille(ctx, tx0, ty0, tx1, ty1);
     // hors de la carte : un voile sombre, et le bord
     ctx.fillStyle = 'rgba(10,8,20,0.7)';
