@@ -183,6 +183,8 @@ OBJETS = {
     'arbre': ([f'decor/arbre-{k}-base.png' for k in (1, 2)], None, 34),
     # l'érable nu de l'hiver à Ottawa, sous la neige (remplace l'érable dessiné en code, decor-ottawa.ts)
     'erableNeige': (['decor/erable-neige-base.png'], None, 44),
+    # le figuier du pont des Tuves (remplace celui dessiné en code, decor-provence.ts) : un tronc lisse, un houppier rond
+    'figuier': (['decor/figuier-base.png'], None, 52),
     'enceinte-34': ([f'decor/enceinte-34-{k}-base.png' for k in (1, 2)], None, 26, True),
 }
 
