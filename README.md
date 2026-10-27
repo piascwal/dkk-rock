@@ -197,6 +197,12 @@ vérifie qu'on va du départ à la fin sans rien casser, change le nom, le thèm
 `.json` à partager, télécharger ou copier) : envoyez-le à Claude pour l'ajouter au jeu, tel quel ou retouché, comme nouveau niveau
 ou à la place d'un niveau existant. Le brouillon se garde tout seul dans le navigateur, et l'export se réimporte.
 
+**Apparences du décor** : un accessoire qui a plusieurs apparences (les trois figuiers, par exemple) se pose au hasard d'un simple
+toucher sur sa vignette ; un appui long sur la vignette ouvre ses apparences en grand, pour choisir celle qu'on veut (le bouton
+« Retour » revient à la liste). L'apparence choisie s'enregistre avec l'accessoire (`decor` : le quatrième nombre). L'éditeur se tient
+aussi en portrait : l'écran « Tournez votre téléphone » ne le recouvre plus. **Tissus** : `/` (rouge) et `\` (blanc, pour les voiles) se
+joignent sans couture ; seul le bas ondule, quand rien ne le continue.
+
 **Tyroliennes poteau par poteau** (objet « Tyrolienne : poteau par poteau ») : on touche la case du premier poteau, puis celle
 de chaque poteau suivant (toujours dans le même sens) ; on retouche le dernier poteau pour finir (il est orange tant qu'on trace).
 Rien n'est déduit : chaque tyrolienne garde ses poteaux, elle peut en croiser une autre, passer au-dessus ou en dessous, commencer

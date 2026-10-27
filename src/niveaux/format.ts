@@ -11,6 +11,7 @@ import { chaineDeTyroliennes, relieTyroliennes, type Tyrolienne } from './tyroli
  *   N neige    G glace   W bois    - plateforme   H échelle   C caisse
  *   T caisson de basses (explose)   I caisson violet (explose, en plus gros)   S sable   V vitre   D béton
  *   | barrière du boss (s'ouvre à sa mort)
+ *   / tissu   \ tissu blanc (voile) : se joignent, et le bas ondule quand rien ne le continue
  *   E échelon scellé (échelle incassable)   = piton (plateforme incassable)
  *   O tonneau WOG (un cœur : +1 vie)   Q tonneau d'or WOG (cœur d'or : tout revient, 10 s d'invincibilité)
  *   . mur de fond (décor d'intérieur, on passe devant)
@@ -42,6 +43,9 @@ export interface Replique {
   photos?: string[];
 }
 
+/** un accessoire posé à la main : [nom, colonne, rangée du sol, apparence choisie (0, 1... ; sans elle : au hasard)] */
+export type DecorFixe = readonly [string, number, number, number?];
+
 export interface DefNiveau {
   id: string;
   titre: string;
@@ -62,7 +66,7 @@ export interface DefNiveau {
   /** un mini-jeu à la place du niveau de plateforme (l'intro lue, il commence ; voir jeu/drift.ts) */
   miniJeu?: 'drift' | 'plongeon' | 'reve' | 'avion' | 'kart';
   /** le décor placé à la main (nom d'accessoire, colonne, rangée du sol) : il remplace le décor semé au hasard */
-  decor?: readonly (readonly [string, number, number])[];
+  decor?: readonly DecorFixe[];
   /** le décor placé à la main s'ajoute au semis au hasard au lieu de le remplacer (Saint-Cézaire, les gorges de la Siagne) */
   semis?: boolean;
   /** les colonnes où un assaut de riders tombe du ciel dès qu'un héros les franchit (voir jeu/assauts.ts) */

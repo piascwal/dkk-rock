@@ -48,6 +48,8 @@ export const T = {
   GRANIT: 30,
   /** le tissu (rideaux, bâches, voiles) : des tuiles qui se joignent, et le bord ondule quand rien ne les continue */
   TISSU: 31,
+  /** la toile blanche des voiles de bateau : même tissage et mêmes bords qui ondulent que le tissu */
+  TISSU_BLANC: 32,
 } as const;
 
 export type Tuile = (typeof T)[keyof typeof T];
@@ -134,6 +136,7 @@ export const PROPRIETES: Record<Tuile, ProprietesTuile> = {
   [T.BOUE]: base({ nom: 'boue', car: ';', pv: 2, debris: '#5a4028' }),
   [T.GRANIT]: base({ nom: 'pierre de taille', car: '[', pv: 30, debris: '#7a7a86' }),
   [T.TISSU]: base({ nom: 'tissu', car: '/', pv: 2, debris: '#8a4b3c' }),
+  [T.TISSU_BLANC]: base({ nom: 'tissu blanc (voile)', car: '\\', pv: 2, debris: '#f2f0ea' }),
 };
 
 const PAR_CARACTERE = new Map<string, Tuile>(

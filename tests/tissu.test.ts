@@ -12,10 +12,20 @@ function carteDeTissu(cases: [number, number][]): Carte {
 }
 
 describe('le tissu', () => {
-  it('se tape au clavier avec « / » et se pose dans l’éditeur comme les autres matières', () => {
+  it('se tape au clavier avec « / » (tissu) et « \\ » (voile blanche), et se pose dans l’éditeur comme les autres matières', () => {
     expect(PROPRIETES[T.TISSU].car).toBe('/');
     expect(tuileDuCaractere('/')).toBe(T.TISSU);
-    expect(PROPRIETES[T.TISSU].solide).toBe(true);
+    expect(tuileDuCaractere('\\')).toBe(T.TISSU_BLANC);
+    expect(PROPRIETES[T.TISSU_BLANC].solide).toBe(true);
+  });
+
+  it('la voile blanche ondule au bord libre, comme le tissu', () => {
+    const c = carteDeTissu([]);
+    c.pose(1, 1, T.TISSU_BLANC);
+    c.pose(2, 1, T.TISSU_BLANC);
+    expect(cotesLibres(c, T.TISSU_BLANC, 1, 1) & COTE.DROITE).toBe(0);
+    expect(cotesLibres(c, T.TISSU_BLANC, 2, 1) & COTE.GAUCHE).toBe(0);
+    expect(cotesLibres(c, T.TISSU_BLANC, 1, 1) & COTE.BAS).toBe(COTE.BAS);
   });
 
   it('une tuile de tissu entourée de tissu n’a aucun bord libre : pas de vague', () => {
@@ -29,15 +39,14 @@ describe('le tissu', () => {
     expect(cotesLibres(c, T.TISSU, 1, 1)).toBe(0);
   });
 
-  it('côte à côte, les tuiles ne font pas de vague entre elles ; le bord qui reste libre ondule', () => {
+  it('seul le bas ondule, et seulement quand rien ne le continue : ni côtés ni haut, pas de vague entre deux tuiles', () => {
     const c = carteDeTissu([
       [1, 1],
       [2, 1],
     ]);
-    const cotes = cotesLibres(c, T.TISSU, 1, 1);
-    expect(cotes & COTE.DROITE).toBe(0);
-    expect(cotes & COTE.GAUCHE).toBe(COTE.GAUCHE);
-    expect(cotes & COTE.HAUT).toBe(COTE.HAUT);
-    expect(cotes & COTE.BAS).toBe(COTE.BAS);
+    expect(cotesLibres(c, T.TISSU, 1, 1)).toBe(COTE.BAS);
+    expect(cotesLibres(c, T.TISSU, 2, 1)).toBe(COTE.BAS);
+    c.pose(1, 2, T.TISSU);
+    expect(cotesLibres(c, T.TISSU, 1, 1)).toBe(0);
   });
 });

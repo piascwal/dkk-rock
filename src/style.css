@@ -703,6 +703,11 @@ h2 {
   display: none;
 }
 
+/* l'éditeur de niveau se tient aussi en portrait : pas de « tournez l'écran » par-dessus */
+.editeur-ouvert #tourne {
+  display: none !important;
+}
+
 @media (orientation: portrait) and (max-width: 900px) {
   #tourne {
     position: fixed;

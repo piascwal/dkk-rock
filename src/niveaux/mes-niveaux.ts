@@ -1,6 +1,6 @@
 import { ACCESSOIRES } from '../rendu/decor-objets';
 import { THEMES, type NomTheme } from '../rendu/themes';
-import { litNiveau, type DefNiveau, type Qui, type Replique } from './format';
+import { litNiveau, type DecorFixe, type DefNiveau, type Qui, type Replique } from './format';
 
 /**
  * « Mes niveaux » : les niveaux faits dans l'éditeur et enregistrés dans le navigateur, pour y rejouer (seul, contre l'ordinateur
@@ -96,8 +96,13 @@ export function valideDef(o: unknown, id: string): DefNiveau | null {
   if (!carte.every((l) => chaine(l, COLONNES_MAX))) return null;
   if (typeof d.theme !== 'string' || !(d.theme in THEMES)) return null;
   const decor = (Array.isArray(d.decor) ? d.decor : []).filter(
-    (x): x is [string, number, number] =>
-      Array.isArray(x) && typeof x[0] === 'string' && x[0] in ACCESSOIRES && entier(x[1]) && entier(x[2]),
+    (x): x is DecorFixe =>
+      Array.isArray(x) &&
+      typeof x[0] === 'string' &&
+      x[0] in ACCESSOIRES &&
+      entier(x[1]) &&
+      entier(x[2]) &&
+      (x[3] === undefined || entier(x[3])),
   );
   const gens = (Array.isArray(d.gens) ? d.gens : []).filter(
     (x): x is [number, number, string] =>

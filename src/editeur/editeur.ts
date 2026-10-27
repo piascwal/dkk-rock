@@ -1,4 +1,5 @@
 import { TUILE } from '../config';
+import { liberePortrait, verrouillePaysage } from '../ui/plein-ecran';
 import type { DefNiveau } from '../niveaux/format';
 import {
   catalogue,
@@ -126,11 +127,15 @@ export class Editeur {
   }
 
   ouvre(): void {
+    liberePortrait();
+    document.body.classList.add('editeur-ouvert');
     this.racine.hidden = false;
     this.redessine();
   }
 
   ferme(): void {
+    verrouillePaysage();
+    document.body.classList.remove('editeur-ouvert');
     this.racine.hidden = true;
   }
 
@@ -174,9 +179,11 @@ export class Editeur {
   choisit(choix: Choix): void {
     if (choix.cle !== this.choix.cle) this.trace.finit(this.doc);
     // la lettre « a » change de nom selon la ville : on relit le choix dans le catalogue du thème
-    this.choix =
+    const trouve =
       catalogue(choix.famille, this.doc?.theme ?? 'garage').find((c) => c.cle === choix.cle) ?? choix;
-    this.nomChoix.textContent = this.choix.nom;
+    this.choix = { ...trouve, variante: choix.variante };
+    this.nomChoix.textContent =
+      this.choix.variante === undefined ? this.choix.nom : `${this.choix.nom} ${this.choix.variante + 1}`;
     this.dessin.vignette(this.vignette.getContext('2d')!, this.choix, this.doc?.theme ?? 'garage', 40, 40);
     if (this.outil !== 'pinceau' && this.outil !== 'rect') this.choisitOutil('pinceau');
   }
@@ -237,7 +244,8 @@ export class Editeur {
     if (this.choix.famille === 'modules') {
       const m = trouveModule(this.choix.cle);
       if (m) this.doc.tampon(m, x - Math.floor(m.lignes[0]!.length / 2), y + 1);
-    } else if (this.choix.famille === 'decor') this.doc.ajouteDecor(this.choix.cle, x, y + 1);
+    } else if (this.choix.famille === 'decor')
+      this.doc.ajouteDecor(this.choix.cle, x, y + 1, this.choix.variante);
     else if (this.choix.cle === 'tyro') this.trace.poteau(this.doc, x, y);
   }
 
@@ -250,7 +258,7 @@ export class Editeur {
         ? { genre: 'module', m, x: x - Math.floor(m.lignes[0]!.length / 2), ySol: y + 1 }
         : null;
     } else if (this.outil === 'pinceau' && this.choix.famille === 'decor')
-      this.apercu = { genre: 'decor', nom: this.choix.cle, x, ySol: y + 1 };
+      this.apercu = { genre: 'decor', nom: this.choix.cle, x, ySol: y + 1, variante: this.choix.variante };
     else this.apercu = { genre: 'case', x, y };
     this.redessine();
   }

@@ -2,6 +2,7 @@ import { TUILE } from '../config';
 import { Aleatoire } from '../moteur/maths';
 import type { Carte } from '../monde/carte';
 import { T } from '../monde/tuiles';
+import type { DecorFixe } from '../niveaux/format';
 import { ACCESSOIRES, type NomAccessoire } from './decor-objets';
 import { imageTuile } from './atlas-tuiles';
 import { pinceau } from './pinceau';
@@ -64,21 +65,25 @@ export function semeDecor(
   theme: NomTheme,
   graine: number,
   /** le décor placé à la main par le générateur (voir DefNiveau.decor) : il remplace le semis */
-  fixe?: readonly (readonly [string, number, number])[],
+  fixe?: readonly DecorFixe[],
   /** avec `fixe` : le semis s'y ajoute au lieu d'être remplacé (voir DefNiveau.semis) */
   semerAussi = false,
 ): Pose[] {
   const rng = new Aleatoire(graine);
   const fixes: Pose[] = (fixe ?? [])
     .filter(([quoi]) => quoi in ACCESSOIRES)
-    .map(([quoi, tx, ty]) => ({
-      tx,
-      ty,
-      quoi: quoi as NomAccessoire,
-      v: rng.entier(0, 255),
-      devant: false,
-      dedans: carte.aFond(tx, ty - 1),
-    }));
+    .map(([quoi, tx, ty, variante]) => {
+      // le tirage a lieu même si l'apparence est choisie : le décor semé après reste le même d'un niveau à l'autre
+      const tire = rng.entier(0, 255);
+      return {
+        tx,
+        ty,
+        quoi: quoi as NomAccessoire,
+        v: variante ?? tire,
+        devant: false,
+        dedans: carte.aFond(tx, ty - 1),
+      };
+    });
   if (fixe && !semerAussi) return fixes;
   const semis = SEMIS[theme];
   const poses: Pose[] = [...fixes];

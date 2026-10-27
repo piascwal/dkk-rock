@@ -194,6 +194,35 @@
   image-rendering: pixelated;
 }
 
+.ed-a-variantes {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  border-bottom: 3px solid #ffd23f; /* il a plusieurs apparences : appui long */
+}
+
+/* les apparences d'un accessoire : de grandes cases, au pouce */
+.ed-item.ed-grande {
+  min-height: 120px;
+  font-size: 0.8rem;
+}
+
+.ed-item.ed-grande canvas {
+  width: 96px;
+  height: 72px;
+}
+
+.ed-retour {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  background: #3a2c58;
+  font-size: 0.95rem;
+}
+
 .ed-groupe {
   grid-column: 1 / -1;
   margin-top: 6px;

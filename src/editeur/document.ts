@@ -10,37 +10,12 @@ import { THEMES, type NomTheme } from '../rendu/themes';
  * rectangle, un module) s'annule d'un coup : `commence` avant, `termine` après.
  */
 
-export type Decor = [string, number, number];
-/** un personnage choisi sur la case d'une lettre : [colonne, rangée, clé] (voir entites/ennemis/gens.ts) */
-export type Gens = [number, number, string];
+export type { Decor, Gens, ModuleEditeur, NiveauExporte } from './export-niveau';
+import type { Decor, Gens, ModuleEditeur, NiveauExporte } from './export-niveau';
 
-/** Un module préconstruit (voir outils/exporte-modules.py) : un rectangle de carte, sa rangée de sol, son décor. */
-export interface ModuleEditeur {
-  id: string;
-  nom: string;
-  famille: string;
-  sol: number;
-  lignes: string[];
-  decor: Decor[];
-  gens?: Gens[];
-}
-
-/** Ce qu'on exporte (et réimporte) : de quoi refaire le niveau tel quel, ou en faire un niveau du jeu. */
-export interface NiveauExporte {
-  format: 'dkk-niveau';
-  version: 1;
-  nom: string;
-  theme: NomTheme;
-  /** le niveau du jeu dont on est parti, s'il y en a un (son identifiant) */
-  depart: string | null;
-  carte: string[];
-  decor: Decor[];
-  gens?: Gens[];
-  /** battle royale : le départ de chaque joueur (siège 0 à 7), ou null */
-  departs?: Depart[];
-  /** les tyroliennes tracées poteau par poteau (voir tyroliennes-tracees.ts) */
-  tyroliennes?: Trace[];
-}
+/** une copie du décor (les cases de la liste sont à part : l'historique n'en partage aucune) */
+const copieDecor = (l: readonly (readonly [string, number, number, number?])[]): Decor[] =>
+  l.map((d) => [...d] as Decor);
 
 interface Instantane {
   lignes: string[];
@@ -118,7 +93,7 @@ export class DocumentNiveau {
 
   /** Une copie d'un niveau du jeu, pour le modifier. */
   static depuisNiveau(def: DefNiveau): DocumentNiveau {
-    const decor = (def.decor ?? []).map(([n, x, y]) => [n, x, y] as Decor);
+    const decor = copieDecor(def.decor ?? []);
     const d = new DocumentNiveau(def.titre, def.theme, def.carte, decor, def.id, def.gens);
     d.dialogues = def.dialogues;
     d.departs = lisDeparts(def.departs);
@@ -134,7 +109,11 @@ export class DocumentNiveau {
     const theme = o.theme && o.theme in THEMES ? o.theme : 'garage';
     const decor = (o.decor ?? []).filter(
       (d): d is Decor =>
-        Array.isArray(d) && typeof d[0] === 'string' && Number.isInteger(d[1]) && Number.isInteger(d[2]),
+        Array.isArray(d) &&
+        typeof d[0] === 'string' &&
+        Number.isInteger(d[1]) &&
+        Number.isInteger(d[2]) &&
+        (d[3] === undefined || Number.isInteger(d[3])),
     );
     const gens = (o.gens ?? []).filter(
       (g): g is Gens =>
@@ -232,10 +211,10 @@ export class DocumentNiveau {
   }
 
   /** Un accessoire de décor posé sur la rangée de sol `ySol` (il se dessine au-dessus) ; un seul par case. */
-  ajouteDecor(nom: string, x: number, ySol: number): void {
+  ajouteDecor(nom: string, x: number, ySol: number, variante?: number): void {
     if (x < 0 || x >= this.largeur || ySol < 1 || ySol >= this.hauteur) return;
     this.decor = this.decor.filter(([, dx, dy]) => dx !== x || dy !== ySol);
-    this.decor.push([nom, x, ySol]);
+    this.decor.push(variante === undefined ? [nom, x, ySol] : [nom, x, ySol, variante]);
     this.change();
   }
 
@@ -261,7 +240,7 @@ export class DocumentNiveau {
     const neuves = dh > 0 ? [...Array<string>(dh).fill(' '.repeat(largeur)), ...lignes] : lignes.slice(-dh);
     this.g = neuves.map((l) => l.split(''));
     this.decor = this.decor
-      .map(([n, x, y]): Decor => [n, x, y + dh])
+      .map((d): Decor => (d[3] === undefined ? [d[0], d[1], d[2] + dh] : [d[0], d[1], d[2] + dh, d[3]]))
       .filter(([, x, y]) => x < largeur && y >= 1 && y < hauteur);
     this.gens = new Map(
       this.listeGens()
@@ -300,7 +279,7 @@ export class DocumentNiveau {
       theme: this.theme,
       depart: this.depart,
       carte: this.lignes().map((l) => l.replace(/\s+$/, '')),
-      decor: this.decor.map(([n, x, y]): Decor => [n, x, y]),
+      decor: copieDecor(this.decor),
       gens: this.listeGens(),
       ...(this.departs.some(Boolean) ? { departs: this.departs } : {}),
       ...(this.tyroliennes.length ? { tyroliennes: lisTraces(this.tyroliennes) } : {}),
@@ -361,7 +340,7 @@ export class DocumentNiveau {
   private instantane(): Instantane {
     return {
       lignes: this.lignes(),
-      decor: this.decor.map(([n, x, y]): Decor => [n, x, y]),
+      decor: copieDecor(this.decor),
       gens: this.listeGens(),
       departs: [...this.departs],
       tyroliennes: lisTraces(this.tyroliennes), // une copie : le tracé change les poteaux sur place

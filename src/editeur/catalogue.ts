@@ -23,6 +23,8 @@ export interface Choix {
   nom: string;
   /** un sous-titre dans la palette (la famille d'un module) */
   groupe?: string;
+  /** une apparence précise d'un accessoire (0, 1...) ; sans elle, celle qui sort au hasard de la case */
+  variante?: number;
 }
 
 export const FAMILLES: readonly [Famille, string][] = [

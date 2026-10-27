@@ -39,7 +39,7 @@ export type Apercu =
   | { genre: 'case'; x: number; y: number }
   | { genre: 'rect'; x0: number; y0: number; x1: number; y1: number; pointille?: boolean }
   | { genre: 'module'; m: ModuleEditeur; x: number; ySol: number }
-  | { genre: 'decor'; nom: string; x: number; ySol: number };
+  | { genre: 'decor'; nom: string; x: number; ySol: number; variante?: number };
 
 const PASTILLES: Record<string, string> = {
   '@': '#3fb04f',
@@ -164,13 +164,13 @@ export class DessinEditeur {
   }
 
   /** Un accessoire de décor, posé sur la rangée `ySol`. */
-  decor(ctx: Ctx, [nom, tx, ty]: Decor, alpha = 1): void {
+  decor(ctx: Ctx, [nom, tx, ty, variante]: Decor, alpha = 1): void {
     const quoi = nom as NomAccessoire;
     if (!(quoi in ACCESSOIRES)) return;
     ctx.save();
     ctx.globalAlpha = alpha;
     ctx.translate(tx * TUILE + TUILE / 2, ty * TUILE);
-    const v = (tx * 7 + ty * 13) % 256;
+    const v = variante ?? (tx * 7 + ty * 13) % 256;
     if (!(SPRITES.has(quoi) && dessineSprite(ctx, quoi as Sprite, v, 'rgba(0,0,0,0)'))) {
       ctx.scale(1.4, 1.4);
       ACCESSOIRES[quoi](pinceau(ctx), v);
@@ -288,7 +288,7 @@ export class DessinEditeur {
       ctx.globalAlpha = 1;
       ctx.strokeRect(a.x * TUILE, y0 * TUILE, a.m.lignes[0]!.length * TUILE, a.m.lignes.length * TUILE);
     } else {
-      this.decor(ctx, [a.nom, a.x, a.ySol], 0.75);
+      this.decor(ctx, [a.nom, a.x, a.ySol, a.variante], 0.75);
       ctx.strokeRect(a.x * TUILE, (a.ySol - 1) * TUILE, TUILE, TUILE);
     }
   }
@@ -312,7 +312,7 @@ export class DessinEditeur {
     } else if (choix.famille === 'decor') {
       c.translate(w / 2 - TUILE / 2, h);
       c.scale(0.7, 0.7);
-      this.decor(c, [choix.cle, 0, 0]);
+      this.decor(c, [choix.cle, 0, 0, choix.variante]);
     } else {
       const m = trouveModule(choix.cle);
       if (!m) return c.restore();
