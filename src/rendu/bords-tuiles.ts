@@ -30,7 +30,7 @@ const POSEES = new Set<number>([
 export const DEBORD = 3;
 
 /** Les matières naturelles, qui s'arrondissent ; le reste (brique, métal, caisses...) garde ses angles. */
-const ARRONDIES = new Set<number>([T.TERRE, T.ROCHE, T.NEIGE, T.SABLE, T.GLACE, T.SOCLE]);
+const ARRONDIES = new Set<number>([T.TERRE, T.ROCHE, T.NEIGE, T.SABLE, T.GLACE, T.SOCLE, T.TISSU]);
 const PLANCHES = new Set<number>([T.PLATEFORME, T.PITON]);
 
 /** pixels retirés au coin, ligne par ligne depuis le bord */
@@ -82,6 +82,10 @@ export function habille(
     c.fillRect(x, y + DEBORD, w, h);
   };
   c.drawImage(source, 0, DEBORD);
+  if (t === T.TISSU) {
+    ondule(c, px, cotes);
+    return;
+  }
   const g = (cotes & COTE.GAUCHE) !== 0;
   const d = (cotes & COTE.DROITE) !== 0;
 
@@ -126,6 +130,27 @@ export function habille(
 }
 
 type Px = (x: number, y: number, w: number, h: number, coul: string) => void;
+
+/**
+ * Le bord du tissu à l'air libre : une vague de 8 px, de 0 à 2 px de creux, la même d'une tuile à l'autre (8 divise 16) : des tuiles
+ * côte à côte forment une seule étoffe bien droite, et seul le bord qui n'a rien pour le continuer ondule.
+ */
+function ondule(c: CanvasRenderingContext2D, px: Px, cotes: number): void {
+  const creux = (i: number) => Math.round(1 + Math.sin((2 * Math.PI * i) / 8));
+  c.globalCompositeOperation = 'destination-out';
+  for (let i = 0; i < TUILE; i++) {
+    if (cotes & COTE.BAS) px(i, TUILE - creux(i), 1, creux(i), '#000');
+    if (cotes & COTE.HAUT) px(i, 0, 1, creux(i), '#000');
+  }
+  for (let j = 0; j < TUILE; j++) {
+    if (cotes & COTE.GAUCHE) px(0, j, creux(j), 1, '#000');
+    if (cotes & COTE.DROITE) px(TUILE - creux(j), j, creux(j), 1, '#000');
+  }
+  c.globalCompositeOperation = 'source-over';
+  // une ligne sombre sur le nouveau bord, pour qu'il se lise sur le fond
+  for (let i = 0; i < TUILE; i++)
+    if (cotes & COTE.BAS && creux(i)) px(i, TUILE - creux(i) - 1, 1, 1, 'rgba(0,0,0,0.35)');
+}
 
 /** Le dessus de la terre à l'air libre : bande irrégulière en trois tons, ombre portée, touffes, coulures. */
 function dessusHerbeux(

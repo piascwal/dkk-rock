@@ -184,7 +184,7 @@ OBJETS = {
     # l'érable nu de l'hiver à Ottawa, sous la neige (remplace l'érable dessiné en code, decor-ottawa.ts)
     'erableNeige': (['decor/erable-neige-base.png'], None, 44),
     # le figuier du pont des Tuves (remplace celui dessiné en code, decor-provence.ts) : un tronc lisse, un houppier rond
-    'figuier': (['decor/figuier-base.png'], None, 52),
+    'figuier': ([f'decor/figuier-{k}-base.png' for k in (1, 2, 3)], None, 52),
     'enceinte-34': ([f'decor/enceinte-34-{k}-base.png' for k in (1, 2)], None, 26, True),
 }
 
@@ -197,7 +197,7 @@ NATIF_BRUT = {'voiture', 'rocker', 'robot', 'borne', 'pneus', 'baril', 'fougere'
 # redimensionnement qui rend les pixels inégaux et brouille les lettres)
 ENTIERS = {'panneau'}
 # des personnages qu'on met tous à la même hauteur (et non à la même largeur) : ils ne se ressemblent pas en largeur
-MEME_HAUTEUR = {'rocker': 19}  # pixels du jeu
+MEME_HAUTEUR = {'rocker': 19, 'figuier': 69}  # pixels du jeu
 
 
 def redresse(a):

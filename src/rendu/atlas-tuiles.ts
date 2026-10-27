@@ -3,6 +3,7 @@ import { bruit } from '../moteur/maths';
 import { NB_TUILES, T } from '../monde/tuiles';
 import { moucheture, PEINTRES_PIERRES, px, type Peintre } from './atlas-pierres';
 import { DEBORD, habille, habilleParoi } from './bords-tuiles';
+import { PEINTRES_TISSU } from './tissu';
 import type { Theme } from './themes';
 
 const VARIANTES = 4;
@@ -17,6 +18,7 @@ function tonneau(c: CanvasRenderingContext2D, bois: string, cercle: string, panc
 
 const PEINTRES: Partial<Record<number, Peintre>> = {
   ...PEINTRES_PIERRES,
+  ...PEINTRES_TISSU,
   [T.TERRE]: (c, v, th) => {
     px(c, 0, 0, 16, 16, th.terre);
     moucheture(c, v, 'rgba(0,0,0,0.25)', 10, 1);

@@ -46,6 +46,8 @@ export const T = {
   BOUE: 29,
   /** la pierre de taille : de gros blocs de granit, cinq fois plus durs que la pierre ; on fait le tour plutôt que de les casser */
   GRANIT: 30,
+  /** le tissu (rideaux, bâches, voiles) : des tuiles qui se joignent, et le bord ondule quand rien ne les continue */
+  TISSU: 31,
 } as const;
 
 export type Tuile = (typeof T)[keyof typeof T];
@@ -131,6 +133,7 @@ export const PROPRIETES: Record<Tuile, ProprietesTuile> = {
   [T.EAU]: base({ nom: 'eau', car: '~', pv: Infinity, solide: false, debris: '#6ab8d8' }),
   [T.BOUE]: base({ nom: 'boue', car: ';', pv: 2, debris: '#5a4028' }),
   [T.GRANIT]: base({ nom: 'pierre de taille', car: '[', pv: 30, debris: '#7a7a86' }),
+  [T.TISSU]: base({ nom: 'tissu', car: '/', pv: 2, debris: '#8a4b3c' }),
 };
 
 const PAR_CARACTERE = new Map<string, Tuile>(

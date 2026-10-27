@@ -225,7 +225,7 @@ export function dessineSprite(
   if (quoi === 'fougere') return dessineDecorFeuille(ctx, 'fougere', 0, voile);
   if (quoi === 'menhir') return dessineDecorFeuille(ctx, 'menhir', 0, voile);
   if (quoi === 'erableNeige') return dessineDecorFeuille(ctx, 'erableNeige', 0, voile);
-  if (quoi === 'figuier') return dessineDecorFeuille(ctx, 'figuier', 0, voile);
+  if (quoi === 'figuier') return dessineDecorFeuille(ctx, 'figuier', v % 3, voile);
   if (quoi === 'sapinNeige') return dessineDecorFeuille(ctx, 'sapin', 1 + ((v >> 4) & 1), voile);
   return dessineDecorFeuille(ctx, 'buisson', v % 3, voile);
 }
