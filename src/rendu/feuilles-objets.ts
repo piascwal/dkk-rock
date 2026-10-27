@@ -272,6 +272,7 @@ export const FEUILLES_DECOR: Record<string, Feuille> = {
   boite: { fichier: 'boite.png', w: 66, h: 124, images: [1, 1], rythme: 1, densite: 6, pied: 33 },
   palmier: { fichier: 'palmier.png', w: 234, h: 271, images: [1, 1, 1], rythme: 1, densite: 6, pied: 117 },
   arbre: { fichier: 'arbre.png', w: 228, h: 246, images: [1, 1], rythme: 1, densite: 6, pied: 114 },
+  erableNeige: { fichier: 'erableNeige.png', w: 180, h: 243, images: [1], rythme: 1, densite: 6, pied: 90 },
   'enceinte-34': {
     fichier: 'enceinte-34.png',
     w: 156,
