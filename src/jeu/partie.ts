@@ -165,7 +165,8 @@ export class Partie implements Contexte {
     const j = new Joueur(this.prochainId(), siege, membreLibre(this, membrePrefere), x, y);
     this.joueurs[siege] = j;
     this.arene?.rejoint(j);
-    if (this.tick > 0) this.evenement({ k: 'bulle', qui: j.def.qui, texte: this.rng.choix(j.def.rejoint) });
+    const { qui, rejoint } = j.def; // en battle royale, personne n'annonce son arrivée
+    if (this.tick > 0 && !this.arene) this.evenement({ k: 'bulle', qui, texte: this.rng.choix(rejoint) });
   }
 
   retireJoueur(siege: number): void {
@@ -190,8 +191,7 @@ export class Partie implements Contexte {
 
   /** Battle royale en ligne : l'hôte comble le salon avec un joueur de l'ordinateur (renvoie son siège, ou -1 s'il est plein). */
   ajouteIA(membre: number): number {
-    const a = this.arene;
-    const s = this.joueurs.findIndex((j, i) => !j && i < this.places);
+    const [a, s] = [this.arene, this.joueurs.findIndex((j, i) => !j && i < this.places)];
     if (!a || s < 0) return -1;
     this.ajouteJoueur(s, membre);
     (a.ia ??= new IAArene([], a.regles.niveauIA)).ajoute(s);

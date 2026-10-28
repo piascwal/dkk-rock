@@ -3,6 +3,7 @@ import { armeRamassee } from '../entites/armes';
 import { PHASES_MINI_JEUX } from '../jeu/mini-jeux';
 import type { EtatVue } from '../jeu/vue';
 import { icone, iconeDeLArme, rangeeDIcones } from './icones-hud';
+import { nomArene } from './noms-arene';
 
 /** Le HUD (HTML) : un cartouche par joueur, les vies et le score, la barre du boss. Mis à jour seulement quand il change. */
 export class Hud {
@@ -23,7 +24,7 @@ export class Hud {
         const arme = armeRamassee(j.arme);
         const nom = noms[s] && v.joueurs.filter((x) => x.present).length > 1 ? ` · ${noms[s]}` : '';
         return `<div class="hud-joueur${j.mort ? ' mort' : ''}" style="--couleur:${h.couleur}">
-          ${s === siegeLocal ? '▶ ' : ''}${h.nom}${echappe(nom)}
+          ${s === siegeLocal ? '▶ ' : ''}${ar ? echappe(nomArene(noms, s)) : `${h.nom}${echappe(nom)}`}
           <span class="coeurs">${rangeeDIcones(icone('coeur'), j.pv)}</span>
           <span class="etoiles">${rangeeDIcones(icone('mediator'), Math.min(6, j.speciaux))}</span>
           ${arme ? `<br>${rangeeDIcones(iconeDeLArme(j.arme), 1)} ${arme.nom} ×${j.munitions}` : ''}

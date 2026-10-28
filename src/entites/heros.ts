@@ -47,7 +47,7 @@ export const HEROS: DefHeros[] = [
     genre: G.JBT,
     couleur: '#e5432f',
     description: 'Lance ses baguettes à la chaîne. Spécial : une grosse caisse qui roule et explose.',
-    arme: instrument('Baguettes', 7, 'baguette', (ctx, t) => tire(ctx, t, BAGUETTE, -1.2)),
+    arme: instrument('Baguettes', 7, 'baguette', (ctx, t) => tire(ctx, t, BAGUETTE)),
     special: {
       nom: 'Grosse caisse',
       lance: (ctx, t) => tire(ctx, t, GROSSE_CAISSE, -2),

@@ -23,15 +23,16 @@ import { Recrue } from './ui/recrue';
 import { prepareInstallation } from './ui/installation';
 import { Bulles, Histoire } from './ui/dialogues';
 import { Hud } from './ui/hud';
+import { FilElimination } from './ui/fil-elim';
 import { controleurDeVersion, ecouteLaFenetre, joueEvenements, nomsDesJoueurs } from './ui/app-aides';
 import { Menus, type Actions } from './ui/menus';
 import { pleinEcran } from './ui/plein-ecran';
 import { FinMiniJeu } from './ui/fin-mini-jeu';
 import { SuiviRecrue } from './ui/suivi-recrue';
-import { ajouteNiveauEssai, NIVEAUX } from './niveaux';
+import { NIVEAUX } from './niveaux';
 import type { ReglesArene } from './jeu/arene';
 import type { CarteArene } from './ui/menus-arene';
-import { partieArene } from './ui/app-arene';
+import { partieArene, partieEssai } from './ui/app-arene';
 import { PanneauArene } from './ui/arene-ui';
 
 const PAS_MS = 1000 / 60;
@@ -62,6 +63,7 @@ export class App implements Actions {
   private readonly tactile = new Tactile($('jeu'));
   private readonly finMini = new FinMiniJeu($('jeu'));
   private readonly menus = new Menus($('ecran'), this);
+  private readonly fil = new FilElimination($('jeu'));
   private readonly arene = new PanneauArene($('jeu'), {
     suivant: () => this.suivant(),
     inviter: () => (this.mettreEnPause(), this.menus.inviter()),
@@ -157,14 +159,7 @@ export class App implements Actions {
     void import('./editeur/editeur').then(({ ouvreEditeur }) =>
       ouvreEditeur({
         // l'essai d'un niveau, sans rien sauvegarder ; au bilan (ou en quittant), on revient à l'éditeur
-        teste: (def, retour) => {
-          // une carte de battle royale s'essaie contre l'ordinateur
-          if (def.arene)
-            return this.joue(partieArene({ def }, { ennemis: false }, 3, this.sauvegarde.membre), retour);
-          const p = new Partie({ niveau: ajouteNiveauEssai(def), drapeau: -1, vies: VIES_DEPART, score: 0 });
-          p.ajouteJoueur(0, this.sauvegarde.membre);
-          this.joue(p, retour);
-        },
+        teste: (def, retour) => this.joue(partieEssai(def, this.sauvegarde.membre), retour),
         quitte: () => this.menus.titre(),
       }),
     );
@@ -184,6 +179,7 @@ export class App implements Actions {
   private joue(p: Partie, essai: (() => void) | null = null): void {
     this.arreteTout();
     this.suiviRecrue.oublie();
+    this.fil.vide();
     this.partie = p;
     this.essai = essai;
     this.entreEnJeu();
@@ -330,7 +326,10 @@ export class App implements Actions {
 
   private evenements(l: readonly Evenement[]): void {
     this.rendu.evenements(l);
-    joueEvenements(l, this.derniereVue, this.client?.siege ?? 0, this.bruitages, this.bulles);
+    const siege = this.client?.siege ?? 0;
+    joueEvenements(l, this.derniereVue, siege, this.bruitages, this.bulles, (e) =>
+      this.fil.ajoute(e, nomsDesJoueurs(this.client, this.hote, this.sauvegarde.pseudo), siege),
+    );
   }
 
   private affiche(v: EtatVue, carte: Carte, siege: number): void {

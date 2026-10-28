@@ -36,9 +36,15 @@ export const DESSINS_TIRS: Partial<Record<number, Dessin>> = {
     p(f % 4 < 2 ? -1 : 1, 2, 1, 2, '#f4f0e0');
   },
   [G.P_BAGUETTE]: (p, f) => {
+    // un liseré sombre : sur le sable, la neige ou le bois, une baguette claire disparaissait
     const r = tourne(f, 4);
-    if (r % 2) p(-1, -3, 1, 6, '#d9a066');
-    else p(-3, 0, 6, 1, '#d9a066');
+    if (r % 2) {
+      p(-2, -4, 3, 8, '#2a1608');
+      p(-1, -3, 1, 6, '#ffd08a');
+    } else {
+      p(-4, -1, 8, 3, '#2a1608');
+      p(-3, 0, 6, 1, '#ffd08a');
+    }
     if (r === 1) p(-1, -3, 1, 1, '#fff');
   },
   [G.P_ONDE]: (p) => {

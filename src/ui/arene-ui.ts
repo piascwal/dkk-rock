@@ -5,6 +5,7 @@ import type { Partie } from '../jeu/partie';
 import { NIVEAUX, niveauLu } from '../niveaux';
 import { COULEURS_SIEGES } from '../rendu/indicateurs';
 import { el } from './elements';
+import { nomArene } from './noms-arene';
 
 /**
  * Ce que le battle royale montre par-dessus le jeu (en HTML, d'après la seule vue : pareil chez l'hôte et chez les invités) :
@@ -51,11 +52,8 @@ export class PanneauArene {
     this.dernier = cle;
     this.element.hidden = !montre;
     if (!montre) return;
-    const nom = (s: number) => {
-      const j = v!.joueurs[s]!;
-      const h = HEROS[j.membre]!.nom;
-      return noms[s] ? `${noms[s]} (${h})` : s === siegeLocal ? `Vous (${h})` : `${h} (ordinateur)`;
-    };
+    // le pseudo, jamais le nom du personnage (il change à chaque manche)
+    const nom = (s: number) => `${nomArene(noms, s)}${s === siegeLocal ? ' (vous)' : ''}`;
     const pastille = (s: number, texte: string) => {
       const ligne = el('div', texte, 'arene-joueur');
       ligne.style.setProperty('--couleur', COULEURS_SIEGES[s % COULEURS_SIEGES.length]!);

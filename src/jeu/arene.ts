@@ -6,6 +6,7 @@ import {
   TICKS_PAR_SECONDE,
   TUILE,
 } from '../config';
+import { HEROS } from '../entites/heros';
 import type { Joueur } from '../entites/joueur';
 import { Boss } from '../entites/ennemis/boss';
 import { Ennemi } from '../entites/ennemis/ennemi';
@@ -130,6 +131,13 @@ export class Arene {
     this.vies.fill(0);
     this.eliminations.fill(0);
     this.rangs.fill(0);
+    // chacun tire son personnage au hasard à chaque manche (sans doublon tant qu'il y en a), et le garde jusqu'à la suivante
+    const membres = HEROS.map((_, i) => i);
+    for (let i = membres.length - 1; i > 0; i--) {
+      const k = Math.floor(p.rng.suivant() * (i + 1));
+      [membres[i], membres[k]] = [membres[k]!, membres[i]!];
+    }
+    joueurs.forEach((j, i) => (j.membre = membres[i % membres.length]!));
     for (const j of joueurs) {
       this.vies[j.siege] = VIES_ARENE;
       // chacun sur son départ, s'il est placé ; sinon loin des autres
@@ -175,6 +183,7 @@ export class Arene {
       if (!this.enJeu) return;
       const tueur = p.joueurs.find((o) => o && o.id === j.dernierTireur && o !== j);
       if (tueur) this.eliminations[tueur.siege]++;
+      p.evenement({ k: 'elim', tueur: tueur ? tueur.siege : -1, victime: j.siege });
       if (--this.vies[j.siege]! <= 0) this.elimine(p, j.siege);
       return;
     }

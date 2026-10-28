@@ -14,9 +14,9 @@ import { afficheNouvelleVersion } from './maj';
 export function nomsDesJoueurs(client: Client | null, hote: Hote | null, pseudo: string): string[] {
   const noms: string[] = Array<string>(MAX_JOUEURS).fill('');
   if (client) for (const j of client.joueurs) noms[j.siege] = j.nom;
-  else if (hote) {
+  else {
     noms[0] = pseudo || 'DKK';
-    for (const d of hote.distants.values()) noms[d.siege] = d.nom;
+    if (hote) for (const d of hote.distants.values()) noms[d.siege] = d.nom;
   }
   return noms;
 }
@@ -28,6 +28,7 @@ export function joueEvenements(
   siege: number,
   bruitages: Bruitages,
   bulles: Bulles,
+  elimination: (e: Extract<Evenement, { k: 'elim' }>) => void,
 ): void {
   const moi = v?.joueurs[siege];
   for (const e of l) {
@@ -35,6 +36,7 @@ export function joueEvenements(
       const d = moi && (e.x || e.y) ? Math.hypot(e.x - moi.x, e.y - moi.y) : 0;
       bruitages.joue(e.n, d);
     } else if (e.k === 'bulle') bulles.ajoute(e.qui, e.texte);
+    else if (e.k === 'elim') elimination(e);
   }
 }
 

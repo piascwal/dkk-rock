@@ -1035,6 +1035,42 @@ h2 {
 }
 
 /* le battle royale : le salon et le classement (voir ui/arene-ui.ts), le compte à rebours */
+.fil-elim {
+  position: fixed;
+  top: calc(64px + env(safe-area-inset-top)); /* sous le compteur de vies et d'éliminations */
+  right: calc(8px + env(safe-area-inset-right));
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  pointer-events: none;
+  max-width: 60vw;
+}
+
+.fil-ligne {
+  padding: 4px 8px;
+  background: rgba(10, 6, 16, 0.78);
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: #f4efe6;
+  text-shadow: 0 1px 0 #000;
+  animation: fil-entre 0.2s ease-out;
+}
+
+.fil-ligne .moi {
+  text-decoration: underline;
+  text-decoration-color: #ffd23f;
+  text-underline-offset: 2px;
+}
+
+@keyframes fil-entre {
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+}
+
 .arene-panneau {
   position: absolute;
   left: 50%;

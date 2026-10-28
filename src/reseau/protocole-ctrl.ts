@@ -34,7 +34,7 @@ export function valideMsgClient(o: unknown): MsgClient | null {
   return null;
 }
 
-const EVENEMENTS = new Set(['son', 'explo', 'texte', 'impact', 'confettis', 'bulle', 'tuile']);
+const EVENEMENTS = new Set(['son', 'explo', 'texte', 'impact', 'confettis', 'bulle', 'elim', 'tuile']);
 
 /** Côté client : un message de l'hôte, validé dans ses grandes lignes (l'hôte est l'arbitre de la partie). */
 export function valideMsgHote(o: unknown): MsgHote | null {

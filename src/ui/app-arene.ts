@@ -1,5 +1,7 @@
 import { HEROS } from '../entites/heros';
 import type { ReglesArene } from '../jeu/arene';
+import { VIES_DEPART } from '../config';
+import type { DefNiveau } from '../niveaux/format';
 import { Partie } from '../jeu/partie';
 import { ajouteNiveauEssai } from '../niveaux';
 import type { CarteArene } from './menus-arene';
@@ -15,5 +17,13 @@ export function partieArene(carte: CarteArene, regles: ReglesArene, ia: number, 
   const sieges = Array.from({ length: ia }, (_, i) => i + 1);
   for (const s of sieges) p.ajouteJoueur(s, Math.floor(Math.random() * HEROS.length));
   p.ouvreArene(regles, ia === 0, sieges);
+  return p;
+}
+
+/** L'essai d'un niveau de l'éditeur : une carte de battle royale s'essaie contre l'ordinateur ; un autre niveau, seul. */
+export function partieEssai(def: DefNiveau, membre: number): Partie {
+  if (def.arene) return partieArene({ def }, { ennemis: false }, 3, membre);
+  const p = new Partie({ niveau: ajouteNiveauEssai(def), drapeau: -1, vies: VIES_DEPART, score: 0 });
+  p.ajouteJoueur(0, membre);
   return p;
 }

@@ -41,6 +41,8 @@ export interface Contexte {
   readonly numeroTemps: number;
   /** en battle royale, le héros (son identifiant) dont on met à jour un tir : celui qui blesse, s'il blesse quelqu'un */
   readonly tireur?: number | null;
+  /** le battle royale, si c'en est un : on n'y est protégé que sur son départ ou à sa réapparition, jamais après un coup reçu */
+  readonly arene?: object | null;
   prochainId(): number;
   ajoute(e: EntiteSimulee): void;
   /** les héros vivants */

@@ -45,7 +45,7 @@ export const P = (d: DefProjectile): DefProjectile => d;
 export const BAGUETTE = P({
   genre: G.P_BAGUETTE,
   vitesse: 6,
-  gravite: 0.15,
+  gravite: 0,
   degats: 1,
   degatsTuile: 1,
   duree: 40,

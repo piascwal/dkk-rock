@@ -105,7 +105,8 @@ export abstract class JoueurBase implements Cible, EtatSpecial {
     this.dejaBlesse = ctx.tick;
     this.dernierTireur = ctx.tireur ?? null;
     this.pv -= Math.max(1, Math.round(degats));
-    this.invulnerable = INVULNERABLE;
+    // en battle royale, aucune protection après un coup : le suivant touche aussi
+    if (!ctx.arene) this.invulnerable = INVULNERABLE;
     this.corps.vx = dx * 2.5;
     this.corps.vy = -2.5;
     this.tyro = null;
@@ -128,7 +129,8 @@ export abstract class JoueurBase implements Cible, EtatSpecial {
     this.tyro = null;
     this.echelle = false;
     ctx.son('mort', this.cx, this.cy);
-    ctx.evenement({ k: 'bulle', qui: this.def.qui, texte: ctx.rng.choix(this.def.mort) });
+    // en battle royale, c'est le fil des éliminations qui l'annonce (voir jeu/arene.ts)
+    if (!ctx.arene) ctx.evenement({ k: 'bulle', qui: this.def.qui, texte: ctx.rng.choix(this.def.mort) });
   }
 
   /** Remet le héros en jeu (réapparition ou changement de membre). */
