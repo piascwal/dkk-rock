@@ -6,11 +6,12 @@ import { NIVEAUX, niveauLu } from '../niveaux';
 import { COULEURS_SIEGES } from '../rendu/indicateurs';
 import { el } from './elements';
 import { nomArene } from './noms-arene';
+import { EcranVersus } from './versus';
 
 /**
  * Ce que le battle royale montre par-dessus le jeu (en HTML, d'après la seule vue : pareil chez l'hôte et chez les invités) :
  * - le salon : la carte et pour combien de joueurs elle est faite, qui est là, inviter, lancer (l'hôte) ;
- * - le compte à rebours, en grand ;
+ * - le compte à rebours, sur l'écran « VERSUS » (voir versus.ts) ;
  * - la fin : le classement, rejouer ou quitter.
  */
 
@@ -25,7 +26,7 @@ export interface ActionsArene {
 
 export class PanneauArene {
   private readonly element = el('div', '', 'arene-panneau');
-  private readonly compte = el('div', '', 'arene-compte');
+  private readonly versus: EcranVersus;
   private dernier = '';
   private conseil: { niveau: number; texte: string } | null = null;
 
@@ -34,15 +35,13 @@ export class PanneauArene {
     private readonly a: ActionsArene,
   ) {
     this.element.hidden = true;
-    this.compte.hidden = true;
-    parent.append(this.element, this.compte);
+    parent.append(this.element);
+    this.versus = new EcranVersus(parent);
   }
 
   maj(v: EtatVue | null, siegeLocal: number, hote: boolean, noms: readonly string[]): void {
     const ar = v?.phase === 'jeu' ? v.arene : undefined;
-    const compte = ar?.etape === 'compte' ? String(3 - Math.floor(ar.minuteur / 60)) : '';
-    this.compte.hidden = !compte;
-    if (this.compte.textContent !== compte) this.compte.textContent = compte;
+    this.versus.maj(v, siegeLocal, noms);
     const montre = !!ar && (ar.etape === 'salon' || ar.etape === 'fin');
     // on ne refait le panneau que s'il change (les boutons restent cliquables)
     const cle = montre

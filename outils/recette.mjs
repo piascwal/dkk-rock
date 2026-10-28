@@ -134,7 +134,9 @@ async function parcours(pg, nomA) {
   await clique(pg, '.liste button >> nth=0');
   await vu('08-br-reglages-solo');
   await clique(pg, 'button:has-text("Jouer")');
-  await pg.waitForTimeout(4200);
+  await pg.waitForTimeout(1200);
+  await vu('09a-br-versus');
+  await pg.waitForTimeout(3000);
   await vu('09-br-combat');
   await app(() => window.dkk.mettreEnPause());
   await vu('10-br-pause');

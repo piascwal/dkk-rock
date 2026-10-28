@@ -234,11 +234,11 @@ Intégrer un export :
 
 ## Battle royale
 
-Menu principal → **Battle royale** : on choisit une carte, on voit pour combien de joueurs elle est faite, on garde ou non les
-ennemis, puis :
+Menu principal → **Battle royale** → **Solo** ou **Multi**, puis une carte (on voit pour combien de joueurs elle est faite), on
+garde ou non les ennemis, et :
 
-- **contre l'ordinateur** (1 à 7 adversaires, de niveau facile, moyen ou difficile) : de quoi s'entraîner ou essayer une carte ;
-- **en ligne** : un salon s'ouvre (Wi-Fi, ou code Internet via « Inviter des amis ») ; les amis le rejoignent par « Rejoindre
+- **solo**, contre l'ordinateur (1 à 7 adversaires, de niveau facile, moyen ou difficile) : de quoi s'entraîner ou essayer une carte ;
+- **multi**, en ligne : un salon s'ouvre (Wi-Fi, ou code Internet via « Inviter des amis ») ; les amis le rejoignent par « Rejoindre
   des amis », s'échauffent sans se blesser ; l'hôte peut combler avec des joueurs de l'ordinateur (« + IA », « − IA ») puis lance
   la partie (jusqu'à 8 joueurs). Pas de flèches vers les adversaires : on se cherche.
 
@@ -251,8 +251,12 @@ l'éditeur, le sien ou celui d'un ami). Une carte sans van ni DJ Boucle est une 
 joue contre l'ordinateur. Dans les objets de l'éditeur, les **8 départs** (un par joueur, de sa couleur) : chacun commence sur le
 sien, et l'on réapparaît sur le départ le plus loin des autres (sans départs placés, au hasard sur la carte).
 
-Trois vies chacun ; les tirs blessent les autres joueurs (jamais soi-même) ; une élimination revient à celui qui a touché en
-dernier. On réapparaît loin des autres, avec quelques secondes de protection. Les cages et les cœurs redonnent une vie (5 au plus).
+Chaque manche s'ouvre sur un écran **VERSUS** (`src/ui/versus.ts`) : la carte de chaque joueur tombe ou monte à sa place (le
+portrait du personnage tiré au sort pour cette manche, sans doublon tant qu'il y en a, et son pseudo ; « Ordi N » pour
+l'ordinateur), le « VS » claque, puis 3, 2, 1. Trois vies chacun ; les tirs blessent les autres joueurs (jamais soi-même), sans
+aucune protection après un coup reçu ; une élimination revient à celui qui a touché en dernier, et le fil en haut à droite
+l'annonce (« A a éliminé B », « B s'est éliminé tout seul » ; `src/ui/fil-elim.ts`). On réapparaît loin des autres, avec quelques
+secondes de protection. Les cages et les cœurs redonnent une vie (5 au plus).
 Le dernier en lice gagne ; le classement s'affiche, et « Rejouer » relance une manche sur la même carte. Plusieurs joueurs peuvent
 jouer le même héros : un repère de couleur au-dessus de chacun dit qui est qui.
 
