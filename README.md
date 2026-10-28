@@ -312,6 +312,12 @@ npm run typecheck && npm run lint && npm run format:check && npm test
 npm run build      # dist/, servi sous /dkk-rock/
 ```
 
+**Recette des écrans** (`outils/recette.mjs`) : avec `npm run dev` lancé à côté, `npm run recette` parcourt tous les écrans (menus,
+battle royale, histoire, jeu, pause, éditeur) sur sept tailles d'appareil (téléphones couchés et debout, tablette, ordinateur), en
+fait une capture et signale ce qui cloche : un menu qui défile, un bouton hors de l'écran ou recouvert, une cible trop petite au doigt,
+un texte coupé, une erreur JavaScript. Captures et rapport dans `recette/`. Il faut Playwright :
+`npm i -D playwright && npx playwright install chromium` (ou `PLAYWRIGHT=<chemin du module>` s'il est installé ailleurs).
+
 Chaque poussée sur `main` est vérifiée puis publiée par GitHub Actions
 (réglage du dépôt, une seule fois : Settings → Pages → Source « GitHub Actions »).
 
