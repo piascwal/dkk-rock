@@ -21,7 +21,7 @@ const ARENES_DU_JEU = NIVEAUX.flatMap((d, i) => (d.arene ? [[d.id, i] as const] 
 function arene(n: number, enLigne = false, ia: number[] = []): Partie {
   const p = new Partie({ niveau: TOUR, drapeau: -1, vies: 0, score: 0 });
   for (let s = 0; s < n; s++) p.ajouteJoueur(s, s);
-  p.ouvreArene({ ennemis: false }, enLigne, ia);
+  p.ouvreArene({}, enLigne, ia);
   return p;
 }
 
@@ -127,7 +127,7 @@ describe('le battle royale', () => {
     for (const [, i] of ARENES_DU_JEU) {
       const p = new Partie({ niveau: i, drapeau: -1, vies: 0, score: 0 });
       for (let s = 0; s < 4; s++) p.ajouteJoueur(s, s);
-      p.ouvreArene({ ennemis: false }, false, [0, 1, 2, 3]);
+      p.ouvreArene({}, false, [0, 1, 2, 3]);
       for (let t = 0; t < 60 * 240 && p.arene!.etape !== 'fin'; t++) pas(p, 1);
       expect(p.arene!.etape, NIVEAUX[i]!.id).toBe('fin');
     }
@@ -217,7 +217,7 @@ describe('le battle royale', () => {
     const tirs = (niveau: 'facile' | 'difficile') => {
       const p = new Partie({ niveau: TOUR, drapeau: -1, vies: 0, score: 0 });
       for (let s = 0; s < 2; s++) p.ajouteJoueur(s, s);
-      p.ouvreArene({ ennemis: false, niveauIA: niveau }, false, [1]);
+      p.ouvreArene({ niveauIA: niveau }, false, [1]);
       // le même personnage des deux côtés (la manche les tire au hasard) : JBG, ses accords ne tuent pas la cible en un coup
       p.joueurs[0]!.membre = p.joueurs[1]!.membre = HEROS.findIndex((h) => h.qui === 'JBG');
       pas(p, 190);

@@ -18,8 +18,7 @@ type Mode = 'solo' | 'multi';
 export type CarteArene = { niveau: number } | { def: DefNiveau };
 
 /** Les réglages, gardés d'une partie à l'autre (le temps de la session). */
-const reglages: { ennemis: boolean; ia: number; niveauIA: NiveauIA } = {
-  ennemis: false,
+const reglages: { ia: number; niveauIA: NiveauIA } = {
   ia: 3,
   niveauIA: 'moyen',
 };
@@ -89,15 +88,11 @@ function choixCarte(m: Menus, a: Actions, mode: Mode): void {
 function reglagesArene(m: Menus, a: Actions, carte: CarteArene, nom: string, mode: Mode): void {
   const lu = 'def' in carte ? litNiveau(carte.def) : niveauLu(carte.niveau);
   const [min, max] = joueursConseilles(lu);
-  const regles = (): ReglesArene => ({ ennemis: reglages.ennemis, niveauIA: reglages.niveauIA });
+  const regles = (): ReglesArene => ({ niveauIA: reglages.niveauIA });
   const texteNiveau = () => `Niveau de l’ordinateur : ${reglages.niveauIA}`;
   const niveau = bouton(texteNiveau(), () => {
     reglages.niveauIA = NIVEAUX_IA[(NIVEAUX_IA.indexOf(reglages.niveauIA) + 1) % NIVEAUX_IA.length]!;
     niveau.textContent = texteNiveau();
-  });
-  const ennemis = bouton(`Ennemis du niveau : ${reglages.ennemis ? 'oui' : 'non'}`, () => {
-    reglages.ennemis = !reglages.ennemis;
-    ennemis.textContent = `Ennemis du niveau : ${reglages.ennemis ? 'oui' : 'non'}`;
   });
   const nombre = el('span', '', 'nombre-ia');
   const majNombre = () => (nombre.textContent = `${reglages.ia} adversaire${reglages.ia > 1 ? 's' : ''}`);
@@ -111,7 +106,6 @@ function reglagesArene(m: Menus, a: Actions, carte: CarteArene, nom: string, mod
   m.montre(
     el('h2', nom),
     el('p', `Carte faite pour ${min === max ? `${min}` : `${min} à ${max}`} joueurs.`, 'conseil'),
-    ennemis,
     ...(mode === 'solo'
       ? [
           el('h3', 'Adversaires'),

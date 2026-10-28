@@ -12,7 +12,7 @@ const TOUR = NIVEAUX.findIndex((d) => d.id === 'arene-tour-de-mixage');
 function combat(n: number): Partie {
   const p = new Partie({ niveau: TOUR, drapeau: -1, vies: 0, score: 0 });
   for (let s = 0; s < n; s++) p.ajouteJoueur(s, 0);
-  p.ouvreArene({ ennemis: false }, false);
+  p.ouvreArene({}, false);
   for (let i = 0; i < 200; i++) p.avance();
   return p;
 }

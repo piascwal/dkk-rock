@@ -234,8 +234,8 @@ Intégrer un export :
 
 ## Battle royale
 
-Menu principal → **Battle royale** → **Solo** ou **Multi**, puis une carte (on voit pour combien de joueurs elle est faite), on
-garde ou non les ennemis, et :
+Menu principal → **Battle royale** → **Solo** ou **Multi**, puis une carte (on voit pour combien de joueurs elle est faite ; pas
+d'ennemis du niveau, on n'y affronte que les autres joueurs), et :
 
 - **solo**, contre l'ordinateur (1 à 7 adversaires, de niveau facile, moyen ou difficile) : de quoi s'entraîner ou essayer une carte ;
 - **multi**, en ligne : un salon s'ouvre (Wi-Fi, ou code Internet via « Inviter des amis ») ; les amis le rejoignent par « Rejoindre

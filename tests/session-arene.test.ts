@@ -25,7 +25,7 @@ describe('le battle royale en ligne', () => {
     const niveau = ajouteNiveauEssai(def);
     const p = new Partie({ niveau, drapeau: -1, vies: 0, score: 0 });
     p.ajouteJoueur(0, 0);
-    p.ouvreArene({ ennemis: false }, true);
+    p.ouvreArene({}, true);
     const hote = new Hote(() => p, 'HOTE');
     aFermer.push(hote);
     const clients: Client[] = [];

@@ -22,7 +22,7 @@ export function partieArene(carte: CarteArene, regles: ReglesArene, ia: number, 
 
 /** L'essai d'un niveau de l'éditeur : une carte de battle royale s'essaie contre l'ordinateur ; un autre niveau, seul. */
 export function partieEssai(def: DefNiveau, membre: number): Partie {
-  if (def.arene) return partieArene({ def }, { ennemis: false }, 3, membre);
+  if (def.arene) return partieArene({ def }, {}, 3, membre);
   const p = new Partie({ niveau: ajouteNiveauEssai(def), drapeau: -1, vies: VIES_DEPART, score: 0 });
   p.ajouteJoueur(0, membre);
   return p;

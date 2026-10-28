@@ -40,8 +40,6 @@ const PROTECTION = 150;
 const FIN_MIN = 2 * TICKS_PAR_SECONDE;
 
 export interface ReglesArene {
-  /** les ennemis du niveau restent (sinon : seulement les joueurs, les caisses, les armes, les soins) */
-  ennemis: boolean;
   /** le niveau des joueurs de l'ordinateur (hors ligne), moyen par défaut */
   niveauIA?: NiveauIA;
 }
@@ -55,7 +53,6 @@ export interface VueArene {
   vies: number[];
   eliminations: number[];
   rangs: number[];
-  ennemis: boolean;
 }
 
 /**
@@ -104,7 +101,8 @@ export class Arene {
   prepare(p: Partie): void {
     p.entites = p.entites.filter((e) => {
       if (e instanceof Objet) return !['van', 'drapeau', 'sibylle'].includes(e.sorte);
-      return this.regles.ennemis || !(e instanceof Ennemi || e instanceof Boss);
+      // pas d'ennemis du niveau : on n'y affronte que les autres joueurs (restent les caisses, les armes, les soins)
+      return !(e instanceof Ennemi || e instanceof Boss);
     });
     // la barrière du boss n'a plus de sens : la carte entière est ouverte
     for (let y = 0; y < p.carte.hauteur; y++)
@@ -254,7 +252,6 @@ export class Arene {
       vies: [...this.vies],
       eliminations: [...this.eliminations],
       rangs: [...this.rangs],
-      ennemis: this.regles.ennemis,
     };
   }
 
