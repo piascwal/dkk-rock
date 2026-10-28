@@ -18,7 +18,8 @@ type Mode = 'solo' | 'multi';
 export type CarteArene = { niveau: number } | { def: DefNiveau };
 
 /** Les réglages, gardés d'une partie à l'autre (le temps de la session). */
-const reglages: { ia: number; niveauIA: NiveauIA } = {
+const reglages: { ia: number; niveauIA: NiveauIA; equipes: boolean } = {
+  equipes: false,
   ia: 3,
   niveauIA: 'moyen',
 };
@@ -88,14 +89,21 @@ function choixCarte(m: Menus, a: Actions, mode: Mode): void {
 function reglagesArene(m: Menus, a: Actions, carte: CarteArene, nom: string, mode: Mode): void {
   const lu = 'def' in carte ? litNiveau(carte.def) : niveauLu(carte.niveau);
   const [min, max] = joueursConseilles(lu);
-  const regles = (): ReglesArene => ({ niveauIA: reglages.niveauIA });
+  const regles = (): ReglesArene => ({ niveauIA: reglages.niveauIA, equipes: reglages.equipes });
+  // chacun pour soi, ou deux équipes (rouge, bleue) : les tirs alliés ne blessent pas, la dernière équipe gagne
+  const texteMode = () => `Mode : ${reglages.equipes ? 'en équipes' : 'chacun pour soi'}`;
+  const boutonMode = bouton(texteMode(), () => {
+    reglages.equipes = !reglages.equipes;
+    boutonMode.textContent = texteMode();
+  });
   const texteNiveau = () => `Niveau de l’ordinateur : ${reglages.niveauIA}`;
   const niveau = bouton(texteNiveau(), () => {
     reglages.niveauIA = NIVEAUX_IA[(NIVEAUX_IA.indexOf(reglages.niveauIA) + 1) % NIVEAUX_IA.length]!;
     niveau.textContent = texteNiveau();
   });
   const nombre = el('span', '', 'nombre-ia');
-  const majNombre = () => (nombre.textContent = `${reglages.ia} adversaire${reglages.ia > 1 ? 's' : ''}`);
+  const majNombre = () =>
+    (nombre.textContent = `${reglages.ia} joueur${reglages.ia > 1 ? 's' : ''} de l’ordinateur`);
   const change = (d: number) => () => {
     reglages.ia = Math.max(1, Math.min(MAX_JOUEURS - 1, reglages.ia + d));
     majNombre();
@@ -106,9 +114,10 @@ function reglagesArene(m: Menus, a: Actions, carte: CarteArene, nom: string, mod
   m.montre(
     el('h2', nom),
     el('p', `Carte faite pour ${min === max ? `${min}` : `${min} à ${max}`} joueurs.`, 'conseil'),
+    boutonMode,
     ...(mode === 'solo'
       ? [
-          el('h3', 'Adversaires'),
+          el('h3', 'L’ordinateur'),
           ia,
           niveau,
           bouton('Jouer', () => a.lanceArene(carte, regles(), reglages.ia), 'principal'),

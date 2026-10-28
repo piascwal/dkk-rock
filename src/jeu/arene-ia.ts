@@ -290,7 +290,10 @@ export class IAArene {
     let meilleure: Cible | null = null;
     let dMin = Infinity;
     const candidats: Cible[] = [
-      ...p.joueurs.filter((o): o is Joueur => !!o && o !== j && !o.mort),
+      // les joueurs du camp d'en face (en équipes, jamais un allié)
+      ...p.joueurs.filter(
+        (o): o is Joueur => !!o && o !== j && !o.mort && !p.arene?.allies(o.siege, j.siege),
+      ),
       ...p.cibles('ennemis').filter((e) => Math.abs(e.x - j.cx) < 160),
     ];
     for (const o of candidats) {

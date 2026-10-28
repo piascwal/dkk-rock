@@ -198,12 +198,11 @@ export class Partie implements Contexte {
     return s;
   }
 
-  /** Retire le dernier joueur de l'ordinateur ajouté (s'il y en a un). */
-  retireIA(): void {
-    const s = this.arene?.ia?.sieges.at(-1);
-    if (s === undefined) return;
-    this.arene!.ia!.retire(s);
-    this.retireJoueur(s);
+  /** Retire un joueur de l'ordinateur (par défaut le dernier ajouté). */
+  retireIA(siege = this.arene?.ia?.sieges.at(-1)): void {
+    if (siege === undefined || !this.arene?.ia?.sieges.includes(siege)) return;
+    this.arene.ia.retire(siege);
+    this.retireJoueur(siege);
   }
 
   /** Une nouvelle manche sur la même carte, refaite à neuf. */

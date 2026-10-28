@@ -1,6 +1,7 @@
 import { HEROS } from '../entites/heros';
 import type { EtatVue } from '../jeu/vue';
-import { COULEURS_SIEGES } from '../rendu/indicateurs';
+import { couleurDuSiege } from '../rendu/couleurs-arene';
+import type { VueArene } from '../jeu/arene';
 import { el } from './elements';
 import { nomArene } from './noms-arene';
 import { portrait } from './portraits';
@@ -31,12 +32,15 @@ export class EcranVersus {
       this.cle = '';
       return;
     }
-    const presents = v!.joueurs.flatMap((j, s) => (j.present ? [[s, j.membre] as const] : []));
-    const cle = JSON.stringify([presents, noms, siegeLocal]);
+    // dans l'ordre des cases du salon : en équipes, les rouges puis les bleus
+    const presents = v!.joueurs
+      .flatMap((j, s) => (j.present ? [[s, j.membre] as const] : []))
+      .sort(([a], [b]) => (ar.places[a] ?? a) - (ar.places[b] ?? b));
+    const cle = JSON.stringify([presents, noms, siegeLocal, ar.equipes, ar.places]);
     if (cle !== this.cle) {
       this.cle = cle;
       this.bande.replaceChildren(
-        ...presents.map(([s, membre], i) => this.carte(s, membre, i, noms, siegeLocal)),
+        ...presents.map(([s, membre], i) => this.carte(ar, s, membre, i, noms, siegeLocal)),
       );
     }
     const n = String(Math.max(1, 3 - Math.floor(ar.minuteur / 60)));
@@ -50,6 +54,7 @@ export class EcranVersus {
   }
 
   private carte(
+    ar: VueArene,
     s: number,
     membre: number,
     i: number,
@@ -57,7 +62,7 @@ export class EcranVersus {
     siegeLocal: number,
   ): HTMLElement {
     const carte = el('div', '', `versus-carte ${i % 2 ? 'bas' : 'haut'}${s === siegeLocal ? ' moi' : ''}`);
-    carte.style.setProperty('--couleur', COULEURS_SIEGES[s % COULEURS_SIEGES.length]!);
+    carte.style.setProperty('--couleur', couleurDuSiege(ar, s));
     carte.style.animationDelay = `${i * 90}ms`;
     const img = el('img');
     img.src = portrait(HEROS[membre]?.qui ?? 'JBT');

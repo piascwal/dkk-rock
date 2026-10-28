@@ -3,7 +3,11 @@ import type { Evenement } from '../jeu/vue';
 
 /** Les messages de contrôle entre l'hôte et les joueurs (canal `ctrl`, fiable, en JSON ; voir protocole.ts). */
 
-export type MsgClient = { t: 'salut'; nom: string; membre: number; v: number } | { t: 'suivant' };
+export type MsgClient =
+  | { t: 'salut'; nom: string; membre: number; v: number }
+  | { t: 'suivant' }
+  /** au salon du battle royale : le joueur prend la case `n` (en équipes, il change de camp) */
+  | { t: 'place'; n: number };
 
 export type MsgHote =
   | { t: 'bienvenue'; siege: number; niveau: number; carte: string }
@@ -23,6 +27,7 @@ export function valideMsgClient(o: unknown): MsgClient | null {
   if (!o || typeof o !== 'object') return null;
   const m = o as Record<string, unknown>;
   if (m.t === 'suivant') return { t: 'suivant' };
+  if (m.t === 'place' && entier(m.n, 0, MAX_JOUEURS - 1)) return { t: 'place', n: m.n };
   if (
     m.t === 'salut' &&
     typeof m.nom === 'string' &&

@@ -1,6 +1,6 @@
 import { HAUTEUR_VUE, TUILE } from '../config';
 import type { EtatVue } from '../jeu/vue';
-import { COULEURS_SIEGES } from './indicateurs';
+import { couleurDuSiege } from './couleurs-arene';
 
 /**
  * Le battle royale à l'écran (d'après la vue) : un repère de couleur au-dessus de chaque joueur (plusieurs peuvent jouer le même
@@ -25,7 +25,7 @@ export function dessineArene(
     ctx.globalAlpha = s === siegeLocal ? 0.55 : 1;
     ctx.fillStyle = '#000';
     ctx.fillRect(x - 3, y - 1, 7, 4);
-    ctx.fillStyle = COULEURS_SIEGES[s % COULEURS_SIEGES.length]!;
+    ctx.fillStyle = couleurDuSiege(ar, s);
     ctx.fillRect(x - 2, y, 5, 1);
     ctx.fillRect(x - 1, y + 1, 3, 1);
     ctx.fillRect(x, y + 2, 1, 1);

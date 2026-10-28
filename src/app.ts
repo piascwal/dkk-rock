@@ -23,7 +23,6 @@ import { Recrue } from './ui/recrue';
 import { prepareInstallation } from './ui/installation';
 import { Bulles, Histoire } from './ui/dialogues';
 import { Hud } from './ui/hud';
-import { FilElimination } from './ui/fil-elim';
 import { controleurDeVersion, ecouteLaFenetre, joueEvenements, nomsDesJoueurs } from './ui/app-aides';
 import { Menus, type Actions } from './ui/menus';
 import { pleinEcran } from './ui/plein-ecran';
@@ -63,12 +62,13 @@ export class App implements Actions {
   private readonly tactile = new Tactile($('jeu'));
   private readonly finMini = new FinMiniJeu($('jeu'));
   private readonly menus = new Menus($('ecran'), this);
-  private readonly fil = new FilElimination($('jeu'));
   private readonly arene = new PanneauArene($('jeu'), {
     suivant: () => this.suivant(),
     inviter: () => (this.mettreEnPause(), this.menus.inviter()),
     quitte: () => this.quitte(),
     partie: () => this.partie,
+    place: (n) =>
+      this.client ? this.client.envoie({ t: 'place', n }) : this.partie?.arene?.choisitPlace(0, n),
   });
   private partie: Partie | null = null;
   private hote: Hote | null = null;
@@ -179,7 +179,7 @@ export class App implements Actions {
   private joue(p: Partie, essai: (() => void) | null = null): void {
     this.arreteTout();
     this.suiviRecrue.oublie();
-    this.fil.vide();
+    this.arene.videFil();
     this.partie = p;
     this.essai = essai;
     this.entreEnJeu();
@@ -327,9 +327,7 @@ export class App implements Actions {
   private evenements(l: readonly Evenement[]): void {
     this.rendu.evenements(l);
     const siege = this.client?.siege ?? 0;
-    joueEvenements(l, this.derniereVue, siege, this.bruitages, this.bulles, (e) =>
-      this.fil.ajoute(e, nomsDesJoueurs(this.client, this.hote, this.sauvegarde.pseudo), siege),
-    );
+    joueEvenements(l, this.derniereVue, siege, this.bruitages, this.bulles, (e) => this.arene.elimination(e));
   }
 
   private affiche(v: EtatVue, carte: Carte, siege: number): void {

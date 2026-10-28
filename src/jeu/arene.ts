@@ -17,11 +17,13 @@ import type { NiveauLu } from '../niveaux/format';
 import type { CacheCibles } from './cibles';
 import type { IAArene, NiveauIA } from './arene-ia';
 import type { Cible } from './contexte';
+import { NOMS_EQUIPES, Places } from './equipes';
 import type { Partie } from './partie';
 
 /**
  * Le battle royale : jusqu'à 8 joueurs sur une petite carte faite pour ça (voir niveaux/arenes.ts, ou un niveau de l'éditeur),
- * 3 vies chacun, et les tirs des héros blessent les autres héros. On réapparaît loin des autres ; le dernier en lice gagne.
+ * 3 vies chacun, et les tirs des héros blessent les autres héros (en équipes, seulement ceux du camp d'en face : voir equipes.ts).
+ * On réapparaît loin des adversaires ; le dernier en lice gagne (en équipes, la dernière équipe).
  *
  * Les étapes : le salon (en ligne, on attend les joueurs en se dégourdissant les jambes, sans dégâts), le compte à rebours (tout
  * le monde est placé, figé), le combat, la fin (le classement ; « suivant » relance une manche sur la même carte).
@@ -40,6 +42,8 @@ const PROTECTION = 150;
 const FIN_MIN = 2 * TICKS_PAR_SECONDE;
 
 export interface ReglesArene {
+  /** deux équipes (rouge, bleue) plutôt que chacun pour soi : les tirs alliés ne blessent pas, la dernière équipe en lice gagne */
+  equipes?: boolean;
   /** le niveau des joueurs de l'ordinateur (hors ligne), moyen par défaut */
   niveauIA?: NiveauIA;
 }
@@ -53,6 +57,9 @@ export interface VueArene {
   vies: number[];
   eliminations: number[];
   rangs: number[];
+  equipes: boolean;
+  /** par siège : sa case au salon (0 à 7 ; en équipes, 0 à 3 rouge, 4 à 7 bleue), -1 s'il n'est pas là */
+  places: number[];
 }
 
 /**
@@ -77,6 +84,8 @@ export class Arene {
   /** les départs placés dans la carte, par siège (case y × largeur + x ; -1 : aucun) : on y commence, et on y réapparaît */
   private departs: number[] = [];
   private cibles = new Map<number, Cible[]>();
+  /** les cases du salon, qui font les camps en équipes */
+  readonly places = new Places();
   /** les joueurs de l'ordinateur (hors ligne) */
   ia: IAArene | null = null;
 
@@ -85,6 +94,30 @@ export class Arene {
     enLigne: boolean,
   ) {
     this.etape = enLigne ? 'salon' : 'compte';
+  }
+
+  get equipes(): boolean {
+    return !!this.regles.equipes;
+  }
+
+  /** Deux joueurs du même camp (en équipes : de la même équipe ; chacun pour soi : le même joueur) ? */
+  allies(a: number, b: number): boolean {
+    return this.places.allies(a, b, this.equipes);
+  }
+
+  /** Au salon : un joueur prend une case libre (en équipes, il change de camp). */
+  choisitPlace(siege: number, n: number): void {
+    if (this.etape === 'salon') this.places.choisit(siege, n);
+  }
+
+  /** Au salon, l'hôte passe de chacun pour soi aux équipes (ou l'inverse) : les camps se refont, équilibrés. */
+  changeMode(p: Partie, equipes: boolean): void {
+    if (this.etape !== 'salon') return;
+    this.regles.equipes = equipes;
+    this.places.redistribue(
+      p.joueurs.flatMap((j) => (j ? [j.siege] : [])),
+      equipes,
+    );
   }
 
   /** Le combat est-il commencé (les tirs blessent, les vies comptent) ? */
@@ -121,6 +154,8 @@ export class Arene {
       return p.carte.solide(d[0], d[1]) || p.carte.solide(d[0], d[1] - 1) ? -1 : d[1] * L + d[0];
     });
     this.cibles.clear();
+    // les joueurs déjà là (hors ligne : tous) prennent une case
+    for (const j of p.joueurs) if (j) this.places.attribue(j.siege, this.equipes);
   }
 
   /** Le début d'une manche : chacun a ses vies et sa place, loin des autres, puis le compte à rebours. */
@@ -138,8 +173,8 @@ export class Arene {
     joueurs.forEach((j, i) => (j.membre = membres[i % membres.length]!));
     for (const j of joueurs) {
       this.vies[j.siege] = VIES_ARENE;
-      // chacun sur son départ, s'il est placé ; sinon loin des autres
-      const k = this.departs[j.siege] ?? -1;
+      // chacun sur le départ de sa case (J1 à J8 dans l'éditeur ; en équipes, J1 à J4 la rouge), s'il est placé ; sinon loin des autres
+      const k = this.departs[this.places.cases[j.siege]!] ?? -1;
       const [x, y] = k >= 0 ? this.position(p, k) : this.pointLibre(p, j.siege);
       j.reapparait(x, y, j.membre);
       j.invulnerable = COMPTE + PROTECTION;
@@ -153,7 +188,14 @@ export class Arene {
   ciblesDuTireur(cache: CacheCibles, tireur: number): readonly Cible[] {
     let l = this.cibles.get(tireur);
     if (!l) {
-      l = [...cache.ennemis, ...cache.heros.filter((h) => h.id !== tireur)];
+      // les héros du camp d'en face (chacun pour soi : tous les autres) ; jamais soi-même, jamais un allié
+      const siege = (cache.heros.find((h) => h.id === tireur) as Joueur | undefined)?.siege;
+      l = [
+        ...cache.ennemis,
+        ...cache.heros.filter(
+          (h) => h.id !== tireur && (siege === undefined || !this.allies(siege, (h as Joueur).siege)),
+        ),
+      ];
       this.cibles.set(tireur, l);
     }
     return l;
@@ -198,6 +240,7 @@ export class Arene {
 
   /** Un joueur arrive : au salon, il joue ; en pleine manche, il regarde jusqu'à la suivante. */
   rejoint(j: Joueur): void {
+    this.places.attribue(j.siege, this.equipes);
     if (this.etape === 'salon') return;
     this.vies[j.siege] = 0;
     j.mort = true;
@@ -210,6 +253,7 @@ export class Arene {
       this.vies[siege] = 0;
       this.elimine(p, siege);
     }
+    this.places.libere(siege);
   }
 
   /** Une vie de plus (un cœur, une cage), jusqu'au maximum. */
@@ -231,7 +275,8 @@ export class Arene {
    * deux), sinon parmi quelques cases libres tirées au sort.
    */
   pointLibre(p: Partie, siege: number): [number, number] {
-    const autres = p.joueurs.filter((o) => o && !o.mort && o.siege !== siege);
+    // loin des adversaires (les alliés, eux, peuvent être tout près)
+    const autres = p.joueurs.filter((o) => o && !o.mort && o.siege !== siege && !this.allies(o.siege, siege));
     const departs = this.departs.filter((k) => k >= 0);
     const liste = departs.length >= 2 ? departs : this.cases;
     let meilleur = this.caseAuHasard(p, liste);
@@ -252,6 +297,8 @@ export class Arene {
       vies: [...this.vies],
       eliminations: [...this.eliminations],
       rangs: [...this.rangs],
+      equipes: this.equipes,
+      places: [...this.places.cases],
     };
   }
 
@@ -272,11 +319,32 @@ export class Arene {
   }
 
   private elimine(p: Partie, siege: number): void {
-    const enLice = p.joueurs.filter((j) => j && this.vies[j.siege]! > 0);
-    this.rangs[siege] = enLice.length + 1;
+    const enLice = p.joueurs.filter((j): j is Joueur => !!j && this.vies[j.siege]! > 0);
     p.texte(p.joueurs[siege]?.cx ?? 0, (p.joueurs[siege]?.corps.y ?? 0) - 12, 'ÉLIMINÉ', '#ff5a5a');
+    if (this.equipes) {
+      // en équipes : la manche finit quand il ne reste qu'un camp ; ses joueurs sont premiers (même éliminés), les autres seconds
+      this.rangs[siege] = 2;
+      const camps = new Set(enLice.map((j) => this.places.camp(j.siege, true)));
+      if (camps.size > 1) return;
+      for (const j of p.joueurs)
+        if (j) this.rangs[j.siege] = camps.has(this.places.camp(j.siege, true)) ? 1 : 2;
+      const [camp] = [...camps];
+      if (camp !== undefined)
+        p.texte(
+          enLice[0]!.cx,
+          enLice[0]!.corps.y - 24,
+          `ÉQUIPE ${NOMS_EQUIPES[camp]!.toUpperCase()}`,
+          '#ffd23f',
+        );
+      return this.termine(p);
+    }
+    this.rangs[siege] = enLice.length + 1;
     if (enLice.length > 1) return;
     if (enLice[0]) this.rangs[enLice[0].siege] = 1;
+    this.termine(p);
+  }
+
+  private termine(p: Partie): void {
     this.etape = 'fin';
     this.minuteur = 0;
     p.son('victoire', 0, 0);

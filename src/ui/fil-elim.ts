@@ -1,4 +1,5 @@
-import { COULEURS_SIEGES } from '../rendu/indicateurs';
+import { couleurDuSiege } from '../rendu/couleurs-arene';
+import type { VueArene } from '../jeu/arene';
 import type { Evenement } from '../jeu/vue';
 import { el } from './elements';
 import { nomArene } from './noms-arene';
@@ -20,7 +21,12 @@ export class FilElimination {
   }
 
   /** Une élimination reçue de la partie ; `noms` : les pseudos du salon, par siège. */
-  ajoute(e: Extract<Evenement, { k: 'elim' }>, noms: readonly string[], siegeLocal: number): void {
+  ajoute(
+    e: Extract<Evenement, { k: 'elim' }>,
+    noms: readonly string[],
+    siegeLocal: number,
+    ar?: VueArene,
+  ): void {
     const entier = (n: unknown) =>
       Number.isInteger(n) && (n as number) >= 0 && (n as number) < 8 ? (n as number) : -1;
     const victime = entier(e.victime);
@@ -28,7 +34,7 @@ export class FilElimination {
     const tueur = entier(e.tueur);
     const nom = (s: number) => {
       const b = el('b', nomArene(noms, s));
-      b.style.color = COULEURS_SIEGES[s % COULEURS_SIEGES.length]!;
+      b.style.color = couleurDuSiege(ar, s);
       if (s === siegeLocal) b.classList.add('moi');
       return b;
     };

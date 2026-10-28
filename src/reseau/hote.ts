@@ -138,6 +138,8 @@ export class Hote {
       // au salon du battle royale, c'est l'hôte qui lance la partie
       if (m.t === 'suivant') {
         if (this.partie().arene?.etape !== 'salon') this.partie().suivant();
+      } else if (m.t === 'place') {
+        if (distant) this.partie().arene?.choisitPlace(distant.siege, m.n);
       } else if (m.t === 'salut' && !distant) {
         if (m.v !== VERSION_PROTOCOLE) return this.envoie(liaison, { t: 'refus', raison: 'version' });
         const siege = this.siegeLibre();

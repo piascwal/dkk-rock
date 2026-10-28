@@ -238,9 +238,14 @@ Menu principal → **Battle royale** → **Solo** ou **Multi**, puis une carte (
 d'ennemis du niveau, on n'y affronte que les autres joueurs), et :
 
 - **solo**, contre l'ordinateur (1 à 7 adversaires, de niveau facile, moyen ou difficile) : de quoi s'entraîner ou essayer une carte ;
-- **multi**, en ligne : un salon s'ouvre (Wi-Fi, ou code Internet via « Inviter des amis ») ; les amis le rejoignent par « Rejoindre
-  des amis », s'échauffent sans se blesser ; l'hôte peut combler avec des joueurs de l'ordinateur (« + IA », « − IA ») puis lance
-  la partie (jusqu'à 8 joueurs). Pas de flèches vers les adversaires : on se cherche.
+- **multi**, en ligne : un salon s'ouvre (Wi-Fi, ou un lien envoyé par le partage du téléphone via « Inviter des amis ») ; les
+  amis le rejoignent, s'échauffent sans se blesser, et chacun prend une **case** du salon (« Venir ») ; l'hôte comble les cases
+  libres avec des joueurs de l'ordinateur (« + IA », « ✕ » pour en retirer un) puis lance la partie (jusqu'à 8 joueurs).
+
+Deux modes, au choix dans les réglages (et, chez l'hôte, au salon) : **chacun pour soi**, ou **en équipes** — rouge contre bleue,
+quatre cases chacune (`src/jeu/equipes.ts`) : prendre une case, c'est choisir son camp ; hors ligne, les camps s'équilibrent
+d'eux-mêmes. En équipes, les tirs alliés ne blessent pas, chaque joueur a la couleur de son équipe (repère, fil, VERSUS),
+l'ordinateur ne vise que le camp d'en face, et la dernière équipe en lice gagne. Pas de flèches vers les adversaires : on se cherche.
 
 Les cartes sont faites pour ce mode, pas celles de l'histoire : petites (72 × 36 tuiles), closes, tout en hauteur, pour se
 chercher en haut, en bas, à gauche et à droite par les échelles, les plateformes et les tyroliennes (certaines à jointures). Quatre
@@ -255,7 +260,9 @@ Chaque manche s'ouvre sur un écran **VERSUS** (`src/ui/versus.ts`) : la carte d
 portrait du personnage tiré au sort pour cette manche, sans doublon tant qu'il y en a, et son pseudo ; « Ordi N » pour
 l'ordinateur), le « VS » claque, puis 3, 2, 1. Trois vies chacun ; les tirs blessent les autres joueurs (jamais soi-même), sans
 aucune protection après un coup reçu ; une élimination revient à celui qui a touché en dernier, et le fil en haut à droite
-l'annonce (« A a éliminé B », « B s'est éliminé tout seul » ; `src/ui/fil-elim.ts`). On réapparaît loin des autres, avec quelques
+l'annonce (« A a éliminé B », « B s'est éliminé tout seul » ; `src/ui/fil-elim.ts`). Les cœurs se comptent au quart près, façon Zelda :
+un tir d'un autre joueur retire ses dégâts en quarts (une baguette un quart, un accord un demi-cœur, une explosion deux cœurs),
+un coup d'ennemi un cœur entier. On réapparaît loin des autres, avec quelques
 secondes de protection. Les cages et les cœurs redonnent une vie (5 au plus).
 Le dernier en lice gagne ; le classement s'affiche, et « Rejouer » relance une manche sur la même carte. Plusieurs joueurs peuvent
 jouer le même héros : un repère de couleur au-dessus de chacun dit qui est qui.
