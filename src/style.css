@@ -106,8 +106,11 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 0.6rem;
+  /* centré par les deux cales ci-dessous, pas par justify-content : un menu trop haut pour l'écran défile alors depuis
+     son titre (centré, son haut serait coupé et hors d'atteinte) */
+  justify-content: flex-start;
+  --ecart: 0.6rem;
+  gap: var(--ecart);
   padding: max(12px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 12px
     max(16px, env(safe-area-inset-left));
   background:
@@ -123,12 +126,57 @@ body:has(#ecran:not(:empty)) .fil-elim {
   visibility: hidden;
 }
 
+/* au doigt, des boutons d'au moins 36 px de haut (à la souris, la taille du texte suffit) */
+@media (pointer: coarse) {
+  .ecran button,
+  .ecran input,
+  .ecran select,
+  .passer-histoire {
+    min-height: 36px;
+    min-width: 36px;
+  }
+}
+
+/* téléphone couché : le menu titre garde ses boutons fins pour tenir sans défiler, et les listes (les arènes...) passent sur deux
+   colonnes */
+@media (pointer: coarse) and (max-height: 450px) {
+  .titre-ouvert .ecran button {
+    min-height: 0;
+  }
+
+  .ecran .liste {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 /* un téléphone couché : l'écran titre tient sans défiler */
 @media (max-height: 450px) {
   .ecran {
-    gap: 0.4rem;
+    --ecart: 0.4rem;
     padding-bottom: 6px;
   }
+}
+
+.ecran::before,
+.ecran::after {
+  content: '';
+  flex: none;
+}
+
+.ecran::before {
+  margin-top: auto;
+  margin-bottom: calc(-1 * var(--ecart));
+}
+
+.ecran::after {
+  margin-top: calc(-1 * var(--ecart));
+  margin-bottom: auto;
+}
+
+/* l'écran titre se tient aussi en portrait (on y choisit l'éditeur de niveau) ; le jeu, lui, demande de tourner l'écran */
+.titre-ouvert #tourne {
+  display: none !important;
 }
 
 .ecran:empty {

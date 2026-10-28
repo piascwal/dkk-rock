@@ -61,6 +61,7 @@ export class Menus {
   montre(...enfants: HTMLElement[]): void {
     if (this.minuteur) clearInterval(this.minuteur);
     this.minuteur = null;
+    document.body.classList.remove('titre-ouvert');
     this.ecran.replaceChildren(...enfants);
     ajusteColonnes(this.ecran); // des boutons en colonne, en plusieurs colonnes si l'écran est trop bas
   }
@@ -105,6 +106,7 @@ export class Menus {
         : el('span'),
       el('p', texteVersion(), 'version version-coin'),
     );
+    document.body.classList.add('titre-ouvert');
   }
 
   /** La carte du monde : on choisit un niveau débloqué (par défaut la partie en cours, sinon le dernier ouvert). */
