@@ -11,43 +11,49 @@ export function ecranInviter(m: Menus, a: Actions): void {
   const hote = a.ouvreHote();
   if (!hote) return m.pause();
   const statut = el('p', '', 'statut');
+  // les messages du partage (le statut du Wi-Fi, lui, se rafraîchit chaque seconde)
+  const info = el('p', '', 'aide');
   const codeEl = el('div', hote.code ?? '', 'code');
   const joueurs = el('div', '', 'liste');
   const lien = () => lienInvitation(location.href, hote.code ?? '');
-  const partage = bouton('Partager le lien', () => {
-    if (navigator.share)
-      void navigator
-        .share({
-          title: 'DKK : Rock Never Dies',
-          text: `Rejoins ma partie ! Code ${hote.code}`,
-          url: lien(),
-        })
-        .catch(() => {});
-    else void navigator.clipboard?.writeText(lien()).then(() => (statut.textContent = 'Lien copié.'));
-  });
-  partage.hidden = !hote.code;
-  const internet = bouton('Créer un code Internet', () => {
-    internet.disabled = true;
-    statut.textContent = 'Création du salon...';
+  // le partage du système (Messages, WhatsApp...) s'ouvre par-dessus le jeu : on envoie le lien sans quitter l'application
+  const partager = () => {
+    if (!navigator.share) {
+      void navigator.clipboard
+        ?.writeText(lien())
+        .then(() => (info.textContent = 'Lien copié : collez-le à vos amis.'));
+      return;
+    }
+    navigator
+      .share({ title: 'DKK : Rock Never Dies', text: `Rejoins ma partie ! Code ${hote.code}`, url: lien() })
+      .catch((e: Error) => {
+        // le navigateur refuse un partage trop longtemps après le toucher (le temps de créer le code) : un toucher de plus
+        if (e.name === 'NotAllowedError') info.textContent = 'Code prêt : touchez « Partager le lien ».';
+      });
+  };
+  const partage = bouton(hote.code ? 'Partager le lien' : 'Inviter par un lien', () => {
+    if (hote.code) return partager();
+    partage.disabled = true;
+    info.textContent = 'Création du code...';
     hote.ouvreInternet().then(
       (code) => {
         codeEl.textContent = code;
-        partage.hidden = false;
-        internet.hidden = true;
+        partage.disabled = false;
+        partage.textContent = 'Partager le lien';
+        partager();
       },
       () => {
-        statut.textContent = 'Impossible de joindre les serveurs de rencontre.';
-        internet.disabled = false;
+        info.textContent = 'Impossible de joindre les serveurs de rencontre.';
+        partage.disabled = false;
       },
     );
   });
-  internet.hidden = !!hote.code;
   const rafraichit = () => {
     statut.textContent =
       hote.wifi === 'ouvert'
         ? 'Partie visible sur votre Wi-Fi.'
         : hote.wifi === 'erreur'
-          ? 'Wi-Fi indisponible : utilisez un code Internet.'
+          ? 'Wi-Fi indisponible : envoyez un lien.'
           : 'Ouverture sur le Wi-Fi...';
     joueurs.replaceChildren(
       ...[...hote.distants.values()].map((d) =>
@@ -58,18 +64,17 @@ export function ecranInviter(m: Menus, a: Actions): void {
   };
   hote.onChange = rafraichit;
   if (hote.wifi === 'ferme') void hote.ouvreWifi();
-  const ligneBoutons = el('div', '', 'ligne');
-  ligneBoutons.append(internet, partage);
   m.montre(
     el('h2', 'Inviter des amis'),
     el(
       'p',
-      'Sur le même Wi-Fi, vos amis voient la partie dans « Rejoindre des amis ». Sinon, donnez-leur un code.',
+      'Sur le même Wi-Fi, vos amis voient la partie dans « Rejoindre des amis ». Sinon, envoyez-leur un lien : il ouvre le jeu et les fait entrer.',
       'aide',
     ),
     statut,
     codeEl,
-    ligneBoutons,
+    partage,
+    info,
     joueurs,
     bouton('Retour au jeu', () => a.reprend(), 'principal'),
   );
