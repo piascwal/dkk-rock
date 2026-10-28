@@ -103,7 +103,7 @@ export class Menus {
             'aide',
           )
         : el('span'),
-      el('p', texteVersion(), 'version'),
+      el('p', texteVersion(), 'version version-coin'),
     );
   }
 

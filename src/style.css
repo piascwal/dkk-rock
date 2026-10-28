@@ -117,6 +117,20 @@ body {
   z-index: 10;
 }
 
+/* un menu ouvert par-dessus le salon du battle royale (Inviter des amis) : le panneau du salon et le fil des éliminations s'effacent */
+body:has(#ecran:not(:empty)) .arene-panneau,
+body:has(#ecran:not(:empty)) .fil-elim {
+  visibility: hidden;
+}
+
+/* un téléphone couché : l'écran titre tient sans défiler */
+@media (max-height: 450px) {
+  .ecran {
+    gap: 0.4rem;
+    padding-bottom: 6px;
+  }
+}
+
 .ecran:empty {
   display: none;
 }
@@ -133,7 +147,8 @@ body {
     8px 8px 0 #ff2e93,
     12px 12px 0 #000;
   letter-spacing: 0.12em;
-  margin: 0 0 8px;
+  /* un peu de marge au-dessus du logo, proportionnée à la hauteur de l'écran */
+  margin: clamp(4px, 3vh, 36px) 0 8px;
   padding-right: 12px;
 }
 
@@ -920,6 +935,15 @@ h2 {
   font-size: 0.8rem;
   opacity: 0.85;
   letter-spacing: 0.05em;
+}
+
+/* le numéro de version, en bas à droite de l'écran titre : hors du flux, il ne fait pas défiler la page */
+.version-coin {
+  position: fixed;
+  right: calc(10px + env(safe-area-inset-right));
+  bottom: calc(6px + env(safe-area-inset-bottom));
+  margin: 0;
+  pointer-events: none;
 }
 
 #maj {
