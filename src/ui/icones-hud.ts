@@ -1,3 +1,4 @@
+import { PV_HEROS, QUARTS_PAR_COEUR } from '../config';
 import { armeRamassee } from '../entites/armes';
 import { iconeArme } from '../rendu/dessins-objets';
 import { FEUILLES_DECOR } from '../rendu/feuilles-objets';
@@ -108,4 +109,20 @@ export function iconeDeLArme(variante: number, hauteur = 14 * ZOOM): Icone {
 export function rangeeDIcones(i: Icone, n: number): string {
   const img = `<img class="px" src="${i.url}" width="${i.w}" height="${i.h}" alt="">`;
   return img.repeat(Math.max(0, n));
+}
+
+/**
+ * Les cœurs du héros, au quart près (façon Zelda) : `pv` en quarts de cœur. Chaque cœur est un cœur éteint, recouvert du cœur
+ * rouge découpé selon ses quarts (voir `.coeur-q` dans le CSS).
+ */
+export function coeursEnQuarts(pv: number): string {
+  const i = icone('coeur');
+  const img = (classe: string) =>
+    `<img class="${classe}" src="${i.url}" width="${i.w}" height="${i.h}" alt="">`;
+  let html = '';
+  for (let c = 0; c < PV_HEROS / QUARTS_PAR_COEUR; c++) {
+    const q = Math.max(0, Math.min(QUARTS_PAR_COEUR, pv - c * QUARTS_PAR_COEUR));
+    html += `<span class="coeur-q q${q}">${img('px vide')}${img('px plein')}</span>`;
+  }
+  return html;
 }

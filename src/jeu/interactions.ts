@@ -1,4 +1,4 @@
-import { DUREE_INVINCIBLE, PV_HEROS, VIES_MAX_RESEAU } from '../config';
+import { DUREE_INVINCIBLE, PV_HEROS, QUARTS_PAR_COEUR, VIES_MAX_RESEAU } from '../config';
 import { armeRamassee } from '../entites/armes';
 import { Chauffage } from '../entites/chauffage';
 import { HEROS } from '../entites/heros';
@@ -72,7 +72,7 @@ export function interactions(p: Partie): void {
           // le cœur d'un tonneau WOG : un cœur de plus dans le HUD de celui qui le ramasse, 3 au plus ; pas de vie en plus
           // (seules les cages en donnent)
           const soigne = j.pv < PV_HEROS;
-          if (soigne) j.pv++;
+          if (soigne) j.pv = Math.min(PV_HEROS, j.pv + QUARTS_PAR_COEUR);
           e.fini = true;
           p.son('liberation', e.corps.x, e.corps.y);
           p.texte(

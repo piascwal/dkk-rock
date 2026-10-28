@@ -438,6 +438,47 @@ h2 {
   color: var(--rouge);
 }
 
+/* un cœur au quart près : le cœur éteint, et par-dessus le cœur rouge découpé (q1 : un quart en bas à gauche, q2 : la moitié
+   gauche, q3 : tout sauf le quart en bas à droite) */
+.coeur-q {
+  position: relative;
+  display: inline-block;
+  margin-right: 1px;
+  line-height: 0;
+  vertical-align: top;
+}
+
+.coeur-q .px {
+  margin: 0;
+  vertical-align: top;
+}
+
+.coeur-q .vide {
+  filter: grayscale(1) brightness(0.45);
+}
+
+.coeur-q .plein {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.coeur-q.q0 .plein {
+  display: none;
+}
+
+.coeur-q.q1 .plein {
+  clip-path: polygon(0 50%, 50% 50%, 50% 100%, 0 100%);
+}
+
+.coeur-q.q2 .plein {
+  clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
+}
+
+.coeur-q.q3 .plein {
+  clip-path: polygon(0 0, 100% 0, 100% 50%, 50% 50%, 50% 100%, 0 100%);
+}
+
 .etoiles {
   color: var(--jaune);
 }

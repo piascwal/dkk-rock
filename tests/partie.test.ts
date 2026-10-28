@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DUREE_INVINCIBLE, PV_HEROS, TUILE, VIES_DEPART } from '../src/config';
+import { DUREE_INVINCIBLE, PV_HEROS, QUARTS_PAR_COEUR, TUILE, VIES_DEPART } from '../src/config';
 import { C } from '../src/jeu/commandes';
 import { Partie } from '../src/jeu/partie';
 import { PHASES_MINI_JEUX } from '../src/jeu/mini-jeux';
@@ -196,7 +196,7 @@ describe('la partie', () => {
       const { p, j, coeur } = casse(T.TONNEAU_WOG, 'coeur');
       j.pv = 1;
       ramasse(p, j, coeur);
-      expect(j.pv).toBe(2);
+      expect(j.pv).toBe(1 + QUARTS_PAR_COEUR); // un cœur entier (quatre quarts)
       expect(coeur.fini).toBe(true);
     });
 

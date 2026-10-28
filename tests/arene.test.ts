@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { HEROS } from '../src/entites/heros';
-import { HEROS_HAUTEUR, TUILE } from '../src/config';
+import { HEROS_HAUTEUR, PV_HEROS, TUILE } from '../src/config';
 import { departEn, placeDepart, retireDepart } from '../src/editeur/departs';
 import { DocumentNiveau } from '../src/editeur/document';
 import { joueursConseilles, VIES_ARENE } from '../src/jeu/arene';
@@ -64,16 +64,16 @@ describe('le battle royale', () => {
     expect(p.arene!.etape).toBe('salon');
     faceAFace(p);
     pas(p, 40, [C.TIR, 0]);
-    expect(p.joueurs[1]!.pv).toBe(3);
+    expect(p.joueurs[1]!.pv).toBe(PV_HEROS);
     p.suivant(); // l'hôte lance : chacun est placé ailleurs, puis le compte à rebours
     pas(p, 190);
     expect(p.arene!.etape).toBe('combat');
     faceAFace(p);
     const [a, b] = [p.joueurs[0]!, p.joueurs[1]!];
     pas(p, 40, [C.TIR, 0]);
-    expect(b.pv).toBeLessThan(3);
+    expect(b.pv).toBeLessThan(PV_HEROS);
     expect(b.dernierTireur).toBe(a.id);
-    expect(a.pv).toBe(3);
+    expect(a.pv).toBe(PV_HEROS);
   });
 
   it('une vie perdue : on revient loin des autres ; plus de vie : éliminé, et le dernier gagne', () => {
@@ -224,7 +224,7 @@ describe('le battle royale', () => {
       faceAFace(p);
       let n = 0;
       for (let t = 0; t < 300; t++) {
-        p.joueurs[0]!.pv = 3; // la cible tient le coup
+        p.joueurs[0]!.pv = PV_HEROS; // la cible tient le coup
         pas(p, 1);
         if (p.commandes[1]! & C.TIR) n++;
       }

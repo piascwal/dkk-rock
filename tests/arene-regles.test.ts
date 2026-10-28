@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { PV_HEROS, QUARTS_PAR_COEUR } from '../src/config';
 import { HEROS } from '../src/entites/heros';
 import { BAGUETTE } from '../src/entites/projectiles-defs';
 import { Partie } from '../src/jeu/partie';
@@ -35,7 +36,23 @@ describe('le battle royale : règles de combat', () => {
     expect(b.invulnerable).toBe(0);
     p.avance();
     b.blesse(1, p, 1);
-    expect(b.pv).toBe(1);
+    expect(b.pv).toBe(PV_HEROS - 2 * QUARTS_PAR_COEUR); // hors d'un tir de joueur : un cœur par coup
+  });
+
+  it('les tirs entre joueurs comptent en quarts de cœur : une baguette, un quart ; un accord, un demi-cœur', () => {
+    const p = combat(2);
+    const [a, b] = [p.joueurs[0]!, p.joueurs[1]!];
+    const tir = (degats: number) => {
+      p.tireur = a.id;
+      b.blesse(degats, p, 1);
+      p.tireur = null;
+      p.avance();
+    };
+    b.invulnerable = 0;
+    tir(1);
+    expect(b.pv).toBe(PV_HEROS - 1);
+    tir(2);
+    expect(b.pv).toBe(PV_HEROS - 3);
   });
 
   it('chaque manche tire les personnages au hasard, sans doublon', () => {

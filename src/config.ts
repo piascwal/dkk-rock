@@ -44,7 +44,9 @@ export const VIES_DEPART = 5;
 export const VIES_MAX_RESEAU = 255;
 /** La durée de l'invincibilité du cœur d'or WOG : dix secondes (en ticks). */
 export const DUREE_INVINCIBLE = 600;
-export const PV_HEROS = 3;
+/** Les points de vie d'un héros se comptent en quarts de cœur (façon Zelda) : trois cœurs. */
+export const QUARTS_PAR_COEUR = 4;
+export const PV_HEROS = 3 * QUARTS_PAR_COEUR;
 export const SPECIAUX_DEPART = 3;
 
 /** Délai avant de réapparaître après une mort (ticks). */

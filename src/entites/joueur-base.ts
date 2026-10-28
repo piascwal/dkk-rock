@@ -1,4 +1,11 @@
-import { HEROS_HAUTEUR, HEROS_LARGEUR, INVULNERABLE, PV_HEROS, SPECIAUX_DEPART } from '../config';
+import {
+  HEROS_HAUTEUR,
+  HEROS_LARGEUR,
+  INVULNERABLE,
+  PV_HEROS,
+  QUARTS_PAR_COEUR,
+  SPECIAUX_DEPART,
+} from '../config';
 import { EtatCommandes } from '../jeu/commandes';
 import type { Camp, Cible, Contexte, Tyrolienne } from '../jeu/contexte';
 import { nouveauCorps, type Corps } from '../monde/physique';
@@ -104,7 +111,10 @@ export abstract class JoueurBase implements Cible, EtatSpecial {
     if (this.mort || this.invulnerable > 0 || this.invincible > 0 || this.dejaBlesse === ctx.tick) return;
     this.dejaBlesse = ctx.tick;
     this.dernierTireur = ctx.tireur ?? null;
-    this.pv -= Math.max(1, Math.round(degats));
+    // les dégâts se comptent en cœurs (un coup d'ennemi : un cœur), sauf le tir d'un autre joueur en battle royale : en quarts,
+    // une baguette prend un quart, un accord un demi-cœur, une explosion deux cœurs
+    const entreJoueurs = !!ctx.arene && ctx.tireur != null;
+    this.pv -= Math.max(1, Math.round(entreJoueurs ? degats : degats * QUARTS_PAR_COEUR));
     // en battle royale, aucune protection après un coup : le suivant touche aussi
     if (!ctx.arene) this.invulnerable = INVULNERABLE;
     this.corps.vx = dx * 2.5;
