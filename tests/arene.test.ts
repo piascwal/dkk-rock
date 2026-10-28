@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { HEROS } from '../src/entites/heros';
 import { HEROS_HAUTEUR, TUILE } from '../src/config';
 import { departEn, placeDepart, retireDepart } from '../src/editeur/departs';
 import { DocumentNiveau } from '../src/editeur/document';
@@ -217,6 +218,8 @@ describe('le battle royale', () => {
       const p = new Partie({ niveau: TOUR, drapeau: -1, vies: 0, score: 0 });
       for (let s = 0; s < 2; s++) p.ajouteJoueur(s, s);
       p.ouvreArene({ ennemis: false, niveauIA: niveau }, false, [1]);
+      // le même personnage des deux côtés (la manche les tire au hasard) : JBG, ses accords ne tuent pas la cible en un coup
+      p.joueurs[0]!.membre = p.joueurs[1]!.membre = HEROS.findIndex((h) => h.qui === 'JBG');
       pas(p, 190);
       faceAFace(p);
       let n = 0;
