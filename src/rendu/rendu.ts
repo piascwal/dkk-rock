@@ -228,8 +228,12 @@ export class Rendu {
     const suivi = moi && moi.present && !moi.mort ? moi : vue.joueurs.find((j) => j.present && !j.mort);
     if (suivi) this.camera.suit(suivi.x, suivi.y, this.largeur, carte.largeur * TUILE, carte.hauteur * TUILE);
     const s = vue.secousse;
-    const camX = this.camera.x + (s ? (Math.random() - 0.5) * s * 0.6 : 0);
-    const camY = this.camera.y + (s ? (Math.random() - 0.5) * s * 0.6 : 0);
+    // la caméra se cale sur les pixels de la toile (1/densité de pixel du jeu), pas sur les pixels du jeu entiers : le héros
+    // court à 2,5 pixels du jeu par pas, et un décor arrondi au pixel entier avancerait de 2, 3, 2, 3... (le défilement
+    // tremblait) ; tout ce qui se dessine à une position entière du monde moins la caméra tombe ainsi sur un pixel de l'écran
+    const grille = (v: number) => Math.round(v * this.densite) / this.densite;
+    const camX = grille(this.camera.x + (s ? (Math.random() - 0.5) * s * 0.6 : 0));
+    const camY = grille(this.camera.y + (s ? (Math.random() - 0.5) * s * 0.6 : 0));
 
     // en traversée, le ferry avance : le fond défile en plus de la caméra
     const decalage = Math.max(0, vue.traversee) * VITESSE_FERRY;
@@ -304,7 +308,7 @@ export class Rendu {
       if (v.g !== G.VAN_REACTEUR || v.e !== 4) continue;
       // le van à réacteur décolle : la flamme suit le van qui se cabre, plein gaz
       ctx.save();
-      ctx.translate(Math.round(v.x - camX), Math.round(v.y - camY));
+      ctx.translate(Math.round(v.x) - camX, Math.round(v.y) - camY);
       ctx.rotate(CABRE);
       flammeReacteur(ctx, TUYERE.x, TUYERE.y, 1, this.tick);
       ctx.restore();

@@ -24,8 +24,8 @@ export function dessineQuai(
   camX: number,
   camY: number,
 ): void {
-  const x0 = Math.round((cote < 0 ? bord - LARGEUR : bord) - camX);
-  const y0 = Math.round(g.pont - camY);
+  const x0 = Math.round(cote < 0 ? bord - LARGEUR : bord) - camX;
+  const y0 = Math.round(g.pont) - camY;
   const p = (x: number, y: number, w: number, h: number, c: string) => {
     ctx.fillStyle = c;
     ctx.fillRect(x0 + x, y0 + y, w, h);

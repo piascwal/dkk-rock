@@ -187,11 +187,11 @@ export function dessineDecor(
   const p = pinceau(ctx);
   for (const o of poses) {
     if (o.devant !== (couche === 'devant') || (!o.devant && o.dedans !== (couche === 'interieur'))) continue;
-    const x = o.tx * TUILE + TUILE / 2 - Math.round(camX);
+    const x = o.tx * TUILE + TUILE / 2 - camX;
     if (x < -90 || x > largeur + 90) continue; // le half-pipe déborde de 75 px de part et d'autre
     if (!carte.props(o.tx, o.ty).solide || carte.solide(o.tx, o.ty - 1)) continue;
     ctx.save();
-    ctx.translate(x, o.ty * TUILE - Math.round(camY));
+    ctx.translate(x, o.ty * TUILE - camY);
     if (couche === 'devant') {
       // une petite touffe d'herbe, de neige ou de sable, devant les pieds
       const h = 2 + (o.v % 3);

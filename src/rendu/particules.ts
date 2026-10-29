@@ -254,8 +254,8 @@ export class Particules {
   dessine(ctx: CanvasRenderingContext2D, camX: number, camY: number): void {
     dessineNuages(ctx, this.liste, camX, camY);
     for (const p of this.liste) {
-      const x = Math.round(p.x - camX);
-      const y = Math.round(p.y - camY);
+      const x = Math.round(p.x) - camX;
+      const y = Math.round(p.y) - camY;
       const t = p.vie / p.vieMax;
       switch (p.sorte) {
         case 'fumee':

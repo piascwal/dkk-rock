@@ -147,8 +147,8 @@ export function dessineVegetation(
   for (let ty = ty0; ty <= ty1; ty++)
     for (let tx = tx0; tx <= tx1; tx++) {
       const t = carte.get(tx, ty);
-      const x = tx * TUILE - Math.round(camX);
-      const y = ty * TUILE - Math.round(camY);
+      const x = tx * TUILE - camX;
+      const y = ty * TUILE - camY;
       const planche = PLANCHES.has(t);
       if (planche) rampe(ctx, carte, tx, ty, x, y);
       if (!planche && !PENDANTES.has(t)) continue;

@@ -19,7 +19,7 @@ export function dessineArene(
   // un petit triangle de la couleur du joueur au-dessus de sa tête (le sien, plus discret)
   vue.joueurs.forEach((j, s) => {
     if (!j.present || j.mort) return;
-    const x = Math.round(j.x - camX);
+    const x = Math.round(j.x) - camX;
     const y = Math.round(j.y - camY - TUILE - 4);
     if (x < -8 || x > largeur + 8 || y < -8 || y > HAUTEUR_VUE + 8) return;
     ctx.globalAlpha = s === siegeLocal ? 0.55 : 1;

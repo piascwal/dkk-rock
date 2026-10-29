@@ -26,8 +26,8 @@ export function dessineTuiles(
   for (let ty = ty0; ty <= ty1; ty++) {
     for (let tx = tx0; tx <= tx1; tx++) {
       const t = carte.get(tx, ty);
-      const x = tx * TUILE - Math.round(camX);
-      const y = ty * TUILE - Math.round(camY);
+      const x = tx * TUILE - camX;
+      const y = ty * TUILE - camY;
       const plein = t !== T.VIDE && !TUILES_LEGERES.has(t);
       // l'eau n'a ni herbe ni bords arrondis : elle épouse ce qui l'entoure
       const cotes = t === T.VIDE || t === T.EAU ? 0 : cotesLibres(carte, t, tx, ty);
@@ -107,15 +107,15 @@ export function dessineTyroliennes(
       let bas = y;
       while (bas < carte.hauteur * TUILE && !carte.solideEnPixel(x, bas + 1)) bas += TUILE / 2;
       ctx.fillStyle = '#5e3b1a';
-      ctx.fillRect(Math.round(x - camX) - 1, Math.round(y - camY) - 4, 3, Math.round(bas - y) + 4);
+      ctx.fillRect(Math.round(x) - camX - 1, Math.round(y) - camY - 4, 3, Math.round(bas - y) + 4);
       ctx.fillStyle = '#ffd23f';
-      ctx.fillRect(Math.round(x - camX) - 2, Math.round(y - camY) - 5, 5, 2);
+      ctx.fillRect(Math.round(x) - camX - 2, Math.round(y) - camY - 5, 5, 2);
     }
     ctx.strokeStyle = '#2b2b2b';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(Math.round(t.x1 - camX) + 0.5, Math.round(t.y1 - camY) + 0.5);
-    ctx.lineTo(Math.round(t.x2 - camX) + 0.5, Math.round(t.y2 - camY) + 0.5);
+    ctx.moveTo(Math.round(t.x1) - camX + 0.5, Math.round(t.y1) - camY + 0.5);
+    ctx.lineTo(Math.round(t.x2) - camX + 0.5, Math.round(t.y2) - camY + 0.5);
     ctx.stroke();
   }
 }

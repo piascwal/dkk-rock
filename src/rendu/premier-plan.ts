@@ -98,12 +98,15 @@ export class PremierPlan {
   dessine(ctx: CanvasRenderingContext2D, camX: number, camY: number, largeur: number, tick: number): void {
     const p = this.def?.parallaxe;
     if (!p) return;
+    // sur les pixels de la toile (pas du jeu) : le premier plan défile aussi régulièrement que le terrain
+    const g = ctx.getTransform().a || 1;
+    const cale = (v: number) => Math.round(v * g) / g;
     for (const o of this.poses) {
       const s = this.sortes[o.sorte]!;
       // la parallaxe en largeur est centrée sur l'écran ; en hauteur, l'élément est au monde, comme le terrain
-      const x = Math.round((o.x - camX - largeur / 2) * p + largeur / 2 - s.pied.x);
-      const y = Math.round(o.y - camY - s.pied.y);
-      const bas = s.prolonge ? Math.min(HAUTEUR_VUE, Math.round(this.fond - camY)) : y + s.toile.height;
+      const x = cale((o.x - camX - largeur / 2) * p + largeur / 2 - s.pied.x);
+      const y = Math.round(o.y - s.pied.y) - camY;
+      const bas = s.prolonge ? Math.min(HAUTEUR_VUE, Math.round(this.fond) - camY) : y + s.toile.height;
       if (x + s.toile.width < 0 || x > largeur || y + s.toile.height < 0 || y > HAUTEUR_VUE) continue;
       ctx.globalAlpha = s.opacite ?? 1;
       ctx.drawImage(s.toile, x, y);

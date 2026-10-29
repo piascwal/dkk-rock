@@ -124,8 +124,8 @@ export function dessineEntite(
 ): void {
   // la position se cale sur la grille de la planche : le pixel du jeu, ou son tiers pour une planche en pleine définition
   const d = FEUILLES[v.g]?.densite ?? 1;
-  const x = Math.round((v.x - Math.round(camX)) * d) / d;
-  let y = Math.round((v.y - Math.round(camY)) * d) / d;
+  const x = Math.round(v.x * d) / d - camX;
+  let y = Math.round(v.y * d) / d - camY;
   // le van qui démarre tressaute sur ses amortisseurs
   if (v.g === G.VAN && (v.e === 2 || v.e === 3)) y -= (Math.floor(performance.now() / 45) % 2) * 0.5;
   const estTir = estUnTir(v.g);

@@ -69,7 +69,7 @@ export class RenduNavire {
     const g = this.g;
     const p = (x: number, y: number, w: number, h: number, c: string) => {
       ctx.fillStyle = c;
-      ctx.fillRect(Math.round(x - camX), Math.round(y - camY), w, h);
+      ctx.fillRect(Math.round(x) - camX, Math.round(y) - camY, w, h);
     };
     const l = g.proue - g.poupe;
     const T = TUILE;
@@ -81,7 +81,7 @@ export class RenduNavire {
       p(x, g.pont + T + 8, 5, 5, '#11182c');
       p(x + 1, g.pont + T + 9, 3, 3, '#ffe27a');
     }
-    ecrit(ctx, 'ENEZ GROE', Math.round(g.poupe + 30 - camX), Math.round(g.pont + T + 6 - camY), '#f2f0ea');
+    ecrit(ctx, 'ENEZ GROE', Math.round(g.poupe + 30) - camX, Math.round(g.pont + T + 6) - camY, '#f2f0ea');
     // l'étrave : la coque s'effile en pointe au-delà de la proue
     for (let y = g.pont; y < g.quille; y++) {
       const w = Math.round(14 * (1 - (y - g.pont) / (g.quille - g.pont)));
@@ -99,8 +99,8 @@ export class RenduNavire {
       ctx.fillStyle = age < 90 ? '#dfe4e8' : '#c4cbd1';
       disque(
         ctx,
-        Math.round(g.poupe + 15 * T + 8 - age * (0.15 + 0.9 * s.vitesse) - camX),
-        Math.round(g.pont - 78 - age * 0.35 - camY),
+        Math.round(g.poupe + 15 * T + 8 - age * (0.15 + 0.9 * s.vitesse)) - camX,
+        Math.round(g.pont - 78 - age * 0.35) - camY,
         3 + Math.floor(age / 26),
       );
     }
@@ -164,10 +164,10 @@ export class RenduNavire {
     // la rampe ouverte laisse voir la cale, sombre, à la place de la poupe ou de la proue
     if (leve < 1) {
       ctx.fillStyle = '#1a2440';
-      ctx.fillRect(Math.round((cote < 0 ? pivot - T : pivot) - camX), Math.round(g.pont - h - camY), T, h);
+      ctx.fillRect(Math.round(cote < 0 ? pivot - T : pivot) - camX, Math.round(g.pont - h) - camY, T, h);
     }
     ctx.save();
-    ctx.translate(Math.round(pivot - camX), Math.round(g.pont - camY));
+    ctx.translate(Math.round(pivot) - camX, Math.round(g.pont) - camY);
     // abaissée, la rampe arrière se couche vers la gauche (quart de tour en sens inverse), la rampe avant vers la droite
     ctx.rotate(cote * (1 - leve) * (Math.PI / 2));
     // relevée, la plaque occupe la case de la poupe (à gauche du pivot) ou de la proue (à droite)
@@ -188,7 +188,7 @@ export class RenduNavire {
   mer(ctx: Ctx, camX: number, camY: number, largeur: number, code: number, tick: number): void {
     const s = scene(code);
     const g = this.g;
-    const y0 = Math.round(g.flottaison - camY);
+    const y0 = Math.round(g.flottaison) - camY;
     if (y0 >= HAUTEUR_VUE) return;
     const fond = ctx.createLinearGradient(0, y0, 0, HAUTEUR_VUE);
     fond.addColorStop(0, '#3a86b8');
@@ -213,7 +213,7 @@ export class RenduNavire {
     const l = g.proue - g.poupe;
     for (let k = 0; k < l / 10; k++) {
       const x = g.proue - ((tick * 2.2 * s.vitesse + k * 10) % l);
-      ctx.fillRect(Math.round(x - camX), y0 + (k % 3) - 1, 4 + (k % 4), 1);
+      ctx.fillRect(Math.round(x) - camX, y0 + (k % 3) - 1, 4 + (k % 4), 1);
     }
     for (let k = 0; k < 8 * s.vitesse; k++)
       ctx.fillRect(
@@ -224,7 +224,7 @@ export class RenduNavire {
       );
     for (let k = 0; k < 24; k++) {
       const d = (tick * 1.8 * s.vitesse + k * 9) % (120 * s.vitesse + 1);
-      ctx.fillRect(Math.round(g.poupe - d - camX), y0 + (k % 4) - 1 + Math.round(d / 40), 6, 1);
+      ctx.fillRect(Math.round(g.poupe - d) - camX, y0 + (k % 4) - 1 + Math.round(d / 40), 6, 1);
     }
   }
 }

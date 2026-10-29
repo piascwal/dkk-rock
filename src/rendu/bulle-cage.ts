@@ -27,7 +27,7 @@ export function dessineBullesCages(
   const texte = plein ? 'VIES MAX' : '+1 VIE';
   for (const v of vue.entites) {
     if (v.g !== G.CAGE || v.e !== 0) continue;
-    const x = Math.round(v.x - camX);
+    const x = Math.round(v.x) - camX;
     if (x < -30 || x > largeur + 30) continue;
     // la bulle flotte doucement, d'un pixel
     const y = Math.round(v.y - camY - HAUT_CAGE - ECART + Math.sin(tick / 14 + v.id) * 1.5);

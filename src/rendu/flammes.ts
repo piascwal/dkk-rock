@@ -89,7 +89,7 @@ export class Braises {
       ctx.globalAlpha = k > 0.6 ? (1 - k) / 0.4 : 1;
       ctx.fillStyle = COULEURS[Math.min(COULEURS.length - 1, Math.floor(k * COULEURS.length))]!;
       const t = k < 0.3 ? 2 : 1;
-      ctx.fillRect(Math.round(b.x - camX), Math.round(b.y - camY), t, t);
+      ctx.fillRect(Math.round(b.x) - camX, Math.round(b.y) - camY, t, t);
     }
     ctx.globalAlpha = 1;
   }

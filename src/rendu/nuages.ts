@@ -31,7 +31,7 @@ export function dessineNuages(
       const t = p.vie / p.vieMax;
       const r = p.taille * (1.4 - t * 0.6) * (t < 0.25 ? t * 4 : 1);
       const [coeur, bord] = t > 0.8 ? FEU_VIF : t > 0.6 ? [p.couleur, '#c0502a'] : t > 0.35 ? BRAISE : CENDRE;
-      return { x: Math.round(p.x - camX), y: Math.round(p.y - camY), r, t, coeur, bord };
+      return { x: Math.round(p.x) - camX, y: Math.round(p.y) - camY, r, t, coeur, bord };
     })
     .filter((n) => n.r >= 1);
   for (const n of nuages) {

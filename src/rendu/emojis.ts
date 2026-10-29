@@ -80,7 +80,7 @@ export class Emojis {
       const w = m.rangees[0]!.length;
       ctx.save();
       ctx.globalAlpha = fondu * OPACITE;
-      ctx.translate(Math.round(e.x - camX), Math.round(e.y - camY) - monte);
+      ctx.translate(Math.round(e.x) - camX, Math.round(e.y) - camY - monte);
       ctx.scale(echelle, echelle);
       ctx.translate(-Math.floor(w / 2), -h);
       for (const [dx, dy] of [

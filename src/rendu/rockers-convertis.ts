@@ -64,12 +64,12 @@ export class RockersRestes {
     camY: number,
     largeur: number,
   ): void {
-    const cx = Math.round(camX);
-    const cy = Math.round(camY);
+    const cx = camX;
+    const cy = camY;
     for (const [id, r] of this.restes) {
       if (vivants.has(id) || r.x - cx < -24 || r.x - cx > largeur + 24) continue;
       ctx.save();
-      ctx.translate(Math.round(r.x - cx), Math.round(r.y - cy));
+      ctx.translate(Math.round(r.x) - cx, Math.round(r.y) - cy);
       if (r.gauche) ctx.scale(-1, 1);
       dessineRockerConverti(ctx, id);
       ctx.restore();

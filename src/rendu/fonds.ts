@@ -269,6 +269,7 @@ export class Fond {
     this.ciel.dessine(ctx, camFond, largeur, tick);
     ctx.globalAlpha = 1;
     if (nuit >= 0) lasersAuLoin(ctx, camFond, largeur, nuit, hautDe(1) + PIED_DE_BANDE, tick);
+    const grille = ctx.getTransform().a || 1;
     PARALLAXE.forEach((f, i) => {
       const x = -((camFond * f) % LARGEUR_BANDE);
       const y = hautDe(i);
@@ -293,9 +294,10 @@ export class Fond {
       const h1 = Math.min(HAUTEUR_BANDE, HAUTEUR_VUE - y);
       if (h1 <= h0) return;
       for (let k = 0; x + k * LARGEUR_BANDE < largeur; k++) {
-        const dx = Math.round(x + k * LARGEUR_BANDE);
-        const sx = Math.max(0, -dx);
-        const sw = Math.min(LARGEUR_BANDE, largeur - dx) - sx;
+        // calé sur les pixels de la toile, pas du jeu : le lointain défile régulièrement, sans à-coups d'un pixel entier
+        const dx = Math.round((x + k * LARGEUR_BANDE) * grille) / grille;
+        const sx = Math.max(0, Math.floor(-dx));
+        const sw = Math.min(LARGEUR_BANDE - sx, Math.ceil(largeur - dx) - sx);
         if (sw <= 0) continue;
         ctx.drawImage(this.plans[i]!, sx, h0, sw, h1 - h0, dx + sx, y + h0, sw, h1 - h0);
         if (nuit <= 0 || !this.plansNuit[i]) continue;
