@@ -81,8 +81,10 @@ export class Rendu {
   private echauffement = 240;
   /** la taille d'écran lue au dernier calibrage : si elle change sans évènement (iPad), on recalibre */
   private tailleVue = '';
-  /** au plus 60 images par seconde, même sur un écran à 120 Hz (voir cadence.ts) */
+  /** chez un client (vue lissée) : au plus 60 images par seconde, même sur un écran à 120 Hz (voir cadence.ts) */
   private readonly aDessiner = cadence(1000 / 60);
+  /** le pas de la partie déjà dessiné */
+  private tickDessine = -1;
 
   /** `faits` : les niveaux déjà terminés un jour (la sauvegarde) : la carte du monde n'y remet pas le brouillard */
   constructor(
@@ -179,7 +181,11 @@ export class Rendu {
   }
 
   dessine(vue: EtatVue, carte: Carte, siegeLocal: number): void {
-    if (!this.aDessiner(performance.now())) return; // la toile garde l'image précédente
+    // une image par pas de la partie, pas une de plus : sur un écran à 120 Hz, sans cela, une image sur deux redessinait la même
+    // scène, et le dessin dérivait par rapport à la partie (deux pas d'un coup, puis aucun : de petits à-coups). Chez un client,
+    // la vue est lissée à chaque image : le limiteur. Sinon la toile garde l'image précédente.
+    if (vue.lissee ? !this.aDessiner(performance.now()) : vue.tick === this.tickDessine) return;
+    this.tickDessine = vue.tick;
     this.tick++;
     const ctx = this.ctx;
     // tout se dessine en pixels du jeu ; la densité est appliquée ici, une fois

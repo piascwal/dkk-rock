@@ -209,7 +209,7 @@ export class Client {
       if (!a || a.g !== x.g || Math.abs(a.x - x.x) > 48) return x;
       return { ...x, x: a.x + (x.x - a.x) * t, y: a.y + (x.y - a.y) * t };
     };
-    return { ...e, entites: e.entites.map(lisse) };
+    return { ...e, entites: e.entites.map(lisse), lissee: true };
   }
 
   ferme(): void {

@@ -329,6 +329,8 @@ export const DUREE_CARTE = 255;
 
 export interface EtatVue {
   tick: number;
+  /** posé par un client distant (jamais envoyé) : les positions sont lissées entre deux messages de l'hôte, à chaque image */
+  lissee?: boolean;
   phase: Phase;
   /** les ennemis « convertis au rock » depuis le début du niveau, par type (voir GENRES_CONVERTIS), 255 au plus chacun */
   convertis: number[];
