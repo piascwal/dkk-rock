@@ -218,6 +218,13 @@ export class DocumentNiveau {
     m.lignes.forEach((l, dy) => [...l].forEach((c, dx) => this.pose(x + dx, y0 + dy, c)));
     for (const [n, dx, dy, variante] of m.decor) this.ajouteDecor(n, x + dx, y0 + dy, variante);
     for (const [dx, dy, cle] of m.gens ?? []) this.choisitGens(x + dx, y0 + dy, cle);
+    // les tyroliennes tracées : des copies (le module reste intact), sans les poteaux qui sortiraient de la carte
+    const dedans = ([px, py]: [number, number]) =>
+      px >= 0 && px < this.largeur && py >= 0 && py < this.hauteur;
+    const neuves = (m.tyroliennes ?? [])
+      .map((t) => t.map(([dx, dy]): [number, number] => [x + dx, y0 + dy]).filter(dedans))
+      .filter((t) => t.length > 1);
+    if (neuves.length) this.applique(() => this.tyroliennes.push(...neuves));
   }
 
   /** Un accessoire de décor posé sur la rangée de sol `ySol` (il se dessine au-dessus) ; un seul par case. */

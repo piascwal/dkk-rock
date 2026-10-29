@@ -226,7 +226,7 @@ presse-papier, qui se pose comme un module : on touche la carte pour le coller, 
 touchée ; il reste aussi dans la palette, Modules → Copie ; Ctrl+C et Ctrl+V au clavier) ou **Module**.
 
 **Mes modules** : l'outil sélection fait aussi un module d'un rectangle de la carte (ses tuiles, ses gens, son
-décor ; le départ et le van restent dans le niveau, les tyroliennes tracées n'y sont pas) ; on le nomme, il rejoint la palette
+décor, ses tyroliennes tracées poteau par poteau, coupées au bord du rectangle s'il y a lieu ; le départ et le van restent dans le niveau) ; on le nomme, il rejoint la palette
 (Modules → Mes modules) et se pose comme ceux du jeu, par sa rangée de sol. Le menu → Mes modules les liste, les exporte (un par un ou tous, un fichier `dkk-modules`), en
 importe et en supprime.
 

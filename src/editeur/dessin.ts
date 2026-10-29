@@ -285,6 +285,9 @@ export class DessinEditeur {
           this.case(ctx, c, (a.x + dx) * TUILE, (y0 + dy) * TUILE, a.x + dx, y0 + dy),
         ),
       );
+      // les poteaux des tyroliennes tracées du module
+      for (const t of a.m.tyroliennes ?? [])
+        for (const [dx, dy] of t) this.pastille(ctx, 'tyro', (a.x + dx) * TUILE, (y0 + dy) * TUILE);
       ctx.globalAlpha = 1;
       ctx.strokeRect(a.x * TUILE, y0 * TUILE, a.m.lignes[0]!.length * TUILE, a.m.lignes.length * TUILE);
     } else {

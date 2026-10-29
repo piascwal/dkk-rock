@@ -8,7 +8,7 @@ export type Decor = [string, number, number, number?];
 /** un personnage choisi sur la case d'une lettre : [colonne, rangée, clé] (voir entites/ennemis/gens.ts) */
 export type Gens = [number, number, string];
 
-/** Un module préconstruit (voir outils/exporte-modules.py) : un rectangle de carte, sa rangée de sol, son décor. */
+/** Un module préconstruit (voir outils/exporte-modules.py) : un rectangle de carte, sa rangée de sol, son décor, ses gens et ses tyroliennes tracées. */
 export interface ModuleEditeur {
   id: string;
   nom: string;
@@ -17,6 +17,8 @@ export interface ModuleEditeur {
   lignes: string[];
   decor: Decor[];
   gens?: Gens[];
+  /** les tyroliennes tracées poteau par poteau (voir tyroliennes-tracees.ts), poteaux relatifs au coin haut gauche */
+  tyroliennes?: Trace[];
 }
 
 /** Ce qu'on exporte (et réimporte) : de quoi refaire le niveau tel quel, ou en faire un niveau du jeu. */

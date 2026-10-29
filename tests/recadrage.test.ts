@@ -103,4 +103,50 @@ describe('copier une sélection', () => {
     const m = extraisModule(d, [0, y, 10, y], '');
     expect(m.lignes[0]).not.toContain('@');
   });
+
+  it('les tyroliennes tracées partent avec la copie, poteaux relatifs ; coupée par le bord, il en reste les suites d’au moins deux poteaux', () => {
+    const d = DocumentNiveau.vide(80, 30);
+    d.tyroliennes = [
+      [
+        [10, 5],
+        [20, 9],
+        [30, 7],
+      ], // toute dans le rectangle
+      [
+        [12, 20],
+        [24, 22],
+        [60, 10],
+      ], // sort à droite : il reste ses deux premiers poteaux
+      [
+        [14, 6],
+        [70, 6],
+      ], // un seul poteau dedans : plus un câble
+    ];
+    const m = extraisModule(d, [8, 4, 32, 24], '');
+    expect(m.tyroliennes).toEqual([
+      [
+        [2, 1],
+        [12, 5],
+        [22, 3],
+      ],
+      [
+        [4, 16],
+        [16, 18],
+      ],
+    ]);
+    copieDansLePressePapier(m);
+    d.commence();
+    d.tampon(pressePapier()!, 40, 29); // le bas de la copie sur la rangée 28
+    d.termine();
+    expect(d.tyroliennes).toContainEqual([
+      [42, 9],
+      [52, 13],
+      [62, 11],
+    ]);
+    expect(d.tyroliennes).toHaveLength(5);
+    d.annule();
+    expect(d.tyroliennes).toHaveLength(3);
+    // un module sans tyrolienne ne garde pas de champ vide
+    expect(extraisModule(DocumentNiveau.vide(60, 30), [0, 0, 5, 5], '').tyroliennes).toBeUndefined();
+  });
 });

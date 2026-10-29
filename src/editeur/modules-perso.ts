@@ -1,6 +1,7 @@
 import { proprietes, tuileDuCaractere } from '../monde/tuiles';
 import type { Decor, DocumentNiveau, Gens, ModuleEditeur } from './document';
 import MODULES_JSON from './modules.json';
+import { lisTraces, type Trace } from './tyroliennes-tracees';
 
 /**
  * Les modules : ceux du jeu (les pièces du générateur, voir outils/exporte-modules.py) et « mes modules », faits dans l'éditeur à
@@ -28,7 +29,9 @@ function valide(m: Partial<ModuleEditeur>): m is ModuleEditeur {
     m.lignes.length > 0 &&
     m.lignes.every((l) => typeof l === 'string' && l.length === m.lignes![0]!.length) &&
     Number.isInteger(m.sol) &&
-    Array.isArray(m.decor ?? [])
+    Array.isArray(m.decor ?? []) &&
+    (m.tyroliennes === undefined ||
+      (Array.isArray(m.tyroliennes) && lisTraces(m.tyroliennes).length === m.tyroliennes.length))
   );
 }
 
@@ -106,6 +109,32 @@ export function lisModules(texte: string): ModuleEditeur[] {
 }
 
 /**
+ * Les tyroliennes tracées qui passent dans le rectangle, poteaux relatifs à son coin : une tyrolienne qui en sort est coupée en
+ * suites de poteaux consécutifs restés dedans, et seules les suites d'au moins deux poteaux (un câble) sont gardées.
+ */
+function tyroliennesDans(
+  traces: readonly Trace[],
+  dedans: (x: number, y: number) => boolean,
+  x0: number,
+  y0: number,
+): Trace[] {
+  const gardees: Trace[] = [];
+  for (const t of traces) {
+    let suite: Trace = [];
+    const ferme = () => {
+      if (suite.length > 1) gardees.push(suite);
+      suite = [];
+    };
+    for (const [x, y] of t) {
+      if (dedans(x, y)) suite.push([x - x0, y - y0]);
+      else ferme();
+    }
+    ferme();
+  }
+  return gardees;
+}
+
+/**
  * Un module fait d'un rectangle de la carte (bornes comprises), avec son décor et ses gens. Sa rangée de sol : la surface de sa
  * première colonne (la première tuile pleine en partant du haut), sinon sa dernière rangée.
  */
@@ -127,6 +156,7 @@ export function extraisModule(
   };
   const sol = lignes.findIndex((l) => plein(l[0]!));
   const dedans = (x: number, y: number) => x >= x0 && x <= x1 && y >= y0 && y <= y1;
+  const tyroliennes = tyroliennesDans(doc.tyroliennes, dedans, x0, y0);
   return {
     id: '',
     nom,
@@ -142,5 +172,6 @@ export function extraisModule(
       .listeGens()
       .filter(([x, y]) => dedans(x, y))
       .map(([x, y, cle]): Gens => [x - x0, y - y0, cle]),
+    ...(tyroliennes.length ? { tyroliennes } : {}),
   };
 }
