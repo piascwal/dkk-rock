@@ -3,18 +3,21 @@ import { FEUILLES } from '../rendu/feuilles';
 import { dessineFeuille } from '../rendu/feuilles-images';
 
 /**
- * Le passage de la carte du monde au niveau : le van traverse l'écran de gauche à droite (le van à réacteur pour un niveau en
- * altitude) en tirant une banderole au nom du niveau, et derrière elle un rideau sombre qui recouvre la carte. L'écran couvert,
- * le niveau se lance dessous (`ensuite`), le nom reste un instant au milieu, puis le rideau remonte et découvre le niveau.
- * Un toucher ou une touche abrège. Sans animation (affichage économe, ou le système en demande moins) : le niveau tout de suite.
+ * Le passage de la carte du monde au niveau : le van entre par la gauche en tirant une banderole au nom du niveau (le van à
+ * réacteur pour un niveau en altitude), ralentit et s'arrête, la banderole bien lisible au milieu d'un rideau sombre qui couvre
+ * la carte. Le niveau se lance dessous pendant l'arrêt ; puis le van repart en trombe vers la droite, emporte la banderole, et le
+ * rideau remonte sur le niveau. Un toucher ou une touche saute l'arrêt. Sans animation (affichage économe, ou le système en
+ * demande moins) : le niveau tout de suite.
  */
 
-const TRAVERSEE = 0.95;
-const TENUE = 0.3;
+/** Les temps (secondes) : l'entrée du van, l'arrêt (le titre se lit), le départ, puis le rideau qui remonte. */
+const ENTREE = 1.1;
+const ARRET = 1.8;
+const DEPART = 0.7;
 const LEVER = 0.45;
 
-const doux = (x: number) => (x < 0.5 ? 2 * x * x : 1 - (-2 * x + 2) ** 2 / 2);
-const accelere = (x: number) => x * x * x;
+const sortieDouce = (x: number) => 1 - (1 - Math.min(1, Math.max(0, x))) ** 3;
+const accelere = (x: number) => Math.min(1, Math.max(0, x)) ** 2.2;
 
 export function transitionVan(
   titre: string,
@@ -38,12 +41,12 @@ export function transitionVan(
     lance = true;
     ensuite();
   };
-  // passer : le niveau se lance, le rideau remonte tout de suite
+  // passer : le niveau se lance, le van repart tout de suite
   const passe = () => {
     const t = (performance.now() - debut) / 1000;
-    if (t < TRAVERSEE + TENUE) {
+    if (t < ENTREE + ARRET) {
       lanceLeNiveau();
-      debut = performance.now() - (TRAVERSEE + TENUE) * 1000;
+      debut = performance.now() - (ENTREE + ARRET) * 1000;
     }
   };
   const touche = (e: KeyboardEvent) => {
@@ -56,7 +59,7 @@ export function transitionVan(
 
   const image = () => {
     const t = (performance.now() - debut) / 1000;
-    if (t >= TRAVERSEE + TENUE + LEVER) {
+    if (t >= ENTREE + ARRET + DEPART + LEVER) {
       lanceLeNiveau();
       window.removeEventListener('keydown', touche, true);
       toile.remove();
@@ -71,17 +74,26 @@ export function transitionVan(
     const f = FEUILLES[genre];
     const k = (H * 0.26) / ((f?.h ?? 199) / (f?.densite ?? 6));
     const largeurVan = ((f?.w ?? 336) / (f?.densite ?? 6)) * k * 0.8;
-    const taille = Math.min(H * 0.07, 34);
+    const taille = Math.min(H * 0.09, 40);
     ctx.font = `700 ${Math.round(taille)}px ${police}`;
-    const largeurBanderole = ctx.measureText(titre).width + taille * 2;
+    const largeurBanderole = Math.min(ctx.measureText(titre).width + taille * 2, W - 40);
     const sol = H * 0.74;
-    if (t < TRAVERSEE) {
-      // la traversée : le rideau suit la banderole, qui suit le van
-      const avance = doux(t / TRAVERSEE);
-      const xVan = -largeurVan + avance * (W + largeurBanderole + largeurVan * 2.2);
-      const xBanderole = xVan - largeurVan * 0.55 - largeurBanderole - 24;
-      rideau(ctx, Math.min(W, xBanderole + 6), H, 0);
-      const flotte = Math.sin(t * 18) * 3;
+    const ecart = largeurVan * 0.55 + 24;
+    // où le van s'arrête : la banderole au milieu de l'écran, sans que le van sorte par la droite
+    const xArret = Math.min(W / 2 + largeurBanderole / 2 + ecart, W - largeurVan * 0.55);
+    const tDepart = ENTREE + ARRET;
+    const s = (t - tDepart) / DEPART;
+    let xVan: number;
+    if (t < ENTREE) xVan = -largeurVan + sortieDouce(t / ENTREE) * (xArret + largeurVan);
+    else if (t < tDepart) xVan = xArret;
+    else xVan = xArret + accelere(s) * (W - xArret + largeurVan + largeurBanderole + ecart + 40);
+    const xBanderole = xVan - ecart - largeurBanderole;
+    // le rideau suit la banderole à l'entrée, couvre tout pendant l'arrêt, puis remonte quand le van est parti
+    const leve = accelere((t - tDepart - DEPART) / LEVER);
+    if (t >= ENTREE * 0.8) lanceLeNiveau();
+    rideau(ctx, t < ENTREE ? Math.min(W, xBanderole + 6) : W, H, -leve * (H + 40));
+    if (leve < 1) {
+      const flotte = Math.sin(t * (t < tDepart ? 5 : 18)) * (t < tDepart ? 2 : 3);
       // la corde, puis la banderole qui flotte
       ctx.strokeStyle = '#3a2412';
       ctx.lineWidth = 2;
@@ -104,25 +116,13 @@ export function transitionVan(
         taille,
       );
       ctx.save();
-      ctx.translate(xVan, sol - (envol ? H * 0.06 * avance : Math.abs(Math.sin(t * 30)) * 2));
+      // à l'arrêt, le moteur tourne : le van tressaute à peine ; en route, il cahote (ou il monte, à réacteur)
+      const cahot =
+        t < ENTREE || t >= tDepart ? Math.abs(Math.sin(t * 30)) * 2 : Math.abs(Math.sin(t * 40)) * 0.6;
+      ctx.translate(xVan, sol - (envol && t >= tDepart ? H * 0.12 * Math.min(1, s) : cahot));
       ctx.scale(k, k);
       dessineFeuille(ctx, genre, envol ? 4 : 2, 0, false);
       ctx.restore();
-    } else {
-      // l'écran couvert : le nom au milieu, puis le rideau remonte et découvre le niveau
-      lanceLeNiveau();
-      const leve = accelere(Math.max(0, (t - TRAVERSEE - TENUE) / LEVER));
-      const dy = -leve * (H + 40);
-      rideau(ctx, W, H, dy);
-      banderole(
-        ctx,
-        (W - largeurBanderole) / 2,
-        H / 2 - taille + dy,
-        largeurBanderole,
-        taille * 2,
-        titre,
-        taille,
-      );
     }
     requestAnimationFrame(image);
   };
