@@ -20,6 +20,7 @@ import { texteVersion } from '../version';
 import { estInstallee, installe, peutInstaller, surIPhone } from './installation';
 import { pleinEcran } from './plein-ecran';
 import { ecranCarte } from './carte-choix';
+import { aUnClavier, contenuTouches } from './touches-ui';
 import { compteSibylles } from '../jeu/sibylles';
 
 /** Ce que les menus demandent à l'application. */
@@ -85,9 +86,9 @@ export class Menus {
     const boutons = el('div', '', 'boutons-menu une-colonne');
     boutons.append(
       bouton('Continuer', () => this.carte(), 'principal'),
+      bouton('Battle royale', () => ecranArene(this, this.a)),
       bouton('Rejoindre des amis', () => this.rejoindre()),
       bouton('Mini-jeux', () => this.miniJeux()),
-      bouton('Battle royale', () => ecranArene(this, this.a)),
       bouton('Éditeur de niveau', () => this.a.ouvreEditeur()),
       bouton('Options', () => this.options()),
     );
@@ -248,10 +249,15 @@ export class Menus {
       qualite,
       el('p', `Affichage actuel : ${this.a.diagnostic()}`, 'aide'),
       pseudo,
+      ...(aUnClavier() ? [bouton('Touches du clavier', () => this.touches())] : []),
       efface,
       tests,
       bouton('Retour', () => this.titre()),
     );
+  }
+
+  touches(): void {
+    this.montre(...contenuTouches(() => this.options()));
   }
 
   pause(): void {

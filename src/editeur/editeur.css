@@ -462,3 +462,26 @@
   font-family: var(--titre, inherit);
   font-size: 0.75rem;
 }
+
+/* l'aide : touches et gestes */
+.ed-aide-clavier h4 {
+  margin: 10px 0 4px;
+  color: #ffd23f;
+}
+
+.ed-touches {
+  display: grid;
+  grid-template-columns: 13rem 1fr;
+  gap: 4px 12px;
+  align-items: baseline;
+  font-size: 0.85rem;
+}
+
+.ed-touche kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  font: inherit;
+  background: #2a2145;
+  border: 1px solid #6a5a9a;
+  border-radius: 4px;
+}

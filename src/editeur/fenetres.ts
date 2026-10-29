@@ -2,6 +2,7 @@ import { NIVEAUX } from '../niveaux';
 import { THEMES, type NomTheme } from '../rendu/themes';
 import { DocumentNiveau, TAILLE_MAX, TAILLE_MIN } from './document';
 import type { Editeur } from './editeur';
+import { aideClavier } from './aide-clavier';
 import { bouton, demandeFichier, element, fenetre, nomDeFichier, offreFichier } from './fenetre';
 import { mesModules } from './fenetres-modules';
 import { conseilArene, enregistre, mesNiveauxEditeur } from './fenetres-niveaux';
@@ -70,6 +71,7 @@ export function menuPrincipal(ed: Editeur): void {
     bouton('exporter', 'Exporter le niveau', () => (ferme(), exporte(ed))),
     bouton('importer', 'Importer un niveau', () => (ferme(), importe(ed))),
     bouton('modules', 'Mes modules', () => (ferme(), mesModules(ed))),
+    bouton(null, 'Aide : touches et gestes', () => (ferme(), aideClavier(ed))),
     element(
       'p',
       'Un doigt peint, deux doigts déplacent et zooment. À la souris : clic droit ou barre d’espace pour déplacer, molette pour zoomer. L’outil sélection (le carré en pointillés) fait un module réutilisable d’un morceau de carte.',

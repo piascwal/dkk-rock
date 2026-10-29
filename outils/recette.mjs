@@ -123,6 +123,11 @@ async function parcours(pg, nomA) {
   await vu('03-mini-jeux');
   await app(() => window.dkk.menus.options());
   await vu('04-options');
+  // les touches du clavier : seulement avec une souris (ordinateur)
+  if (await pg.$('button:has-text("Touches du clavier")')) {
+    await clique(pg, 'button:has-text("Touches du clavier")');
+    await vu('04b-touches');
+  }
   await app(() => window.dkk.menus.rejoindre());
   await vu('05-rejoindre');
   // le battle royale contre l'ordinateur
@@ -179,6 +184,8 @@ async function editeur(pg, nomA) {
   await clique(pg, '.ed-palette .ed-fermer');
   await clique(pg, 'button[aria-label="Menu"]');
   await capture(pg, nomA, '19-editeur-menu');
+  await clique(pg, 'button:has-text("Aide : touches et gestes")');
+  await capture(pg, nomA, '20-editeur-aide');
 }
 
 fs.mkdirSync(SORTIE, { recursive: true });

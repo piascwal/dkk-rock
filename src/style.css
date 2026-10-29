@@ -1461,3 +1461,106 @@ h2 {
     gap: 6px;
   }
 }
+
+/* Options → Touches du clavier */
+.touches-liste {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.3rem 0.6rem;
+  width: min(34rem, 94vw);
+}
+
+/* assez large : deux colonnes, pour que l'écran ne défile pas */
+@media (min-width: 760px) {
+  .touches-liste {
+    grid-template-columns: 1fr 1fr;
+    width: min(60rem, 96vw);
+  }
+}
+
+.touche-ligne {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.3rem 0.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  text-align: left;
+}
+
+.touche-nom {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.touche-nom .aide {
+  font-size: 0.65rem;
+  line-height: 1.2;
+}
+
+.touche-puces {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
+.touche-groupe {
+  display: inline-flex;
+}
+
+.touches-liste .touche,
+.touches-fixes .touche {
+  min-width: 0;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  color: #fff;
+  background: #2a2145;
+  border: 2px solid #6a5a9a;
+  border-radius: 6px;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.touches-liste .touche-ajout {
+  opacity: 0.7;
+}
+
+.touches-liste .touche-attente {
+  color: #1a1030;
+  background: var(--jaune);
+  border-color: var(--jaune);
+}
+
+.touches-liste .touche-groupe .touche:not(:only-child) {
+  border-radius: 6px 0 0 6px;
+}
+
+.touches-liste .touche-retire {
+  padding: 0.2rem 0.3rem;
+  font-size: 0.7rem;
+  line-height: 1.2;
+  color: #fff;
+  background: #5a2a3a;
+  border: 2px solid #8a4a5a;
+  border-left: 0;
+  border-radius: 0 6px 6px 0;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.touches-fixes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.3rem 0.9rem;
+  align-items: center;
+  max-width: min(60rem, 96vw);
+}
+
+.touches-fixes .touche {
+  cursor: default;
+}

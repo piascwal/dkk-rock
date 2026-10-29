@@ -92,7 +92,11 @@ mer, puis le festival, sa foule, ses lasers, ses stroboscopes et sa grande scèn
   d'hypnose inverse les commandes).
 
 Commandes : joystick et boutons à l'écran ; clavier flèches/ZQSD/WASD, Espace saut, J tir, L
-spécial, Échap pause ; manette standard.
+spécial, Échap pause ; manette standard. **Sur ordinateur (une souris), Options → Touches du clavier** montre à quoi sert chaque
+touche et les réaffecte : on touche une touche, on appuie sur la nouvelle (Échap annule) ; trois touches au plus par action,
+« × » en retire une, « + » en ajoute une, une touche déjà prise passe à la nouvelle action (sauf si l'autre n'en aurait plus aucune) ;
+Entrée et les touches de fonction sont réservées, Échap ne sert qu'à la pause. Les touches sont gardées dans le navigateur
+(`entrees/touches.ts`, `ui/touches-ui.ts`) ; la pause est une action comme les autres.
 
 - **Viser :** haut tire droit en l'air, haut + côté en diagonale ; en l'air, bas tire vers le sol.
 - **Contre un mur :** pas d'escalade, des sauts. Saut en poussant vers le mur = petit saut qui remonte la paroi (on
@@ -192,7 +196,7 @@ boss), les objets (le départ, le van, les drapeaux, les cages, le butin, les ty
 des villes, rampes du FISE... et les siens). Outils : la main (déplacer), le pinceau, le rectangle plein, la gomme, la pipette et la
 sélection ; un doigt peint, deux doigts déplacent et zooment, un doigt qui reste appuyé fait apparaître les outils (et la palette,
 et annuler) en rond autour de lui : on glisse vers l'un d'eux et on lève le doigt, ou on lève au centre puis on touche ; à la souris, clic droit ou barre d'espace pour déplacer, molette pour
-zoomer, Ctrl+Z pour annuler. **Tester** joue le niveau tout de suite (on revient à l'éditeur au bilan, ou en quittant) ; le menu
+zoomer, Ctrl+Z pour annuler (le menu a une **Aide : touches et gestes** qui liste tous les raccourcis du clavier, de la souris et du doigt ; ? ou F1 l'ouvre aussi). **Tester** joue le niveau tout de suite (on revient à l'éditeur au bilan, ou en quittant) ; le menu
 vérifie qu'on va du départ à la fin sans rien casser, change le nom, le thème et la taille, et **exporte** le niveau (un fichier
 `.json` à partager, télécharger ou copier) : envoyez-le à Claude pour l'ajouter au jeu, tel quel ou retouché, comme nouveau niveau
 ou à la place d'un niveau existant. Le brouillon se garde tout seul dans le navigateur, et l'export se réimporte.
@@ -244,7 +248,7 @@ Intégrer un export :
 
 ## Battle royale
 
-Menu principal → **Battle royale** → **Solo** ou **Multi**, puis une carte (on voit pour combien de joueurs elle est faite ; pas
+Menu principal (Continuer, **Battle royale**, Rejoindre des amis…) → **Battle royale** → **Solo** ou **Multi**, puis une carte (on voit pour combien de joueurs elle est faite ; pas
 d'ennemis du niveau, on n'y affronte que les autres joueurs), et :
 
 - **solo**, contre l'ordinateur (1 à 7 adversaires, de niveau facile, moyen ou difficile) : de quoi s'entraîner ou essayer une carte ;
@@ -358,7 +362,7 @@ src/
   histoire/          épilogue et défaite
   rendu/             caméra, trois plans de fond, décor du plan proche, tuiles, sprites, particules
   audio/             synthé, bruitages, séquenceur musical
-  entrees/           clavier, manette, tactile
+  entrees/           clavier, touches (réaffectables), manette, tactile
   reseau/            protocole binaire, hôte, client (sur lan-kit)
   ui/                menus, HUD, dialogues, portraits (HTML)
   app.ts             relie le tout : boucle à pas fixe, solo, hôte ou invité

@@ -1,26 +1,7 @@
 import { C } from '../jeu/commandes';
+import { touches } from './touches';
 
-/** Touches → commandes. ZQSD (AZERTY) et WASD (QWERTY) marchent toutes les deux, et les flèches. */
-const TOUCHES: Record<string, number> = {
-  ArrowLeft: C.GAUCHE,
-  KeyA: C.GAUCHE,
-  KeyQ: C.GAUCHE,
-  ArrowRight: C.DROITE,
-  KeyD: C.DROITE,
-  ArrowUp: C.HAUT,
-  KeyW: C.HAUT,
-  KeyZ: C.HAUT,
-  ArrowDown: C.BAS,
-  KeyS: C.BAS,
-  Space: C.SAUT,
-  KeyK: C.SAUT,
-  KeyJ: C.TIR,
-  KeyX: C.TIR,
-  ShiftLeft: C.TIR,
-  KeyL: C.SPECIAL,
-  KeyC: C.SPECIAL,
-};
-
+/** Le clavier : les touches de chaque action sont celles d'Options → Touches du clavier (touches.ts). */
 export class Clavier {
   private bits = 0;
   onPause: () => void = () => {};
@@ -28,17 +9,18 @@ export class Clavier {
   constructor() {
     window.addEventListener('keydown', (e) => {
       if (e.target instanceof HTMLInputElement) return;
-      const c = TOUCHES[e.code];
+      const c = touches.commande(e.code);
       if (c) {
         this.bits |= c;
         e.preventDefault();
       }
-      if (e.code === 'Escape' || e.code === 'KeyP') this.onPause();
+      if (touches.action(e.code) === 'pause') this.onPause();
     });
     window.addEventListener('keyup', (e) => {
-      const c = TOUCHES[e.code];
+      const c = touches.commande(e.code);
       if (c) this.bits &= ~c;
     });
+    touches.onChange = () => (this.bits = 0);
     window.addEventListener('blur', () => (this.bits = 0));
   }
 

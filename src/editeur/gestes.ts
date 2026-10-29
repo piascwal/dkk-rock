@@ -1,5 +1,6 @@
 import { TUILE } from '../config';
 import type { Camera } from './dessin';
+import { aideClavier } from './aide-clavier';
 import { ZOOM, type Editeur, type Outil } from './editeur';
 import { apercoit, pipette, poseAuLacher } from './pose';
 import type { Prise } from './rognage';
@@ -224,6 +225,7 @@ export function brancheGestes(ed: Editeur): void {
     else if ((e.ctrlKey || e.metaKey) && k === 'c') ed.selection.copie();
     else if ((e.ctrlKey || e.metaKey) && k === 'v') ed.selection.colle();
     else if (e.ctrlKey || e.metaKey) return;
+    else if (k === '?' || k === 'f1') aideClavier(ed);
     else if (k === 'enter' && ed.rognage.actif) ed.rognage.applique();
     else if (k === 'escape') {
       ed.palette.ferme();
