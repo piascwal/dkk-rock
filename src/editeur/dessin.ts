@@ -92,20 +92,10 @@ export class DessinEditeur {
     return carte;
   }
 
-  /** Une case de la carte, son coin haut gauche en (x, y) (pixels du monde) ; `cle` : le personnage choisi sur la case ;
-   * `couvert` : un baril est empilé sur le baril de cette case (on n'en voit plus le dessus). */
-  case(
-    ctx: Ctx,
-    c: string,
-    x: number,
-    y: number,
-    tx: number,
-    ty: number,
-    cle?: string,
-    couvert = false,
-  ): void {
+  /** Une case de la carte, son coin haut gauche en (x, y) (pixels du monde) ; `cle` : le personnage choisi sur la case. */
+  case(ctx: Ctx, c: string, x: number, y: number, tx: number, ty: number, cle?: string): void {
     if (c === ' ') return;
-    if (c === '%' && this.baril(ctx, x + TUILE / 2, y + TUILE, couvert)) return;
+    if (c === '%' && this.baril(ctx, x + TUILE / 2, y + TUILE)) return;
     if (c === '.') return ctx.drawImage(this.atlas.paroi, x, y, TUILE, TUILE);
     const t = tuileDuCaractere(c);
     if (t !== null) {
@@ -136,11 +126,11 @@ export class DessinEditeur {
     return ok;
   }
 
-  /** Le baril explosif, pieds en (x, y) : sa planche (ligne 1 : dessus caché) si elle est chargée. */
-  baril(ctx: Ctx, x: number, y: number, couvert: boolean): boolean {
+  /** Le baril explosif, pieds en (x, y) : sa planche si elle est chargée. */
+  baril(ctx: Ctx, x: number, y: number): boolean {
     ctx.save();
     ctx.translate(x, y);
-    const ok = dessineFeuille(ctx, G.BARIL, couvert ? 1 : 0, 0, false);
+    const ok = dessineFeuille(ctx, G.BARIL, 0, 0, false);
     ctx.restore();
     return ok;
   }
@@ -195,20 +185,12 @@ export class DessinEditeur {
     this.terrain(ctx, doc, cam, w, h);
     dessineTyroliennes(ctx, this.carte!.tyroliennes, this.carteDe(doc), 0, 0); // le terrain vient de refaire la carte
     for (const d of doc.decor) if (d[1] >= tx0 - 6 && d[1] < tx1 + 6) this.decor(ctx, d);
-    for (let ty = ty0; ty < ty1; ty++)
+    // de bas en haut : le pied d'un baril empilé recouvre le dessus de celui qu'il porte
+    for (let ty = ty1 - 1; ty >= ty0; ty--)
       for (let tx = tx0; tx < tx1; tx++) {
         const c = doc.get(tx, ty);
         if (c !== ' ' && c !== '.' && tuileDuCaractere(c) === null)
-          this.case(
-            ctx,
-            c,
-            tx * TUILE,
-            ty * TUILE,
-            tx,
-            ty,
-            doc.gensEn(tx, ty),
-            c === '%' && doc.get(tx, ty - 1) === '%',
-          );
+          this.case(ctx, c, tx * TUILE, ty * TUILE, tx, ty, doc.gensEn(tx, ty));
       }
     // les départs du battle royale, rangés à part : une pastille de la couleur du joueur
     doc.departs.forEach((d, i) => d && this.pastille(ctx, `J${i + 1}`, d[0] * TUILE, d[1] * TUILE));

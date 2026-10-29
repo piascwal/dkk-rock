@@ -304,9 +304,13 @@ export class Rendu {
     // les objets derrière, puis les personnages, puis les tirs
     const tri = (v: EntiteVue) => (estUnTir(v.g) ? 2 : !estPersonnage(v.g) || v.e === ANIM.TERRASSE ? 0 : 1);
     this.restes.dessine(ctx, this.restes.maj(vue), camX, camY, this.largeur);
+    // les barils empilés : du plus bas au plus haut, le pied de celui du dessus recouvre le dessus de celui qu'il porte
+    const barils = vue.entites.filter((v) => v.g === G.BARIL).sort((a, b) => b.y - a.y);
+    for (const v of barils) dessineEntite(ctx, v, camX, camY, this.atlas, this.theme.lueur);
     for (const passe of [0, 1, 2])
       for (const v of vue.entites)
-        if (tri(v) === passe) dessineEntite(ctx, v, camX, camY, this.atlas, this.theme.lueur);
+        if (v.g !== G.BARIL && tri(v) === passe)
+          dessineEntite(ctx, v, camX, camY, this.atlas, this.theme.lueur);
     for (const v of vue.entites) {
       // le van démarre sur la route (e = 2) : graviers et fumée
       if (v.g === G.VAN && v.e === 2) this.particules.van(v.x, v.y, v.f / 20);

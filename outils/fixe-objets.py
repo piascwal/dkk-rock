@@ -170,9 +170,8 @@ OBJETS = {
     'fougere': (['decor/fougere-base.png'], None, 14),
     # le menhir des forêts et de l'île (arc breton) : une pierre levée, de l'artiste ; le dolmen, lui, est dessiné en code
     'menhir': (['decor/menhir-1-base.png'], None, 14),
-    # le baril explosif (le tonneau WOG en feu) : un objet du jeu (genre BARIL), pas un décor ; deux états, comme la cage : le dessus
-    # visible (ligne 0), ou recouvert par un autre baril empilé dessus (ligne 1, voir outils/fixe-baril-couvert.py)
-    'baril': (['decor/baril-explosif-base.png', 'decor/baril-explosif-couvert-base.png'], 'BARIL', 15),
+    # le baril explosif (le tonneau WOG en feu) : un objet du jeu (genre BARIL), pas un décor ; entier même empilé
+    'baril': (['decor/baril-explosif-base.png'], 'BARIL', 15),
     'poubelle': ([f'decor/poubelle-{k}-base.png' for k in (1, 2)], None, 11),
     # le tonneau de décor, sans pancarte (les tonneaux WOG sont des tuiles : outils/fixe-tuiles.py)
     'tonneau': (['decor/tonneau-base.png'], None, 13),
