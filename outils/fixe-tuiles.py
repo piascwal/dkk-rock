@@ -25,8 +25,28 @@ PROPORTIONS = {'tonneau-wog', 'tonneau-or'}
 FACTEUR_ENTIER = 3
 
 
+# les tonneaux dessinés en grand (1024 px) : le dessin entier est réduit avec un filtre de qualité (comme la caisse) à cette
+# hauteur, centré en bas de sa case carrée ; les plus petits (pixel art de 128 px) sont agrandis par un facteur entier, plus bas
+HAUTEUR_TONNEAU = 120
+
+
+def tonneau_grand(nom, image):
+    ys, xs = np.nonzero(np.array(image)[..., 3])
+    dessin = image.crop((xs.min(), ys.min(), xs.max() + 1, ys.max() + 1))
+    h = HAUTEUR_TONNEAU
+    w = round(dessin.width * h / dessin.height)
+    case = Image.new('RGBA', (h, h), (0, 0, 0, 0))
+    case.alpha_composite(dessin.resize((w, h), Image.LANCZOS), ((h - w) // 2, 0))
+    case.save(RACINE / 'public' / 'sprites' / f'tuile-{nom}.png')
+    print(f'tuile-{nom}.png : {dessin.width}x{dessin.height} -> {w}x{h} dans {h}x{h}')
+
+
 def main():
     for nom in TUILES:
+        source = Image.open(RACINE / 'assets-sources' / 'tuiles' / f'{nom}-base.png').convert('RGBA')
+        if nom in PROPORTIONS and source.width >= 512:
+            tonneau_grand(nom, source)
+            continue
         nat, _ = natif_et_case(RACINE / 'assets-sources' / 'tuiles' / f'{nom}-base.png')
         ys, xs = np.nonzero(nat[..., 3])
         nat = nat[ys.min() : ys.max() + 1, xs.min() : xs.max() + 1]
