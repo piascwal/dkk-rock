@@ -182,6 +182,12 @@ OBJETS = {
     'palmier': ([f'decor/palmier-{k}-base.png' for k in (1, 2, 3)], None, 34),
     'arbre': ([f'decor/arbre-{k}-base.png' for k in (1, 2)], None, 34),
     # l'érable nu de l'hiver à Ottawa, sous la neige (remplace l'érable dessiné en code, decor-ottawa.ts)
+    # le buisson de neige (alpages, cimes, Ottawa), à la taille du buisson vert
+    'buissonNeige': (['decor/buisson-neige-base.png'], None, 24),
+    # le cairn des alpages et des sentiers : une pile de pierres, de l'artiste (le code en dessinait trois blocs de 10 px)
+    'cairn': (['decor/cairn-base.png'], None, 14),
+    # le dolmen (landes, Bretagne) : deux pierres et une table, de l'artiste (le code en dessinait les blocs)
+    'dolmen': (['decor/dolmen-base.png'], None, 28),
     'erableNeige': (['decor/erable-neige-base.png'], None, 44),
     # le figuier du pont des Tuves (remplace celui dessiné en code, decor-provence.ts) : un tronc lisse, un houppier rond
     'figuier': ([f'decor/figuier-{k}-base.png' for k in (1, 2, 3)], None, 52),

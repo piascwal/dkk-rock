@@ -236,7 +236,8 @@ export class Joueur extends JoueurBase {
     c.y = t.y1 + ((mx - t.x1) / (t.x2 - t.x1)) * (t.y2 - t.y1) + 2;
     c.vy = 0;
     const auBout = (mx <= t.x1 && !t.precedente) || (mx >= t.x2 && !t.suivante);
-    const lache = k.appuye(C.SAUT) || k.tenu(C.BAS) || auBout;
+    // bas lâche le câble, sauf en tirant : alors il vise vers le bas (sauter, lui, lâche toujours)
+    const lache = k.appuye(C.SAUT) || (k.tenu(C.BAS) && !k.tenu(C.TIR)) || auBout;
     // on ne lâche que si le câble rentre dans un mur (la tête cogne), pas si les pieds frôlent le sol
     if (lache || ctx.carte.solideEnPixel(mx, c.y + 2)) {
       this.tyro = null;
@@ -247,7 +248,7 @@ export class Joueur extends JoueurBase {
 
   private majTir(ctx: Contexte): void {
     const k = this.commandes;
-    this.angle = angleVisee(k, !this.corps.auSol);
+    this.angle = angleVisee(k);
     const cos = Math.cos(this.angle);
     const sin = Math.sin(this.angle);
     const bouche = {

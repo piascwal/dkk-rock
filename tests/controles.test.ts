@@ -26,19 +26,22 @@ const pas = (p: Partie, n: number, bits: number) => {
 const tirs = (p: Partie) => p.entites.filter((e): e is Projectile => e instanceof Projectile);
 
 describe('viser', () => {
-  it('haut tire droit en l’air, haut et côté en diagonale, bas seulement en l’air', () => {
+  it('haut tire droit en l’air, haut et côté en diagonale, bas et bas-côté vers le sol, partout', () => {
     const k = new EtatCommandes();
     k.avance(C.HAUT);
-    expect(angleVisee(k, false)).toBeCloseTo(Math.PI / 2);
+    expect(angleVisee(k)).toBeCloseTo(Math.PI / 2);
     k.avance(C.HAUT | C.DROITE);
-    expect(angleVisee(k, false)).toBeCloseTo(Math.PI / 4);
+    expect(angleVisee(k)).toBeCloseTo(Math.PI / 4);
     k.avance(C.BAS);
-    expect(angleVisee(k, false)).toBe(0);
-    expect(angleVisee(k, true)).toBeCloseTo(-Math.PI / 2);
+    expect(angleVisee(k)).toBeCloseTo(-Math.PI / 2);
     k.avance(C.BAS | C.GAUCHE);
-    expect(angleVisee(k, true)).toBeCloseTo(-Math.PI / 4);
+    expect(angleVisee(k)).toBeCloseTo(-Math.PI / 4);
+    k.avance(C.BAS | C.DROITE);
+    expect(angleVisee(k)).toBeCloseTo(-Math.PI / 4);
+    k.avance(C.HAUT | C.BAS); // haut l'emporte
+    expect(angleVisee(k)).toBeCloseTo(Math.PI / 2);
     k.avance(0);
-    expect(angleVisee(k, true)).toBe(0);
+    expect(angleVisee(k)).toBe(0);
   });
 
   it('le code réseau de la visée fait l’aller-retour', () => {
@@ -56,6 +59,51 @@ describe('viser', () => {
     const t = tirs(p)[0]!;
     expect(Math.sign(Math.round(t.vx * 10) / 10)).toBe(sx);
     expect(Math.sign(Math.round(t.vy * 10) / 10)).toBe(sy);
+  });
+});
+
+describe('viser vers le bas à terre', () => {
+  it('bas et bas + côté visent vers le sol, comme en l’air (le tir s’éteint dans le sol)', () => {
+    for (const [bits, code] of [
+      [C.BAS, 4],
+      [C.BAS | C.DROITE, 3],
+      [C.BAS | C.GAUCHE, 3],
+    ] as const) {
+      const p = nouvelle();
+      pas(p, 3, C.TIR | bits);
+      const j = p.joueurs[0]!;
+      expect(j.corps.auSol).toBe(true);
+      expect((p.vue().entites.find((e) => e.id === j.id)!.f >> 4) & 7).toBe(code);
+    }
+  });
+});
+
+describe('viser vers le bas sur une échelle', () => {
+  it('on descend en tirant vers le bas, et en diagonale', () => {
+    for (const [bits, sx] of [
+      [C.BAS, 0],
+      [C.BAS | C.DROITE, 1],
+    ] as const) {
+      const p = nouvelle();
+      const j = p.joueurs[0]!;
+      const tx = Math.floor(j.cx / TUILE);
+      const ty = Math.floor((j.corps.y + j.corps.h) / TUILE);
+      // un espace dégagé autour, un sol plus bas, et une échelle sur plusieurs rangées : on s'y accroche en descendant
+      for (let x = tx - 2; x <= tx + 5; x++) {
+        for (let y = ty - 6; y <= ty + 5; y++) p.carte.pose(x, y, T.VIDE);
+        p.carte.pose(x, ty + 6, T.TERRE);
+      }
+      for (let y = ty - 4; y <= ty + 5; y++) p.carte.pose(tx, y, T.ECHELLE);
+      Object.assign(j.corps, { x: tx * TUILE + 2, y: (ty - 2) * TUILE, vx: 0, vy: 0 });
+      pas(p, 6, C.BAS);
+      expect(j.surEchelle).toBe(true);
+      pas(p, 3, C.TIR | bits);
+      expect(j.surEchelle).toBe(true);
+      const t = tirs(p)[0]!;
+      expect(t).toBeDefined();
+      expect(t.vy).toBeGreaterThan(0);
+      expect(Math.sign(Math.round(t.vx * 10) / 10)).toBe(sx);
+    }
   });
 });
 

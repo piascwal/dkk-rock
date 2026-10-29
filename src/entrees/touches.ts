@@ -20,7 +20,7 @@ export const ACTIONS: readonly DefAction[] = [
   { id: 'gauche', nom: 'Aller à gauche', aide: 'Marcher, nager, piloter', commande: C.GAUCHE },
   { id: 'droite', nom: 'Aller à droite', aide: 'Marcher, nager, piloter', commande: C.DROITE },
   { id: 'haut', nom: 'Haut', aide: 'Monter à l’échelle, viser en haut, changer de voie', commande: C.HAUT },
-  { id: 'bas', nom: 'Bas', aide: 'Descendre, se baisser, viser en bas en l’air', commande: C.BAS },
+  { id: 'bas', nom: 'Bas', aide: 'Descendre, se baisser, viser en bas', commande: C.BAS },
   {
     id: 'saut',
     nom: 'Sauter',

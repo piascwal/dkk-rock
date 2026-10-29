@@ -42,7 +42,6 @@ const REPERES: readonly [string, string][] = [
   ['K', 'Cage (un membre à libérer)'],
   ['*', 'Arme au hasard'],
   ['+', 'Médiator d’or'],
-  ['%', 'Baril explosif'],
   // tracée poteau par poteau, rangée à part dans le document : elle peut en croiser une autre (voir tyroliennes-tracees.ts)
   ['tyro', 'Tyrolienne : poteau par poteau (retoucher le dernier pour finir)'],
   ['(', 'Tyrolienne auto : départ (reliée au poteau le plus proche à droite)'],
@@ -138,13 +137,18 @@ export function cleAGarder(cle: string, theme: NomTheme): string | null {
 
 export function catalogue(famille: Famille, _theme?: NomTheme): Choix[] {
   switch (famille) {
-    case 'tuiles':
-      return [
+    case 'tuiles': {
+      const liste: Choix[] = [
         { famille, cle: '.', nom: 'Mur de fond' },
         ...Object.values(PROPRIETES)
           .filter((p) => p.car !== ' ')
           .map((p) => ({ famille, cle: p.car, nom: NOMS_TUILES[p.car] ?? majuscule(p.nom) })),
       ];
+      // le baril explosif n'est pas une tuile du jeu (c'est un objet qui explose), mais il se pose comme les tonneaux WOG, à côté
+      const apres = liste.findIndex((c) => c.cle === 'Q') + 1;
+      liste.splice(apres || liste.length, 0, { famille, cle: '%', nom: 'Baril explosif' });
+      return liste;
+    }
     case 'gens':
       return gens();
     case 'objets':
@@ -166,7 +170,7 @@ export function choixDuCaractere(c: string, theme: NomTheme): Choix | null {
   if (c === ' ') return null;
   if (/[a-z]/.test(c) || BOSS.some(([b]) => b === c)) return choixDuPersonnage(c, undefined, theme);
   const famille: Famille =
-    c === '.' || tuileDuCaractere(c) !== null
+    c === '.' || c === '%' || tuileDuCaractere(c) !== null
       ? 'tuiles'
       : /[a-z]/.test(c) || BOSS.some(([b]) => b === c)
         ? 'gens'

@@ -316,11 +316,15 @@ export class DessinEditeur {
     c.clearRect(0, 0, w, h);
     c.imageSmoothingEnabled = false;
     c.save();
-    if (choix.famille === 'tuiles') {
+    // le baril explosif est rangé avec les tuiles (comme les tonneaux WOG) mais se dessine comme un objet, sans être étiré
+    if (choix.famille === 'tuiles' && choix.cle !== '%') {
       c.scale(w / TUILE, h / TUILE);
       this.case(c, choix.cle, 0, 0, 0, 0);
-    } else if (choix.famille === 'gens' || choix.famille === 'objets') {
-      const z = choix.famille === 'gens' ? Math.min(w, h) / 26 : Math.min(w, h) / TUILE;
+    } else if (choix.famille === 'gens' || choix.famille === 'objets' || choix.cle === '%') {
+      const z =
+        choix.famille === 'gens'
+          ? Math.min(w, h) / 26
+          : (Math.min(w, h) / TUILE) * (choix.cle === '%' ? 0.8 : 1);
       c.translate(w / 2, h);
       c.scale(z, z);
       const boss = /^[A-Z]$/.test(choix.cle);
