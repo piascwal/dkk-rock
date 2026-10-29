@@ -27,6 +27,8 @@ export class Baril implements EntiteSimulee, Cible {
   fini = false;
   /** ticks restants avant l'explosion ; 0 tant que le baril n'a pas été touché */
   private meche = 0;
+  /** un autre baril est posé dessus : on n'en voit plus le dessus (sa vue est celle du baril « couvert ») */
+  private couvert = false;
 
   constructor(ctx: Contexte, tx: number, ty: number) {
     this.id = ctx.prochainId();
@@ -59,6 +61,7 @@ export class Baril implements EntiteSimulee, Cible {
   maj(ctx: Contexte): void {
     appliqueGravite(this.corps);
     deplace(this.corps, ctx.carte);
+    this.couvert = ctx.props().some((o) => o instanceof Baril && o !== this && !o.fini && this.porte(o));
     if (this.meche === 0) return;
     if (--this.meche > 0) return;
     this.fini = true;
@@ -69,6 +72,12 @@ export class Baril implements EntiteSimulee, Cible {
       DEGATS_BARIL,
       'tous',
     );
+  }
+
+  /** `o` repose-t-il sur ce baril ? (son pied touche le haut de celui-ci, et ils se recouvrent en largeur) */
+  private porte(o: Baril): boolean {
+    const [a, b] = [this.corps, o.corps];
+    return Math.abs(b.y + b.h - a.y) <= 1 && b.x < a.x + a.w && b.x + b.w > a.x;
   }
 
   vue(): EntiteVue | null {
@@ -82,7 +91,8 @@ export class Baril implements EntiteSimulee, Cible {
       gauche: false,
       // un clignotement rapide pendant la mèche : il passe au blanc une fois sur deux
       clignote: this.meche > 0 && Math.floor(this.meche / 6) % 2 === 1,
-      e: 0,
+      // la planche a deux lignes : le dessus visible (0), ou recouvert par le baril empilé dessus (1)
+      e: this.couvert ? 1 : 0,
       f: 0,
     };
   }

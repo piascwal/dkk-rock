@@ -10,11 +10,10 @@ import { dessineTuiles, dessineTyroliennes } from '../rendu/dessin-tuiles';
 import { DESSINS_ENNEMIS } from '../rendu/dessins-ennemis';
 import { dessineFeuille } from '../rendu/feuilles-images';
 import { pinceau } from '../rendu/pinceau';
-import { COULEURS_SIEGES } from '../rendu/indicateurs';
-import { ecritCentre } from '../rendu/police';
 import { THEMES, type NomTheme } from '../rendu/themes';
 import { chaineDeTyroliennes, relieTyroliennes, type Poteau, type Tyrolienne } from '../niveaux/tyroliennes';
 import { ennemiDeLaLettre, type Choix } from './catalogue';
+import { dessinePastille } from './pastilles';
 import type { Decor, DocumentNiveau, ModuleEditeur } from './document';
 import { trouveModule } from './modules-perso';
 
@@ -41,35 +40,7 @@ export type Apercu =
   | { genre: 'module'; m: ModuleEditeur; x: number; ySol: number }
   | { genre: 'decor'; nom: string; x: number; ySol: number; variante?: number };
 
-const PASTILLES: Record<string, string> = {
-  '@': '#3fb04f',
-  F: '#2a6fdb',
-  '!': '#e8b000',
-  K: '#a84fdb',
-  '*': '#e8702a',
-  '+': '#d8a800',
-  '%': '#c8202a',
-  '(': '#6a6a78',
-  ')': '#6a6a78',
-  $: '#6a6a78',
-  tyro: '#6a6a78',
-  // le dernier poteau de la tyrolienne qu'on trace
-  tyroEnCours: '#e8702a',
-  '&': '#2a8ac8',
-  // les départs du battle royale : la couleur de chaque joueur
-  ...Object.fromEntries(COULEURS_SIEGES.map((c, i) => [`J${i + 1}`, c])),
-};
 const BOSS_GENRE: Record<string, Genre> = { Y: G.YETI_ALPHA, P: G.CHAMPION, Z: G.DJ };
-/** ce que la police pixel ne sait pas écrire (ni @ ni &), et le van en toutes lettres */
-const SIGNES: Record<string, string> = {
-  '@': 'GO',
-  F: 'VAN',
-  '&': 'B',
-  $: '()',
-  tyro: 'T',
-  tyroEnCours: 'T',
-};
-
 /**
  * Les câbles des tyroliennes posées : celles de la carte (aucune tant qu'un poteau reste seul : le menu « Vérifier » dit lequel),
  * puis celles tracées poteau par poteau.
@@ -121,9 +92,20 @@ export class DessinEditeur {
     return carte;
   }
 
-  /** Une case de la carte, son coin haut gauche en (x, y) (pixels du monde) ; `cle` : le personnage choisi sur la case. */
-  case(ctx: Ctx, c: string, x: number, y: number, tx: number, ty: number, cle?: string): void {
+  /** Une case de la carte, son coin haut gauche en (x, y) (pixels du monde) ; `cle` : le personnage choisi sur la case ;
+   * `couvert` : un baril est empilé sur le baril de cette case (on n'en voit plus le dessus). */
+  case(
+    ctx: Ctx,
+    c: string,
+    x: number,
+    y: number,
+    tx: number,
+    ty: number,
+    cle?: string,
+    couvert = false,
+  ): void {
     if (c === ' ') return;
+    if (c === '%' && this.baril(ctx, x + TUILE / 2, y + TUILE, couvert)) return;
     if (c === '.') return ctx.drawImage(this.atlas.paroi, x, y, TUILE, TUILE);
     const t = tuileDuCaractere(c);
     if (t !== null) {
@@ -154,13 +136,18 @@ export class DessinEditeur {
     return ok;
   }
 
+  /** Le baril explosif, pieds en (x, y) : sa planche (ligne 1 : dessus caché) si elle est chargée. */
+  baril(ctx: Ctx, x: number, y: number, couvert: boolean): boolean {
+    ctx.save();
+    ctx.translate(x, y);
+    const ok = dessineFeuille(ctx, G.BARIL, couvert ? 1 : 0, 0, false);
+    ctx.restore();
+    return ok;
+  }
+
   /** Un repère : une pastille de couleur et son signe (le chiffre d'un dialogue, @ pour le départ...). */
   pastille(ctx: Ctx, c: string, x: number, y: number): void {
-    ctx.fillStyle = 'rgba(0,0,0,0.55)';
-    ctx.fillRect(x + 1, y + 1, TUILE - 1, TUILE - 1);
-    ctx.fillStyle = PASTILLES[c] ?? '#5a5a8a';
-    ctx.fillRect(x + 1, y + 1, TUILE - 2, TUILE - 2);
-    ecritCentre(ctx, SIGNES[c] ?? c, x + TUILE / 2, y + 5, '#ffffff');
+    dessinePastille(ctx, c, x, y);
   }
 
   /** Un accessoire de décor, posé sur la rangée `ySol`. */
@@ -212,7 +199,16 @@ export class DessinEditeur {
       for (let tx = tx0; tx < tx1; tx++) {
         const c = doc.get(tx, ty);
         if (c !== ' ' && c !== '.' && tuileDuCaractere(c) === null)
-          this.case(ctx, c, tx * TUILE, ty * TUILE, tx, ty, doc.gensEn(tx, ty));
+          this.case(
+            ctx,
+            c,
+            tx * TUILE,
+            ty * TUILE,
+            tx,
+            ty,
+            doc.gensEn(tx, ty),
+            c === '%' && doc.get(tx, ty - 1) === '%',
+          );
       }
     // les départs du battle royale, rangés à part : une pastille de la couleur du joueur
     doc.departs.forEach((d, i) => d && this.pastille(ctx, `J${i + 1}`, d[0] * TUILE, d[1] * TUILE));

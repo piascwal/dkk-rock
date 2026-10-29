@@ -25,7 +25,7 @@ export const T = {
   PITON: 17,
   TONNEAU_WOG: 18,
   TONNEAU_OR: 19,
-  BIDON: 20,
+  // 20 : l'ancien bidon d'essence, retiré (le baril explosif est un objet) ; le numéro reste libre
   /** la matière des parcs du FISE : un revêtement noir mat, fait exprès pour rouler (rampes, curbs, funbox) */
   PARC: 21,
   /** le plateau rose des modules du parc (box jump, spine, haut des quarters) */
@@ -117,8 +117,6 @@ export const PROPRIETES: Record<Tuile, ProprietesTuile> = {
   // revient, et dix secondes d'invincibilité)
   [T.TONNEAU_WOG]: base({ nom: 'tonneau WOG', car: 'O', pv: 3, tombe: true, debris: '#7a4a22' }),
   [T.TONNEAU_OR]: base({ nom: 'tonneau d’or WOG', car: 'Q', pv: 6, tombe: true, debris: '#ffd23f' }),
-  // un bidon d'essence : comme une caisse, on monte dessus, et il arrête le héros qui le rencontre
-  [T.BIDON]: base({ nom: 'bidon d’essence', car: 'J', pv: 2, tombe: true, debris: '#c1121f' }),
   [T.PARC]: base({ nom: 'revêtement de parc', car: 'L', pv: 6, debris: '#3a3a40' }),
   [T.PLATEAU]: base({ nom: 'plateau de module', car: 'U', pv: 6, debris: '#e8607a' }),
   [T.RAMPE]: base({ nom: 'rampe de bois', car: 'A', pv: 4, debris: '#d8a868' }),
@@ -148,7 +146,8 @@ export const tuileDuCaractere = (c: string): Tuile | null => PAR_CARACTERE.get(c
 
 export const proprietes = (t: number): ProprietesTuile => PROPRIETES[t as Tuile] ?? PROPRIETES[T.VIDE];
 
-export const NB_TUILES = Object.keys(PROPRIETES).length;
+/** Un de plus que le plus grand numéro de tuile (le numéro 20, retiré, laisse un trou). */
+export const NB_TUILES = Math.max(...Object.keys(PROPRIETES).map(Number)) + 1;
 
 /** Les tuiles qui ne remplissent pas leur case : on voit le mur de fond (ou le décor) derrière elles. */
 export const TUILES_LEGERES: ReadonlySet<number> = new Set<number>([

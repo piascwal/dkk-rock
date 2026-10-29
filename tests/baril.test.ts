@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { VIES_DEPART } from '../src/config';
+import { TUILE, VIES_DEPART } from '../src/config';
 import { Baril, DUREE_MECHE, RAYON_BARIL } from '../src/entites/baril';
 import { Projectile } from '../src/entites/projectile';
 import { BAGUETTE } from '../src/entites/projectiles-defs';
@@ -167,5 +167,33 @@ describe('le baril explosif', () => {
     b.blesse(1, p);
     for (let t = 0; t < DUREE_MECHE + 1; t++) p.avance();
     expect(p.carte.obstacles).not.toContain(b.corps);
+  });
+});
+
+describe('des barils empilés', () => {
+  it("n'en montrent le dessus que pour celui du haut", () => {
+    const p = nouvelle(0);
+    const bas = barils(p)[0]!;
+    pres(p, bas, 200);
+    const [tx, ty] = [Math.floor(bas.corps.x / TUILE), Math.floor(bas.corps.y / TUILE)];
+    const haut = new Baril(p, tx, ty - 1);
+    p.ajoute(haut);
+    for (let t = 0; t < 30; t++) p.avance();
+    expect(haut.corps.y + haut.corps.h).toBe(bas.corps.y);
+    expect(haut.vue()!.e).toBe(0);
+    expect(bas.vue()!.e).toBe(1);
+  });
+
+  it('retrouvent leur dessus quand celui qui les couvrait a explosé', () => {
+    const p = nouvelle(0);
+    const bas = barils(p)[0]!;
+    pres(p, bas, 200);
+    const haut = new Baril(p, Math.floor(bas.corps.x / TUILE), Math.floor(bas.corps.y / TUILE) - 1);
+    p.ajoute(haut);
+    for (let t = 0; t < 30; t++) p.avance();
+    haut.blesse(1, p);
+    for (let t = 0; t < DUREE_MECHE + 2; t++) p.avance();
+    expect(haut.fini).toBe(true);
+    if (!bas.fini) expect(bas.vue()!.e).toBe(0);
   });
 });

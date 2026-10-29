@@ -135,7 +135,7 @@ OBJETS = {
     'enceinteRose': (['decor/enceinte-rose-base.png'], None, 20),
     # la borne à incendie des rues (remplace le dessin en code « bouche »)
     'borne': (['decor/borne-base.png'], None, 15),
-    # les pneus empilés (garage, ville) ; le bidon d'essence est une tuile (outils/fixe-tuiles.py)
+    # les pneus empilés (garage, ville)
     'pneus': (['decor/pneus-base.png'], None, 14),
     # Tom de dos sur une échelle : deux images qui alternent (montée comme descente) ; même densité que les planches des héros (6),
     # largeur choisie pour que sa taille égale celle de Tom debout (118 px de planche de la tête aux pieds)
@@ -170,8 +170,9 @@ OBJETS = {
     'fougere': (['decor/fougere-base.png'], None, 14),
     # le menhir des forêts et de l'île (arc breton) : une pierre levée, de l'artiste ; le dolmen, lui, est dessiné en code
     'menhir': (['decor/menhir-1-base.png'], None, 14),
-    # le baril explosif (garage, ville) : un objet du jeu (genre BARIL), pas un décor
-    'baril': (['decor/baril-explosif-base.png'], 'BARIL', 15),
+    # le baril explosif (le tonneau WOG en feu) : un objet du jeu (genre BARIL), pas un décor ; deux états, comme la cage : le dessus
+    # visible (ligne 0), ou recouvert par un autre baril empilé dessus (ligne 1, voir outils/fixe-baril-couvert.py)
+    'baril': (['decor/baril-explosif-base.png', 'decor/baril-explosif-couvert-base.png'], 'BARIL', 15),
     'poubelle': ([f'decor/poubelle-{k}-base.png' for k in (1, 2)], None, 11),
     # le tonneau de décor, sans pancarte (les tonneaux WOG sont des tuiles : outils/fixe-tuiles.py)
     'tonneau': (['decor/tonneau-base.png'], None, 13),
@@ -192,7 +193,7 @@ OBJETS = {
 # Ces images ne sont pas du pixel art sur une grille de 2 : leurs pixels sont déjà ceux du jeu. Les ramener à la grille
 # détecterait une case fausse et abîmerait le dessin (bruit, détails perdus) ; on les prend telles quelles, et on les agrandit
 # d'un facteur entier pour que chaque pixel reste carré.
-NATIF_BRUT = {'voiture', 'rocker', 'robot', 'borne', 'pneus', 'baril', 'fougere', 'menhir', *(f'{h}-echelle' for h in ECHELLES), *SAUTS, *MURS}
+NATIF_BRUT = {'voiture', 'rocker', 'robot', 'borne', 'pneus', 'fougere', 'menhir', *(f'{h}-echelle' for h in ECHELLES), *SAUTS, *MURS}
 # les panneaux de direction (le texte doit se lire) : chaque pixel de l'artiste reste un carré net (agrandissement entier, sans
 # redimensionnement qui rend les pixels inégaux et brouille les lettres)
 ENTIERS = {'panneau'}

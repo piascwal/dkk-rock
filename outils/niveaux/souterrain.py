@@ -76,8 +76,6 @@ def tonneaux_de_surface(r, barils=False):
             n.repere(a + 1, 'O', ymin=n.base - 3, surface=True)
         elif barils and k % 4 == 1:
             n.repere(a + 1, '%', ymin=n.base - 3, surface=True)  # un baril explosif, entre deux tonneaux de bois
-        elif barils and k % 4 == 3:
-            n.repere(a + 1, 'J', ymin=n.base - 3, surface=True)  # un bidon d'essence, comme une caisse
     if raccords:
         a, b = raccords[milieu]
         n.repere(a + 1, 'Q', ymin=n.base - 3, surface=True)

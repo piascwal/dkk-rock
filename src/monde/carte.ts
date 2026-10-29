@@ -24,8 +24,7 @@ const estMatiere = (t: number) =>
   t !== T.CAISSE &&
   t !== T.CAISSON &&
   t !== T.CAISSON_ROSE &&
-  t !== T.BARRIERE &&
-  t !== T.BIDON;
+  t !== T.BARRIERE;
 
 /**
  * La grille de tuiles d'un niveau. Hors de la carte : murs de socle à gauche
