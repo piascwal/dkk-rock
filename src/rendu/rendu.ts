@@ -85,6 +85,9 @@ export class Rendu {
   private readonly aDessiner = cadence(1000 / 60);
   /** le pas de la partie déjà dessiné */
   private tickDessine = -1;
+  /** la dernière scène dessinée (pour redessiner aussitôt après un effacement de la toile), et si on est en plein dessin */
+  private derniere: [EtatVue, Carte, number] | null = null;
+  private enDessin = false;
 
   /** `faits` : les niveaux déjà terminés un jour (la sauvegarde) : la carte du monde n'y remet pas le brouillard */
   constructor(
@@ -130,9 +133,18 @@ export class Rendu {
     // inutile de dessiner plus fin que les pixels de l'écran (ceux d'un téléphone sont 2 à 3 fois plus petits qu'un pixel CSS)
     const ecran = Math.floor((HAUTEUR_VUE * k * (window.devicePixelRatio || 1)) / HAUTEUR_VUE);
     this.densite = this.densiteVoulue(ecran);
-    this.toile.width = this.largeur * this.densite;
-    this.toile.height = HAUTEUR_VUE * this.densite;
+    // réassigner la taille efface la toile, même identique : seulement si elle change (un évènement de redimensionnement de la
+    // fenêtre visuelle arrive aussi quand deux doigts touchent l'écran, ou quand la barre du navigateur bouge : un écran noir)
+    const [lt, ht] = [this.largeur * this.densite, HAUTEUR_VUE * this.densite];
+    if (this.toile.width === lt && this.toile.height === ht) return;
+    this.toile.width = lt;
+    this.toile.height = ht;
     this.ctx.imageSmoothingEnabled = false;
+    // la toile vient d'être effacée : on la redessine tout de suite (sans attendre le prochain pas de la partie)
+    if (this.derniere && !this.enDessin) {
+      this.tickDessine = -1;
+      this.dessine(...this.derniere);
+    }
   }
 
   /** Mesure la durée moyenne des images ; en mode auto, descend à 3 si elle reste lente après le chargement. */
@@ -186,6 +198,16 @@ export class Rendu {
     // la vue est lissée à chaque image : le limiteur. Sinon la toile garde l'image précédente.
     if (vue.lissee ? !this.aDessiner(performance.now()) : vue.tick === this.tickDessine) return;
     this.tickDessine = vue.tick;
+    this.derniere = [vue, carte, siegeLocal];
+    this.enDessin = true;
+    try {
+      this.dessineScene(vue, carte, siegeLocal);
+    } finally {
+      this.enDessin = false;
+    }
+  }
+
+  private dessineScene(vue: EtatVue, carte: Carte, siegeLocal: number): void {
     this.tick++;
     const ctx = this.ctx;
     // tout se dessine en pixels du jeu ; la densité est appliquée ici, une fois
