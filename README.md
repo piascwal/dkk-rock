@@ -35,6 +35,11 @@ mer, puis le festival, sa foule, ses lasers, ses stroboscopes et sa grande scèn
 
 ## Comment on joue
 
+**L'écran titre est vivant** (`ui/titre-anime.ts`) : les cinq DKK en silhouette de part et d'autre des boutons rebondissent au tempo du jeu,
+trois projecteurs aux couleurs du logo balaient la scène (un héros pris dans un faisceau sort de l'ombre), la rampe de LED bat la
+mesure, et de temps en temps un passant traverse : Fadatchi, un yéti, un goéland ou le van. Sur un téléphone debout, les héros
+se rangent plus petits le long du bas. En affichage économe, ou si le système demande moins d'animations : une image fixe.
+
 - Tout est destructible sauf le socle ; les caisses, le sable et la neige tombent quand on leur
   retire le sol ; les caissons de basses explosent en chaîne.
 - Échelles, tyroliennes, saut et escalade contre les murs. Une tyrolienne se descend toute seule dans le sens de la pente,

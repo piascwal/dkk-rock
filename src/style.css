@@ -183,6 +183,16 @@ body:has(#ecran:not(:empty)) .fil-elim {
   display: none;
 }
 
+/* l'écran titre vivant (ui/titre-anime.ts) : sous le logo et les boutons, sur le fond du menu, sans prendre de clic */
+.titre-fond {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
 .logo {
   font-family: var(--titre);
   font-weight: 700;
