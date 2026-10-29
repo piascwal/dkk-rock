@@ -19,6 +19,7 @@ import type { Carte } from './monde/carte';
 import { chargeFeuilles } from './rendu/feuilles-images';
 import { Rendu } from './rendu/rendu';
 import { Intro } from './ui/intro';
+import { EntreeBoss } from './ui/entree-boss';
 import { Recrue } from './ui/recrue';
 import { prepareInstallation } from './ui/installation';
 import { Bulles, Histoire } from './ui/dialogues';
@@ -79,6 +80,7 @@ export class App implements Actions {
   private bitsAvant = 0;
   private derniereVue: EtatVue | null = null;
   private recrue!: Recrue;
+  private readonly entreeBoss = new EntreeBoss();
   private readonly suiviRecrue = new SuiviRecrue(
     () => this.recrue,
     this.sauvegarde,
@@ -275,7 +277,7 @@ export class App implements Actions {
 
   // ——— la boucle ———
   private commandes(): number {
-    if (this.enPause || this.menus.ouvert || this.recrue.enCours) return 0;
+    if (this.enPause || this.menus.ouvert || this.recrue.enCours || this.entreeBoss.enCours) return 0;
     return this.clavier.commandes | this.tactile.commandes | commandesManette() | this.finMini.commandes;
   }
 
@@ -290,8 +292,8 @@ export class App implements Actions {
       this.suivant();
 
     if (this.partie) {
-      const solo = !this.multijoueur;
-      if (!((this.enPause || this.recrue.enCours) && solo)) {
+      // seul, la partie attend pendant la pause et une scène coupée (recrue, entrée d'un boss)
+      if (this.multijoueur || !(this.enPause || this.recrue.enCours || this.entreeBoss.enCours)) {
         this.reste += dt;
         while (this.reste >= PAS_MS) {
           this.reste -= PAS_MS;
@@ -335,6 +337,7 @@ export class App implements Actions {
     this.derniereVue = v;
     this.finMini.maj(v);
     this.suiviRecrue.maj(v, siege);
+    this.entreeBoss.maj(v);
     this.rendu.dessine(v, carte, siege);
     if (retiensRecords(this.sauvegarde, v)) this.enregistre();
     const noms = nomsDesJoueurs(this.client, this.hote, this.sauvegarde.pseudo);

@@ -40,6 +40,11 @@ trois projecteurs aux couleurs du logo balaient la scène (un héros pris dans u
 mesure, et de temps en temps un passant traverse : Fadatchi, un yéti, un goéland ou le van. Sur un téléphone debout, les héros
 se rangent plus petits le long du bas. En affichage économe, ou si le système demande moins d'animations : une image fixe.
 
+**L'entrée des boss** (`ui/entree-boss.ts`) : quand le Yéti Alpha, le Champion du FISE ou DJ Boucle se réveille, un éclair blanc,
+l'écran tremble, et un bandeau en travers de l'écran le présente en grand avec son nom en lettres qui tremblent et son titre
+(2,4 s, un toucher ou une touche l'abrège). Une fois par boss et par niveau ; seul, la partie attend ; à plusieurs, elle continue
+dessous. Elle ne lit que la vue (la barre de vie du boss qui apparaît) : les clients distants la voient aussi.
+
 - Tout est destructible sauf le socle ; les caisses, le sable et la neige tombent quand on leur
   retire le sol ; les caissons de basses explosent en chaîne.
 - Échelles, tyroliennes, saut et escalade contre les murs. Une tyrolienne se descend toute seule dans le sens de la pente,

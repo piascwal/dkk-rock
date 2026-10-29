@@ -64,6 +64,16 @@ body {
   touch-action: none;
 }
 
+/* l'entrée d'un boss (ui/entree-boss.ts) : par-dessus le jeu, sous les menus */
+.entree-boss {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 25;
+  pointer-events: none;
+}
+
 /* le bouton pour passer l'intro : discret, en haut à droite (le bas porte les noms des personnages) */
 .passer-intro {
   position: fixed;
