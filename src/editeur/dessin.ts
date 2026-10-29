@@ -65,6 +65,8 @@ function tyroliennesDe(doc: DocumentNiveau): Tyrolienne[] {
 
 export class DessinEditeur {
   private theme: NomTheme | null = null;
+  /** une toile à part pour dessiner un accessoire en grand avant de le recadrer dans sa vignette */
+  private brouillon: HTMLCanvasElement | null = null;
   private atlas!: AtlasTuiles;
   /** la carte du jeu faite du document (refaite quand il change), que dessine rendu/dessin-tuiles.ts */
   private carte: { doc: DocumentNiveau; version: number; carte: Carte; tyroliennes: Tyrolienne[] } | null =
@@ -274,6 +276,40 @@ export class DessinEditeur {
     }
   }
 
+  /**
+   * Un accessoire de décor dans sa vignette : agrandi pour remplir la case (un champignon ou une souche, à l'échelle du jeu, y
+   * serait un point), sans le déformer. Dessiné d'abord en grand sur une toile à part, pour garder tout son détail, puis recadré sur
+   * ce qu'il couvre. La carte, elle, garde l'échelle du jeu (voir `decor`).
+   */
+  private vignetteDecor(c: CanvasRenderingContext2D, choix: Choix, w: number, h: number): void {
+    const GROS = 6;
+    const [L, H] = [640, 640];
+    const t = (this.brouillon ??= document.createElement('canvas'));
+    if (t.width !== L) [t.width, t.height] = [L, H];
+    const g = t.getContext('2d', { willReadFrequently: true })!;
+    g.clearRect(0, 0, L, H);
+    g.imageSmoothingEnabled = false;
+    g.save();
+    g.translate(L / 2 - (TUILE / 2) * GROS, H - 24);
+    g.scale(GROS, GROS);
+    this.decor(g, [choix.cle, 0, 0, choix.variante]);
+    g.restore();
+    // ce que l'accessoire couvre
+    const px = g.getImageData(0, 0, L, H).data;
+    let [x0, y0, x1, y1] = [L, H, -1, -1];
+    for (let y = 0; y < H; y++)
+      for (let x = 0; x < L; x++)
+        if (px[(y * L + x) * 4 + 3]! > 8)
+          [x0, y0, x1, y1] = [Math.min(x0, x), Math.min(y0, y), Math.max(x1, x), Math.max(y1, y)];
+    if (x1 < 0) return;
+    const [bw, bh] = [x1 - x0 + 1, y1 - y0 + 1];
+    const marge = 4;
+    const z = Math.min((w - 2 * marge) / bw, (h - 2 * marge) / bh);
+    c.imageSmoothingEnabled = true;
+    c.imageSmoothingQuality = 'high';
+    c.drawImage(t, x0, y0, bw, bh, (w - bw * z) / 2, (h - bh * z) / 2, bw * z, bh * z);
+  }
+
   /** La vignette d'un choix de la palette, dans une toile de `w` × `h` pixels. */
   vignette(c: CanvasRenderingContext2D, choix: Choix, theme: NomTheme, w: number, h: number): void {
     this.regleTheme(theme);
@@ -291,9 +327,7 @@ export class DessinEditeur {
       if (choix.famille === 'gens' && !boss) this.case(c, 'a', -TUILE / 2, -TUILE, 0, 0, choix.cle);
       else this.case(c, choix.cle, -TUILE / 2, -TUILE, 0, 0);
     } else if (choix.famille === 'decor') {
-      c.translate(w / 2 - TUILE / 2, h);
-      c.scale(0.7, 0.7);
-      this.decor(c, [choix.cle, 0, 0, choix.variante]);
+      this.vignetteDecor(c, choix, w, h);
     } else {
       const m = trouveModule(choix.cle);
       if (!m) return c.restore();
