@@ -1,14 +1,14 @@
+import { cadence } from './cadence';
+import { particulesDesEvenements } from './evenements-particules';
 import { DENSITE_MAX, DENSITE_MIN, HAUTEUR_CARTE, HAUTEUR_VUE, TUILE } from '../config';
 import type { Qualite } from '../jeu/sauvegarde';
 import { ANIM, G, estPersonnage, estUnTir, type EntiteVue, type EtatVue, type Evenement } from '../jeu/vue';
 import { Carte } from '../monde/carte';
-import { proprietes } from '../monde/tuiles';
 import { NIVEAUX, niveauLu } from '../niveaux';
 import { AtlasTuiles } from './atlas-tuiles';
 import { Camera } from './camera';
 import { dessineCarteMonde } from './carte-monde';
 import { dessineEntite } from './dessin-entites';
-import { debrisDeDecor } from './debris-decor';
 import { dessineDecor, semeDecor, type CoucheDecor } from './decor';
 import { dessineTuiles, dessineTyroliennes } from './dessin-tuiles';
 import { Emojis } from './emojis';
@@ -81,6 +81,8 @@ export class Rendu {
   private echauffement = 240;
   /** la taille d'écran lue au dernier calibrage : si elle change sans évènement (iPad), on recalibre */
   private tailleVue = '';
+  /** au plus 60 images par seconde, même sur un écran à 120 Hz (voir cadence.ts) */
+  private readonly aDessiner = cadence(1000 / 60);
 
   /** `faits` : les niveaux déjà terminés un jour (la sauvegarde) : la carte du monde n'y remet pas le brouillard */
   constructor(
@@ -173,32 +175,11 @@ export class Rendu {
 
   /** Les évènements de la partie deviennent des particules. */
   evenements(evts: readonly Evenement[]): void {
-    const p = this.particules;
-    for (const e of evts) {
-      switch (e.k) {
-        case 'tuile':
-          if (e.t !== 0) break;
-          p.debris((e.x + 0.5) * TUILE, (e.y + 0.5) * TUILE, proprietes(e.avant).debris, 7);
-          // ce qui était posé sur cette tuile (décor) se brise aussi : des morceaux s'envolent
-          for (const o of this.decorParTuile.get(e.y * 100000 + e.x) ?? []) debrisDeDecor(p, o);
-          break;
-        case 'explo':
-          p.explosion(e.x, e.y, e.r);
-          break;
-        case 'impact':
-          p.impact(e.x, e.y, e.c);
-          break;
-        case 'confettis':
-          p.confettis(e.x, e.y);
-          break;
-        case 'texte':
-          p.texte(e.x, e.y, e.s, e.c);
-          break;
-      }
-    }
+    particulesDesEvenements(this.particules, this.decorParTuile, evts);
   }
 
   dessine(vue: EtatVue, carte: Carte, siegeLocal: number): void {
+    if (!this.aDessiner(performance.now())) return; // la toile garde l'image précédente
     this.tick++;
     const ctx = this.ctx;
     // tout se dessine en pixels du jeu ; la densité est appliquée ici, une fois
