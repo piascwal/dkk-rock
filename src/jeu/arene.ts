@@ -222,7 +222,10 @@ export class Arene {
       j.delaiReapparition = DELAI_REAPPARITION;
       if (!this.enJeu) return;
       const tueur = p.joueurs.find((o) => o && o.id === j.dernierTireur && o !== j);
-      if (tueur) this.eliminations[tueur.siege]++;
+      if (tueur) {
+        this.eliminations[tueur.siege]++;
+        p.texte(tueur.cx, tueur.corps.y - 4, '+1', '#ffd23f'); // il saute au-dessus de celui qui élimine
+      }
       p.evenement({ k: 'elim', tueur: tueur ? tueur.siege : -1, victime: j.siege });
       if (--this.vies[j.siege]! <= 0) this.elimine(p, j.siege);
       return;

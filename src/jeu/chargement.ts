@@ -103,9 +103,12 @@ export function releveCarte(p: Partie): void {
     const cy = (m.y + 0.5) * TUILE;
     if (m.avant === T.CAISSON) p.enAttente.push([p.tick + 5, cx, cy]);
     if (m.avant === T.CAISSON_ROSE) p.enAttente.push([p.tick + 5, cx, cy, 'rose']);
-    // un tonneau WOG cassé libère un cœur, un tonneau d'or WOG un cœur d'or
-    if (m.avant === T.TONNEAU_WOG) p.ajoute(new Objet(p, 'coeur', m.x * TUILE, m.y * TUILE));
-    if (m.avant === T.TONNEAU_OR) p.ajoute(new Objet(p, 'coeurOr', m.x * TUILE, m.y * TUILE));
+    // un tonneau WOG cassé libère un cœur, un tonneau d'or WOG un cœur d'or : il jaillit, puis rebondit (voir Objet.maj)
+    if (m.avant === T.TONNEAU_WOG || m.avant === T.TONNEAU_OR) {
+      const coeur = new Objet(p, m.avant === T.TONNEAU_OR ? 'coeurOr' : 'coeur', m.x * TUILE, m.y * TUILE);
+      coeur.corps.vy = -4;
+      p.ajoute(coeur);
+    }
     if (m.avant === T.CAISSE) {
       const r = p.rng.suivant();
       if (r < 0.2)

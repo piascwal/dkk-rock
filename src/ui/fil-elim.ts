@@ -32,15 +32,16 @@ export class FilElimination {
     const victime = entier(e.victime);
     if (victime < 0) return;
     const tueur = entier(e.tueur);
-    const nom = (s: number) => {
-      const b = el('b', nomArene(noms, s));
+    const nom = (s: number, classe = '') => {
+      const b = el('b', nomArene(noms, s), classe);
       b.style.color = couleurDuSiege(ar, s);
       if (s === siegeLocal) b.classList.add('moi');
       return b;
     };
     const ligne = el('div', '', 'fil-ligne');
-    if (tueur < 0 || tueur === victime) ligne.append(nom(victime), ' s’est éliminé tout seul');
-    else ligne.append(nom(tueur), ' a éliminé ', nom(victime));
+    // le nom de l'éliminé se barre d'un trait rouge (style.css : .fil-ligne .victime)
+    if (tueur < 0 || tueur === victime) ligne.append(nom(victime, 'victime'), ' s’est éliminé tout seul');
+    else ligne.append(nom(tueur), ' a éliminé ', nom(victime, 'victime'));
     this.element.append(ligne);
     while (this.element.childElementCount > LIGNES_MAX) this.element.firstElementChild?.remove();
     setTimeout(() => ligne.remove(), DUREE_MS);

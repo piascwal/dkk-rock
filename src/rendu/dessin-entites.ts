@@ -1,3 +1,4 @@
+import { DUREE_MECHE } from '../entites/baril';
 import { TUILE } from '../config';
 import { dessineSibylle } from './sibylle';
 import { ARME_CHAUFFAGE, armeRamassee } from '../entites/armes';
@@ -143,8 +144,8 @@ export function dessineEntite(
   const heros = herosDuGenre(v.g);
   const aTerre = v.e === ANIM.TERRASSE && heros === undefined && estPersonnage(v.g);
   if (v.clignote && heros) ctx.globalAlpha = 0.35;
-  // le baril explosif, pendant sa mèche : il pâlit une fois sur deux
-  if (v.clignote && v.g === G.BARIL) ctx.globalAlpha = 0.4;
+  // le baril explosif, pendant sa mèche : il tremble et rougeoie de plus en plus, jusqu'à l'explosion
+  if (v.g === G.BARIL && v.f > 0) return dessineBarilAllume(ctx, v, x, y);
 
   ctx.save();
   // monde sombre : un liseré lumineux détache les personnages du fond (cyan pour les héros, rose pour ceux d'en face)
@@ -256,4 +257,27 @@ function dessineBarreDeVie(p: Pinceau, genre: Genre, vie: number): void {
   const y = -haut - 5;
   p(-7, y, 14, 3, '#000');
   p(-6, y + 1, Math.max(1, Math.round(12 * k)), 1, couleur);
+}
+
+/** Le baril allumé (`v.f` : ticks de mèche restants, sur DUREE_MECHE) : un halo orange qui bat de plus en plus vite, le baril
+ * qui tremble de plus en plus fort, et un éclair blanc une image sur deux à la fin. */
+function dessineBarilAllume(ctx: CanvasRenderingContext2D, v: EntiteVue, x: number, y: number): void {
+  const urgence = 1 - Math.min(1, v.f / DUREE_MECHE);
+  const t = performance.now() / 1000;
+  const battement = 0.5 + 0.5 * Math.sin(t * (8 + 22 * urgence));
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  const r = 10 + 8 * urgence;
+  const halo = ctx.createRadialGradient(x, y - 9, 1, x, y - 9, r);
+  halo.addColorStop(0, `rgba(255, 140, 30, ${0.25 + 0.45 * battement * (0.4 + urgence)})`);
+  halo.addColorStop(1, 'rgba(255, 60, 0, 0)');
+  ctx.fillStyle = halo;
+  ctx.fillRect(x - r, y - 9 - r, 2 * r, 2 * r);
+  ctx.restore();
+  const force = 0.3 + 1.4 * urgence;
+  ctx.save();
+  ctx.translate(x + (Math.random() - 0.5) * 2 * force, y + (Math.random() - 0.5) * force);
+  if (v.clignote && urgence > 0.6 && 'filter' in ctx) ctx.filter = 'brightness(2.2)';
+  dessineFeuille(ctx, v.g, 0, 0, false);
+  ctx.restore();
 }

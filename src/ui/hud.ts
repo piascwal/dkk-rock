@@ -3,12 +3,15 @@ import { HEROS } from '../entites/heros';
 import { armeRamassee } from '../entites/armes';
 import { PHASES_MINI_JEUX } from '../jeu/mini-jeux';
 import type { EtatVue } from '../jeu/vue';
+import { animeCoeurs } from './hud-effets';
 import { coeursEnQuarts, icone, iconeDeLArme, rangeeDIcones } from './icones-hud';
 import { nomArene } from './noms-arene';
 
 /** Le HUD (HTML) : un cartouche par joueur, les vies et le score, la barre du boss. Mis à jour seulement quand il change. */
 export class Hud {
   private dernier = '';
+  /** les points de vie de chacun à la dernière image (pour animer les cœurs qui changent) */
+  private pvAvant: (number | null)[] = [];
 
   constructor(private readonly element: HTMLElement) {}
 
@@ -24,7 +27,7 @@ export class Hud {
         const h = HEROS[j.membre]!;
         const arme = armeRamassee(j.arme);
         const nom = noms[s] && v.joueurs.filter((x) => x.present).length > 1 ? ` · ${noms[s]}` : '';
-        return `<div class="hud-joueur${j.mort ? ' mort' : ''}" style="--couleur:${h.couleur}">
+        return `<div class="hud-joueur${j.mort ? ' mort' : ''}" data-siege="${s}" style="--couleur:${h.couleur}">
           ${s === siegeLocal ? '▶ ' : ''}${ar ? echappe(nomArene(noms, s)) : `${h.nom}${echappe(nom)}`}
           <span class="coeurs" aria-label="${j.pv / QUARTS_PAR_COEUR} cœurs">${coeursEnQuarts(j.pv)}</span>
           <span class="etoiles">${rangeeDIcones(icone('mediator'), Math.min(6, j.speciaux))}</span>
@@ -36,9 +39,16 @@ export class Hud {
       v.boss >= 0 ? `<div id="barre-boss"><div style="width:${Math.round(v.boss * 100)}%"></div></div>` : '';
     const html = `<div class="hud-joueurs">${joueurs}</div>
       <div class="hud-droite">${ar ? droiteArene(v, siegeLocal) : `${rangeeDIcones(icone('guitare'), 1)} × ${v.vies}<br>${v.score.toLocaleString('fr-FR')}`}</div>${boss}`;
-    if (html === this.dernier) return;
-    this.dernier = html;
-    this.element.innerHTML = html;
+    if (html !== this.dernier) {
+      this.dernier = html;
+      this.element.innerHTML = html;
+    }
+    v.joueurs.forEach((j, s) => {
+      const avant = this.pvAvant[s];
+      this.pvAvant[s] = j.present && !j.mort ? j.pv : null;
+      const coeurs = this.element.querySelector<HTMLElement>(`[data-siege="${s}"] .coeurs`);
+      if (avant != null && this.pvAvant[s] != null && coeurs) animeCoeurs(coeurs, avant, j.pv);
+    });
   }
 }
 

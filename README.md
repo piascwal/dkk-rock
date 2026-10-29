@@ -45,6 +45,16 @@ l'écran tremble, et un bandeau en travers de l'écran le présente en grand ave
 (2,4 s, un toucher ou une touche l'abrège). Une fois par boss et par niveau ; seul, la partie attend ; à plusieurs, elle continue
 dessous. Elle ne lit que la vue (la barre de vie du boss qui apparaît) : les clients distants la voient aussi.
 
+**La traversée du van** (`ui/transition-van.ts`) : quand on choisit un niveau sur la carte du monde, le van (à réacteur pour un niveau
+en altitude) traverse l'écran en tirant une banderole au nom du niveau et un rideau sombre ; l'écran couvert, le niveau se lance
+dessous, puis le rideau remonte (1,7 s, un toucher l'abrège ; rien en affichage économe).
+
+**Les retours de jeu** : un quart de cœur perdu fait trembler le cœur et en fait sortir un éclat, un cœur vidé éclate, un cœur
+regagné gonfle avec un éclat doré (`ui/hud-effets.ts`) ; le cœur d'un tonneau WOG jaillit et rebondit deux fois ; un reflet
+traverse le tonneau d'or et deux étoiles scintillent autour ; le baril allumé tremble et rougeoie de plus en plus fort pendant sa
+mèche (`f` de sa vue : les ticks restants) ; en battle royale, « +1 » saute au-dessus de celui qui élimine et le nom de l'éliminé
+se barre dans le fil ; les boutons des menus s'enfoncent et rebondissent.
+
 - Tout est destructible sauf le socle ; les caisses, le sable et la neige tombent quand on leur
   retire le sol ; les caissons de basses explosent en chaîne.
 - Échelles, tyroliennes, saut et escalade contre les murs. Une tyrolienne se descend toute seule dans le sens de la pente,

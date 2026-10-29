@@ -83,7 +83,8 @@ export class Baril implements EntiteSimulee, Cible {
       // un clignotement rapide pendant la mèche : il passe au blanc une fois sur deux
       clignote: this.meche > 0 && Math.floor(this.meche / 6) % 2 === 1,
       e: 0,
-      f: 0,
+      // f : les ticks de mèche restants (0 : pas allumé) ; le rendu le fait trembler et rougeoyer de plus en plus
+      f: this.meche,
     };
   }
 }

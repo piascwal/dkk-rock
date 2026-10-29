@@ -54,6 +54,8 @@ export class Objet implements EntiteSimulee {
   envol = false;
   private vx = 0;
   private depuis = 0;
+  /** un cœur sorti d'un tonneau rebondit deux fois en retombant */
+  private rebonds = 0;
 
   constructor(
     ctx: Contexte,
@@ -99,8 +101,14 @@ export class Objet implements EntiteSimulee {
     }
     // tout retombe si on détruit le sol dessous (sauf le van, garé pour de bon, et la carte Sibylle, qui lévite)
     if (this.sorte !== 'van' && this.sorte !== 'sibylle') {
+      const chute = this.corps.vy;
       appliqueGravite(this.corps);
       deplace(this.corps, ctx.carte);
+      const coeur = this.sorte === 'coeur' || this.sorte === 'coeurOr';
+      if (coeur && this.corps.auSol && chute > 1.5 && this.rebonds < 2) {
+        this.corps.vy = -chute * 0.45;
+        this.rebonds++;
+      }
       if (this.corps.y > ctx.carte.hauteur * TUILE + 32) this.fini = true;
     }
   }

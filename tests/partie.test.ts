@@ -192,6 +192,15 @@ describe('la partie', () => {
       avance(p, 2);
     };
 
+    it('le cœur jaillit du tonneau, puis retombe au sol', () => {
+      const { p, coeur } = casse(T.TONNEAU_WOG, 'coeur');
+      const y0 = coeur.corps.y;
+      avance(p, 6);
+      expect(coeur.corps.y).toBeLessThan(y0);
+      avance(p, 120);
+      expect(coeur.corps.auSol).toBe(true);
+    });
+
     it('un tonneau WOG libère un cœur qui redonne un point de vie à qui en a perdu', () => {
       const { p, j, coeur } = casse(T.TONNEAU_WOG, 'coeur');
       j.pv = 1;

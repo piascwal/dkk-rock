@@ -22,6 +22,7 @@ import { pleinEcran } from './plein-ecran';
 import { ecranCarte } from './carte-choix';
 import { aUnClavier, contenuTouches } from './touches-ui';
 import { animeTitre } from './titre-anime';
+import { transitionVan } from './transition-van';
 import { compteSibylles } from '../jeu/sibylles';
 
 /** Ce que les menus demandent à l'application. */
@@ -123,7 +124,11 @@ export class Menus {
       (n) => compteSibylles(s, n),
       depart,
       // depuis le menu, on repart du début du niveau (les vies et le score restent) ; le dernier drapeau sert à la pause
-      (n) => this.lanceNiveau(n, s.enCours?.niveau === n ? { ...s.enCours, drapeau: -1 } : null),
+      // le van traverse l'écran avec le nom du niveau, puis le niveau se lance dessous (transition-van.ts)
+      (n) =>
+        transitionVan(NIVEAUX[n]!.titre, NIVEAUX[n]!.envol === true, s.qualite === 'eco', () =>
+          this.lanceNiveau(n, s.enCours?.niveau === n ? { ...s.enCours, drapeau: -1 } : null),
+        ),
       () => this.titre(),
     );
   }

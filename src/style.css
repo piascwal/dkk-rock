@@ -354,6 +354,8 @@ h2 {
     inset -2px -2px 0 rgba(0, 0, 0, 0.3);
   cursor: pointer;
   touch-action: manipulation;
+  /* relâché, il rebondit en reprenant sa place, façon médiator (le ressort dépasse un peu) */
+  transition: transform 0.22s cubic-bezier(0.3, 1.9, 0.5, 1);
 }
 
 .ecran button.principal {
@@ -362,7 +364,8 @@ h2 {
 }
 
 .ecran button:active {
-  transform: translate(2px, 2px);
+  transform: translate(2px, 2px) scale(0.94);
+  transition-duration: 0.04s;
   box-shadow:
     inset -2px -2px 0 rgba(255, 255, 255, 0.4),
     inset 2px 2px 0 rgba(0, 0, 0, 0.3);
@@ -1234,6 +1237,42 @@ h2 {
   animation: fil-entre 0.2s ease-out;
 }
 
+/* l'éliminé : un trait rouge le barre, tracé de gauche à droite juste après l'arrivée de la ligne */
+.fil-ligne .victime {
+  position: relative;
+}
+
+.fil-ligne .victime::after {
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: 50%;
+  height: 2px;
+  width: calc(100% + 4px);
+  background: #e5243b;
+  box-shadow: 0 1px 0 #000;
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: fil-barre 0.3s 0.2s ease-out forwards;
+}
+
+@keyframes fil-barre {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fil-ligne .victime::after {
+    animation: none;
+    transform: none;
+  }
+
+  .ecran button {
+    transition: none;
+  }
+}
+
 .fil-ligne .moi {
   text-decoration: underline;
   text-decoration-color: #ffd23f;
@@ -1626,4 +1665,33 @@ h2 {
 
 .touches-fixes .touche {
   cursor: default;
+}
+
+/* les éclats des cœurs du HUD (ui/hud-effets.ts) */
+.hud-effets {
+  position: fixed;
+  inset: 0;
+  z-index: 26;
+  pointer-events: none;
+}
+
+.eclat-hud {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+}
+
+.coeurs,
+.coeur-q {
+  display: inline-block;
+}
+
+/* la traversée du van, de la carte du monde au niveau (ui/transition-van.ts) : par-dessus tout */
+.transition-van {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 45;
+  touch-action: none;
 }
