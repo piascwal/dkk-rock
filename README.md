@@ -46,9 +46,10 @@ l'écran tremble, et un bandeau en travers de l'écran le présente en grand ave
 dessous. Elle ne lit que la vue (la barre de vie du boss qui apparaît) : les clients distants la voient aussi.
 
 **La traversée du van** (`ui/transition-van.ts`) : quand on choisit un niveau sur la carte du monde, le van (à réacteur pour un niveau
-en altitude) entre par la gauche en tirant une banderole au nom du niveau et un rideau sombre, ralentit et s'arrête : le nom se lit
-au milieu pendant près de 2 s, le niveau se lance dessous, puis le van repart en trombe avec la banderole et le rideau remonte
-(4 s en tout ; un toucher saute l'arrêt ; rien en affichage économe).
+en altitude) tire, d'un seul bloc rigide, un grand drap sombre et, dessus, une banderole au nom du niveau. Il entre par la gauche en
+ralentissant et s'arrête : le drap couvre l'écran et le nom se lit pendant près de 2 s, le niveau se lance dessous ; puis le van
+repart en trombe avec le drap et la banderole, dont le bord arrière découvre le niveau de gauche à droite (3,9 s en tout ; un
+toucher saute l'arrêt ; rien en affichage économe).
 
 **Les retours de jeu** : un quart de cœur perdu fait trembler le cœur et en fait sortir un éclat, un cœur vidé éclate, un cœur
 regagné gonfle avec un éclat doré (`ui/hud-effets.ts`) ; le cœur d'un tonneau WOG jaillit et rebondit deux fois ; un reflet
