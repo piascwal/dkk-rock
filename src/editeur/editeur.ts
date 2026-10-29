@@ -1,26 +1,19 @@
 import { TUILE } from '../config';
 import { liberePortrait, verrouillePaysage } from '../ui/plein-ecran';
 import type { DefNiveau } from '../niveaux/format';
-import {
-  catalogue,
-  choixDuCaractere,
-  choixDuPersonnage,
-  cleAGarder,
-  lettreDe,
-  type Choix,
-} from './catalogue';
+import { catalogue, cleAGarder, lettreDe, type Choix } from './catalogue';
 import { DessinEditeur, type Apercu, type Camera } from './dessin';
 import { DocumentNiveau } from './document';
 import './editeur.css';
 import { menuPrincipal } from './fenetres';
-import { creeModule } from './fenetres-modules';
 import { bouton } from './bouton-icone';
-import { departEn, placeDepart, retireDepart } from './departs';
+import { placeDepart, retireDepart } from './departs';
 import type { NomIcone } from './icones';
-import { trouveModule } from './modules-perso';
 import { brancheGestes } from './gestes';
 import { MenuRond } from './menu-rond';
 import { Palette } from './palette';
+import { Rognage } from './rognage';
+import { Selection } from './selection';
 import { TraceTyrolienne } from './tyroliennes-tracees';
 
 /**
@@ -63,6 +56,9 @@ export class Editeur {
   apercu: Apercu | null = null;
   /** la tyrolienne qu'on trace poteau par poteau */
   readonly trace = new TraceTyrolienne();
+  /** rogner la carte en tirant ses bords, et ce qu'on fait d'une sélection (copier, module) */
+  readonly rognage: Rognage;
+  readonly selection: Selection;
   private readonly nom = document.createElement('span');
   private readonly boutonsOutils = new Map<Outil, HTMLButtonElement>();
   private readonly annuler: HTMLButtonElement;
@@ -118,6 +114,8 @@ export class Editeur {
     this.racine.append(haut, this.toile, bas, this.message);
     this.palette = new Palette(this);
     this.rond = new MenuRond(this);
+    this.rognage = new Rognage(this);
+    this.selection = new Selection(this);
     document.body.append(this.racine);
     brancheGestes(this);
     new ResizeObserver(() => this.redessine()).observe(this.toile);
@@ -142,6 +140,8 @@ export class Editeur {
   /** Change de niveau édité (page blanche, niveau du jeu, fichier importé). */
   remplace(doc: DocumentNiveau): void {
     this.doc = doc;
+    this.rognage?.fin();
+    this.selection?.ferme();
     doc.onChange = () => {
       this.redessine();
       this.majBoutons();
@@ -170,6 +170,7 @@ export class Editeur {
 
   choisitOutil(o: Outil): void {
     if (o !== this.outil) this.trace.finit(this.doc);
+    if (o !== 'selection') this.selection.ferme();
     this.outil = o;
     for (const [k, b] of this.boutonsOutils) b.classList.toggle('actif', k === o);
     this.apercu = null;
@@ -227,56 +228,11 @@ export class Editeur {
       for (let x = Math.min(x0, x1); x <= Math.max(x0, x1); x++) this.peint(x, y);
   }
 
-  /** La sélection lâchée : on en fait un module à soi. */
-  selectionne(x0: number, y0: number, x1: number, y1: number): void {
-    creeModule(this, [x0, y0, x1, y1]);
-  }
-
   /** Le départ et le van sont uniques : en poser un ailleurs retire l'ancien. */
   poseCaractere(x: number, y: number, c: string): void {
     if (c === '@' || c === 'F')
       this.doc.lignes().forEach((l, yy) => [...l].forEach((o, xx) => o === c && this.doc.pose(xx, yy, ' ')));
     this.doc.pose(x, y, c);
-  }
-
-  /** Le geste qui se pose quand on lève le doigt : un module, un accessoire. */
-  poseAuLacher(x: number, y: number): void {
-    if (this.choix.famille === 'modules') {
-      const m = trouveModule(this.choix.cle);
-      if (m) this.doc.tampon(m, x - Math.floor(m.lignes[0]!.length / 2), y + 1);
-    } else if (this.choix.famille === 'decor')
-      this.doc.ajouteDecor(this.choix.cle, x, y + 1, this.choix.variante);
-    else if (this.choix.cle === 'tyro') this.trace.poteau(this.doc, x, y);
-  }
-
-  /** L'aperçu du geste en cours, pour une case visée. */
-  apercoit(x: number, y: number): void {
-    if (this.outil === 'main') this.apercu = null;
-    else if (this.outil === 'pinceau' && this.choix.famille === 'modules') {
-      const m = trouveModule(this.choix.cle);
-      this.apercu = m
-        ? { genre: 'module', m, x: x - Math.floor(m.lignes[0]!.length / 2), ySol: y + 1 }
-        : null;
-    } else if (this.outil === 'pinceau' && this.choix.famille === 'decor')
-      this.apercu = { genre: 'decor', nom: this.choix.cle, x, ySol: y + 1, variante: this.choix.variante };
-    else this.apercu = { genre: 'case', x, y };
-    this.redessine();
-  }
-
-  pipette(x: number, y: number): void {
-    const d = this.doc.decorEn(x, y);
-    const car = this.doc.get(x, y);
-    const depart = departEn(this.doc, x, y);
-    const c =
-      depart >= 0 || this.doc.tyroliennes.some((t) => t.some(([px, py]) => px === x && py === y))
-        ? catalogue('objets').find((o) => o.cle === (depart >= 0 ? `J${depart + 1}` : 'tyro'))
-        : d
-          ? catalogue('decor').find((o) => o.cle === d[0])
-          : /[a-z]/.test(car)
-            ? choixDuPersonnage(car, this.doc.gensEn(x, y), this.doc.theme)
-            : choixDuCaractere(car, this.doc.theme);
-    if (c) this.choisit(c);
-    else this.choisitOutil('pinceau');
   }
 
   dit(texte: string, erreur = false): void {
@@ -314,6 +270,7 @@ export class Editeur {
       const ctx = this.toile.getContext('2d')!;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       this.dessin.dessine(ctx, this.doc, this.cam, w, h, this.apercu, this.trace.dernier(this.doc));
+      this.rognage.dessine(ctx);
     });
   }
 

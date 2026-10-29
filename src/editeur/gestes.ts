@@ -1,6 +1,8 @@
 import { TUILE } from '../config';
 import type { Camera } from './dessin';
 import { ZOOM, type Editeur, type Outil } from './editeur';
+import { apercoit, pipette, poseAuLacher } from './pose';
+import type { Prise } from './rognage';
 
 /**
  * Les gestes sur la carte de l'éditeur :
@@ -51,6 +53,8 @@ export function brancheGestes(ed: Editeur): void {
   let trait: { derniere: Point } | null = null;
   let pince: { dist: number; milieu: Point; cam: Camera } | null = null;
   let glisse: Point | null = null;
+  /** le bord de la carte qu'on tire (voir rognage.ts) */
+  let prise: Prise | null = null;
   let espace = false;
   /** l'appui long en cours : le doigt, où il s'est posé, le minuteur */
   let appui: { id: number; x: number; y: number; minuteur: ReturnType<typeof setTimeout> } | null = null;
@@ -100,16 +104,23 @@ export function brancheGestes(ed: Editeur): void {
       return;
     }
     if (doigts.size > 2 || pince) return;
+    // rogner la carte : on tire un bord s'il y en a un sous le doigt, sinon un doigt déplace la vue
+    if (ed.rognage.actif) {
+      prise = ed.rognage.prise(e.clientX, e.clientY, e.pointerType !== 'mouse');
+      if (prise) ed.rognage.deplace(prise, e.clientX, e.clientY);
+      else glisse = { x: e.clientX, y: e.clientY };
+      return;
+    }
     if (ed.outil === 'main' || e.button === 1 || e.button === 2 || espace) {
       glisse = { x: e.clientX, y: e.clientY };
       return;
     }
     if (e.button !== 0) return;
     const c = ed.caseSous(e.clientX, e.clientY);
-    if (ed.outil === 'pipette') return ed.pipette(c.x, c.y);
+    if (ed.outil === 'pipette') return pipette(ed, c.x, c.y);
     ed.doc.commence();
     trait = { derniere: c };
-    if (auLacher()) ed.apercoit(c.x, c.y);
+    if (auLacher()) apercoit(ed, c.x, c.y);
     else if (ed.outil === 'rect' || ed.outil === 'selection')
       ed.apercu = { genre: 'rect', x0: c.x, y0: c.y, x1: c.x, y1: c.y, pointille: ed.outil === 'selection' };
     else ed.peint(c.x, c.y);
@@ -121,6 +132,7 @@ export function brancheGestes(ed: Editeur): void {
     if (appui?.id === e.pointerId && Math.hypot(e.clientX - appui.x, e.clientY - appui.y) > JEU_DU_DOIGT)
       oublieAppui();
     if (rond === e.pointerId) return ed.rond.survole(e.clientX, e.clientY);
+    if (prise && doigts.size === 1) return ed.rognage.deplace(prise, e.clientX, e.clientY);
     if (pince && doigts.size >= 2) {
       const [m, dist] = milieu();
       const r = t.getBoundingClientRect();
@@ -140,12 +152,12 @@ export function brancheGestes(ed: Editeur): void {
     if (pince) return;
     const c = ed.caseSous(e.clientX, e.clientY);
     if (!trait) {
-      if (e.pointerType === 'mouse') ed.apercoit(c.x, c.y);
+      if (e.pointerType === 'mouse' && !ed.rognage.actif) apercoit(ed, c.x, c.y);
       return;
     }
     if (c.x === trait.derniere.x && c.y === trait.derniere.y) return;
     if (ed.apercu?.genre === 'rect') Object.assign(ed.apercu, { x1: c.x, y1: c.y });
-    else if (auLacher()) ed.apercoit(c.x, c.y);
+    else if (auLacher()) apercoit(ed, c.x, c.y);
     else segment(trait.derniere, c, (x, y) => ed.peint(x, y));
     trait.derniere = c;
     ed.redessine();
@@ -163,19 +175,19 @@ export function brancheGestes(ed: Editeur): void {
       if (doigts.size === 0) pince = null;
       return;
     }
-    glisse = null;
+    glisse = prise = null;
     if (!trait) return;
     const c = trait.derniere;
     trait = null;
     if (annule) ed.doc.abandonne();
     else {
       const a = ed.apercu;
-      if (a?.genre === 'rect' && a.pointille) ed.selectionne(a.x0, a.y0, a.x1, a.y1);
+      if (a?.genre === 'rect' && a.pointille) ed.selection.propose([a.x0, a.y0, a.x1, a.y1]);
       else if (a?.genre === 'rect') ed.remplit(a.x0, a.y0, a.x1, a.y1);
-      else if (auLacher()) ed.poseAuLacher(c.x, c.y);
+      else if (auLacher()) poseAuLacher(ed, c.x, c.y);
       ed.doc.termine();
     }
-    if (e.pointerType !== 'mouse') ed.apercu = null;
+    if (e.pointerType !== 'mouse' && !ed.selection.rect) ed.apercu = null;
     ed.redessine();
   };
   t.addEventListener('pointerup', (e) => lache(e, false));
@@ -209,10 +221,15 @@ export function brancheGestes(ed: Editeur): void {
     const k = e.key.toLowerCase();
     if ((e.ctrlKey || e.metaKey) && k === 'z') ed.doc[e.shiftKey ? 'refait' : 'annule']();
     else if ((e.ctrlKey || e.metaKey) && k === 'y') ed.doc.refait();
+    else if ((e.ctrlKey || e.metaKey) && k === 'c') ed.selection.copie();
+    else if ((e.ctrlKey || e.metaKey) && k === 'v') ed.selection.colle();
     else if (e.ctrlKey || e.metaKey) return;
+    else if (k === 'enter' && ed.rognage.actif) ed.rognage.applique();
     else if (k === 'escape') {
       ed.palette.ferme();
       ed.rond.ferme();
+      ed.rognage.fin();
+      ed.selection.ferme();
     } else if (k === ' ') espace = true;
     else if (TOUCHES[k]) ed.choisitOutil(TOUCHES[k]);
     else if (k === '+' || k === '=') ed.zoome(1.4);

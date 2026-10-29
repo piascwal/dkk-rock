@@ -1,5 +1,6 @@
 import { type DefNiveau, type Replique } from '../niveaux/format';
 import { lisDeparts, type Depart } from './departs';
+import { decaleCarte, decaleDecor, decaleDeparts, decaleGens, decaleTraces } from './recadrage';
 import { lisTraces, type Trace } from './tyroliennes-tracees';
 import { verifieNiveau } from './verification';
 import { THEMES, type NomTheme } from '../rendu/themes';
@@ -70,6 +71,15 @@ export class DocumentNiveau {
     d.g[sol - 1]![3] = '@';
     d.g[sol - 1]![largeur - 5] = 'F';
     return d;
+  }
+
+  /** Un niveau complètement vide : que du ciel, ni sol, ni départ, ni van (tout est à poser). */
+  static vide(largeur = 160, hauteur = 40, theme: NomTheme = 'garage'): DocumentNiveau {
+    return new DocumentNiveau(
+      'Mon niveau',
+      theme,
+      Array.from({ length: hauteur }, () => ' '.repeat(largeur)),
+    );
   }
 
   /**
@@ -206,7 +216,7 @@ export class DocumentNiveau {
   tampon(m: ModuleEditeur, x: number, ySol: number): void {
     const y0 = ySol - m.sol;
     m.lignes.forEach((l, dy) => [...l].forEach((c, dx) => this.pose(x + dx, y0 + dy, c)));
-    for (const [n, dx, dy] of m.decor) this.ajouteDecor(n, x + dx, y0 + dy);
+    for (const [n, dx, dy, variante] of m.decor) this.ajouteDecor(n, x + dx, y0 + dy, variante);
     for (const [dx, dy, cle] of m.gens ?? []) this.choisitGens(x + dx, y0 + dy, cle);
   }
 
@@ -230,31 +240,33 @@ export class DocumentNiveau {
     this.change();
   }
 
+  /**
+   * Recadre la carte : `gauche`, `haut`, `droite` et `bas` colonnes ou rangées ajoutées (+) ou rognées (−) de chaque côté, et tout ce
+   * qui est posé dessus suit (voir recadrage.ts). Renvoie faux, sans rien changer, si la taille sortirait des limites.
+   */
+  recadre(gauche: number, haut: number, droite: number, bas: number): boolean {
+    const c = { g: gauche, h: haut, L: this.largeur + gauche + droite, H: this.hauteur + haut + bas };
+    if (c.L < TAILLE_MIN[0] || c.L > TAILLE_MAX[0] || c.H < TAILLE_MIN[1] || c.H > TAILLE_MAX[1])
+      return false;
+    if (!gauche && !haut && !droite && !bas) return true;
+    this.g = decaleCarte(this.g, c);
+    this.decor = decaleDecor(this.decor, c);
+    this.gens = new Map(decaleGens(this.listeGens(), c).map(([x, y, k]) => [`${x},${y}`, k]));
+    this.departs = decaleDeparts(this.departs, c);
+    this.tyroliennes = decaleTraces(this.tyroliennes, c);
+    this.change();
+    return true;
+  }
+
   /** Change la taille : les colonnes s'ajoutent ou se retirent à droite, les rangées en haut (le sol ne bouge pas). */
   redimensionne(largeur: number, hauteur: number): void {
-    largeur = Math.max(TAILLE_MIN[0], Math.min(TAILLE_MAX[0], Math.round(largeur)));
-    hauteur = Math.max(TAILLE_MIN[1], Math.min(TAILLE_MAX[1], Math.round(hauteur)));
-    if (largeur === this.largeur && hauteur === this.hauteur) return;
-    const dh = hauteur - this.hauteur;
-    const lignes = this.lignes().map((l) => l.padEnd(largeur).slice(0, largeur));
-    const neuves = dh > 0 ? [...Array<string>(dh).fill(' '.repeat(largeur)), ...lignes] : lignes.slice(-dh);
-    this.g = neuves.map((l) => l.split(''));
-    this.decor = this.decor
-      .map((d): Decor => (d[3] === undefined ? [d[0], d[1], d[2] + dh] : [d[0], d[1], d[2] + dh, d[3]]))
-      .filter(([, x, y]) => x < largeur && y >= 1 && y < hauteur);
-    this.gens = new Map(
-      this.listeGens()
-        .map(([x, y, cle]): Gens => [x, y + dh, cle])
-        .filter(([x, y]) => x < largeur && y >= 0 && y < hauteur)
-        .map(([x, y, cle]) => [`${x},${y}`, cle]),
+    const borne = (v: number, [min, max]: [number, number]) => Math.max(min, Math.min(max, Math.round(v)));
+    this.recadre(
+      0,
+      borne(hauteur, [TAILLE_MIN[1], TAILLE_MAX[1]]) - this.hauteur,
+      borne(largeur, [TAILLE_MIN[0], TAILLE_MAX[0]]) - this.largeur,
+      0,
     );
-    this.departs = this.departs.map((d) =>
-      d && d[0] < largeur && d[1] + dh >= 1 ? [d[0], d[1] + dh] : null,
-    );
-    this.tyroliennes = this.tyroliennes
-      .map((t) => t.map(([x, y]): [number, number] => [x, y + dh]).filter(([x, y]) => x < largeur && y >= 0))
-      .filter((t) => t.length > 1);
-    this.change();
   }
 
   annule(): void {

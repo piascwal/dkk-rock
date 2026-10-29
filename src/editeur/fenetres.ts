@@ -39,10 +39,16 @@ export function menuPrincipal(ed: Editeur): void {
   const ferme = fenetre(
     ed,
     'Éditeur de niveau',
-    bouton('nouveau', 'Nouveau niveau (page blanche)', () => {
+    bouton('nouveau', 'Nouveau niveau : départ, arrivée et sol', () => {
       if (!remplacer()) return;
       ferme();
       ed.remplace(DocumentNiveau.vierge(160, 40, ed.doc.theme));
+    }),
+    bouton('rectangle', 'Nouveau niveau : complètement vide', () => {
+      if (!remplacer()) return;
+      ferme();
+      ed.remplace(DocumentNiveau.vide(160, 40, ed.doc.theme));
+      ed.dit('Un niveau vide : à vous de poser le sol, le départ (@) et le van (F).');
     }),
     bouton('arene', 'Nouvelle arène (battle royale)', () => {
       if (!remplacer()) return;
@@ -124,6 +130,19 @@ function reglages(ed: Editeur): void {
     champ('Thème (le ciel, les textures, les gens du coin)', theme),
     champ('Largeur (en tuiles)', largeur),
     champ('Hauteur (en tuiles : les rangées s’ajoutent en haut)', hauteur),
+    bouton(
+      'selection',
+      'Rogner à la souris : tirer les bords de la carte',
+      () => {
+        d.nom = nom.value.trim() || d.nom;
+        d.theme = theme.value as NomTheme;
+        ferme();
+        ed.choisit(ed.choix);
+        d.onChange();
+        ed.rognage.demarre();
+      },
+      'ed-large',
+    ),
     bouton(
       'verifier',
       'Appliquer',

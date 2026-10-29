@@ -66,9 +66,28 @@ export function retireModule(id: string): void {
   garde();
 }
 
+/**
+ * Le presse-papier : le morceau de carte copié (outil sélection → Copier), un module comme les autres pour le poser (le bas du
+ * rectangle sur la rangée touchée), mais jamais gardé : il ne vit que le temps de la session.
+ */
+export const ID_PRESSE_PAPIER = 'presse-papier';
+let presse: ModuleEditeur | null = null;
+export const pressePapier = (): ModuleEditeur | null => presse;
+export const copieDansLePressePapier = (m: ModuleEditeur): void => {
+  presse = {
+    ...m,
+    id: ID_PRESSE_PAPIER,
+    nom: `Copie ${m.lignes[0]!.length} × ${m.lignes.length}`,
+    famille: 'Presse-papier',
+    sol: m.lignes.length,
+  };
+};
+
 /** Un module, du jeu ou à soi, par son identifiant. */
 export const trouveModule = (id: string): ModuleEditeur | undefined =>
-  modulesPerso().find((m) => m.id === id) ?? MODULES.find((m) => m.id === id);
+  id === ID_PRESSE_PAPIER
+    ? (presse ?? undefined)
+    : (modulesPerso().find((m) => m.id === id) ?? MODULES.find((m) => m.id === id));
 
 export const exporteModules = (modules: ModuleEditeur[]): ModulesExportes => ({
   format: 'dkk-modules',
@@ -114,7 +133,11 @@ export function extraisModule(
     famille: FAMILLE_PERSO,
     sol: sol >= 0 ? sol : lignes.length - 1,
     lignes,
-    decor: doc.decor.filter(([, x, y]) => dedans(x, y)).map(([n, x, y]): Decor => [n, x - x0, y - y0]),
+    decor: doc.decor
+      .filter(([, x, y]) => dedans(x, y))
+      .map((d): Decor =>
+        d[3] === undefined ? [d[0], d[1] - x0, d[2] - y0] : [d[0], d[1] - x0, d[2] - y0, d[3]],
+      ),
     gens: doc
       .listeGens()
       .filter(([x, y]) => dedans(x, y))

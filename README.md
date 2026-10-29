@@ -184,7 +184,8 @@ points, plus 10 par seconde d'avance sur le décollage. Le tarmac se tire d'apr�
 ## L'éditeur de niveau
 
 Menu principal → **Éditeur de niveau** : on peint une carte au doigt (téléphone, en portrait comme en paysage) ou à la souris. On part
-d'une page blanche ou d'un niveau du jeu ; la carte se dessine comme en jeu (l'herbe ou la neige sur la terre, les coins
+d'un niveau de base (le départ, le van et le sol), d'un niveau **complètement vide** (que du ciel : tout est à poser) ou d'un niveau
+du jeu ; la carte se dessine comme en jeu (l'herbe ou la neige sur la terre, les coins
 arrondis, la végétation). La palette (le bouton en bas) range tout ce qu'on peut poser : les tuiles avec les textures du thème,
 les gens (chaque apparence à part, comme les trois bigoudènes, les gens du coin de chaque ville, qu'on peut poser ailleurs, et les
 boss), les objets (le départ, le van, les drapeaux, les cages, le butin, les tyroliennes, les déclencheurs de dialogue), le décor
@@ -214,9 +215,19 @@ du jeu : chaque départ y est relié au poteau le plus proche à sa droite.
 Menu → Mes niveaux les rouvre ou les supprime. Ils se jouent en battle royale, seul contre l'ordinateur ou en ligne (l'hôte
 envoie le niveau aux autres joueurs). « Vérifier le parcours » dit aussi pour combien de joueurs la carte est faite.
 
-**Mes modules** : l'outil sélection (le carré en pointillés) fait un module d'un rectangle de la carte (ses tuiles, ses gens, son
-décor ; le départ et le van restent dans le niveau) ; on le nomme, il rejoint la palette (Modules → Mes modules) et se pose comme
-ceux du jeu, par sa rangée de sol. Le menu → Mes modules les liste, les exporte (un par un ou tous, un fichier `dkk-modules`), en
+**Rogner la carte** : Menu → Nom, thème et taille → « Rogner à la souris » (`src/editeur/rognage.ts`). La carte entre dans la vue avec
+un cadre jaune qu'on tire par ses poignées (les quatre coins, le milieu de chaque côté, ou n'importe où le long d'un bord) : le
+rogné se teinte en rouge, l'ajouté en vert, la taille s'affiche ; « Appliquer » recadre (tout ce qui est posé suit : décor, gens,
+départs, tyroliennes tracées), « Annuler » laisse la carte telle quelle ; un doigt qui ne saisit rien déplace la vue (Entrée
+applique, Échap annule). Les nombres de la fenêtre restent : les colonnes s'ajoutent à droite, les rangées en haut.
+
+**Copier** : l'outil sélection (le carré en pointillés) trace un rectangle ; une barre propose alors **Copier** (le morceau entre dans le
+presse-papier, qui se pose comme un module : on touche la carte pour le coller, autant de fois qu'on veut, son bas sur la rangée
+touchée ; il reste aussi dans la palette, Modules → Copie ; Ctrl+C et Ctrl+V au clavier) ou **Module**.
+
+**Mes modules** : l'outil sélection fait aussi un module d'un rectangle de la carte (ses tuiles, ses gens, son
+décor ; le départ et le van restent dans le niveau, les tyroliennes tracées n'y sont pas) ; on le nomme, il rejoint la palette
+(Modules → Mes modules) et se pose comme ceux du jeu, par sa rangée de sol. Le menu → Mes modules les liste, les exporte (un par un ou tous, un fichier `dkk-modules`), en
 importe et en supprime.
 
 Le code est dans `src/editeur/` (chargé seulement à l'ouverture de l'éditeur) ; les modules du jeu sont les pièces du générateur,

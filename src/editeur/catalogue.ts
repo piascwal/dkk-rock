@@ -6,7 +6,7 @@ import { PROPRIETES, tuileDuCaractere } from '../monde/tuiles';
 import { ACCESSOIRES } from '../rendu/decor-objets';
 import { FEUILLES } from '../rendu/feuilles';
 import type { NomTheme } from '../rendu/themes';
-import { MODULES, modulesPerso } from './modules-perso';
+import { MODULES, modulesPerso, pressePapier } from './modules-perso';
 
 /**
  * Tout ce que l'éditeur sait poser, par famille : les tuiles (la matière, l'eau, les échelles...), les gens (les ennemis de chaque
@@ -152,7 +152,7 @@ export function catalogue(famille: Famille, _theme?: NomTheme): Choix[] {
     case 'decor':
       return Object.keys(ACCESSOIRES).map((cle) => ({ famille, cle, nom: lisible(cle) }));
     case 'modules':
-      return [...modulesPerso(), ...MODULES].map((m) => ({
+      return [...(pressePapier() ? [pressePapier()!] : []), ...modulesPerso(), ...MODULES].map((m) => ({
         famille,
         cle: m.id,
         nom: m.nom,
