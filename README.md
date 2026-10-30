@@ -406,6 +406,15 @@ validé.
   cartes sont générées par `python3 outils/genere-niveaux.py` puis modifiables à la main ; l'aperçu de chaque carte est
   dans `assets-sources/niveaux/`. Le test d'accessibilité vérifie qu'on atteint la fin sans rien détruire. Sous le
   terrain il n'y a plus de socle : creuser trop, c'est tomber.
+  **Refaire un niveau sans gêner les joueurs** (le chantier du level design, à la manière de Broforce : du relief, des vides
+  qu'on ne creuse pas, plusieurs routes) : la refonte s'écrit à côté de l'original, dans `src/niveaux/refontes/` (le plan
+  `marseille_refonte` de `outils/niveaux/plans.py`, puis `python3 outils/pose-barils.py ../refontes/21-marseille`), et se
+  déclare dans `src/niveaux/refontes.ts`. Elle garde l'`id` et la place du niveau : les sauvegardes ne bougent pas. Les joueurs
+  ne l'ont qu'une fois son `id` ajouté à `REFONTES_PUBLIEES` (augmenter alors `VERSION_PROTOCOLE`) ; avant, on l'essaie en
+  ouvrant le jeu avec `?essai` à la fin de l'adresse (l'appareil s'en souvient ; `?essai=0` l'éteint ; un bandeau le
+  rappelle). En essai, on joue seul : inviter est indisponible, et rejoindre un ami reprend les versions publiées.
+  `python3 outils/mesure-niveaux.py` compare les cartes : la montée et la casse du chemin le moins cher, la montée imposée
+  même en cassant tout (faible : on traverse tout droit en cassant les murs), les gouffres et les falaises.
   **Les forteresses ne se grimpent pas par la façade** : à chaque étage, un balcon de quatre tuiles à gauche (un ennemi dessus : on
   se cogne dessous en sautant de mur en mur) et une annexe fermée à droite ; chacun a sa porte sur l'étage, il faut passer par
   l'intérieur (`_avancees` dans `outils/niveaux/structures.py`).

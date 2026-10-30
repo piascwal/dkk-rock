@@ -87,6 +87,8 @@ class Niveau:
             if self.base < h:
                 for y in range(self.base, h):
                     self.set(x, y, t['sol'] if y == self.base else t['sous'])
+                if self.get(x, h) == t['sol']:  # l'ancienne surface enfouie : du sous-sol (voir base_col)
+                    self.set(x, h, t['sous'])
             elif self.base > h:
                 for y in range(h, self.base):
                     self.set(x, y, ' ')
@@ -110,6 +112,10 @@ class Niveau:
         if cible < h:
             for y in range(cible, h):
                 self.set(x, y, t['sol'] if y == cible else t['sous'])
+            # l'ancienne surface, enfouie sous le massif, devient du sous-sol : sinon une veine de terre tendre le traverse de part en
+            # part, à la même hauteur que le reste du niveau (on y creuse tout droit)
+            if self.get(x, h) == t['sol']:
+                self.set(x, h, t['sous'])
         elif cible > h:
             for y in range(h, cible):
                 self.set(x, y, ' ')

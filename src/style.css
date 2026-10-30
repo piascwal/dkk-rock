@@ -1695,3 +1695,19 @@ h2 {
   z-index: 45;
   touch-action: none;
 }
+
+/* le mode essai (niveaux refaits, voir ui/essai.ts) : un rappel discret, qui ne capte aucun toucher */
+#bandeau-essai {
+  position: fixed;
+  left: 6px;
+  bottom: 6px;
+  z-index: 50;
+  padding: 2px 6px;
+  font:
+    700 10px Silkscreen,
+    monospace;
+  color: #1a1a1a;
+  background: #ffd23f;
+  pointer-events: none;
+  opacity: 0.85;
+}

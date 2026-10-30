@@ -24,6 +24,7 @@ import { aUnClavier, contenuTouches } from './touches-ui';
 import { animeTitre } from './titre-anime';
 import { transitionVan } from './transition-van';
 import { compteSibylles } from '../jeu/sibylles';
+import { versionsDuModeEssai } from './essai';
 
 /** Ce que les menus demandent à l'application. */
 export interface Actions {
@@ -85,6 +86,7 @@ export class Menus {
   }
 
   titre(): void {
+    versionsDuModeEssai(); // de retour d'une partie rejointe : le mode essai reprend ses niveaux refaits
     const boutons = el('div', '', 'boutons-menu une-colonne');
     boutons.append(
       bouton('Continuer', () => this.carte(), 'principal'),

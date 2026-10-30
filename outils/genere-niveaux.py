@@ -4,6 +4,8 @@ lieux (forteresses, barrages, traversées de gouffres, tours...) reliés par de 
 caves entrées par une échelle (outils/niveaux/souterrain.py). Jamais de longue ligne droite sans rien à y faire.
 
 Usage : python3 outils/genere-niveaux.py [garage|alpages|cimes|plage|ville|club|foret|port|groix ...]     Sortie : les cartes + un aperçu PNG
+Une refonte (marseille_refonte...) s'écrit dans src/niveaux/refontes/ : elle ne remplace l'original qu'une fois publiée
+(voir src/niveaux/refontes.ts).
 Après une régénération, relancer python3 outils/pose-barils.py : il repose les barils explosifs (seuls ou en pile) des niveaux.
 Les cartes sont ensuite modifiables à la main (c'est du texte) ; relancer le script les écrase.
 """
@@ -429,7 +431,8 @@ class Recette:
                 f'export const ZONES_{constante.removeprefix("CARTE_")}: [number, number][] = [{", ".join(f"[{a}, {b}]" for a, b in n.zones)}];\n'
             )
         (CARTES / nom_fichier).write_text(ts)
-        apercu(lignes, nom_fichier.replace('.ts', '.png'))
+        # une refonte (../refontes/...) a son aperçu à côté des autres, préfixé
+        apercu(lignes, nom_fichier.replace('../refontes/', 'refonte-').replace('.ts', '.png'))
 
 
 COULEURS = {
@@ -492,7 +495,8 @@ def construit(nom, theme, textes, plan, fichier, constante, graine, base=30, van
                     dernier = x0
                     break
         elif g == 'raccord' and x0 - dernier >= 50 and x0 > 30 and not drapeaux:
-            r.drapeau(x0 + (x1 - x0) // 2)
+            # au sol du raccord (n.base, lui, est celui de la fin du niveau : il a monté ou descendu en chemin)
+            r.drapeau(x0 + (x1 - x0) // 2, base=r.base_debut[x0])
             dernier = x0
     for x0, x1, g in r.pieces:
         if g in ('arene', 'vide') and x1 - x0 >= 40:

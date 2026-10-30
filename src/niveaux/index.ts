@@ -46,6 +46,7 @@ import { NEW_YORK } from './textes/20-new-york';
 import { MARSEILLE } from './textes/21-marseille';
 import { OTTAWA } from './textes/23-ottawa';
 import { ARENES } from './arenes';
+import { versionDe } from './refontes';
 
 /** Les niveaux, arc après arc (voir arcs.ts). Pour en ajouter un : un texte, une carte, une ligne ici. */
 export const NIVEAUX: DefNiveau[] = [
@@ -90,6 +91,25 @@ export const NIVEAUX: DefNiveau[] = [
 /** Les niveaux du jeu lui-même ; au-delà, des niveaux de l'éditeur (essais, Mes niveaux, ou reçus d'un hôte). */
 export const NOMBRE_NIVEAUX_JEU = NIVEAUX.length;
 
+/** Les niveaux du jeu tels qu'écrits ci-dessus, avant de choisir leur version (voir refontes.ts). */
+const ORIGINAUX = NIVEAUX.slice();
+let essai = false;
+
+/**
+ * Chaque niveau du jeu prend sa version : sa refonte publiée, ou en mode essai toute refonte (voir refontes.ts). Les niveaux
+ * déjà lus sont oubliés. Au chargement : les refontes publiées.
+ */
+export function choisitVersions(enEssai: boolean): void {
+  essai = enEssai;
+  ORIGINAUX.forEach((def, i) => (NIVEAUX[i] = versionDe(def, enEssai)));
+  lus.clear();
+}
+
+/** Vrai si les refontes en essai sont jouées (le mode essai, en solo). */
+export function versionsEnEssai(): boolean {
+  return essai;
+}
+
 /**
  * Ajoute un niveau d'essai (fait dans l'éditeur de niveau) à la fin de la liste, le temps d'y jouer, et renvoie son indice. Chaque
  * essai a le sien : rien de ce qui est gardé en mémoire par indice (la carte lue, les cachettes) ne vaut pour un autre.
@@ -100,6 +120,7 @@ export function ajouteNiveauEssai(def: DefNiveau): number {
 }
 
 const lus = new Map<number, NiveauLu>();
+choisitVersions(false);
 
 /**
  * Chez un joueur qui rejoint : le niveau de l'éditeur que l'hôte fait jouer, à l'indice que l'hôte lui donne (les indices des

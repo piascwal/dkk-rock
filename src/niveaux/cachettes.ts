@@ -179,15 +179,16 @@ export function detourDuTrace(lu: NiveauLu): Int32Array {
   return parcoursAcces(lu, true, chemin.length ? chemin : undefined).dist;
 }
 
-const memoire = new Map<number, Repere[]>();
+const memoire = new Map<number, { lu: NiveauLu | null; c: Repere[] }>();
 
-/** Les cachettes du niveau `i` (indice dans NIVEAUX), calculées une fois. */
+/** Les cachettes du niveau `i` (indice dans NIVEAUX), calculées une fois par version du niveau (voir choisitVersions). */
 export function cachettesDuNiveau(i: number): Repere[] {
-  let c = memoire.get(i);
-  if (!c) {
-    // une arène du battle royale n'en a pas : on n'y cherche pas de cartes
-    c = i >= 0 && i < NIVEAUX.length && !NIVEAUX[i]!.arene ? cachettes(niveauLu(i)) : [];
-    memoire.set(i, c);
+  // une arène du battle royale n'en a pas : on n'y cherche pas de cartes
+  const lu = i >= 0 && i < NIVEAUX.length && !NIVEAUX[i]!.arene ? niveauLu(i) : null;
+  let m = memoire.get(i);
+  if (!m || m.lu !== lu) {
+    m = { lu, c: lu ? cachettes(lu) : [] };
+    memoire.set(i, m);
   }
-  return c;
+  return m.c;
 }

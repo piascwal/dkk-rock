@@ -441,6 +441,41 @@ NIVEAUX = {
             ('arene', 40, dict(lettres='acqg')),
         ],
     ),
+    # Marseille refait (le chantier du level design, voir src/niveaux/refontes.ts) : à la manière de Broforce, la ville se gravit.
+    # On part au ras de l'eau (le Vieux-Port), on monte au Panier, on redescend au fort, on remonte au fort Saint-Jean, on plonge
+    # vers la mer (les Catalans, les calanques) puis on grimpe jusqu'à la Bonne Mère, tout en haut. Des parois et des vides sans
+    # fond entre les massifs : casser les murs ne dispense plus de grimper ; des routes hautes et basses (passe haute, grotte,
+    # puits) au choix
+    'marseille_refonte': dict(
+        nom='Marseille', theme='marseille', textes='21-marseille.ts', fichier='../refontes/21-marseille.ts',
+        constante='CARTE_MARSEILLE_REFONTE', graine=212, base=58, raccord='ac', caves='ac',
+        lieux=[
+            ('plat', 12, dict(lettres='a', deco=3)),
+            ('ponton', 42, dict(lettres='ac', digit='1')),  # le Vieux-Port, au ras de l'eau ; les gabians
+            ('corniches', 22, dict(monte=10, lettres='ac')),  # on monte au Panier
+            ('calade', 34, dict(lettres='ac', digit='2')),  # le Panier
+            ('toits', 42, dict(lettres='ac')),
+            ('descente', 24, dict(chute=8, lettres='ac')),  # on redescend vers le fort, en tyrolienne
+            ('bastion', 26, dict(haut=8, lettres='ac')),  # un bastion du fort Saint-Nicolas
+            ('plat', 14, dict(lettres='qq', digit='3')),  # la pétanque
+            ('gouffre', 20, dict(lettres='ac', nb=4)),
+            ('corniches', 22, dict(monte=12, lettres='ac')),  # la paroi du fort Saint-Jean
+            ('forteresse', 34, dict(etages=3, lettres='ac', mat='{', cage=True)),  # le fort Saint-Jean
+            ('pont_singe', 22, dict(lettres='ac', butin='+')),
+            ('descente', 24, dict(chute=10, lettres='ac')),  # on plonge vers la mer
+            ('plat', 10, dict(lettres='aa', digit='4', drones=2)),  # les supporters de l'OM aux Catalans ; les gabians
+            ('traversee', 36, dict(lettres='ac', mode='iles')),
+            ('calanques', 36, dict(lettres='ac', digit='5')),  # les calanques
+            ('grotte', 20, dict(monte=8, lettres='ac', butin='+')),  # et la longue montée vers la Bonne Mère
+            ('passe_haute', 22, dict(haut=10, lettres='ac')),
+            ('corniches', 22, dict(monte=10, lettres='ac')),
+            ('puits', 24, dict(lettres='acq')),
+            ('corniches', 22, dict(monte=8, lettres='ac')),
+            ('bonne_mere', 44, dict(lettres='acq')),  # Notre-Dame de la Garde, tout en haut
+            ('barrage', 20, dict(haut=12, lettres='acq', butin='+')),
+            ('arene', 40, dict(lettres='acqg')),
+        ],
+    ),
     # Ottawa (voir niveaux/ottawa.py), entre New York et Lund : les trois mois de Mat au Canada. On y descend (le Glebe, la
     # tyrolienne), on y monte (la colline du Parlement, la tour de la Paix, la grotte, la tour) ; la pierre de taille (niveaux/detours.py)
     # se contourne plutôt que de se casser
