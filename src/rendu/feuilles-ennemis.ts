@@ -165,4 +165,15 @@ export const FEUILLES_ENNEMIS: Partial<Record<Genre, Feuille>> = {
     pied: 79,
     densite: 6,
   },
+  [G.BOULISTE]: {
+    fichier: 'boulistes.png',
+    w: 100,
+    h: 136,
+    images: [4, 6, 0, 0, 0, 0, 0, 0, 0, 3, 5],
+    apparences: 1,
+    compacte: true,
+    rythmes: [15, 8, 0, 0, 0, 0, 0, 0, 0, 8, 6],
+    pied: 50,
+    densite: 6,
+  },
 };

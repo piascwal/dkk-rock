@@ -483,7 +483,7 @@ validé.
   « c » des cartes deviennent un passager perdu et un passager pressé, un habitué du pub et un mouton, un étudiant en
   salopette et un cycliste, un trader et un rat, un hockeyeur (et sa rondelle qui glisse au sol) et un castor, un supporter de
   l'OM et un livreur en scooter ; chaque ville a en plus son spécial (z : la gargouille, u : le pilier du Munster, j : l'élan,
-  n : le pigeon, w : la bernache du Canada, i : le gardien de but, q : le bouliste et sa boule de pétanque).
+  n : le pigeon, w : la bernache du Canada, i : le gardien de but, q : le bouliste et sa boule de pétanque ; le bouliste est animé à la main par `outils/anime-bouliste.py`, qui découpe son sprite et en tire repos, marche, lancer et touché, puis `outils/fixe-ennemis.py` en fait la planche).
   Aucune image en plus à télécharger (protocole v31).
   **Le FISE** (Montpellier, sur les berges du Lez) est fait à la main, zone par zone (`outils/niveaux/fise.py`) : l'entrée
   (l'arche et le logo officiel), le grand parc noir à plateaux roses (tuiles `L` et `U`), le food court à l'ombre des platanes
