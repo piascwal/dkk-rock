@@ -45,15 +45,18 @@ def pose_sur(toile, calque, dx=0, dy=0):
     toile[ys2[bon], xs2[bon]] = calque[ys[bon], xs[bon]]
 
 
-def tourne(calque, pivot, angle, dy=0):
-    """Fait tourner un membre autour de son pivot (angle en degrés, positif : vers l'avant, à droite) ; au plus proche voisin."""
+def tourne(calque, pivot, angle, dy=0, marge=MARGE):
+    """Fait tourner un membre autour de son pivot (angle en degrés, positif : vers l'avant, à droite) ; au plus proche voisin.
+
+    Le résultat est agrandi de `marge` de chaque côté (0 : une image déjà à la taille de la toile garde sa taille).
+    """
     a = math.radians(angle)
     h, w = calque.shape[:2]
-    sortie = np.zeros((h + 2 * MARGE, w + 2 * MARGE, 4), np.uint8)
+    sortie = np.zeros((h + 2 * marge, w + 2 * marge, 4), np.uint8)
     ys, xs = np.mgrid[0 : sortie.shape[0], 0 : sortie.shape[1]]
-    vx, vy = xs - MARGE - pivot[0], ys - MARGE - dy - pivot[1]
+    vx, vy = xs - marge - pivot[0], ys - marge - dy - pivot[1]
     # rotation inverse : d'où vient chaque pixel d'arrivée
-    sx = np.rint(pivot[0] + vx * math.cos(a) - vy * math.sin(a) - 0.0).astype(int)
+    sx = np.rint(pivot[0] + vx * math.cos(a) - vy * math.sin(a)).astype(int)
     sy = np.rint(pivot[1] + vx * math.sin(a) + vy * math.cos(a)).astype(int)
     bon = (sx >= 0) & (sx < w) & (sy >= 0) & (sy < h)
     sortie[bon] = calque[sy[bon], sx[bon]]

@@ -187,4 +187,15 @@ export const FEUILLES_ENNEMIS: Partial<Record<Genre, Feuille>> = {
     pied: 50,
     densite: 6,
   },
+  [G.SCOOTER]: {
+    fichier: 'scooters.png',
+    w: 134,
+    h: 122,
+    images: [4, 6, 0, 0, 0, 0, 0, 0, 0, 3, 4],
+    apparences: 1,
+    compacte: true,
+    rythmes: [6, 6, 0, 0, 0, 0, 0, 0, 0, 8, 6],
+    pied: 67,
+    densite: 6,
+  },
 };

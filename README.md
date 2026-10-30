@@ -483,7 +483,7 @@ validé.
   « c » des cartes deviennent un passager perdu et un passager pressé, un habitué du pub et un mouton, un étudiant en
   salopette et un cycliste, un trader et un rat, un hockeyeur (et sa rondelle qui glisse au sol) et un castor, un supporter de
   l'OM et un livreur en scooter ; chaque ville a en plus son spécial (z : la gargouille, u : le pilier du Munster, j : l'élan,
-  n : le pigeon, w : la bernache du Canada, i : le gardien de but, q : le bouliste et sa boule de pétanque ; le bouliste et le supporter de l'OM sont animés à la main par `outils/anime-bouliste.py` et `outils/anime-supporter.py` (outils communs dans `outils/anime_commun.py`), qui découpent leur sprite et en tirent repos, marche, attaque et touché, puis `outils/fixe-ennemis.py` en fait la planche).
+  n : le pigeon, w : la bernache du Canada, i : le gardien de but, q : le bouliste et sa boule de pétanque ; le bouliste, le supporter de l'OM et le livreur en scooter sont animés à la main par `outils/anime-bouliste.py`, `outils/anime-supporter.py` et `outils/anime-scooter.py` (outils communs dans `outils/anime_commun.py`), qui découpent leur sprite et en tirent repos, marche, attaque et touché, puis `outils/fixe-ennemis.py` en fait la planche).
   Aucune image en plus à télécharger (protocole v31).
   **Le FISE** (Montpellier, sur les berges du Lez) est fait à la main, zone par zone (`outils/niveaux/fise.py`) : l'entrée
   (l'arche et le logo officiel), le grand parc noir à plateaux roses (tuiles `L` et `U`), le food court à l'ombre des platanes
