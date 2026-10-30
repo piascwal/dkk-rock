@@ -68,6 +68,9 @@ TYPES = {
     'glaireux': ('GLAIREUX', 20),
     # l'habitué du pub de Limerick (voir ANIMES) : 3e valeur, durée d'une image de la marche
     'habitue': ('HABITUE', 20, 8),
+    # le pilier du Munster (Limerick) : deux apparences, le maillot rouge et le maillot vert ; chaque ennemi tire la sienne
+    # selon son identifiant (une répartition égale)
+    'pilier': ('PILIER', 22),
 }
 
 # les lignes de la planche par état d'animation (ANIM dans jeu/vue.ts) : le vol au repos (0), le piqué en attaque (10).

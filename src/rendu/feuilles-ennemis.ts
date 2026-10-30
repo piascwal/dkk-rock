@@ -51,4 +51,5 @@ export const FEUILLES_ENNEMIS: Partial<Record<Genre, Feuille>> = {
     rythme: 8,
     densite: 6,
   },
+  [G.PILIER]: { fichier: 'piliers.png', w: 124, h: 132, images: [2], variantes: true, densite: 6 },
 };
