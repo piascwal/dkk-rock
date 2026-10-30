@@ -88,7 +88,7 @@ ANIMES = {'habitue'}
 # <type>-<n>-anim.png (une ligne par animation) et <type>-<n>-anim.json (taille des images, nom et nombre d'images de chaque ligne).
 # Le projet Depix (<type>-<n>-projet.json, à rouvrir dans Depix) garde le découpage et les poses pour les retoucher.
 # Chaque animation va dans la ligne de son état (ANIM dans jeu/vue.ts) ; les apparences sont côte à côte, un bloc de colonnes chacune.
-DEPIX = {'pilier'}
+DEPIX = {'pilier', 'fetard'}
 LIGNES_DEPIX = {'repos': 0, 'marche': 1, 'touche': 9, 'attaque': 10}
 # une image dure 6 ticks (10 par seconde) : une animation plus lente (le repos, 4 par seconde) répète ses images
 IMAGES_PAR_SECONDE = 10

@@ -3,7 +3,15 @@ import { G, type Genre } from '../jeu/vue';
 import type { Feuille } from './feuilles';
 
 export const FEUILLES_ENNEMIS: Partial<Record<Genre, Feuille>> = {
-  [G.FETARD]: { fichier: 'fetards.png', w: 79, h: 120, images: [4], variantes: true, densite: 6 },
+  [G.FETARD]: {
+    fichier: 'fetards.png',
+    w: 111,
+    h: 129,
+    images: [8, 8, 0, 0, 0, 0, 0, 0, 0, 3, 5],
+    apparences: 4,
+    pied: 48,
+    densite: 6,
+  },
   [G.VIDEUR]: { fichier: 'videurs.png', w: 80, h: 138, images: [2], variantes: true, densite: 6 },
   [G.INFLUENCEUR]: { fichier: 'influenceurs.png', w: 63, h: 120, images: [1], variantes: true, densite: 6 },
   [G.YETI]: { fichier: 'yetis.png', w: 131, h: 150, images: [1], variantes: true, densite: 6 },
