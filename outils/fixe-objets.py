@@ -188,6 +188,8 @@ OBJETS = {
     'cairn': (['decor/cairn-base.png'], None, 14),
     # la souche (sous-bois, Bretagne, alpages) : une vieille souche écorcée, de l'artiste (le code en dessinait une tache de 10 px)
     'souche': (['decor/souche-base.png'], None, 14),
+    # la lavande de Provence (STC, semis, international) : une touffe de tiges violettes sur un pied vert-gris, de l'artiste
+    'lavande': (['decor/lavande-base.png'], None, 16),
     # le dolmen (landes, Bretagne) : deux pierres et une table, de l'artiste (le code en dessinait les blocs)
     'dolmen': (['decor/dolmen-base.png'], None, 28),
     'erableNeige': (['decor/erable-neige-base.png'], None, 44),
