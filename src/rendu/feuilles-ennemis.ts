@@ -9,7 +9,7 @@ export const FEUILLES_ENNEMIS: Partial<Record<Genre, Feuille>> = {
     h: 129,
     images: [8, 8, 0, 0, 0, 0, 0, 0, 0, 3, 5],
     apparences: 4,
-    pied: 48,
+    pied: 63,
     densite: 6,
   },
   [G.VIDEUR]: { fichier: 'videurs.png', w: 80, h: 138, images: [2], variantes: true, densite: 6 },

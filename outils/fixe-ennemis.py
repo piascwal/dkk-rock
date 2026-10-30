@@ -90,6 +90,9 @@ ANIMES = {'habitue'}
 # Chaque animation va dans la ligne de son état (ANIM dans jeu/vue.ts) ; les apparences sont côte à côte, un bloc de colonnes chacune.
 DEPIX = {'pilier', 'fetard'}
 LIGNES_DEPIX = {'repos': 0, 'marche': 1, 'touche': 9, 'attaque': 10}
+# les apparences dessinées vers la gauche : le jeu suppose un sprite tourné vers la droite (il le retourne quand l'ennemi va à
+# gauche), elles sont donc retournées ici
+MIROIRS = {('fetard', 1), ('fetard', 4)}
 # une image dure 6 ticks (10 par seconde) : une animation plus lente (le repos, 4 par seconde) répète ses images
 IMAGES_PAR_SECONDE = 10
 
@@ -143,7 +146,10 @@ def planche_depix(type_, hauteur):
         meta = json.loads(js.read_text())
         a = np.array(Image.open(png).convert('RGBA'))
         fw, fh = meta['frameWidth'], meta['frameHeight']
-        case = lambda ligne, col: a[ligne * fh : (ligne + 1) * fh, col * fw : (col + 1) * fw]
+        miroir = (type_, n) in MIROIRS
+        case = lambda ligne, col, m=miroir: (lambda c: c[:, ::-1] if m else c)(
+            a[ligne * fh : (ligne + 1) * fh, col * fw : (col + 1) * fw]
+        )
         lignes = {}
         for anim in meta['animations']:
             if anim['name'] not in LIGNES_DEPIX:
