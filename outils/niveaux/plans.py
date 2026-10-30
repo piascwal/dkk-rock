@@ -49,7 +49,7 @@ NIVEAUX = {
             ('forteresse', 40, dict(etages=4, lettres='ac', cage=True)),
             ('calade', 30, dict(lettres='ac', haut=4)),
             ('remparts', 18, dict(haut=6, lettres='ac')),
-            ('traversee', 36, dict(lettres='ac', mode='iles')),
+            ('traversee', 36, dict(lettres='acii', mode='iles')),
             ('gouffre', 22, dict(lettres='ac', nb=5)),
             ('barrage', 20, dict(haut=16, lettres='ac', tyro=11, butin='+')),  # le bord de la falaise, au belvédère
             ('arene', 40, dict(lettres='ac')),
@@ -341,7 +341,7 @@ NIVEAUX = {
             ('plat', 12, dict(lettres='c', deco=3)),
             ('pres', 30, dict(lettres='c', digit='1')),  # les prés à murets, leurs moutons
             ('colline', 18, dict(haut=3, lettres='c')),
-            ('bastion', 26, dict(haut=8, lettres='acl')),  # une vieille tour de garde en pierre de taille
+            ('bastion', 26, dict(haut=8, lettres='acli')),  # une vieille tour de garde en pierre de taille
             ('pres', 26, dict(lettres='cc')),
             ('corniches', 22, dict(monte=6, lettres='ac')),  # on monte au château
             ('chateau_roi_jean', 44, dict(lettres='ac', digit='2')),  # le château du roi Jean
@@ -452,13 +452,13 @@ NIVEAUX = {
             ('maison', 14, dict(lettres='ac')),
             ('toits', 42, dict(lettres='acl')),  # les toits du Glebe
             ('corniches', 22, dict(monte=6, lettres='ac')),  # on monte la rue en pente...
-            ('glebe', 34, dict(lettres='ac', chute=6, digit='2')),  # ... le Glebe Collegiate : on n'en sort qu'en bas
+            ('glebe', 34, dict(lettres='acii', chute=6, digit='2')),  # ... le Glebe Collegiate : on n'en sort qu'en bas
             ('plat', 10, dict(lettres='ac', drones=2)),  # les bernaches
             ('bastion', 26, dict(haut=8, lettres='ac')),
-            ('gouffre', 20, dict(lettres='ac', nb=4)),
+            ('gouffre', 20, dict(lettres='acii', nb=4)),
             ('patinoire', 64, dict(lettres='a', digit='3')),  # la patinoire sur la rivière gelée
             ('corniches', 22, dict(monte=6, lettres='ac')),  # on monte sur la colline du Parlement
-            ('parlement', 46, dict(lettres='ac', digit='4')),  # la tour de la Paix
+            ('parlement', 46, dict(lettres='acii', digit='4')),  # la tour de la Paix
             ('descente', 24, dict(chute=6, lettres='acl')),
             ('passe_haute', 22, dict(haut=10, lettres='ac')),
             ('plat', 12, dict(lettres='cwl', digit='5', drones=2)),  # le marché By

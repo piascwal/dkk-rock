@@ -27,10 +27,16 @@ const pres = (p: Partie, b: Baril, ecart = 0) => {
 };
 
 describe('le baril explosif', () => {
-  it('est posé à Saint-Cézaire et dans la ville, et nulle part ailleurs', () => {
-    expect(barils(nouvelle(0)).length).toBeGreaterThan(0);
-    expect(barils(nouvelle(4)).length).toBeGreaterThan(0);
-    expect(barils(nouvelle(1))).toHaveLength(0);
+  it('est posé un peu partout, parfois en pile de deux (voir outils/pose-barils.py)', () => {
+    for (const n of [0, 1, 2, 4]) expect(barils(nouvelle(n)).length, `niveau ${n}`).toBeGreaterThan(3);
+    // une pile : deux barils dans la même colonne, l'un sur l'autre
+    const empiles = [0, 1, 2, 3, 4, 6].some((n) => {
+      const bs = barils(nouvelle(n));
+      return bs.some((a) =>
+        bs.some((b) => b !== a && b.corps.x === a.corps.x && b.corps.y === a.corps.y - 16),
+      );
+    });
+    expect(empiles).toBe(true);
   });
 
   it('explose deux secondes après le premier coup, avec le rayon voulu', () => {

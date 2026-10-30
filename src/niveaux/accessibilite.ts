@@ -34,6 +34,8 @@ export function parcoursAcces(
 ): ParcoursAcces {
   // la barrière du boss s'ouvre quand on le bat : elle ne coupe pas le chemin (sauf pour vérifier qu'on ne la contourne pas)
   const tuiles = Uint8Array.from(lu.tuiles, (t) => (barriereOuverte && t === T.BARRIERE ? T.VIDE : t));
+  // un baril explosif est plein : on bute contre lui et on monte dessus, comme sur une caisse (le casser, c'est détruire)
+  for (const b of lu.barils) tuiles[b.ty * lu.largeur + b.tx] = T.CAISSE;
   const c = new Carte(lu.largeur, lu.hauteur, tuiles, lu.fond);
   const L = lu.largeur;
   // le héros fait presque deux tuiles de haut : il lui faut la case et celle du dessus
