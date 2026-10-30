@@ -16,6 +16,8 @@ Chaque sprite est remis sur sa grille de pixels, recadré sur sa silhouette, agr
 lissage (6 pixels de canvas par pixel du jeu : `densite`), puis centré dans une image de largeur commune, les pieds
 en bas. Aucun pixel n'est redessiné.
 """
+import json
+import math
 import pathlib
 import re
 import sys
@@ -82,6 +84,15 @@ ETATS = {'goeland': (0, 10), 'bmxpro': (0, 10), 'champion': (0, 10)}
 # se décalent (voir marche.py), quatre images dans la ligne de la course (1)
 ANIMES = {'habitue'}
 
+# les types animés dans Depix (piascwal/pix-pixelart, mode Animation, export « Pour le jeu ») : pour chaque apparence n,
+# <type>-<n>-anim.png (une ligne par animation) et <type>-<n>-anim.json (taille des images, nom et nombre d'images de chaque ligne).
+# Le projet Depix (<type>-<n>-projet.json, à rouvrir dans Depix) garde le découpage et les poses pour les retoucher.
+# Chaque animation va dans la ligne de son état (ANIM dans jeu/vue.ts) ; les apparences sont côte à côte, un bloc de colonnes chacune.
+DEPIX = {'pilier'}
+LIGNES_DEPIX = {'repos': 0, 'marche': 1, 'touche': 9, 'attaque': 10}
+# une image dure 6 ticks (10 par seconde) : une animation plus lente (le repos, 4 par seconde) répète ses images
+IMAGES_PAR_SECONDE = 10
+
 
 def natif(chemin):
     """Le sprite remis sur sa grille réelle (cases de 2, 5, 8... px selon le fichier), recadré sur sa silhouette."""
@@ -118,6 +129,51 @@ def pose_animee(images, largeur, h):
     return planche, [len(lignes.get(k, [])) for k in range(11)]
 
 
+def planche_depix(type_, hauteur):
+    """La planche à lignes et à apparences d'un type animé dans Depix : (planche, largeur, hauteur, comptes, pied, nb d'apparences).
+
+    L'échelle vient de la pose de repos (sa silhouette fait `hauteur` pixels) ; toutes les images de toutes les apparences se
+    calent sur les pieds de cette pose (en bas de la case, au même `pied`) : le personnage ne flotte ni ne glisse.
+    """
+    blocs = []
+    for n in range(1, 10):
+        png, js = SRC / f'{type_}-{n}-anim.png', SRC / f'{type_}-{n}-anim.json'
+        if not png.exists():
+            break
+        meta = json.loads(js.read_text())
+        a = np.array(Image.open(png).convert('RGBA'))
+        fw, fh = meta['frameWidth'], meta['frameHeight']
+        case = lambda ligne, col: a[ligne * fh : (ligne + 1) * fh, col * fw : (col + 1) * fw]
+        lignes = {}
+        for anim in meta['animations']:
+            if anim['name'] not in LIGNES_DEPIX:
+                continue
+            rep = max(1, round(IMAGES_PAR_SECONDE / anim.get('fps', IMAGES_PAR_SECONDE)))
+            ims = [case(anim['row'], k) for k in range(anim['frames']) for _ in range(rep)]
+            lignes[LIGNES_DEPIX[anim['name']]] = ims
+        repos = lignes[0][0]
+        ys, xs = np.nonzero(repos[..., 3])
+        k = hauteur / (ys.max() - ys.min() + 1)
+        bas, milieu = ys.max() + 1, (xs.min() + xs.max() + 1) / 2
+        blocs.append((lignes, k, bas, milieu, fw, fh))
+    # la case commune : assez large des deux côtés du pied, assez haute au-dessus des pieds
+    gauche = max(math.ceil(m * k) for _, k, _, m, _, _ in blocs)
+    droite = max(math.ceil((fw - m) * k) for _, k, _, m, fw, _ in blocs)
+    haut = max(math.ceil(b * k) for _, k, b, _, _, _ in blocs)
+    w, h = gauche + droite, haut
+    colonnes = max(len(ims) for lignes, *_ in blocs for ims in lignes.values())
+    planche = Image.new('RGBA', (w * colonnes * len(blocs), h * (max(LIGNES_DEPIX.values()) + 1)), (0, 0, 0, 0))
+    for b, (lignes, k, bas, milieu, fw, fh) in enumerate(blocs):
+        for ligne, ims in lignes.items():
+            for c, im in enumerate(ims):
+                # sous les pieds de la pose de repos : coupé (le sol)
+                petit = agrandi(im[:bas], round(bas * k))
+                x = (b * colonnes + c) * w + gauche - round(milieu * k)
+                planche.alpha_composite(petit, (max(0, x), ligne * h + h - petit.height))
+    comptes = [len(blocs[0][0].get(k, [])) for k in range(max(LIGNES_DEPIX.values()) + 1)]
+    return planche, w, h, comptes, gauche, len(blocs)
+
+
 def apparences(type_):
     """Les fichiers <type>-<n>-base.png, dans l'ordre de n."""
     trouves = []
@@ -132,6 +188,15 @@ def main():
     SORTIE.mkdir(parents=True, exist_ok=True)
     lignes = []
     for type_, (genre, hauteur, *anim) in TYPES.items():
+        if type_ in DEPIX:
+            planche, largeur, h, compte, pied, nb = planche_depix(type_, hauteur * DENSITE)
+            nom = f'{type_}s.png'
+            planche.save(SORTIE / nom)
+            print(f'{nom} : {nb} apparence(s) animée(s) dans Depix, {largeur} x {h} px, lignes {compte}')
+            lignes.append(
+                f"  [G.{genre}]: {{ fichier: '{nom}', w: {largeur}, h: {h}, images: [{', '.join(map(str, compte))}], apparences: {nb}, pied: {pied}, densite: {DENSITE} }},"
+            )
+            continue
         fichiers = apparences(type_)
         if not fichiers:
             continue

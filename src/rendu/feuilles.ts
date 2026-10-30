@@ -35,6 +35,12 @@ export interface Feuille {
    */
   variantes?: boolean;
   /**
+   * Planche animée à plusieurs apparences (outils/fixe-ennemis.py, `DEPIX`) : les apparences sont côte à côte, un bloc de
+   * colonnes chacune (autant que la ligne la plus longue) ; les lignes restent celles des animations. Le jeu choisit le bloc
+   * d'après l'identifiant de l'ennemi.
+   */
+  apparences?: number;
+  /**
    * Pixels de la planche par pixel du jeu (1 par défaut). À 3, la planche est en pleine définition : le
    * canvas dessine en 3× (voir DENSITE_RENDU), un pixel de la planche vaut un tiers de pixel du jeu.
    */
@@ -88,13 +94,28 @@ export const FEUILLES: Partial<Record<Genre, Feuille>> = {
 /** Pour les tests et la lisibilité : tous les genres de héros. */
 export const GENRES_HEROS: Genre[] = [G.JBT, G.JBM, G.JBG, G.MAT, G.TOM];
 
-/** La case de la planche à dessiner : colonne et ligne, pour l'animation `e` à l'instant `compteur`. */
-export function caseDeLaPlanche(f: Feuille, e: number, compteur: number): { col: number; ligne: number } {
+/**
+ * La case de la planche à dessiner : colonne et ligne, pour l'animation `e` à l'instant `compteur` ; `apparence` choisit le
+ * bloc de colonnes d'une planche à `apparences`.
+ */
+export function caseDeLaPlanche(
+  f: Feuille,
+  e: number,
+  compteur: number,
+  apparence = 0,
+): { col: number; ligne: number } {
   // apparences : `compteur` est alors l'identifiant de l'ennemi, il fixe l'apparence une fois pour toutes
   if (f.variantes) return { col: compteur % Math.max(1, f.images[0] ?? 1), ligne: 0 };
   const ligne = (f.images[e] ?? 0) > 0 ? e : 0;
   const n = Math.max(1, f.images[ligne] ?? 1);
-  return { col: colonneDuCycle(f, n, compteur), ligne };
+  const bloc = f.apparences ? (apparence % f.apparences) * Math.max(...f.images) : 0;
+  return { col: bloc + colonneDuCycle(f, n, compteur), ligne };
+}
+
+/** Le nombre d'apparences d'une planche (`variantes` ou `apparences`), 1 sinon. */
+export function nombreApparencesDe(f: Feuille | undefined): number {
+  if (f?.apparences) return f.apparences;
+  return f?.variantes ? Math.max(1, f.images[0] ?? 1) : 1;
 }
 
 /** L'image d'une ligne de `n` images à l'instant `compteur` (voir `cycle`). */

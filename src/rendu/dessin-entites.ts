@@ -186,6 +186,9 @@ export function dessineEntite(
 
   // sprites à apparences : l'identifiant choisit l'apparence ; héros : phase d'animation ; autres : compteur
   const compteur = aTerre ? 0 : FEUILLES[v.g]?.variantes ? v.id : heros ? v.f & 15 : v.f;
+  // planche animée à apparences : l'identifiant choisit l'apparence ; un ennemi touché joue sa ligne « étourdi » s'il en a une
+  const apparence = FEUILLES[v.g]?.apparences ? v.id : 0;
+  const etat = blanc && (FEUILLES[v.g]?.images[ANIM.ETOURDI] ?? 0) > 0 ? ANIM.ETOURDI : v.e;
   const imagesEchelle = v.e === ANIM.ECHELLE ? IMAGES_ECHELLE[v.g] : undefined;
   // en l'air, et sur une tyrolienne (pour l'instant, la même image que le saut)
   const enLair = v.e === ANIM.SAUT || v.e === ANIM.TYROLIENNE;
@@ -200,10 +203,11 @@ export function dessineEntite(
     dessineFeuille(
       ctx,
       v.g,
-      v.e,
+      etat,
       compteur,
       heros !== undefined && (v.f & 128) !== 0,
       heros ? (v.f >> 4) & 7 : 0,
+      apparence,
     )
   ) {
     // une planche fournie remplace le dessin en code ; l'instrument d'un héros se pose par-dessus

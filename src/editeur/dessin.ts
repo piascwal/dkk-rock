@@ -118,7 +118,7 @@ export class DessinEditeur {
     ctx.save();
     ctx.translate(x, y);
     // une planche à apparences prend la sienne d'après le « compteur » (l'identifiant, en jeu) : voir rendu/feuilles.ts
-    let ok = dessineFeuille(ctx, genre, ANIM.DEBOUT, apparence, false);
+    let ok = dessineFeuille(ctx, genre, ANIM.DEBOUT, apparence, false, 0, apparence);
     const dessin = DESSINS_ENNEMIS[genre];
     if (!ok && dessin) {
       dessin(pinceau(ctx), ANIM.DEBOUT, 0);

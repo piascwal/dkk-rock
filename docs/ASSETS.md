@@ -85,6 +85,15 @@ ennemi, et elle ne change pas.
 déclare tout au jeu (`src/rendu/feuilles-ennemis.ts`, généré). Types connus : fetard, videur, influenceur,
 yeti ; pour un nouveau type, ajouter une ligne à `TYPES` dans le script, avec sa hauteur en jeu.
 
+**Animer un ennemi dans Depix** (dépôt séparé `piascwal/pix-pixelart`, https://piascwal.github.io/pix-pixelart/, hors du
+jeu) : découper le sprite (pièces et articulations), générer repos, marche, attaque et touché, retoucher image par image,
+puis « Pour le jeu (PNG + JSON) ». Déposer les deux fichiers dans `assets-sources/ennemis/` sous les noms
+`<type>-<n>-anim.png` et `<type>-<n>-anim.json` (une paire par apparence), ajouter le type à `DEPIX` dans
+`outils/fixe-ennemis.py` et lancer le script : repos (ligne 0), marche (1), touché (9, jouée pendant le flash blanc) et
+attaque (10), chaque apparence dans son bloc de colonnes (`apparences` dans la feuille). Garder aussi le projet Depix
+(« Enregistrer », `<type>-<n>-projet.json`) : il se rouvre dans Depix pour reprendre les poses. Premier ennemi animé
+ainsi : le pilier du Munster (maillots rouge et vert).
+
 ## À savoir
 
 - Le **bras** d'un héros ne suit pas la visée (seul l'instrument pivote) : des lignes dédiées (tir en

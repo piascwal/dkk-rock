@@ -4,7 +4,7 @@ import { ennemiDuCoin, ENNEMIS_LOCAUX } from '../entites/ennemis/locaux';
 import { G, type Genre } from '../jeu/vue';
 import { PROPRIETES, tuileDuCaractere } from '../monde/tuiles';
 import { ACCESSOIRES } from '../rendu/decor-objets';
-import { FEUILLES } from '../rendu/feuilles';
+import { FEUILLES, nombreApparencesDe } from '../rendu/feuilles';
 import type { NomTheme } from '../rendu/themes';
 import { MODULES, modulesPerso, pressePapier } from './modules-perso';
 
@@ -92,8 +92,7 @@ const APPARENCES: Partial<Record<number, string[]>> = {
 
 /** Le nombre d'apparences d'un personnage (sa planche en a plusieurs : `variantes`), 1 sinon. */
 export function nombreApparences(genre: Genre): number {
-  const f = FEUILLES[genre];
-  return f?.variantes ? Math.max(1, f.images[0] ?? 1) : 1;
+  return nombreApparencesDe(FEUILLES[genre]);
 }
 
 /** La lettre d'un choix de la famille des gens (« ottawa/a#1 » → « a ») ; un boss est sa propre lettre. */

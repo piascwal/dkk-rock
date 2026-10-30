@@ -1,0 +1,31 @@
+{
+  "frameWidth": 234,
+  "frameHeight": 202,
+  "animations": [
+    {
+      "name": "repos",
+      "row": 0,
+      "frames": 4,
+      "fps": 4
+    },
+    {
+      "name": "marche",
+      "row": 1,
+      "frames": 8,
+      "fps": 10
+    },
+    {
+      "name": "attaque",
+      "row": 2,
+      "frames": 5,
+      "fps": 10
+    },
+    {
+      "name": "touche",
+      "row": 3,
+      "frames": 3,
+      "fps": 8
+    }
+  ],
+  "regard": "droite"
+}

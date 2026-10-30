@@ -139,13 +139,14 @@ export function dessineFeuille(
   compteur: number,
   tire: boolean,
   visee = 0,
+  apparence = 0,
 ): boolean {
   const f = FEUILLES[genre];
   const img = images.get(genre);
   if (!f || !img) return false;
   // à l'arrêt, un héros qui tire tend le bras ; en mouvement, ses bras balancent et l'instrument montre le tir
   const tendu = tire && e === ANIM.DEBOUT && (f.images[ANIM.ATTAQUE] ?? 0) > 0;
-  let { col, ligne } = caseDeLaPlanche(f, tendu ? ANIM.ATTAQUE : e, compteur);
+  let { col, ligne } = caseDeLaPlanche(f, tendu ? ANIM.ATTAQUE : e, compteur, apparence);
   if (f.visees !== undefined && visee > 0 && (e === ANIM.DEBOUT || e === ANIM.COURT || e === ANIM.SAUT)) {
     ligne = f.visees + visee - 1;
     col = e === ANIM.COURT ? colonneDuCycle(f, f.images[ligne] ?? 1, compteur) : 0;

@@ -33,6 +33,27 @@ describe('les apparences d’un ennemi', () => {
   });
 });
 
+describe('une planche animée à plusieurs apparences', () => {
+  // deux apparences côte à côte, chacune un bloc de 8 colonnes : repos 4 images, course 8, étourdi 3
+  const f: Feuille = {
+    fichier: 'x.png',
+    w: 20,
+    h: 40,
+    images: [4, 8, 0, 0, 0, 0, 0, 0, 0, 3],
+    apparences: 2,
+  };
+
+  it('garde les lignes des animations et prend le bloc de son apparence', () => {
+    expect(caseDeLaPlanche(f, 1, 6, 0)).toEqual({ col: 1, ligne: 1 });
+    expect(caseDeLaPlanche(f, 1, 6, 1)).toEqual({ col: 9, ligne: 1 });
+    expect(caseDeLaPlanche(f, 9, 0, 3)).toEqual({ col: 8, ligne: 9 });
+  });
+
+  it('ne déborde jamais sur le bloc voisin', () => {
+    for (let t = 0; t < 100; t++) expect(caseDeLaPlanche(f, 0, t, 0).col).toBeLessThan(4);
+  });
+});
+
 describe('les planches déclarées', () => {
   it.each(Object.entries(FEUILLES))(
     'le genre %s : le fichier existe et ses dimensions collent à la déclaration',
@@ -41,7 +62,7 @@ describe('les planches déclarées', () => {
       expect(png.subarray(1, 4).toString()).toBe('PNG');
       const largeur = png.readUInt32BE(16);
       const hauteur = png.readUInt32BE(20);
-      expect(largeur).toBe(f!.w * Math.max(...f!.images));
+      expect(largeur).toBe(f!.w * Math.max(...f!.images) * (f!.apparences ?? 1));
       expect(hauteur).toBe(f!.h * f!.images.length);
       expect(f!.images[0]).toBeGreaterThan(0);
     },

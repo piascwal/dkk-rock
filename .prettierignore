@@ -1,3 +1,5 @@
 dist/
 package-lock.json
 recette/
+# projets d’animation Depix : un JSON compact, à rouvrir dans Depix (piascwal/pix-pixelart)
+assets-sources/**/*-projet.json
