@@ -75,6 +75,8 @@ TYPES = {
     'pilier': ('PILIER', 22),
     # le hockeyeur d'Ottawa : animé dans Depix (sa marche est une glisse de patineur)
     'hockeyeur': ('HOCKEYEUR', 19),
+    # le gardien de but d'Ottawa : une seule animation, ses déplacements (à l'arrêt, il garde la première image)
+    'gardien': ('GARDIEN', 22),
 }
 
 # les lignes de la planche par état d'animation (ANIM dans jeu/vue.ts) : le vol au repos (0), le piqué en attaque (10).
@@ -90,7 +92,7 @@ ANIMES = {'habitue'}
 # <type>-<n>-anim.png (une ligne par animation) et <type>-<n>-anim.json (taille des images, nom et nombre d'images de chaque ligne).
 # Le projet Depix (<type>-<n>-projet.json, à rouvrir dans Depix) garde le découpage et les poses pour les retoucher.
 # Chaque animation va dans la ligne de son état (ANIM dans jeu/vue.ts) ; les apparences sont côte à côte, un bloc de colonnes chacune.
-DEPIX = {'hockeyeur', 'pilier', 'fetard', 'danseur', 'lanceur', 'yeti', 'influenceur', 'videur', 'glaireux'}
+DEPIX = {'gardien', 'hockeyeur', 'pilier', 'fetard', 'danseur', 'lanceur', 'yeti', 'influenceur', 'videur', 'glaireux'}
 LIGNES_DEPIX = {'repos': 0, 'marche': 1, 'touche': 9, 'attaque': 10}
 # les apparences dessinées vers la gauche : le jeu suppose un sprite tourné vers la droite (il le retourne quand l'ennemi va à
 # gauche), elles sont donc retournées ici

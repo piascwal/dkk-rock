@@ -143,4 +143,15 @@ export const FEUILLES_ENNEMIS: Partial<Record<Genre, Feuille>> = {
     pied: 66,
     densite: 6,
   },
+  [G.GARDIEN]: {
+    fichier: 'gardiens.png',
+    w: 139,
+    h: 132,
+    images: [1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    apparences: 1,
+    compacte: true,
+    rythmes: [15, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    pied: 71,
+    densite: 6,
+  },
 };
