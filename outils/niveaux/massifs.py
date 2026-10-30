@@ -1,8 +1,10 @@
 """Les entrailles des massifs (le chantier du level design, à la manière de Broforce). Un niveau qui monte et descend laisse
 sous ses plateaux de grands blocs de roche pleins, sans rien à y faire. On y creuse un réseau :
 
-- des galeries jusqu'à cinq profondeurs sous la surface (tant que le massif est assez épais), en tronçons (jamais d'un bout à l'autre), décalées d'un étage à l'autre ;
-- reliées par des échelles : de la surface au premier étage, d'un étage à celui du dessous ;
+- des galeries jusqu'à cinq profondeurs sous la surface (tant que le massif est assez épais), en tronçons (jamais d'un bout à
+  l'autre) ; chaque galerie d'un étage plus bas passe sous deux galeries du dessus et remonte des deux côtés (un treillis, pas
+  un arbre : on ne revient pas sur ses pas) ;
+- reliées par des échelles : de la surface (ou du rez-de-chaussée d'une tour) au premier étage, d'un étage à ceux du dessous ;
 - des salles plus hautes, gardées, avec un piton où se tient un garde ; en profondeur, des cavernes à pitons en escalier ;
 - du butin au bout des culs-de-sac (médiators, armes, tonneaux WOG, barils, quelques cages) ;
 - des fenêtres sur la falaise quand une galerie arrive au bord d'un vide : on voit dehors, et on peut en tomber.
@@ -14,7 +16,7 @@ On ne creuse que la terre et la roche naturelles : les forts, les puits et les g
 
 PROFONDEURS = (5, 10, 15, 20, 25)  # la rangée du sol de chaque étage, sous la surface la plus basse du tronçon
 HAUT = 3  # la hauteur d'une galerie (un héros en fait deux)
-TRONCON = (16, 30)  # la longueur d'un tronçon de galerie
+TRONCON = (10, 30)  # la longueur d'un tronçon de galerie
 ROCHE_ENTRE = (3, 6)  # la roche laissée entre deux tronçons du même étage (on la creuse, ou on fait le détour)
 BUTINS = ['+', '*', 'O', '%', '+', 'K', '*', 'O']
 
@@ -44,9 +46,9 @@ def _troncons(n, rng):
         fin = x
         while fin < n.w - 10 and epais[fin]:
             fin += 1
-        a = x
-        while fin - a >= TRONCON[0]:
-            longueur = min(fin - a, rng.randrange(*TRONCON))
+        a, bord = x + 2, fin - 2  # une paroi de deux tuiles au bord du massif : la galerie ne s'ouvre pas d'elle-même sur le vide
+        while bord - a >= TRONCON[0]:
+            longueur = min(bord - a, rng.randrange(*TRONCON))
             morceaux.append((a, a + longueur))
             a += longueur + rng.randrange(*ROCHE_ENTRE)
         x = fin
@@ -76,12 +78,16 @@ def reseau(r, lettres='a'):
     """Le réseau de galeries sous tous les massifs du niveau (voir en tête de fichier)."""
     n, rng = r.n, r.n.rng
     etages = [[] for _ in PROFONDEURS]  # par étage : (a, b, sol)
-    troncons = _troncons(n, rng)  # une fois pour toutes, avant de creuser : chaque étage passe sous les mêmes massifs
+    segments = _troncons(n, rng)  # le premier étage : les tronçons des massifs, calculés avant de creuser
     for k, prof in enumerate(PROFONDEURS):
-        for a, b in troncons:
-            # décalés d'un étage à l'autre (un coup à droite, un coup à gauche) : une échelle mène toujours un peu plus loin
-            a, b = (a + 7, b) if k % 2 else (a, b - 7 * (k > 0))
-            if b - a < TRONCON[0] - 4:
+        if k:
+            # un étage plus bas : sous deux galeries voisines du dessus (le même massif, un peu de roche entre elles), du milieu de
+            # l'une au milieu de l'autre. Chaque galerie profonde remonte des deux côtés : descendre fait passer sous la roche et
+            # ressortir plus loin, jamais revenir sur ses pas
+            dessus = etages[k - 1]
+            segments = [((a1 + b1) // 2, (a2 + b2) // 2) for (a1, b1, _), (a2, b2, _) in zip(dessus, dessus[1:]) if a2 - b1 <= 8]
+        for a, b in segments:
+            if b - a < TRONCON[0] - 2:
                 continue
             sol = max(n.toit[a:b]) + prof - 1
             if sol + 3 >= n.bas or not _plein(n, a - 1, b + 1, sol - HAUT, sol + 2):
@@ -91,15 +97,15 @@ def reseau(r, lettres='a'):
     butin = 0
     for k, galeries in enumerate(etages):
         for i, (a, b, sol) in enumerate(galeries):
-            # l'accès : du dessus (un étage plus haut qui la recouvre), sinon de la surface
+            # l'accès : une échelle vers chaque galerie du dessus qui la recouvre (deux, d'ordinaire), sinon de la surface
             dessus = [(a2, b2, s2) for a2, b2, s2 in (etages[k - 1] if k else []) if a2 + 2 < b - 2 and a + 2 < b2 - 2]
-            if dessus:
-                a2, b2, s2 = dessus[0]
+            for a2, b2, s2 in dessus[:2]:
                 x = rng.randrange(max(a, a2) + 1, min(b, b2) - 1)
                 for y in range(s2, sol + 1):
                     n.set(x, y, 'H')
-            else:
-                x = next((x for x in (a + 2, b - 3, (a + b) // 2) if n.get(x, n.haut[x] - 1) == ' '), None)
+            if not dessus:
+                # du dehors, ou du rez-de-chaussée d'une tour (une trappe dans son plancher)
+                x = next((x for x in (a + 2, b - 3, (a + b) // 2) if n.get(x, n.haut[x] - 1) in ' .' and n.get(x, n.haut[x] - 2) in ' .'), None)
                 if x is None:
                     continue
                 for y in range(n.haut[x], sol + 1):

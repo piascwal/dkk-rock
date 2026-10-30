@@ -19,6 +19,7 @@ from peintre import Niveau
 from plans import NIVEAUX, enchaine
 from souterrain import souterrain, tonneaux_de_surface
 from massifs import reseau
+from blocs import bloc
 from ferry import ferry
 from fise import bigair, breakdance, densite, entree, flat_bmx, food_court, gradins, halfpipe_bois, parc_street, soirees, spine, village
 from plage import festival
@@ -226,6 +227,9 @@ class Recette:
 
     def p_toits(self, x0, x1, lettres='a'):
         toits(self.n, x0, x1 - x0, lettres, self.n.t['mur'])
+
+    def p_bloc(self, x0, x1, **kw):  # une tour d'une suite de blocs d'immeubles (voir niveaux/blocs.py)
+        bloc(self, x0, x1, **kw)
 
     # ---- le vide et l'escalade (voir niveaux/hauteurs.py)
     def p_pont_singe(self, x0, x1, lettres='a', butin=None):
