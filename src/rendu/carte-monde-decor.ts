@@ -310,9 +310,10 @@ export const SOLS: Record<Decor, Sol> = {
     petits: [palmier, I.pointu, caillou],
     grands: [I.bonneMere],
   },
+  // Ottawa : une neige bleutée, glacée, qui la distingue de celle de Lund
   ottawa: {
-    clair: '#eef2f8',
-    sombre: '#e0e8f2',
+    clair: '#c8ddf4',
+    sombre: '#b8d2ee',
     petits: [I.feuilleErable, I.castor, sapin],
     grands: [I.parlement],
   },

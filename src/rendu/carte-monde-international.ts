@@ -128,3 +128,27 @@ export const castor = (p: Px, x: number, y: number) => {
   p(x, y + 5, 2, 1, '#3a2a1e');
   p(x + 7, y + 4, 1, 1, '#f2f2e0');
 };
+
+/**
+ * Les frontières entre les villes de l'île de l'International Tour (des pays différents) : un pointillé sombre sur le bord des
+ * cases de deux régions voisines. Sans elles, deux villes sous la neige (Lund, Ottawa) se confondraient.
+ */
+export function frontieres(
+  p: Px,
+  region: readonly number[],
+  dansIleEst: (x: number, y: number) => boolean,
+  largeur: number,
+  hauteur: number,
+  c: number,
+): void {
+  for (let y = 0; y < hauteur; y++)
+    for (let x = 0; x < largeur; x++) {
+      if (!dansIleEst(x, y)) continue;
+      const k = y * largeur + x;
+      // le bord droit et le bord du bas de la case, en pointillés (un tiret sur deux cases)
+      if (x + 1 < largeur && dansIleEst(x + 1, y) && region[k + 1] !== region[k] && y % 2 === 0)
+        p(x * c + c - 1, y * c, 2, c, '#5a4a6e');
+      if (y + 1 < hauteur && dansIleEst(x, y + 1) && region[k + largeur] !== region[k] && x % 2 === 0)
+        p(x * c, y * c + c - 1, c, 2, '#5a4a6e');
+    }
+}

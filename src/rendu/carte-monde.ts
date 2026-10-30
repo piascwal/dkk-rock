@@ -13,6 +13,7 @@ import {
   terre,
 } from './carte-iles';
 import { arbreDeLimite, C, limiteVillePort, SOLS, mer, type Px } from './carte-monde-decor';
+import { frontieres } from './carte-monde-international';
 import { brouillard } from './carte-brouillard';
 import { dessineRoute, detroit, longueur, surRoute } from './carte-route';
 import { imageDe } from './feuilles-images';
@@ -152,6 +153,7 @@ function plan(): Plan {
         occupe.add(k);
       }
     }
+  frontieres(p, region, (x, y) => x >= DEBUT_ILE_EST && ile(x, y), LT, HT, C);
   // au-dessus de la mer (le détroit de Groix, le vol vers l'île de l'est), la route n'est plus qu'un sillage en pointillés
   dessineRoute(p, route, C, LT, { has: (k) => !ile(k % LT, Math.floor(k / LT)) });
   const pl = { route, etapes, fond: toile, region };
