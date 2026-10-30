@@ -445,10 +445,10 @@ NIVEAUX = {
     # On part au ras de l'eau (le Vieux-Port), on monte au Panier, on redescend au fort, on remonte au fort Saint-Jean, on plonge
     # vers la mer (les Catalans, les calanques) puis on grimpe jusqu'à la Bonne Mère, tout en haut. Des parois et des vides sans
     # fond entre les massifs : casser les murs ne dispense plus de grimper ; des routes hautes et basses (passe haute, grotte,
-    # puits) au choix
+    # puits) au choix, et sous chaque plateau un réseau de galeries à trois étages (voir niveaux/massifs.py)
     'marseille_refonte': dict(
         nom='Marseille', theme='marseille', textes='21-marseille.ts', fichier='../refontes/21-marseille.ts',
-        constante='CARTE_MARSEILLE_REFONTE', graine=212, base=58, raccord='ac', caves='ac',
+        constante='CARTE_MARSEILLE_REFONTE', graine=212, base=58, raccord='ac', caves='ac', reseau=True,
         lieux=[
             ('plat', 12, dict(lettres='a', deco=3)),
             ('ponton', 42, dict(lettres='ac', digit='1')),  # le Vieux-Port, au ras de l'eau ; les gabians

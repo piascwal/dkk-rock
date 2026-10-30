@@ -18,6 +18,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent / 'niveaux'))
 from peintre import Niveau
 from plans import NIVEAUX, enchaine
 from souterrain import souterrain, tonneaux_de_surface
+from massifs import reseau
 from ferry import ferry
 from fise import bigair, breakdance, densite, entree, flat_bmx, food_court, gradins, halfpipe_bois, parc_street, soirees, spine, village
 from plage import festival
@@ -519,7 +520,9 @@ def fabrique(cle):
         cfg['nom'], cfg['theme'], cfg['textes'], plan, '', '', cfg['graine'], base=cfg['base'], van=cfg.get('van', True),
         altitude=cfg.get('altitude', False), profondeur=cfg.get('profondeur', 30), drapeaux=cfg.get('drapeaux'),
     )
-    if not cfg.get('sans_caves'):  # le ferry est un petit niveau : rien sous le quai
+    if cfg.get('reseau'):  # un niveau en relief (une refonte) : les galeries dans ses massifs (voir niveaux/massifs.py)
+        reseau(r, cfg['caves'])
+    elif not cfg.get('sans_caves'):  # le ferry est un petit niveau : rien sous le quai
         souterrain(r, cfg['caves'])
     tonneaux_de_surface(r, barils=cle in ('stc', 'ville', 'newyork'))
     if cle == 'cimes':
