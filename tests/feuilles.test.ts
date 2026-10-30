@@ -2,7 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { G } from '../src/jeu/vue';
-import { FEUILLES, caseDeLaPlanche, colonneDuCycle, type Feuille } from '../src/rendu/feuilles';
+import {
+  FEUILLES,
+  caseDeLaPlanche,
+  colonneDuCycle,
+  nombreDeRangees,
+  rangeeDeLaPlanche,
+  type Feuille,
+} from '../src/rendu/feuilles';
 
 const f: Feuille = { fichier: 'x.png', w: 32, h: 32, images: [2, 4, 1], rythme: 5 };
 
@@ -54,6 +61,31 @@ describe('une planche animée à plusieurs apparences', () => {
   });
 });
 
+describe('une planche compacte', () => {
+  // repos 4 images (15 ticks chacune), course 8 (6 ticks), étourdi 3 : trois lignes dans le fichier au lieu de dix
+  const f: Feuille = {
+    fichier: 'x.png',
+    w: 20,
+    h: 40,
+    images: [4, 8, 0, 0, 0, 0, 0, 0, 0, 3],
+    compacte: true,
+    rythme: 6,
+    rythmes: [15, 6, 0, 0, 0, 0, 0, 0, 0, 7],
+  };
+
+  it('ne garde que les lignes qui ont des images, dans l’ordre des animations', () => {
+    expect(nombreDeRangees(f)).toBe(3);
+    expect([0, 1, 9].map((e) => rangeeDeLaPlanche(f, e))).toEqual([0, 1, 2]);
+  });
+
+  it('donne à chaque animation sa durée d’image', () => {
+    expect(caseDeLaPlanche(f, 0, 14).col).toBe(0);
+    expect(caseDeLaPlanche(f, 0, 15).col).toBe(1);
+    expect(caseDeLaPlanche(f, 1, 6).col).toBe(1);
+    expect(caseDeLaPlanche(f, 9, 14).col).toBe(2);
+  });
+});
+
 describe('les planches déclarées', () => {
   it.each(Object.entries(FEUILLES))(
     'le genre %s : le fichier existe et ses dimensions collent à la déclaration',
@@ -63,7 +95,7 @@ describe('les planches déclarées', () => {
       const largeur = png.readUInt32BE(16);
       const hauteur = png.readUInt32BE(20);
       expect(largeur).toBe(f!.w * Math.max(...f!.images) * (f!.apparences ?? 1));
-      expect(hauteur).toBe(f!.h * f!.images.length);
+      expect(hauteur).toBe(f!.h * nombreDeRangees(f!));
       expect(f!.images[0]).toBeGreaterThan(0);
     },
   );

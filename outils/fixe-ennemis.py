@@ -93,8 +93,6 @@ LIGNES_DEPIX = {'repos': 0, 'marche': 1, 'touche': 9, 'attaque': 10}
 # les apparences dessinées vers la gauche : le jeu suppose un sprite tourné vers la droite (il le retourne quand l'ennemi va à
 # gauche), elles sont donc retournées ici
 MIROIRS = {('fetard', 1), ('fetard', 4)}
-# une image dure 6 ticks (10 par seconde) : une animation plus lente (le repos, 4 par seconde) répète ses images
-IMAGES_PAR_SECONDE = 10
 
 
 def natif(chemin):
@@ -139,6 +137,7 @@ def planche_depix(type_, hauteur):
     calent sur les pieds de cette pose (en bas de la case, au même `pied`) : le personnage ne flotte ni ne glisse.
     """
     blocs = []
+    rythmes = {}
     for n in range(1, 10):
         png, js = SRC / f'{type_}-{n}-anim.png', SRC / f'{type_}-{n}-anim.json'
         if not png.exists():
@@ -154,9 +153,9 @@ def planche_depix(type_, hauteur):
         for anim in meta['animations']:
             if anim['name'] not in LIGNES_DEPIX:
                 continue
-            rep = max(1, round(IMAGES_PAR_SECONDE / anim.get('fps', IMAGES_PAR_SECONDE)))
-            ims = [case(anim['row'], k) for k in range(anim['frames']) for _ in range(rep)]
+            ims = [case(anim['row'], k) for k in range(anim['frames'])]
             lignes[LIGNES_DEPIX[anim['name']]] = ims
+            rythmes[LIGNES_DEPIX[anim['name']]] = round(60 / anim.get('fps', 10))
         repos = lignes[0][0]
         ys, xs = np.nonzero(repos[..., 3])
         k = hauteur / (ys.max() - ys.min() + 1)
@@ -168,16 +167,19 @@ def planche_depix(type_, hauteur):
     haut = max(math.ceil(b * k) for _, k, b, _, _, _ in blocs)
     w, h = gauche + droite, haut
     colonnes = max(len(ims) for lignes, *_ in blocs for ims in lignes.values())
-    planche = Image.new('RGBA', (w * colonnes * len(blocs), h * (max(LIGNES_DEPIX.values()) + 1)), (0, 0, 0, 0))
+    # planche compacte : une ligne de fichier par animation présente, dans l'ordre des animations
+    rangs = {ligne: r for r, ligne in enumerate(sorted(LIGNES_DEPIX.values()))}
+    planche = Image.new('RGBA', (w * colonnes * len(blocs), h * len(rangs)), (0, 0, 0, 0))
     for b, (lignes, k, bas, milieu, fw, fh) in enumerate(blocs):
         for ligne, ims in lignes.items():
             for c, im in enumerate(ims):
                 # sous les pieds de la pose de repos : coupé (le sol)
                 petit = agrandi(im[:bas], round(bas * k))
                 x = (b * colonnes + c) * w + gauche - round(milieu * k)
-                planche.alpha_composite(petit, (max(0, x), ligne * h + h - petit.height))
-    comptes = [len(blocs[0][0].get(k, [])) for k in range(max(LIGNES_DEPIX.values()) + 1)]
-    return planche, w, h, comptes, gauche, len(blocs)
+                planche.alpha_composite(petit, (max(0, x), rangs[ligne] * h + h - petit.height))
+    toutes = range(max(LIGNES_DEPIX.values()) + 1)
+    comptes = [len(blocs[0][0].get(k, [])) for k in toutes]
+    return planche, w, h, comptes, gauche, len(blocs), [rythmes.get(k, 0) for k in toutes]
 
 
 def apparences(type_):
@@ -195,12 +197,12 @@ def main():
     lignes = []
     for type_, (genre, hauteur, *anim) in TYPES.items():
         if type_ in DEPIX:
-            planche, largeur, h, compte, pied, nb = planche_depix(type_, hauteur * DENSITE)
+            planche, largeur, h, compte, pied, nb, rythmes = planche_depix(type_, hauteur * DENSITE)
             nom = f'{type_}s.png'
             planche.save(SORTIE / nom)
             print(f'{nom} : {nb} apparence(s) animée(s) dans Depix, {largeur} x {h} px, lignes {compte}')
             lignes.append(
-                f"  [G.{genre}]: {{ fichier: '{nom}', w: {largeur}, h: {h}, images: [{', '.join(map(str, compte))}], apparences: {nb}, pied: {pied}, densite: {DENSITE} }},"
+                f"  [G.{genre}]: {{ fichier: '{nom}', w: {largeur}, h: {h}, images: [{', '.join(map(str, compte))}], apparences: {nb}, compacte: true, rythmes: [{', '.join(map(str, rythmes))}], pied: {pied}, densite: {DENSITE} }},"
             )
             continue
         fichiers = apparences(type_)

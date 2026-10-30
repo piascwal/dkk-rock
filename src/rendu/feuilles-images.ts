@@ -1,6 +1,6 @@
 import { ANIM, G } from '../jeu/vue';
 import { VERSION } from '../version';
-import { FEUILLES, caseDeLaPlanche, colonneDuCycle, type Feuille } from './feuilles';
+import { FEUILLES, caseDeLaPlanche, colonneDuCycle, rangeeDeLaPlanche, type Feuille } from './feuilles';
 import { FEUILLES_DECOR } from './feuilles-objets';
 import { chargeTuiles } from './atlas-tuiles';
 import { chargeVoitures } from './drift-voitures';
@@ -174,7 +174,7 @@ function dessineCase(
   ctx.drawImage(
     img,
     col * f.w,
-    ligne * f.h,
+    rangeeDeLaPlanche(f, ligne) * f.h,
     f.w,
     f.h,
     arrondi(-(f.pied ?? f.w / 2) * k),

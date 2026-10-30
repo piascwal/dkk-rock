@@ -41,6 +41,13 @@ export interface Feuille {
    */
   apparences?: number;
   /**
+   * Planche compacte : seules les lignes d'animations qui ont des images sont dans le fichier, l'une sous l'autre dans l'ordre des
+   * animations (voir `rangeeDeLaPlanche`). Une planche animée de plusieurs apparences, sinon, serait aux deux tiers vide.
+   */
+  compacte?: boolean;
+  /** Durée d'une image (ticks) par animation, quand elle diffère de `rythme` : le repos va plus lentement que la course. */
+  rythmes?: number[];
+  /**
    * Pixels de la planche par pixel du jeu (1 par défaut). À 3, la planche est en pleine définition : le
    * canvas dessine en 3× (voir DENSITE_RENDU), un pixel de la planche vaut un tiers de pixel du jeu.
    */
@@ -109,7 +116,7 @@ export function caseDeLaPlanche(
   const ligne = (f.images[e] ?? 0) > 0 ? e : 0;
   const n = Math.max(1, f.images[ligne] ?? 1);
   const bloc = f.apparences ? (apparence % f.apparences) * Math.max(...f.images) : 0;
-  return { col: bloc + colonneDuCycle(f, n, compteur), ligne };
+  return { col: bloc + colonneDuCycle(f, n, compteur, ligne), ligne };
 }
 
 /** Le nombre d'apparences d'une planche (`variantes` ou `apparences`), 1 sinon. */
@@ -118,7 +125,21 @@ export function nombreApparencesDe(f: Feuille | undefined): number {
   return f?.variantes ? Math.max(1, f.images[0] ?? 1) : 1;
 }
 
-/** L'image d'une ligne de `n` images à l'instant `compteur` (voir `cycle`). */
-export function colonneDuCycle(f: Feuille, n: number, compteur: number): number {
-  return (f.cycle ? Math.floor((compteur * n) / f.cycle) : Math.floor(compteur / (f.rythme ?? 6))) % n;
+/** L'image d'une ligne de `n` images à l'instant `compteur` (voir `cycle`) ; `animation` : sa durée peut lui être propre (`rythmes`). */
+export function colonneDuCycle(f: Feuille, n: number, compteur: number, animation = -1): number {
+  const rythme = f.rythmes?.[animation] || (f.rythme ?? 6);
+  return (f.cycle ? Math.floor((compteur * n) / f.cycle) : Math.floor(compteur / rythme)) % n;
+}
+
+/** La ligne du fichier où se trouve l'animation `ligne` : elle-même, ou son rang parmi les lignes non vides d'une planche compacte. */
+export function rangeeDeLaPlanche(f: Feuille, ligne: number): number {
+  if (!f.compacte) return ligne;
+  let rang = 0;
+  for (let e = 0; e < ligne; e++) if ((f.images[e] ?? 0) > 0) rang++;
+  return rang;
+}
+
+/** Le nombre de lignes du fichier de la planche. */
+export function nombreDeRangees(f: Feuille): number {
+  return f.compacte ? f.images.filter((n) => n > 0).length : f.images.length;
 }
