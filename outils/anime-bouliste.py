@@ -15,19 +15,14 @@ sauf sous un membre qui bouge, où la zone du corps qu'il cachait reprend la cou
   des trous) : le pied avance ou recule, et se lève pendant le pas ;
 - le corps descend d'un ou deux pixels à chaque appui, et penche en bloc quand il est touché.
 """
-import json
 import math
 import pathlib
 import sys
 
 import numpy as np
-from PIL import Image
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from prepare_instrument import natif_et_case
-
-SRC = pathlib.Path(__file__).resolve().parent.parent / 'assets-sources' / 'ennemis'
-MARGE = 24  # autour du sprite, pour les bras levés et le recul
+from anime_commun import MARGE, comble_entrejambe, ecrit_planche, incline, jambe, nettoie, pas, pose_sur, sprite, tourne, voisins
 
 CORPS, BRAS_P, BRAS_L, JAMBE_P, JAMBE_L = range(5)
 EPAULE_P, EPAULE_L = (24.0, 57.0), (95.0, 66.0)
@@ -35,12 +30,6 @@ HANCHE, CHEVILLE, GENOU = 108, 172, 138
 CONTOUR = (36, 22, 22, 255)  # le trait sombre qui borde la chemise là où le bras la cachait
 # bord droit du bras proche, ligne par ligne : au-delà, c'est la chemise
 BORD_BRAS = [(44, 40), (60, 38), (70, 35), (80, 31), (90, 30), (100, 33), (108, 36)]
-
-
-def sprite():
-    nat, _ = natif_et_case(SRC / 'bouliste-1-base.png')
-    ys, xs = np.nonzero(nat[..., 3])
-    return nat[ys.min() : ys.max() + 1, xs.min() : xs.max() + 1]
 
 
 def decoupe(nat):
@@ -71,10 +60,7 @@ def decoupe(nat):
     # les contours sombres collés à un bras le suivent
     for etiquette in (BRAS_P, BRAS_L):
         for _ in range(2):
-            m = lab == etiquette
-            voisin = np.zeros_like(m)
-            voisin[1:] |= m[:-1]; voisin[:-1] |= m[1:]; voisin[:, 1:] |= m[:, :-1]; voisin[:, :-1] |= m[:, 1:]
-            lab[voisin & op & sombre & (lab == CORPS)] = etiquette
+            lab[voisins(lab == etiquette) & op & sombre & (lab == CORPS)] = etiquette
     return lab
 
 
@@ -105,57 +91,9 @@ def remplit_corps(nat, lab):
     return corps
 
 
-def pose_sur(toile, calque, dx=0, dy=0):
-    """Pose un calque (RGBA) décalé sur la toile : les pixels opaques écrasent."""
-    h, w = calque.shape[:2]
-    ys, xs = np.nonzero(calque[..., 3])
-    ys2, xs2 = ys + dy + MARGE, xs + dx + MARGE
-    bon = (ys2 >= 0) & (ys2 < toile.shape[0]) & (xs2 >= 0) & (xs2 < toile.shape[1])
-    toile[ys2[bon], xs2[bon]] = calque[ys[bon], xs[bon]]
-
-
-def tourne(calque, pivot, angle, dy=0):
-    """Fait tourner un membre autour de son pivot (angle en degrés, positif : vers l'avant, à droite) ; au plus proche voisin."""
-    a = math.radians(angle)
-    h, w = calque.shape[:2]
-    sortie = np.zeros((h + 2 * MARGE, w + 2 * MARGE, 4), np.uint8)
-    ys, xs = np.mgrid[0 : sortie.shape[0], 0 : sortie.shape[1]]
-    vx, vy = xs - MARGE - pivot[0], ys - MARGE - dy - pivot[1]
-    # rotation inverse : d'où vient chaque pixel d'arrivée
-    sx = np.rint(pivot[0] + vx * math.cos(a) - vy * math.sin(a) - 0.0).astype(int)
-    sy = np.rint(pivot[1] + vx * math.sin(a) + vy * math.cos(a)).astype(int)
-    bon = (sx >= 0) & (sx < w) & (sy >= 0) & (sy < h)
-    sortie[bon] = calque[sy[bon], sx[bon]]
-    return sortie
-
-
-def jambe(calque, avance, leve):
-    """La jambe décalée ligne à ligne depuis la hanche : le pied avance de `avance` pixels (vers la droite) et monte de `leve`."""
-    h, w = calque.shape[:2]
-    sortie = np.zeros_like(calque)
-    for y in range(HANCHE, h):
-        t = min(1.0, (y - HANCHE) / (CHEVILLE - HANCHE)) ** 1.3
-        dx = round(avance * t)
-        dy = -round(leve * min(1.0, max(0.0, (y - GENOU) / (CHEVILLE - GENOU)) ** 1.2))
-        ligne = calque[y]
-        for x in np.nonzero(ligne[:, 3])[0]:
-            if 0 <= x + dx < w and 0 <= y + dy < h:
-                sortie[y + dy, x + dx] = ligne[x]
-    return sortie
-
-
-def pas(u, amplitude=10.0, hauteur=9.0):
-    """Une jambe à la phase u du cycle (0 : le talon se pose, devant) : appui jusqu'à 0,5 (le pied recule), puis le pas (le pied revient en se levant)."""
-    u %= 1.0
-    if u < 0.5:
-        return amplitude * (1 - 4 * u), 0.0
-    v = (u - 0.5) * 2
-    return -amplitude * math.cos(math.pi * v), hauteur * math.sin(math.pi * v)
-
-
 class Bouliste:
     def __init__(self):
-        self.nat = sprite()
+        self.nat = sprite('bouliste')
         self.lab = decoupe(self.nat)
         self.corps = remplit_corps(self.nat, self.lab)
         h, w = self.nat.shape[:2]
@@ -178,67 +116,17 @@ class Bouliste:
     def image(self, bob=0, jp=(0, 0), jl=(0, 0), bras_p=0.0, bras_l=0.0, penche=0.0, leve_bras_p=0):
         """Une image : bob = descente du corps (px), jp / jl = (avance, lève) de chaque pied, bras en degrés, penche = recul du haut du corps (px)."""
         toile = np.zeros((self.h + 2 * MARGE, self.w + 2 * MARGE, 4), np.uint8)
-        pose_sur(toile, jambe(self.c[JAMBE_L], *jl))
-        pose_sur(toile, jambe(self.c[JAMBE_P], *jp))
+        pose_sur(toile, jambe(self.c[JAMBE_L], *jl, HANCHE, GENOU, CHEVILLE))
+        pose_sur(toile, jambe(self.c[JAMBE_P], *jp, HANCHE, GENOU, CHEVILLE))
         bl = tourne(self.c[BRAS_L], EPAULE_L, bras_l, bob)
         bp = tourne(self.c[BRAS_P], EPAULE_P, bras_p, bob + leve_bras_p)
         toile[bl[..., 3] > 0] = bl[bl[..., 3] > 0]
         pose_sur(toile, self.corps, 0, bob)
         toile[bp[..., 3] > 0] = bp[bp[..., 3] > 0]
-        comble_entrejambe(toile)
+        comble_entrejambe(toile, HANCHE)
         if penche:
             toile = incline(toile, penche)
         return nettoie(toile)
-
-
-def nettoie(toile):
-    """Retire les pixels isolés (aucun voisin opaque) et les petits îlots de moins de 6 pixels."""
-    op = toile[..., 3] > 0
-    vu = np.zeros_like(op)
-    h, w = op.shape
-    for y0, x0 in zip(*np.nonzero(op)):
-        if vu[y0, x0]:
-            continue
-        groupe, pile = [], [(y0, x0)]
-        vu[y0, x0] = True
-        while pile:
-            y, x = pile.pop()
-            groupe.append((y, x))
-            for ny, nx in ((y + 1, x), (y - 1, x), (y, x + 1), (y, x - 1)):
-                if 0 <= ny < h and 0 <= nx < w and op[ny, nx] and not vu[ny, nx]:
-                    vu[ny, nx] = True
-                    pile.append((ny, nx))
-        if len(groupe) < 6:
-            for y, x in groupe:
-                toile[y, x] = 0
-    return toile
-
-
-def comble_entrejambe(toile):
-    """Les petits vides d'une ou deux cases entre les jambes, sous le ventre, reprennent la couleur de leur voisin de gauche."""
-    for y in range(HANCHE + MARGE, HANCHE + MARGE + 22):
-        ligne = toile[y]
-        pleins = np.nonzero(ligne[:, 3])[0]
-        if len(pleins) < 2:
-            continue
-        for x in range(pleins.min(), pleins.max()):
-            if ligne[x, 3] == 0:
-                fin = next((k for k in range(x, min(x + 4, ligne.shape[0])) if ligne[k, 3]), None)
-                if fin is not None and ligne[x - 1, 3]:
-                    ligne[x : fin] = ligne[x - 1]
-
-
-def incline(toile, penche):
-    """Le haut du corps recule en bloc (ligne à ligne, aucun trou), les pieds restent au sol."""
-    sortie = np.zeros_like(toile)
-    bas = toile.shape[0] - MARGE
-    for y in range(toile.shape[0]):
-        dx = -round(penche * (max(0.0, bas - y) / bas) ** 1.4)
-        ligne = toile[y]
-        xs = np.nonzero(ligne[:, 3])[0]
-        ok = (xs + dx >= 0) & (xs + dx < toile.shape[1])
-        sortie[y, xs[ok] + dx] = ligne[xs[ok]]
-    return sortie
 
 
 def animations(b):
@@ -269,20 +157,7 @@ def animations(b):
 
 
 def main():
-    b = Bouliste()
-    anims = animations(b)
-    fh, fw = anims[0][1][0].shape[:2]
-    planche = np.zeros((fh * len(anims), fw * max(len(ims) for _, ims, _ in anims), 4), np.uint8)
-    meta = []
-    for r, (nom, ims, fps) in enumerate(anims):
-        for c, im in enumerate(ims):
-            planche[r * fh : (r + 1) * fh, c * fw : (c + 1) * fw] = im
-        meta.append({'name': nom, 'row': r, 'frames': len(ims), 'fps': fps})
-    Image.fromarray(planche).save(SRC / 'bouliste-1-anim.png')
-    (SRC / 'bouliste-1-anim.json').write_text(
-        json.dumps({'frameWidth': fw, 'frameHeight': fh, 'animations': meta, 'regard': 'droite'}, ensure_ascii=False)
-    )
-    print(f'bouliste-1-anim.png : {fw} x {fh} par image, {[(n, len(i)) for n, i, _ in anims]}')
+    ecrit_planche('bouliste', animations(Bouliste()))
 
 
 if __name__ == '__main__':
