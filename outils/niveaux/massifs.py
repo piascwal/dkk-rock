@@ -2,9 +2,11 @@
 sous ses plateaux et sous ses tours de grands blocs de roche pleins, sans rien à y faire. On y bâtit des complexes souterrains :
 
 - des bunkers, construits comme les tours (voir blocs.py) mais sous la roche : un à quatre étages selon l'épaisseur du massif,
-  de largeurs différentes, coupés en pièces, des échelles décalées d'un étage à l'autre, des gardes, des caisses, du butin ;
+  de largeurs différentes, coupés en pièces, des échelles décalées d'un étage à l'autre ; plus garnis que les tours : deux à
+  quatre gardes par étage, des caisses et des barils pour se couvrir, du butin à chaque étage, une cage au fond de chacun ;
 - reliés deux à deux par des boyaux creusés dans la roche, qui partent d'un étage de l'un pour arriver à un autre étage du
-  suivant : ils serpentent, montent et descendent d'une marche à la fois, s'élargissent en poches où guette un garde ;
+  suivant : ils serpentent, montent et descendent d'une marche à la fois, gardés tout du long, et s'élargissent en poches où
+  guette un garde près d'une arme, d'un médiator, d'un tonneau ou d'une cage ;
 - entrés par des puits d'échelle depuis la surface (ou le rez-de-chaussée d'une tour) : le premier bunker de chaque massif en a
   un, les autres une fois sur deux. On descend dans un bunker, on traverse, on file par un boyau et on ressort plus loin.
 
@@ -12,11 +14,12 @@ Rien n'y est obligatoire : la surface ne change pas (le toit d'un bunker laisse 
 chemin de tout le monde reste dehors. On ne creuse que la terre et la roche naturelles : les forts, les puits et les grottes des
 modules restent tels quels.
 """
-from blocs import ETAGE, tour
+from blocs import ETAGE, place_libre, tour
 
 BUNKER = (12, 23)  # la largeur d'un bunker
 ENTRE = (8, 17)  # la roche entre deux bunkers, où passe le boyau
 CHAMBRE = 3  # la hauteur d'un boyau (un héros en fait deux)
+POCHES = ['*', '+', 'O', '%', '*', 'K']  # ce qu'on trouve au fond des poches des boyaux
 
 
 def _naturel(n, c):
@@ -67,11 +70,14 @@ def _boyau(n, xa, ya, xb, yb, toit, rng, lettres):
         haut = CHAMBRE + (rng.random() < 0.2)
         for y in range(f - haut, f):
             _creuse(n, x, y)
-        if 3 < x - xa < xb - xa - 5 and rng.random() < 0.08:  # une poche : plus haute, plus large, gardée
-            for xx in range(x, x + 4):
+        if 3 < x - xa < xb - xa - 6 and rng.random() < 0.16:  # une poche : plus haute, plus large, gardée, avec son butin
+            for xx in range(x, x + 5):
                 for y in range(f - CHAMBRE - 2, f):
                     _creuse(n, xx, y)
-            n.pose_sur_sol(x + 2, rng.choice(lettres), f - CHAMBRE - 2)
+            n.pose_sur_sol(x + 1, rng.choice(lettres), f - CHAMBRE - 2)
+            n.pose_sur_sol(x + 3, rng.choice(POCHES), f - CHAMBRE - 2)
+        elif (x - xa) % 7 == 3 and x < xb - 2:  # des gardes tout le long
+            n.pose_sur_sol(x, rng.choice(lettres), f - CHAMBRE)
 
 
 def reseau(r, lettres='a'):
@@ -98,8 +104,13 @@ def reseau(r, lettres='a'):
             liens.append((b1, j1, b2, j2))
         for i, b in enumerate(bunkers):
             top, ta, tb = tour(n, b['x'], b['w'], b['g'], b['etages'], mat, lettres, b['pg'], b['pd'], rng, butin=b['x'] // 5, dehors=False)
-            if i == 0:
-                n.repere(b['x'] + b['w'] // 2, 'K', ymin=b['g'] - ETAGE + 1)  # une cage au fond du premier bunker
+            # une cage au fond de chaque bunker, hors des embrasures et des trappes
+            a0, b0 = b['x'], b['x'] + b['w']
+            sol = b['g']
+            for px in rng.sample(range(a0 + 2, b0 - 2), b0 - a0 - 4):
+                if all(n.get(px, sol - k) == '.' for k in (1, 2, 3)) and n.get(px, sol) != 'H':
+                    n.set(px, sol - 1, 'K')
+                    break
             # le puits d'entrée, depuis la surface (ou le rez-de-chaussée d'une tour) jusqu'au dernier étage
             if i == 0 or rng.random() < 0.5:
                 plancher = b['g'] - (b['etages'] - 1) * ETAGE

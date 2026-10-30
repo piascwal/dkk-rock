@@ -17,6 +17,20 @@ from hauteurs import abime, pont
 ETAGE = 5  # la hauteur d'un étage, dalle comprise : quatre rangées de pièce
 PROPS = ['C', 'T', '%', 'C', 'O', 'T']
 BUTINS = ['+', '*', '+', '*']
+SOUS_BUTINS = ['*', '+', 'O', '*', '%', '+']  # sous terre, à chaque étage d'un bunker
+
+
+def place_libre(n, a, b, haut, sol, rng):
+    """Une colonne de [a + 3, b - 3) où poser un objet au sol de l'étage (rangées haut à sol - 1) : jamais dans l'embrasure d'une
+    cloison, au pied d'une échelle ni sur une trappe ; None si l'on n'en trouve pas."""
+    for _ in range(6):
+        px = rng.randrange(a + 3, max(a + 4, b - 3))
+        if all(n.get(x, y) == '.' for x in (px - 1, px, px + 1) for y in range(haut, sol)) and 'H' not in (
+            n.get(px - 1, sol), n.get(px, sol), n.get(px + 1, sol)
+        ):
+            return px
+    return None
+
 
 
 def _plancher(g, j):
@@ -108,13 +122,15 @@ def tour(n, x0, w, g, etages, mat, lettres, portes_g=(), portes_d=(), rng=None, 
         for x in (a, b - 1):
             if dehors and rng.random() < 0.6 and n.get(x, sol - 3) == mat:
                 n.set(x, sol - 3, 'V')
-        # une caisse, un caisson, un baril ou un tonneau : jamais dans l'embrasure d'une cloison, au pied d'une échelle ni sur une trappe
-        px = rng.randrange(a + 3, max(a + 4, b - 3))
-        if all(n.get(x, y) == '.' for x in (px - 1, px, px + 1) for y in range(haut, sol)) and 'H' not in (
-            n.get(px - 1, sol), n.get(px, sol), n.get(px + 1, sol)
-        ):
-            n.set(px, sol - 1, PROPS[(j + x0) % len(PROPS)])
-        n.ennemis(a + 2, b - 2, lettres, 1 + (j > 0) + (b - a >= 22), ymin=haut)
+        # des caisses, caissons, barils ou tonneaux (plus sous terre, où l'on se bat à couvert) ; un butin par étage sous terre
+        for k in range(1 if dehors else 3):
+            px = place_libre(n, a, b, haut, sol, rng)
+            if px is not None:
+                n.set(px, sol - 1, PROPS[(j + k + x0) % len(PROPS)])
+        if not dehors:
+            n.repere(rng.randrange(a + 2, b - 2), SOUS_BUTINS[(j + x0) % len(SOUS_BUTINS)], ymin=haut)
+        gardes = 1 + (j > 0) + (b - a >= 22) if dehors else 2 + (b - a >= 18) + rng.randrange(2)
+        n.ennemis(a + 2, b - 2, lettres, gardes, ymin=haut)
     for j in portes_g:
         n.rect(x0, _plancher(g, j) - 2, x0 + 1, _plancher(g, j), ' ')
     for j in portes_d:
