@@ -4,6 +4,7 @@ lieux (forteresses, barrages, traversées de gouffres, tours...) reliés par de 
 caves entrées par une échelle (outils/niveaux/souterrain.py). Jamais de longue ligne droite sans rien à y faire.
 
 Usage : python3 outils/genere-niveaux.py [garage|alpages|cimes|plage|ville|club|foret|port|groix ...]     Sortie : les cartes + un aperçu PNG
+Après une régénération, relancer python3 outils/pose-barils.py : il repose les barils explosifs (seuls ou en pile) des niveaux.
 Les cartes sont ensuite modifiables à la main (c'est du texte) ; relancer le script les écrase.
 """
 import pathlib
