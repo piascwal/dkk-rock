@@ -154,4 +154,15 @@ export const FEUILLES_ENNEMIS: Partial<Record<Genre, Feuille>> = {
     pied: 71,
     densite: 6,
   },
+  [G.ELAN]: {
+    fichier: 'elans.png',
+    w: 166,
+    h: 172,
+    images: [4, 6, 0, 0, 0, 0, 0, 0, 0, 3, 5],
+    apparences: 1,
+    compacte: true,
+    rythmes: [15, 8, 0, 0, 0, 0, 0, 0, 0, 8, 6],
+    pied: 79,
+    densite: 6,
+  },
 };
