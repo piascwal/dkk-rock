@@ -409,8 +409,8 @@ validé.
   **Refaire un niveau sans gêner les joueurs** (le chantier du level design, à la manière de Broforce : du relief, des vides
   qu'on ne creuse pas, plusieurs routes) : la refonte s'écrit à côté de l'original, dans `src/niveaux/refontes/` (le plan
   `marseille_refonte` de `outils/niveaux/plans.py` : des suites de tours pleines de pièces séparées par le vide, qu'on
-  franchit par une passerelle ou une tyrolienne, `outils/niveaux/blocs.py`, et sous chaque plateau et chaque tour un réseau
-  de galeries à plusieurs étages, `outils/niveaux/massifs.py` ; puis `python3 outils/pose-barils.py ../refontes/21-marseille`), et se
+  franchit par une passerelle ou une tyrolienne, `outils/niveaux/blocs.py`, et sous chaque plateau et chaque tour des
+  complexes souterrains (des bunkers à étages reliés par des boyaux sinueux), `outils/niveaux/massifs.py` ; puis `python3 outils/pose-barils.py ../refontes/21-marseille`), et se
   déclare dans `src/niveaux/refontes.ts`. Elle garde l'`id` et la place du niveau : les sauvegardes ne bougent pas. Les joueurs
   ne l'ont qu'une fois son `id` ajouté à `REFONTES_PUBLIEES` (augmenter alors `VERSION_PROTOCOLE`) ; avant, on l'essaie en
   ouvrant le jeu avec `?essai` à la fin de l'adresse (l'appareil s'en souvient ; `?essai=0` l'éteint ; un bandeau le

@@ -1,24 +1,22 @@
 """Les entrailles des massifs (le chantier du level design, à la manière de Broforce). Un niveau qui monte et descend laisse
-sous ses plateaux de grands blocs de roche pleins, sans rien à y faire. On y creuse un réseau :
+sous ses plateaux et sous ses tours de grands blocs de roche pleins, sans rien à y faire. On y bâtit des complexes souterrains :
 
-- des galeries jusqu'à cinq profondeurs sous la surface (tant que le massif est assez épais), en tronçons (jamais d'un bout à
-  l'autre) ; chaque galerie d'un étage plus bas passe sous deux galeries du dessus et remonte des deux côtés (un treillis, pas
-  un arbre : on ne revient pas sur ses pas) ;
-- reliées par des échelles : de la surface (ou du rez-de-chaussée d'une tour) au premier étage, d'un étage à ceux du dessous ;
-- des salles plus hautes, gardées, avec un piton où se tient un garde ; en profondeur, des cavernes à pitons en escalier ;
-- du butin au bout des culs-de-sac (médiators, armes, tonneaux WOG, barils, quelques cages) ;
-- des fenêtres sur la falaise quand une galerie arrive au bord d'un vide : on voit dehors, et on peut en tomber.
+- des bunkers, construits comme les tours (voir blocs.py) mais sous la roche : un à quatre étages selon l'épaisseur du massif,
+  de largeurs différentes, coupés en pièces, des échelles décalées d'un étage à l'autre, des gardes, des caisses, du butin ;
+- reliés deux à deux par des boyaux creusés dans la roche, qui partent d'un étage de l'un pour arriver à un autre étage du
+  suivant : ils serpentent, montent et descendent d'une marche à la fois, s'élargissent en poches où guette un garde ;
+- entrés par des puits d'échelle depuis la surface (ou le rez-de-chaussée d'une tour) : le premier bunker de chaque massif en a
+  un, les autres une fois sur deux. On descend dans un bunker, on traverse, on file par un boyau et on ressort plus loin.
 
-Rien n'y est obligatoire : la surface ne change pas (la galerie la plus haute laisse trois rangées de terre au-dessus d'elle),
-et le chemin de tout le monde reste dehors. Le réseau est une autre route, à l'abri du ciel mais dans le noir, avec ses gardes.
-On ne creuse que la terre et la roche naturelles : les forts, les puits et les grottes des modules restent tels quels.
+Rien n'y est obligatoire : la surface ne change pas (le toit d'un bunker laisse trois rangées de terre au-dessus de lui), et le
+chemin de tout le monde reste dehors. On ne creuse que la terre et la roche naturelles : les forts, les puits et les grottes des
+modules restent tels quels.
 """
+from blocs import ETAGE, tour
 
-PROFONDEURS = (5, 10, 15, 20, 25)  # la rangée du sol de chaque étage, sous la surface la plus basse du tronçon
-HAUT = 3  # la hauteur d'une galerie (un héros en fait deux)
-TRONCON = (10, 30)  # la longueur d'un tronçon de galerie
-ROCHE_ENTRE = (3, 6)  # la roche laissée entre deux tronçons du même étage (on la creuse, ou on fait le détour)
-BUTINS = ['+', '*', 'O', '%', '+', 'K', '*', 'O']
+BUNKER = (12, 23)  # la largeur d'un bunker
+ENTRE = (8, 17)  # la roche entre deux bunkers, où passe le boyau
+CHAMBRE = 3  # la hauteur d'un boyau (un héros en fait deux)
 
 
 def _naturel(n, c):
@@ -29,103 +27,87 @@ def _plein(n, x0, x1, y0, y1):
     return all(_naturel(n, n.get(x, y)) for x in range(x0, x1) for y in range(y0, y1))
 
 
-def _troncons(n, rng):
-    """Les tronçons de massif : des colonnes de terre pleine sur au moins 12 rangées, coupés en morceaux. Sous un module (un fort,
-    un puits, une grotte), la terre pleine commence plus bas : `toit` en garde la première rangée, colonne par colonne."""
+def _massifs(n):
+    """Les massifs : des colonnes voisines de terre pleine sur au moins 12 rangées (sous un module, la terre pleine commence plus
+    bas : `toit` en garde la première rangée, colonne par colonne), moins une paroi de deux tuiles à chaque bord."""
     toit = [None] * n.w
     for x in range(n.w):
         toit[x] = next((y for y in range(n.haut[x] + 1, n.haut[x] + 12) if y + 12 < n.bas and _plein(n, x, x + 1, y, y + 12)), None)
-    n.toit = toit
-    epais = [t is not None for t in toit]
-    morceaux = []
-    x = 10
+    morceaux, x = [], 10
     while x < n.w - 10:
-        if not epais[x]:
+        if toit[x] is None:
             x += 1
             continue
         fin = x
-        while fin < n.w - 10 and epais[fin]:
+        while fin < n.w - 10 and toit[fin] is not None:
             fin += 1
-        a, bord = x + 2, fin - 2  # une paroi de deux tuiles au bord du massif : la galerie ne s'ouvre pas d'elle-même sur le vide
-        while bord - a >= TRONCON[0]:
-            longueur = min(bord - a, rng.randrange(*TRONCON))
-            morceaux.append((a, a + longueur))
-            a += longueur + rng.randrange(*ROCHE_ENTRE)
+        if fin - x >= BUNKER[0] + 4:
+            morceaux.append((x + 2, fin - 2))
         x = fin
-    return morceaux
+    return morceaux, toit
 
 
-def _galerie(n, a, b, sol):
-    """Creuse [a, b) sur HAUT rangées au-dessus de la rangée `sol` (le plancher, qui reste plein)."""
-    n.rect(a, sol - HAUT + 1, b, sol + 1, ' ')
+def _creuse(n, x, y):
+    if _naturel(n, n.get(x, y)):
+        n.set(x, y, ' ')
 
 
-def _fenetres(n, a, b, sol):
-    """Au bord d'un vide (moins de cinq tuiles de roche jusqu'au dehors), la galerie s'ouvre sur la falaise."""
-    for bout, pas in ((a - 1, -1), (b, 1)):
-        for k in range(5):
-            x = bout + pas * k
-            if n.get(x, sol - 1) == ' ' and n.get(x, sol) == ' ':
-                for xx in range(bout, x, pas):
-                    for y in range(sol - 1, sol + 1):
-                        n.set(xx, y, ' ')
-                break
-            if not _naturel(n, n.get(x, sol - 1)):
-                break
+def _boyau(n, xa, ya, xb, yb, toit, rng, lettres):
+    """Un boyau de la colonne xa (son plancher à la rangée ya) à la colonne xb (plancher yb) : CHAMBRE rangées de haut, parfois
+    une de plus, il serpente d'une marche à la fois (on le parcourt sans échelle) et s'élargit en poches où guette un garde."""
+    f = ya
+    for x in range(xa, xb + 1):
+        reste = xb - x
+        if abs(f - yb) >= reste and f != yb:  # il faut rejoindre la porte d'en face
+            f += 1 if yb > f else -1
+        elif rng.random() < 0.35:  # une marche au hasard, si on a encore le temps de rattraper
+            essai = f + rng.choice((-1, 1))
+            if abs(essai - yb) < reste and (toit[x] or 0) + 5 <= essai <= n.bas - 3:
+                f = essai
+        haut = CHAMBRE + (rng.random() < 0.2)
+        for y in range(f - haut, f):
+            _creuse(n, x, y)
+        if 3 < x - xa < xb - xa - 5 and rng.random() < 0.08:  # une poche : plus haute, plus large, gardée
+            for xx in range(x, x + 4):
+                for y in range(f - CHAMBRE - 2, f):
+                    _creuse(n, xx, y)
+            n.pose_sur_sol(x + 2, rng.choice(lettres), f - CHAMBRE - 2)
 
 
 def reseau(r, lettres='a'):
-    """Le réseau de galeries sous tous les massifs du niveau (voir en tête de fichier)."""
+    """Les complexes souterrains de tous les massifs du niveau (voir en tête de fichier)."""
     n, rng = r.n, r.n.rng
-    etages = [[] for _ in PROFONDEURS]  # par étage : (a, b, sol)
-    segments = _troncons(n, rng)  # le premier étage : les tronçons des massifs, calculés avant de creuser
-    for k, prof in enumerate(PROFONDEURS):
-        if k:
-            # un étage plus bas : sous deux galeries voisines du dessus (le même massif, un peu de roche entre elles), du milieu de
-            # l'une au milieu de l'autre. Chaque galerie profonde remonte des deux côtés : descendre fait passer sous la roche et
-            # ressortir plus loin, jamais revenir sur ses pas
-            dessus = etages[k - 1]
-            segments = [((a1 + b1) // 2, (a2 + b2) // 2) for (a1, b1, _), (a2, b2, _) in zip(dessus, dessus[1:]) if a2 - b1 <= 8]
-        for a, b in segments:
-            if b - a < TRONCON[0] - 2:
-                continue
-            sol = max(n.toit[a:b]) + prof - 1
-            if sol + 3 >= n.bas or not _plein(n, a - 1, b + 1, sol - HAUT, sol + 2):
-                continue
-            _galerie(n, a, b, sol)
-            etages[k].append((a, b, sol))
-    butin = 0
-    for k, galeries in enumerate(etages):
-        for i, (a, b, sol) in enumerate(galeries):
-            # l'accès : une échelle vers chaque galerie du dessus qui la recouvre (deux, d'ordinaire), sinon de la surface
-            dessus = [(a2, b2, s2) for a2, b2, s2 in (etages[k - 1] if k else []) if a2 + 2 < b - 2 and a + 2 < b2 - 2]
-            for a2, b2, s2 in dessus[:2]:
-                x = rng.randrange(max(a, a2) + 1, min(b, b2) - 1)
-                for y in range(s2, sol + 1):
-                    n.set(x, y, 'H')
-            if not dessus:
-                # du dehors, ou du rez-de-chaussée d'une tour (une trappe dans son plancher)
-                x = next((x for x in (a + 2, b - 3, (a + b) // 2) if n.get(x, n.haut[x] - 1) in ' .' and n.get(x, n.haut[x] - 2) in ' .'), None)
-                if x is None:
-                    continue
-                for y in range(n.haut[x], sol + 1):
-                    n.set(x, y, 'H')
-            # en profondeur, une galerie sur deux est une caverne : haute, des pitons en escalier, le butin sur le plus haut
-            if k >= 2 and i % 2 == 0 and _plein(n, a, b, sol - 8, sol - HAUT + 1):
-                px, py = n.caverne(a + 1, b - a - 2, 7, y=sol)
-                n.repere(px, BUTINS[butin % len(BUTINS)], ymin=py - 2)
-                butin += 1
-            # une salle sur trois : plus haute, un piton au milieu et son garde
-            elif i % 3 == 1 and b - a >= 20:
-                m = (a + b) // 2
-                if _plein(n, m - 5, m + 5, sol - HAUT - 3, sol - HAUT + 1):
-                    n.rect(m - 5, sol - HAUT - 2, m + 5, sol - HAUT + 1, ' ')
-                    for xx in range(m - 2, m + 2):
-                        n.set(xx, sol - 3, '=')
-                    n.ennemis(m - 2, m + 2, lettres, 1, ymin=sol - 5)
-            # les gardes, et le butin au bout opposé à l'échelle
-            n.ennemis(a + 2, b - 2, lettres, 1 + (b - a > 22) + (k >= 2), ymin=sol - HAUT)
-            bout = b - 2 if x - a < b - x else a + 1
-            n.repere(bout, BUTINS[butin % len(BUTINS)], ymin=sol - HAUT)
-            butin += 1
-            _fenetres(n, a, b, sol)
+    mat = n.t['mur']
+    morceaux, toit = _massifs(n)
+    for a, fin in morceaux:
+        bunkers = []
+        x = a + rng.randrange(0, 4)
+        while fin - x >= BUNKER[0]:
+            w = min(fin - x, rng.randrange(*BUNKER))
+            top = max(t for t in toit[x : x + w] if t is not None) + 3
+            etages = min(4, (n.bas - 3 - top) // ETAGE, 1 + rng.randrange(4))
+            if etages >= 1 and _plein(n, x - 1, x + w + 1, top - 1, top + etages * ETAGE + 1):
+                bunkers.append(dict(x=x, w=w, g=top + etages * ETAGE, etages=etages, pg=[], pd=[]))
+            x += w + rng.randrange(*ENTRE)
+        # deux bunkers voisins : un boyau d'un étage de l'un à un étage de l'autre
+        liens = []
+        for b1, b2 in zip(bunkers, bunkers[1:]):
+            j1, j2 = rng.randrange(b1['etages']), rng.randrange(b2['etages'])
+            b1['pd'].append(j1)
+            b2['pg'].append(j2)
+            liens.append((b1, j1, b2, j2))
+        for i, b in enumerate(bunkers):
+            top, ta, tb = tour(n, b['x'], b['w'], b['g'], b['etages'], mat, lettres, b['pg'], b['pd'], rng, butin=b['x'] // 5, dehors=False)
+            if i == 0:
+                n.repere(b['x'] + b['w'] // 2, 'K', ymin=b['g'] - ETAGE + 1)  # une cage au fond du premier bunker
+            # le puits d'entrée, depuis la surface (ou le rez-de-chaussée d'une tour) jusqu'au dernier étage
+            if i == 0 or rng.random() < 0.5:
+                plancher = b['g'] - (b['etages'] - 1) * ETAGE
+                for px in rng.sample(range(ta + 2, tb - 2), max(0, tb - ta - 4)):
+                    if n.get(px, n.haut[px] - 1) in ' .' and n.get(px, n.haut[px] - 2) in ' .':
+                        for y in range(n.haut[px], plancher):
+                            n.set(px, y, 'H')
+                        break
+        for b1, j1, b2, j2 in liens:
+            ya, yb = b1['g'] - j1 * ETAGE, b2['g'] - j2 * ETAGE
+            _boyau(n, b1['x'] + b1['w'], ya, b2['x'] - 1, yb, toit, rng, lettres)

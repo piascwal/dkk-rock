@@ -58,11 +58,11 @@ def _etendues(w, etages, forces, rng):
     return etendues
 
 
-def tour(n, x0, w, g, etages, mat, lettres, portes_g=(), portes_d=(), rng=None, butin=0):
+def tour(n, x0, w, g, etages, mat, lettres, portes_g=(), portes_d=(), rng=None, butin=0, dehors=True):
     """Une tour de `etages` étages dans l'emprise [x0, x0 + w), son rez-de-chaussée sur la rangée g. `portes_g` / `portes_d` : les
     étages dont le mur de gauche / de droite (au bord de l'emprise) a une porte. Les étages n'ont pas tous la même largeur : là où
-    l'étage du dessous dépasse, son toit fait une terrasse, et une porte y donne. Renvoie la rangée du toit et l'étendue du dernier
-    étage."""
+    l'étage du dessous dépasse, son toit fait une terrasse, et une porte y donne. `dehors` False : un bunker sous terre (ni
+    terrasses, ni fenêtres, ni guetteurs sur le toit : la roche l'entoure). Renvoie la rangée du toit et l'étendue du dernier étage."""
     rng = rng or n.rng
     forces = {}
     for j in portes_g:
@@ -92,11 +92,11 @@ def tour(n, x0, w, g, etages, mat, lettres, portes_g=(), portes_d=(), rng=None, 
                 n.set(gx, y, 'H')
         echelles_dessous = choix
         # une terrasse : là où l'étage du dessous dépasse, une porte de l'étage k y donne, et un garde s'y tient
-        if k < etages:
-            for cote, mur, dehors in (('g', a1, range(a0, a1)), ('d', b1 - 1, range(b1, b0))):
-                if len(dehors) >= 3:
+        if k < etages and dehors:
+            for cote, mur, dehors_ in (('g', a1, range(a0, a1)), ('d', b1 - 1, range(b1, b0))):
+                if len(dehors_) >= 3:
                     n.rect(mur, ys - 2, mur + 1, ys, ' ')
-                    n.ennemis(dehors.start, dehors.stop, lettres, 1, ymin=ys - 2)
+                    n.ennemis(dehors_.start, dehors_.stop, lettres, 1, ymin=ys - 2)
     for j, (a, b) in enumerate(et):  # l'étage j : cloisons, fenêtres, décor, gardes
         sol = _plancher(g, j)
         haut = sol - ETAGE + 1
@@ -106,7 +106,7 @@ def tour(n, x0, w, g, etages, mat, lettres, portes_g=(), portes_d=(), rng=None, 
                 for y in range(haut, sol - 2):  # une cloison, sa porte au ras du sol
                     n.set(cx, y, mat)
         for x in (a, b - 1):
-            if rng.random() < 0.6 and n.get(x, sol - 3) == mat:
+            if dehors and rng.random() < 0.6 and n.get(x, sol - 3) == mat:
                 n.set(x, sol - 3, 'V')
         # une caisse, un caisson, un baril ou un tonneau : jamais dans l'embrasure d'une cloison, au pied d'une échelle ni sur une trappe
         px = rng.randrange(a + 3, max(a + 4, b - 3))
@@ -124,9 +124,10 @@ def tour(n, x0, w, g, etages, mat, lettres, portes_g=(), portes_d=(), rng=None, 
     a, b = et[j]
     n.repere(rng.randrange(a + 2, b - 2), BUTINS[butin % len(BUTINS)], ymin=_plancher(g, j) - ETAGE + 1)
     a, b = et[-1]
-    for x in range(a, b, 5):
-        n.set(x, top - 1, '=')
-    n.ennemis(a + 2, b - 2, lettres, 1 + (w >= 22), ymin=top - 2)
+    if dehors:
+        for x in range(a, b, 5):
+            n.set(x, top - 1, '=')
+        n.ennemis(a + 2, b - 2, lettres, 1 + (w >= 22), ymin=top - 2)
     return top, a, b
 
 
