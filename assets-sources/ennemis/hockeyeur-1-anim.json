@@ -1,0 +1,13 @@
+{
+  "frameWidth": 97,
+  "frameHeight": 95,
+  "animations": [
+    {
+      "name": "marche",
+      "row": 0,
+      "frames": 8,
+      "fps": 10
+    }
+  ],
+  "regard": "face"
+}

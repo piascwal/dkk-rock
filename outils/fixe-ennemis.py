@@ -73,6 +73,8 @@ TYPES = {
     # le pilier du Munster (Limerick) : deux apparences, le maillot rouge et le maillot vert ; chaque ennemi tire la sienne
     # selon son identifiant (une répartition égale)
     'pilier': ('PILIER', 22),
+    # le hockeyeur d'Ottawa : animé dans Depix (sa marche est une glisse de patineur)
+    'hockeyeur': ('HOCKEYEUR', 19),
 }
 
 # les lignes de la planche par état d'animation (ANIM dans jeu/vue.ts) : le vol au repos (0), le piqué en attaque (10).
@@ -88,7 +90,7 @@ ANIMES = {'habitue'}
 # <type>-<n>-anim.png (une ligne par animation) et <type>-<n>-anim.json (taille des images, nom et nombre d'images de chaque ligne).
 # Le projet Depix (<type>-<n>-projet.json, à rouvrir dans Depix) garde le découpage et les poses pour les retoucher.
 # Chaque animation va dans la ligne de son état (ANIM dans jeu/vue.ts) ; les apparences sont côte à côte, un bloc de colonnes chacune.
-DEPIX = {'pilier', 'fetard', 'danseur', 'lanceur', 'yeti', 'influenceur', 'videur', 'glaireux'}
+DEPIX = {'hockeyeur', 'pilier', 'fetard', 'danseur', 'lanceur', 'yeti', 'influenceur', 'videur', 'glaireux'}
 LIGNES_DEPIX = {'repos': 0, 'marche': 1, 'touche': 9, 'attaque': 10}
 # les apparences dessinées vers la gauche : le jeu suppose un sprite tourné vers la droite (il le retourne quand l'ennemi va à
 # gauche), elles sont donc retournées ici
@@ -156,6 +158,10 @@ def planche_depix(type_, hauteur):
             ims = [case(anim['row'], k) for k in range(anim['frames'])]
             lignes[LIGNES_DEPIX[anim['name']]] = ims
             rythmes[LIGNES_DEPIX[anim['name']]] = round(60 / anim.get('fps', 10))
+        # sans repos : la première image de la première animation tient lieu de pose de repos
+        if 0 not in lignes:
+            lignes[0] = [lignes[min(lignes)][0]]
+            rythmes.setdefault(0, 15)
         repos = lignes[0][0]
         ys, xs = np.nonzero(repos[..., 3])
         k = hauteur / (ys.max() - ys.min() + 1)
@@ -168,7 +174,7 @@ def planche_depix(type_, hauteur):
     w, h = gauche + droite, haut
     colonnes = max(len(ims) for lignes, *_ in blocs for ims in lignes.values())
     # planche compacte : une ligne de fichier par animation présente, dans l'ordre des animations
-    rangs = {ligne: r for r, ligne in enumerate(sorted(LIGNES_DEPIX.values()))}
+    rangs = {ligne: r for r, ligne in enumerate(sorted(blocs[0][0]))}
     planche = Image.new('RGBA', (w * colonnes * len(blocs), h * len(rangs)), (0, 0, 0, 0))
     for b, (lignes, k, bas, milieu, fw, fh) in enumerate(blocs):
         for ligne, ims in lignes.items():
