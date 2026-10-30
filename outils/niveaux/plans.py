@@ -326,7 +326,7 @@ NIVEAUX = {
             ('gouffre', 20, dict(lettres='ac', nb=4)),
             ('pont_singe', 22, dict(lettres='ac', butin='+')),
             ('tour', 18, dict(etages=3, tyro=9, apres=13, lettres='ac')),
-            ('grotte', 20, dict(monte=6, lettres='ac', butin='+')),
+            ('grotte', 20, dict(monte=6, lettres='acl', butin='+')),
             ('traversee', 36, dict(lettres='ac', mode='pont')),
             ('descente', 24, dict(chute=6, lettres='ac')),
             ('plat', 10, dict(lettres='ac', digit='5', drones=1)),  # le dernier appel
@@ -341,7 +341,7 @@ NIVEAUX = {
             ('plat', 12, dict(lettres='c', deco=3)),
             ('pres', 30, dict(lettres='c', digit='1')),  # les prés à murets, leurs moutons
             ('colline', 18, dict(haut=3, lettres='c')),
-            ('bastion', 26, dict(haut=8, lettres='ac')),  # une vieille tour de garde en pierre de taille
+            ('bastion', 26, dict(haut=8, lettres='acl')),  # une vieille tour de garde en pierre de taille
             ('pres', 26, dict(lettres='cc')),
             ('corniches', 22, dict(monte=6, lettres='ac')),  # on monte au château
             ('chateau_roi_jean', 44, dict(lettres='ac', digit='2')),  # le château du roi Jean
@@ -349,7 +349,7 @@ NIVEAUX = {
             ('plat', 8, dict(lettres='ac')),
             ('universite', 40, dict(lettres='ac', digit='3')),  # l'Université de Limerick, le stage de Mat
             ('shannon', 30, dict(lettres='ac')),  # la Shannon, le pont de Thomond
-            ('passe_haute', 22, dict(haut=10, lettres='ac')),
+            ('passe_haute', 22, dict(haut=10, lettres='acl')),
             ('pub', 26, dict(lettres='a', digit='4')),  # la session au pub
             ('toits', 42, dict(lettres='ac')),
             ('grotte', 20, dict(monte=6, lettres='ac', butin='+')),
@@ -448,9 +448,9 @@ NIVEAUX = {
         nom='Ottawa', theme='ottawa', textes='23-ottawa.ts', fichier='23-ottawa.ts', constante='CARTE_OTTAWA',
         graine=231, base=40, profondeur=36, raccord='ac', caves='ac',
         lieux=[
-            ('plat', 12, dict(lettres='c', deco=3, digit='1')),  # la neige, les castors
+            ('plat', 12, dict(lettres='cl', deco=3, digit='1')),  # la neige, les castors et un caribou
             ('maison', 14, dict(lettres='ac')),
-            ('toits', 42, dict(lettres='ac')),  # les toits du Glebe
+            ('toits', 42, dict(lettres='acl')),  # les toits du Glebe
             ('corniches', 22, dict(monte=6, lettres='ac')),  # on monte la rue en pente...
             ('glebe', 34, dict(lettres='ac', chute=6, digit='2')),  # ... le Glebe Collegiate : on n'en sort qu'en bas
             ('plat', 10, dict(lettres='ac', drones=2)),  # les bernaches
@@ -459,9 +459,9 @@ NIVEAUX = {
             ('patinoire', 64, dict(lettres='a', digit='3')),  # la patinoire sur la rivière gelée
             ('corniches', 22, dict(monte=6, lettres='ac')),  # on monte sur la colline du Parlement
             ('parlement', 46, dict(lettres='ac', digit='4')),  # la tour de la Paix
-            ('descente', 24, dict(chute=6, lettres='ac')),
+            ('descente', 24, dict(chute=6, lettres='acl')),
             ('passe_haute', 22, dict(haut=10, lettres='ac')),
-            ('plat', 12, dict(lettres='cw', digit='5', drones=2)),  # le marché By
+            ('plat', 12, dict(lettres='cwl', digit='5', drones=2)),  # le marché By
             ('grotte', 20, dict(monte=6, lettres='ac', butin='+')),
             ('pont_singe', 22, dict(lettres='ac', butin='+')),
             ('puits', 24, dict(lettres='ac')),

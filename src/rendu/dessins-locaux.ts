@@ -10,7 +10,7 @@ type Dessin = (p: Pinceau, e: number, f: number) => void;
 const pasDe = (e: number, f: number) => (e === ANIM.COURT ? Math.floor(f / 5) % 4 : -1);
 const attaque = (e: number) => e === ANIM.ATTAQUE;
 
-/** Un quadrupède (mouton, élan) : le corps, la tête devant, quatre pattes qui trottent. */
+/** Un quadrupède (mouton, élan, caribou) : le corps, la tête devant, quatre pattes qui trottent. */
 function quadrupede(
   p: Pinceau,
   e: number,
@@ -132,6 +132,22 @@ export const DESSINS_LOCAUX: Partial<Record<number, Dessin>> = {
       { pas: e === ANIM.COURT ? Math.floor(f / 3) % 4 : -1 },
     );
     if (Math.floor(f / 10) % 3 === 0) p(6, -12, 2, 2, '#ffd23f'); // la sonnette
+  },
+  // Ottawa : le caribou, brun et crème, ses bois en ramures (le dessin de secours : il a sa planche, animée dans Depix)
+  [G.CARIBOU]: (p, e, f) => {
+    const y = quadrupede(p, e, f, {
+      l: 15,
+      h: 7,
+      corps: '#7a5a3e',
+      tete: '#6a4a30',
+      pattes: '#4a3424',
+      haut: 8,
+    });
+    p(4, y + 1, 4, 5, '#e8dcc0'); // le poitrail crème
+    p(6, y - 9, 1, 7, '#8a6a48'); // les bois
+    p(9, y - 8, 1, 6, '#8a6a48');
+    p(4, y - 8, 3, 1, '#8a6a48');
+    p(9, y - 6, 3, 1, '#8a6a48');
   },
   // Lund : l'élan, grand, brun, ses bois en palmes
   [G.ELAN]: (p, e, f) => {

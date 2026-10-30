@@ -77,6 +77,8 @@ export const FEUILLES: Partial<Record<Genre, Feuille>> = {
   ...FEUILLES_ENNEMIS,
   ...FEUILLES_HEROS,
   ...FEUILLES_OBJETS,
+  // l'élan de Lund porte la planche du caribou d'Ottawa, en attendant la sienne
+  [G.ELAN]: FEUILLES_ENNEMIS[G.CARIBOU],
   // Fadatchi, fabriqué par outils/anime-kiwi.py : debout 8 images (il respire), court 4, saut 1, coup de bec 4
   [G.KIWI]: {
     fichier: 'fadatchi.png',

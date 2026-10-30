@@ -77,8 +77,8 @@ TYPES = {
     'hockeyeur': ('HOCKEYEUR', 19),
     # le gardien de but d'Ottawa : une seule animation, ses déplacements (à l'arrêt, il garde la première image)
     'gardien': ('GARDIEN', 22),
-    # l'élan de Lund : un caribou animé dans Depix (squelette à 4 pattes) ; sa hauteur compte les bois
-    'elan': ('ELAN', 28),
+    # le caribou d'Ottawa : animé dans Depix (squelette à 4 pattes) ; sa hauteur compte les bois
+    'caribou': ('CARIBOU', 28),
 }
 
 # les lignes de la planche par état d'animation (ANIM dans jeu/vue.ts) : le vol au repos (0), le piqué en attaque (10).
@@ -94,7 +94,7 @@ ANIMES = {'habitue'}
 # <type>-<n>-anim.png (une ligne par animation) et <type>-<n>-anim.json (taille des images, nom et nombre d'images de chaque ligne).
 # Le projet Depix (<type>-<n>-projet.json, à rouvrir dans Depix) garde le découpage et les poses pour les retoucher.
 # Chaque animation va dans la ligne de son état (ANIM dans jeu/vue.ts) ; les apparences sont côte à côte, un bloc de colonnes chacune.
-DEPIX = {'elan', 'gardien', 'hockeyeur', 'pilier', 'fetard', 'danseur', 'lanceur', 'yeti', 'influenceur', 'videur', 'glaireux'}
+DEPIX = {'caribou', 'gardien', 'hockeyeur', 'pilier', 'fetard', 'danseur', 'lanceur', 'yeti', 'influenceur', 'videur', 'glaireux'}
 LIGNES_DEPIX = {'repos': 0, 'marche': 1, 'touche': 9, 'attaque': 10}
 # les apparences dessinées vers la gauche : le jeu suppose un sprite tourné vers la droite (il le retourne quand l'ennemi va à
 # gauche), elles sont donc retournées ici

@@ -117,6 +117,22 @@ export const ENNEMIS_SPECIAUX: Record<string, DefEnnemi> = {
     contact: 1,
     cris: ['HONK !', 'HOOONK.'],
   }),
+  // Ottawa encore : le caribou, ses bois immenses ; il fonce tête baissée
+  l: humain({
+    nom: 'Caribou',
+    genre: G.CARIBOU,
+    pv: 8,
+    w: 18,
+    h: 20,
+    vitesse: 0.9,
+    vision: 150,
+    visionVerticale: 40,
+    cadence: 60,
+    points: 250,
+    comportement: charge,
+    contact: 1,
+    cris: ['Hrrrnk.', 'Pas touche à mon lichen !'],
+  }),
   i: humain({
     nom: 'Gardien de but',
     genre: G.GARDIEN,

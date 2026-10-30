@@ -120,6 +120,8 @@ export const G = {
   GARDIEN: 90,
   /** la rondelle du hockeyeur : un tir qui glisse au sol (voir `estUnTir`) */
   P_RONDELLE: 91,
+  /** le caribou d'Ottawa (après la rondelle : `estPersonnage` le compte à part) */
+  CARIBOU: 92,
 } as const;
 
 export type Genre = (typeof G)[keyof typeof G];
@@ -130,7 +132,10 @@ export const estUnTir = (g: number): boolean =>
 
 /** Un personnage (héros, ennemi, boss) : la plage d'avant les tirs, plus les gens de l'International Tour. */
 export const estPersonnage = (g: number): boolean =>
-  g < G.P_BAGUETTE || (g >= G.PASSAGER && g <= G.BOULISTE) || (g >= G.HOCKEYEUR && g <= G.GARDIEN);
+  g < G.P_BAGUETTE ||
+  (g >= G.PASSAGER && g <= G.BOULISTE) ||
+  (g >= G.HOCKEYEUR && g <= G.GARDIEN) ||
+  g === G.CARIBOU;
 
 /** États d'animation des héros (champ `e`). */
 export const ANIM = {
@@ -319,6 +324,7 @@ export const GENRES_CONVERTIS: readonly number[] = [
   G.CASTOR,
   G.BERNACHE,
   G.GARDIEN,
+  G.CARIBOU,
 ];
 
 /** Les ennemis qui volent : un drone ou un goéland tombé n'est pas un rocker, il tombe comme un oiseau. */
