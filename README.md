@@ -408,7 +408,7 @@ validé.
   terrain il n'y a plus de socle : creuser trop, c'est tomber.
   **Refaire un niveau sans gêner les joueurs** (le chantier du level design, à la manière de Broforce : du relief, des vides
   qu'on ne creuse pas, plusieurs routes) : la refonte s'écrit à côté de l'original, dans `src/niveaux/refontes/` (le plan
-  `marseille_refonte` de `outils/niveaux/plans.py` : des suites de tours pleines de pièces séparées par le vide, qu'on
+  `marseille_refonte` de `outils/niveaux/plans.py`, publiée : des suites de tours pleines de pièces séparées par le vide, qu'on
   franchit par une passerelle ou une tyrolienne, `outils/niveaux/blocs.py`, et sous chaque plateau et chaque tour des
   complexes souterrains (des bunkers à étages reliés par des boyaux sinueux), `outils/niveaux/massifs.py` ; puis `python3 outils/pose-barils.py ../refontes/21-marseille`), et se
   déclare dans `src/niveaux/refontes.ts`. Elle garde l'`id` et la place du niveau : les sauvegardes ne bougent pas. Les joueurs

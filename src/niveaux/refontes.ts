@@ -17,7 +17,7 @@ export const REFONTES: Readonly<Record<string, Partial<DefNiveau>>> = {
  * Les refontes essayées et validées : tous les joueurs les ont. En publier une change les cartes que l'hôte et les invités
  * doivent partager : augmenter VERSION_PROTOCOLE (reseau/protocole.ts) dans le même temps.
  */
-export const REFONTES_PUBLIEES: ReadonlySet<string> = new Set<string>([]);
+export const REFONTES_PUBLIEES: ReadonlySet<string> = new Set<string>(['marseille']);
 
 /** La version d'un niveau à jouer : sa refonte si elle est publiée, ou en mode essai ; sinon l'original. */
 export function versionDe(def: DefNiveau, essai: boolean): DefNiveau {
