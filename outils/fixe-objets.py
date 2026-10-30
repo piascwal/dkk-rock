@@ -186,6 +186,8 @@ OBJETS = {
     'buissonNeige': (['decor/buisson-neige-base.png'], None, 24),
     # le cairn des alpages et des sentiers : une pile de pierres, de l'artiste (le code en dessinait trois blocs de 10 px)
     'cairn': (['decor/cairn-base.png'], None, 14),
+    # la souche (sous-bois, Bretagne, alpages) : une vieille souche écorcée, de l'artiste (le code en dessinait une tache de 10 px)
+    'souche': (['decor/souche-base.png'], None, 14),
     # le dolmen (landes, Bretagne) : deux pierres et une table, de l'artiste (le code en dessinait les blocs)
     'dolmen': (['decor/dolmen-base.png'], None, 28),
     'erableNeige': (['decor/erable-neige-base.png'], None, 44),

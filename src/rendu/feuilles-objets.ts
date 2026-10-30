@@ -274,6 +274,7 @@ export const FEUILLES_DECOR: Record<string, Feuille> = {
   arbre: { fichier: 'arbre.png', w: 228, h: 246, images: [1, 1], rythme: 1, densite: 6, pied: 114 },
   buissonNeige: { fichier: 'buissonNeige.png', w: 144, h: 88, images: [1], rythme: 1, densite: 6, pied: 72 },
   cairn: { fichier: 'cairn.png', w: 84, h: 70, images: [1], rythme: 1, densite: 6, pied: 42 },
+  souche: { fichier: 'souche.png', w: 84, h: 54, images: [1], rythme: 1, densite: 6, pied: 42 },
   dolmen: { fichier: 'dolmen.png', w: 168, h: 88, images: [1], rythme: 1, densite: 6, pied: 84 },
   erableNeige: { fichier: 'erableNeige.png', w: 264, h: 357, images: [1], rythme: 1, densite: 6, pied: 132 },
   figuier: { fichier: 'figuier.png', w: 322, h: 414, images: [1, 1, 1], rythme: 1, densite: 6, pied: 161 },

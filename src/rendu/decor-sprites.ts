@@ -70,6 +70,7 @@ export type Sprite =
   | 'erableNeige'
   | 'buissonNeige'
   | 'cairn'
+  | 'souche'
   | 'dolmen'
   | 'figuier';
 export const SPRITES: ReadonlySet<string> = new Set<Sprite>([
@@ -136,6 +137,7 @@ export const SPRITES: ReadonlySet<string> = new Set<Sprite>([
   'erableNeige',
   'buissonNeige',
   'cairn',
+  'souche',
   'dolmen',
   'figuier',
 ]);
@@ -232,6 +234,7 @@ export function dessineSprite(
   if (quoi === 'menhir') return dessineDecorFeuille(ctx, 'menhir', 0, voile);
   if (quoi === 'erableNeige') return dessineDecorFeuille(ctx, 'erableNeige', 0, voile);
   if (quoi === 'cairn') return dessineDecorFeuille(ctx, 'cairn', 0, voile);
+  if (quoi === 'souche') return dessineDecorFeuille(ctx, 'souche', 0, voile);
   if (quoi === 'dolmen') return dessineDecorFeuille(ctx, 'dolmen', 0, voile);
   if (quoi === 'buissonNeige') {
     if (v & 1) ctx.scale(-1, 1);
