@@ -92,7 +92,7 @@ puis « Pour le jeu (PNG + JSON) ». Déposer les deux fichiers dans `assets-sou
 `outils/fixe-ennemis.py` et lancer le script : repos (ligne 0), marche (1), touché (9, jouée pendant le flash blanc) et
 attaque (10), chaque apparence dans son bloc de colonnes (`apparences` dans la feuille). Garder aussi le projet Depix
 (« Enregistrer », `<type>-<n>-projet.json`) : il se rouvre dans Depix pour reprendre les poses. Premier ennemi animé
-ainsi : le pilier du Munster (maillots rouge et vert), puis les quatre fêtards.
+ainsi : le pilier du Munster (maillots rouge et vert), puis les fêtards, le danseur, le lanceur, le yéti, l'influenceur, les videurs et le glaireux. Seuls les ennemis `DEPIX` ont ce traitement : les autres types restent des sprites fixes.
 
 ## À savoir
 
