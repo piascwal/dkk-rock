@@ -98,11 +98,13 @@ TYPES = {
     'castor': ('CASTOR', 12),
     # le pigeon de New York : trois images de vol (ailes levées, à mi-hauteur, baissées ; outils/anime-pigeon.py) et le piqué (voir ETATS)
     'pigeon': ('PIGEON', 14, 8),
+    # la bernache du Canada d'Ottawa (vole, puis pique) : deux apparences, le vol et le piqué (voir ETATS, comme le pigeon)
+    'bernache': ('BERNACHE', 16, 8),
 }
 
 # les lignes de la planche par état d'animation (ANIM dans jeu/vue.ts) : le vol au repos (0), le piqué en attaque (10).
 # Une planche à lignes : chaque apparence va dans sa ligne, les autres lignes restent vides.
-ETATS = {'goeland': (0, 10), 'pigeon': (0, 0, 0, 10), 'bmxpro': (0, 10), 'champion': (0, 10)}
+ETATS = {'goeland': (0, 10), 'bernache': (0, 10), 'pigeon': (0, 0, 0, 10), 'bmxpro': (0, 10), 'champion': (0, 10)}
 
 # les types dont la marche est tirée de la pose au repos (1er fichier : au repos, ligne 0 ; 2e : l'alerte, la recherche et l'attaque,
 # lignes 7, 8 et 10) : les jambes

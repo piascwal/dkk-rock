@@ -262,4 +262,12 @@ export const FEUILLES_ENNEMIS: Partial<Record<Genre, Feuille>> = {
     rythme: 8,
     densite: 6,
   },
+  [G.BERNACHE]: {
+    fichier: 'bernaches.png',
+    w: 108,
+    h: 96,
+    images: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    rythme: 8,
+    densite: 6,
+  },
 };
