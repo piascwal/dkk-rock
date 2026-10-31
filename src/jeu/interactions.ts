@@ -1,4 +1,4 @@
-import { DUREE_INVINCIBLE, PV_HEROS, QUARTS_PAR_COEUR, VIES_MAX_RESEAU } from '../config';
+import { DUREE_INVINCIBLE, PV_HEROS, QUARTS_PAR_COEUR, SPECIAUX_MAX, VIES_MAX_RESEAU } from '../config';
 import { armeRamassee } from '../entites/armes';
 import { Chauffage } from '../entites/chauffage';
 import { HEROS } from '../entites/heros';
@@ -95,13 +95,15 @@ export function interactions(p: Partie): void {
         case 'sibylle':
           prendSibylle(p, e);
           break;
-        case 'soin':
-          j.pv = PV_HEROS;
-          j.speciaux++;
+        case 'soin': {
+          // le médiator d'or : un spécial de plus, SPECIAUX_MAX au plus ; il ne soigne pas (les cœurs viennent des tonneaux WOG)
+          const plein = j.speciaux >= SPECIAUX_MAX;
+          j.speciaux = Math.min(SPECIAUX_MAX, j.speciaux + 1);
           e.fini = true;
           p.son('ramasse', e.corps.x, e.corps.y);
-          p.texte(e.corps.x, e.corps.y - 10, 'MÉDIATOR D’OR', '#ffd23f');
+          p.texte(e.corps.x, e.corps.y - 10, plein ? 'SPÉCIAUX AU MAX' : 'MÉDIATOR D’OR', '#ffd23f');
           break;
+        }
       }
     }
     // en battle royale, pas de dialogues de l'histoire

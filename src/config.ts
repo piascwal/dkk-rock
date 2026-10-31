@@ -48,6 +48,8 @@ export const DUREE_INVINCIBLE = 600;
 export const QUARTS_PAR_COEUR = 4;
 export const PV_HEROS = 3 * QUARTS_PAR_COEUR;
 export const SPECIAUX_DEPART = 3;
+/** les spéciaux d'un héros : un médiator d'or en redonne un, jamais au-delà */
+export const SPECIAUX_MAX = 3;
 
 /** Délai avant de réapparaître après une mort (ticks). */
 export const DELAI_REAPPARITION = 90;

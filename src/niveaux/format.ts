@@ -19,7 +19,7 @@ import { chaineDeTyroliennes, relieTyroliennes, type Tyrolienne } from './tyroli
  * Repères (la case est vide une fois lue) :
  *   @ départ   F le van (fin du niveau)   ! drapeau (point de sauvegarde)
  *   & embarquement (le ferry : le pont se ferme, des vagues montent à l'abordage, voir jeu/traversee.ts)
- *   K cage (un membre du groupe à libérer)   * arme au hasard   + médiator d'or (soin + spécial)
+ *   K cage (un membre du groupe à libérer)   * arme au hasard   + médiator d'or (un spécial de plus, 3 au plus)
  *   % baril explosif (s'allume au premier tir, explose deux secondes après)
  *   ( et ) : extrémités d'une tyrolienne ; chaque ( est reliée au poteau le plus proche à sa droite
  *   $ : jointure de tyrolienne (un poteau où le câble change de pente et repart, voir niveaux/tyroliennes.ts)

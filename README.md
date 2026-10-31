@@ -101,7 +101,7 @@ se barre dans le fil ; les boutons des menus s'enfoncent et rebondissent.
   détache les personnages du fond (`Theme.lueur`, cyan pour les héros, rose pour les autres) ; des enceintes dans chaque monde.
 - **Armes à ramasser** : lecteur minidisc (disque à ondes), pile alcaline (rafale), flipper (le
   dauphin rebondit en le disant, puis explose), frisbee (guidé vers les ennemis), machine à donuts (explosifs), boîtier de CD « L5 » (trois boîtiers en éventail, un plaisir coupable),
-  **chauffage soufflant** (compagnon) ; l'icône de l'arme remplace « TIR » sur le bouton ; **médiators d'or** : soin et spécial.
+  **chauffage soufflant** (compagnon) ; l'icône de l'arme remplace « TIR » sur le bouton ; **médiators d'or** : un spécial de plus (3 au plus ; ils ne soignent pas).
   Le **chauffage soufflant** est une arme-compagnon (`entites/chauffage.ts`, `DefArme.compagnon`) : il suit le héros à la place
   de Fadatchi en avançant par petits bonds, passe devant lui quand il tire et crache un gros jet de flammes par le centre du
   cercle de sa grille ; quand les munitions s'épuisent (ou que le héros change d'arme ou tombe), il s'en va et le kiwi revient.
