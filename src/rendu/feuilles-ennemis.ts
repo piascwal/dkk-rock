@@ -253,4 +253,5 @@ export const FEUILLES_ENNEMIS: Partial<Record<Genre, Feuille>> = {
     pied: 77,
     densite: 6,
   },
+  [G.CASTOR]: { fichier: 'castors.png', w: 69, h: 72, images: [1], variantes: true, densite: 6 },
 };

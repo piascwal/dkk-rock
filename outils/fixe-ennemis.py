@@ -94,6 +94,8 @@ TYPES = {
     # animés à la main (outils/anime-lund.py) ; le jeu choisit l'apparence du cycliste selon son identifiant
     'etudiant': ('ETUDIANT', 20),
     'cycliste': ('CYCLISTE', 21),
+    # le castor d'Ottawa (ennemi qui charge) : une image, dessinée à la main (pas d'animation pour l'instant)
+    'castor': ('CASTOR', 12),
 }
 
 # les lignes de la planche par état d'animation (ANIM dans jeu/vue.ts) : le vol au repos (0), le piqué en attaque (10).
