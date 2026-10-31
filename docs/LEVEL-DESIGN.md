@@ -53,6 +53,18 @@ coup d'œil : les comparer avant et après chaque refonte.
   s'arrête avant de percer un sol par en dessous, une rampe ne passe jamais devant une porte : sinon l'escalier ou la porte du
   chemin principal disparaît (le test d'accessibilité le voit).
 
+## Au-dessus et en dessous
+
+- **Jamais une longue traversée sur le même plan.** Une étendue plate (une patinoire, un lac gelé, un pré, un quai) où l'on
+  passe sans changer de hauteur reçoit quelque chose au-dessus et une raison de passer dessous (`relief.py`, appliqué à toute
+  étendue plate d'au moins 34 colonnes) : des gradins qu'on gravit marche après marche, des gardes en haut, une corniche de
+  pitons plus haut encore ; et juste devant, une fosse de trois marches où l'on entre en marchant, un passage sous les gradins
+  qui ressort de l'autre côté, un boyau vers les souterrains. Sur la glace ou l'eau, les gradins sont des pitons posés en l'air :
+  on patine dessous, on y grimpe d'un saut.
+- **Une échelle ne suffit pas à donner envie de descendre.** L'entrée d'un souterrain se trouve sur le chemin, à l'horizontale :
+  sur la remontée d'une cuvette, un palier et une ouverture dans la paroi où l'on entre en marchant (la courte échelle sert à
+  passer par-dessus) ; au fond d'une fosse ; au bout d'une rampe.
+
 ## Les bâtiments
 
 - **Séparés par le vide.** Deux tours voisines ne se touchent pas : entre elles, le vide. On passe de l'une à l'autre par une

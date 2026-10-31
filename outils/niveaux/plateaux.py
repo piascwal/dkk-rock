@@ -110,12 +110,14 @@ def _profil(prof, pente, paliers):
     return cols
 
 
-def cuvette(n, x0, largeur, profondeur=14, lettres='a', pente=2, pente_d=None, paliers=0, fortin=True, bateau=False):
+def cuvette(n, x0, largeur, profondeur=14, lettres='a', pente=2, pente_d=None, paliers=0, fortin=True, bateau=False, ouverture=True):
     """Une cuvette de `profondeur` rangées sur [x0 + 2, x0 + largeur - 2), sans pont : on y descend par des marches taillées dans le
     terrain et l'on remonte en face, le fond plat entre les deux. Ses formes varient d'un niveau à l'autre (voir docs/LEVEL-DESIGN.md) :
     `pente` / `pente_d` (colonnes par rangée, à gauche / à droite : un ravin raide, une combe douce, un versant de chaque sorte),
     `paliers` (des terrasses), au fond un fortin (`fortin`) ou un bateau en cale sèche (`bateau`, sa coque se gravit par une
-    échelle). Son toit reste sous le bord : ce n'est pas un pont. `base` ne change pas."""
+    échelle). Son toit reste sous le bord : ce n'est pas un pont. `ouverture` : à mi-hauteur de la remontée, un palier et, dans la
+    paroi, une ouverture où l'on entre à l'horizontale dans les souterrains ; une courte échelle passe par-dessus. `base` ne
+    change pas."""
     rng = n.rng
     base = n.base
     fond = min(base + profondeur, n.bas - 4)
@@ -123,6 +125,13 @@ def cuvette(n, x0, largeur, profondeur=14, lettres='a', pente=2, pente_d=None, p
     a, c = x0 + 2, x0 + largeur - 2
     gauche = _profil(prof, pente, paliers)
     droite = _profil(prof, pente_d or pente, paliers)[::-1]
+    mur = None
+    if ouverture and prof >= 10:
+        # le palier, à mi-hauteur : quatre colonnes ; la paroi qui suit monte d'un coup de quatre rangées (l'ouverture y est percée)
+        j = next(i for i, v in enumerate(droite) if v <= prof // 2 + 2)
+        palier = droite[j]
+        droite = droite[:j] + [palier] * 4 + [v for v in droite[j:] if v <= palier - 4]
+        mur = (j + 4, palier)
     for i, x in enumerate(range(a, a + len(gauche))):  # on descend...
         n.base_col(x, base + gauche[i])
     g, d = a + len(gauche), c - len(droite)
@@ -130,6 +139,19 @@ def cuvette(n, x0, largeur, profondeur=14, lettres='a', pente=2, pente_d=None, p
         n.base_col(x, fond)
     for i, x in enumerate(range(d, c)):  # ... et on remonte en face
         n.base_col(x, base + droite[i])
+    if mur:
+        # l'ouverture : un boyau qui entre dans la paroi au niveau du palier (le réseau souterrain le prolonge, voir massifs.py) ;
+        # la courte échelle, au bord du palier, monte sur la paroi
+        xm, sol = d + mur[0], base + mur[1]
+        for x in range(xm, min(xm + 6, c)):
+            for y in range(sol - 3, sol):
+                n.set(x, y, ' ')
+        for y in range(base + droite[mur[0]] - 1, sol):
+            n.set(xm - 1, y, 'H')
+        n.ennemis(xm, xm + 6, lettres, 1, ymin=sol - 4)
+        if not hasattr(n, 'ouvertures'):
+            n.ouvertures = []
+        n.ouvertures.append((xm + 6, sol, 1))
     # des gardes sur les versants (sur les terrasses, s'il y en a) et au fond
     n.ennemis(a, g, lettres, 2 + (paliers > 0), ymin=base - 2)
     n.ennemis(d, c, lettres, 2 + (paliers > 0), ymin=base - 2)
@@ -154,7 +176,8 @@ def cuvette(n, x0, largeur, profondeur=14, lettres='a', pente=2, pente_d=None, p
         px = rng.randrange(g + 1, d - 1)
         if px not in occupe and n.get(px, fond - 1) == ' ' and n.get(px, fond - 2) == ' ':  # jamais devant une porte du fortin
             n.set(px, fond - 1, PROPS[k])
-    n.repere(g + 2, '!', ymin=fond - 3)
+    # le drapeau, hors de la rampe qui part du bord vers les souterrains (six colonnes, voir massifs._entrees)
+    n.repere(g + 7 if d - g > 20 else (g + d) // 2, '!', ymin=fond - 3)
     n.repere(mid + (w // 2 + 1 if occupe else 0), 'K', ymin=fond - 3)
     _acces(n, g, d - 1, fond)
 

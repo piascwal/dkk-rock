@@ -20,6 +20,7 @@ from plans import NIVEAUX, enchaine
 from souterrain import souterrain, tonneaux_de_surface
 from massifs import reseau
 from acces import relie_l_inaccessible
+from relief import relief_des_plats
 from blocs import bloc
 from plateaux import cuvette, grotte_traversante, miradors, plateau_caverne
 from ferry import ferry
@@ -538,7 +539,10 @@ def fabrique(cle):
         cfg['nom'], cfg['theme'], cfg['textes'], plan, '', '', cfg['graine'], base=cfg['base'], van=cfg.get('van', True),
         altitude=cfg.get('altitude', False), profondeur=cfg.get('profondeur', 30), drapeaux=cfg.get('drapeaux'),
     )
-    if cfg.get('reseau'):  # un niveau en relief (une refonte) : les galeries dans ses massifs (voir niveaux/massifs.py)
+    if cfg.get('reseau'):  # un niveau en relief (une refonte) : des gradins sur les longues étendues plates (niveaux/relief.py), puis
+        # les galeries dans ses massifs (voir niveaux/massifs.py)
+        if cfg.get('relief', True):
+            relief_des_plats(r, cfg['caves'])
         reseau(r, cfg['caves'])
     elif not cfg.get('sans_caves'):  # le ferry est un petit niveau : rien sous le quai
         souterrain(r, cfg['caves'])

@@ -141,6 +141,7 @@ def reseau(r, lettres='a'):
             _boyau(n, b1['x'] + b1['w'], ya, b2['x'] - 1, yb, toit, rng, lettres)
         tous += bunkers + _rangee_profonde(n, bunkers, toit, rng, lettres, mat)
     _entrees(n, tous, toit, rng, lettres)
+    _ouvertures(n, rng, lettres)
     _cavernes(n, rng, lettres)
     _relie_les_isoles(n)
 
@@ -247,6 +248,28 @@ def _entrees(n, bunkers, toit, rng, lettres, portee=45, rampe=6):
                     n.set(cx, y, ' ')
         n.rect(mur, b['g'] - 2, mur + 1, b['g'], ' ')  # la porte du rez-de-chaussée
         _boyau(n, xa, ya, xb, yb, toit, rng, lettres)
+
+
+def _ouvertures(n, rng, lettres, portee=50):
+    """Les ouvertures percées dans la paroi des remontées (plateaux.cuvette : la colonne, la rangée du sol, le côté) : le boyau
+    continue à l'horizontale dans la roche, jusqu'au premier creux (une pièce, un boyau, une caverne) ; le mur d'un bunker reçoit
+    une porte. On y entre en marchant, sans échelle. S'il ne trouve rien, il finit sur une poche (un garde, du butin)."""
+    for x, sol, pas in getattr(n, 'ouvertures', []):
+        for _ in range(portee):
+            if all(n.get(x, y) in ' .' for y in (sol - 1, sol - 2)):
+                break
+            c = n.get(x, sol - 1)
+            if c not in ' .' and not _naturel(n, c):  # le mur d'un bunker : une porte
+                if c != 'X':
+                    n.set(x, sol - 1, '.')
+                    n.set(x, sol - 2, '.')
+                break
+            for y in range(sol - CHAMBRE, sol):
+                _creuse(n, x, y)
+            x += pas
+        else:
+            n.ennemis(x - 6 * pas, x, lettres, 1, ymin=sol - 4)
+            n.pose_sur_sol(x - 2 * pas, rng.choice(POCHES), sol - 3)
 
 
 def _relie_les_isoles(n, taille=10, portee=40):
