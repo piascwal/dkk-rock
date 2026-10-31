@@ -10,6 +10,17 @@ Un niveau raté se traverse tout droit : une bande de sol à hauteur constante d
 suffit de casser les murs pour filer. Les vues d'ensemble (une carte par niveau, une tuile = quelques pixels) le montrent d'un
 coup d'œil : les comparer avant et après chaque refonte.
 
+## Chaque niveau sa structure
+
+- **Pas de gabarit commun.** Un niveau n'est pas la même suite de modules (corniches, trois tours, miradors, cuvette, grotte
+  traversante, plateau creusé, arène) avec un autre décor : le joueur aurait l'impression de refaire toujours le même niveau.
+  Chacun a sa signature, tirée de son lieu : la canopée de la Forêt (des chaînes de cabanes dans les arbres), les quais du
+  Port (presque à plat, au ras de l'eau), la côte de Groix (une grande montée par les falaises, puis la descente vers la plage).
+- **Varier les formes d'un même module.** Une cuvette peut être un ravin raide (`pente=1`), une combe douce en terrasses
+  (`pente=3, paliers=4`), à un versant à pic et l'autre doux (`pente_d`), avec un fortin ou un bateau en cale sèche au fond, ou
+  rien. Une grotte traversante peut être basse et longue sous un toit épais. Comparer les vues d'ensemble des niveaux d'un même arc
+  entre eux, pas seulement avant / après.
+
 ## Imposer la verticalité, sans mur
 
 - **Le vide plutôt que le mur.** Ce qui sépare deux parties du niveau est un vide sans fond, trop large pour être sauté (plus de

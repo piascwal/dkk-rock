@@ -97,38 +97,66 @@ def miradors(n, x0, largeur, lettres='a'):
     n.ennemis(x0 + 2, x0 + largeur - 2, lettres, 2, ymin=base - 3)
 
 
-def cuvette(n, x0, largeur, profondeur=14, lettres='a'):
-    """Une cuvette de `profondeur` rangées sur [x0 + 2, x0 + largeur - 2) : des marches d'une rangée toutes les deux colonnes pour
-    y descendre et pour en remonter, le fond plat entre les deux, un fortin au milieu du fond (son toit reste sous le bord : ce
-    n'est pas un pont). `base` ne change pas."""
+def _profil(prof, pente, paliers):
+    """La descente d'une cuvette, colonne par colonne : la profondeur de chaque colonne sous le bord. `pente` colonnes par rangée
+    (1 : raide, à sauter de marche en marche ; 3 : douce) ; `paliers` : toutes les `paliers` rangées, un replat de cinq colonnes
+    où se tient un garde. Une marche ne fait jamais plus d'une rangée : on remonte toujours en sautant."""
+    cols, d = [], 0
+    while d < prof:
+        d += 1
+        cols += [d] * pente
+        if paliers and d % paliers == 0 and d < prof:
+            cols += [d] * 5
+    return cols
+
+
+def cuvette(n, x0, largeur, profondeur=14, lettres='a', pente=2, pente_d=None, paliers=0, fortin=True, bateau=False):
+    """Une cuvette de `profondeur` rangées sur [x0 + 2, x0 + largeur - 2), sans pont : on y descend par des marches taillées dans le
+    terrain et l'on remonte en face, le fond plat entre les deux. Ses formes varient d'un niveau à l'autre (voir docs/LEVEL-DESIGN.md) :
+    `pente` / `pente_d` (colonnes par rangée, à gauche / à droite : un ravin raide, une combe douce, un versant de chaque sorte),
+    `paliers` (des terrasses), au fond un fortin (`fortin`) ou un bateau en cale sèche (`bateau`, sa coque se gravit par une
+    échelle). Son toit reste sous le bord : ce n'est pas un pont. `base` ne change pas."""
     rng = n.rng
     base = n.base
     fond = min(base + profondeur, n.bas - 4)
     prof = fond - base
     a, c = x0 + 2, x0 + largeur - 2
-    marches = 2 * prof
-    for i, x in enumerate(range(a, a + marches)):  # on descend...
-        n.base_col(x, base + i // 2 + 1)
-    for x in range(a + marches, c - marches):
+    gauche = _profil(prof, pente, paliers)
+    droite = _profil(prof, pente_d or pente, paliers)[::-1]
+    for i, x in enumerate(range(a, a + len(gauche))):  # on descend...
+        n.base_col(x, base + gauche[i])
+    g, d = a + len(gauche), c - len(droite)
+    for x in range(g, d):
         n.base_col(x, fond)
-    for i, x in enumerate(range(c - marches, c)):  # ... et on remonte en face
-        n.base_col(x, fond - i // 2 - 1)
-    # le fortin, au milieu du fond, ses deux portes au rez-de-chaussée
-    w = min(16, c - a - 2 * marches - 16)  # huit colonnes de fond de chaque côté : la rampe vers les souterrains y passe
-    mid = (a + c) // 2
-    fortin = range(mid - w // 2 - 2, mid + w // 2 + 3) if w >= 10 else range(0)
-    if w >= 10:
+    for i, x in enumerate(range(d, c)):  # ... et on remonte en face
+        n.base_col(x, base + droite[i])
+    # des gardes sur les versants (sur les terrasses, s'il y en a) et au fond
+    n.ennemis(a, g, lettres, 2 + (paliers > 0), ymin=base - 2)
+    n.ennemis(d, c, lettres, 2 + (paliers > 0), ymin=base - 2)
+    n.ennemis(g, d, lettres, 3, ymin=fond - 3)
+    mid = (g + d) // 2
+    occupe = range(0)
+    w = min(16, d - g - 16)  # huit colonnes de fond de chaque côté : la rampe vers les souterrains y passe
+    if bateau and w >= 12:
+        # la coque : quatre rangées de bois, plus étroite en bas ; une échelle sur son flanc gauche ; la cabine sur le pont
+        x1, x2 = mid - w // 2, mid + w // 2
+        for k in range(4):
+            for x in range(x1 + (3 - k), x2 - (3 - k) // 2):
+                n.set(x, fond - 1 - k, 'W')
+        for y in range(fond - 5, fond):
+            n.set(x1 + 1, y, 'H')
+        tour(n, mid - 3, 8, fond - 4, 1, 'W', lettres, [0], [0], rng, butin=x0)
+        occupe = range(x1 - 1, x2 + 2)
+    elif fortin and w >= 10:
         tour(n, mid - w // 2, w, fond, max(1, (prof - 4) // 5), n.t['mur'], lettres, [0], [0], rng, butin=x0)
-    n.ennemis(a, a + marches, lettres, 2, ymin=base - 2)  # des gardes sur les marches
-    n.ennemis(c - marches, c, lettres, 2, ymin=base - 2)
-    n.ennemis(a + marches, c - marches, lettres, 3, ymin=fond - 3)
-    for k in range(3):
-        px = rng.randrange(a + marches + 1, c - marches - 1)
-        if px not in fortin and n.get(px, fond - 1) == ' ' and n.get(px, fond - 2) == ' ':  # jamais devant une porte du fortin
+        occupe = range(mid - w // 2 - 2, mid + w // 2 + 3)
+    for k in range(3 if d - g > 4 else 0):
+        px = rng.randrange(g + 1, d - 1)
+        if px not in occupe and n.get(px, fond - 1) == ' ' and n.get(px, fond - 2) == ' ':  # jamais devant une porte du fortin
             n.set(px, fond - 1, PROPS[k])
-    n.repere(a + marches + 2, '!', ymin=fond - 3)
-    n.repere(mid + (w // 2 + 1 if w >= 10 else 0), 'K', ymin=fond - 3)
-    _acces(n, a + marches, c - marches - 1, fond)
+    n.repere(g + 2, '!', ymin=fond - 3)
+    n.repere(mid + (w // 2 + 1 if occupe else 0), 'K', ymin=fond - 3)
+    _acces(n, g, d - 1, fond)
 
 
 def _acces(n, gauche, droite, fond):

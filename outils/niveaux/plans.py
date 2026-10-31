@@ -275,92 +275,99 @@ NIVEAUX = {
             ('arene', 46, dict(lettres='acdfhm')),
         ],
     ),
-    # Le Breizh Tour refait (le chantier du level design, voir docs/LEVEL-DESIGN.md et l'International Tour plus bas) : du relief
-    # partout, des tours séparées par le vide (passerelles en haut, tyroliennes), des cuvettes et des grottes qu'on traverse en
-    # descendant des marches, des complexes souterrains (reseau=True). Ni barrage, ni cheminée : la verticalité vient du vide et
-    # du terrain. Les lieux restent : les pierres levées, le manoir, la tour de l'enchanteur, le lac ; la citadelle, les toits, les
-    # pontons ; Port-Tudy, la côte sauvage, le phare de Pen-Men
+    # Le Breizh Tour refait (le chantier du level design, voir docs/LEVEL-DESIGN.md) : chaque niveau a sa structure à lui, pas
+    # le gabarit de l'International Tour avec un autre décor. Ni barrage, ni cheminée : la verticalité vient du vide et du terrain.
+    # - la Forêt : la canopée. De longues chaînes de cabanes dans les arbres, séparées par le vide, qu'on traverse par des ponts de
+    #   cordes en haut et des tyroliennes ; des gorges (ponts de singe, rochers flottants) ; le Val sans Retour, un ravin étroit et raide ;
+    # - le Port : les quais. Presque à plat, au ras de l'eau : les toits de la ville close, les pontons, les grues, le bassin de
+    #   radoub en terrasses et son bateau en cale sèche, les entrepôts des docks, la base de sous-marins de Keroman, basse et longue ;
+    # - Groix : la côte. Une grande montée par les falaises jusqu'au sémaphore et au phare, le Trou de l'Enfer (un versant à pic,
+    #   l'autre en terrasses), la grotte marine sous le plateau, et la longue descente vers la plage.
     'foret_refonte': dict(
         nom='La Forêt des Murmures', theme='foret', textes='07-foret.ts', fichier='../refontes/07-foret.ts',
-        constante='CARTE_FORET_REFONTE', graine=772, base=58, raccord='adh', caves='adh', reseau=True,
+        constante='CARTE_FORET_REFONTE', graine=773, base=58, raccord='adh', caves='adh', reseau=True,
         lieux=[
             ('plat', 12, dict(lettres='a', deco=3, digit='1')),  # la brume, les pierres levées
-            ('corniches', 22, dict(monte=8, lettres='adh')),  # les rochers moussus
-            ('bloc', 26, dict(etages=4, lien='passerelle', ecart=10, mat='W', lettres='adh')),  # les cabanes dans les arbres
-            ('bloc', 24, dict(etages=5, lien='tyro', ecart=12, mat='W', lettres='adh', monte=-6)),
-            ('bloc', 22, dict(etages=3, lien=None, ecart=0, mat='W', lettres='adh')),
-            ('miradors', 30, dict(lettres='adh')),  # les miradors des chasseurs
-            ('cuvette', 92, dict(profondeur=14, lettres='adh')),  # le Val sans Retour : on descend, on remonte en face
+            ('corniches', 22, dict(monte=6, lettres='adh')),  # les rochers moussus
+            # la canopée : cinq grands arbres, des ponts de cordes entre leurs cabanes, une tyrolienne vers le plus bas
+            ('bloc', 22, dict(etages=5, lien='passerelle', ecart=9, mat='W', lettres='adh')),
+            ('bloc', 20, dict(etages=6, lien='passerelle', ecart=10, mat='W', lettres='adh', monte=-2)),
+            ('bloc', 22, dict(etages=6, lien='tyro', ecart=12, mat='W', lettres='adh')),
+            ('bloc', 20, dict(etages=4, lien='passerelle', ecart=9, mat='W', lettres='adh', monte=-4)),
+            ('bloc', 22, dict(etages=4, lien=None, ecart=0, mat='W', lettres='adh')),
+            ('pont_singe', 18, dict(lettres='adh', butin='+')),  # une gorge
             ('plat', 10, dict(lettres='ach', digit='2', drones=1)),  # la fontaine qui rend les guitares neuves
             ('forteresse', 34, dict(etages=3, lettres='adh', mat='R', cage=True)),  # le vieux manoir en ruine
-            ('pont_singe', 18, dict(lettres='adh', butin='+')),  # un ravin dans la forêt
-            ('gouffre', 20, dict(lettres='adh', nb=4)),
-            ('corniches', 22, dict(monte=10, lettres='adfh')),
-            ('tour', 22, dict(etages=3, lettres='adfh', mat='R', tyro=10, apres=14, digit='3')),  # la tour de l'enchanteur
-            ('descente', 24, dict(chute=10, lettres='acdfh')),
-            ('traversee', 36, dict(lettres='acdh', mode='iles')),
-            ('grotte_traversante', 92, dict(profondeur=12, hauteur=10, lettres='acdfh')),  # sous les racines du grand chêne
-            ('bloc', 26, dict(etages=4, lien='passerelle', ecart=10, mat='W', lettres='acdfh')),
-            ('bloc', 24, dict(etages=3, lien=None, ecart=0, mat='W', lettres='acdfh')),
+            ('cuvette', 60, dict(profondeur=16, lettres='adh', pente=1, fortin=False)),  # le Val sans Retour : un ravin raide
+            ('traversee', 36, dict(lettres='acdh', mode='iles')),  # des rochers flottants au-dessus d'une gorge
+            ('grotte', 20, dict(monte=8, lettres='acdfh', butin='+')),  # on remonte par l'intérieur, sous les racines
+            ('tour', 22, dict(etages=4, lettres='adfh', mat='R', tyro=10, apres=14, digit='3')),  # la tour de l'enchanteur
+            ('descente', 24, dict(chute=8, lettres='acdfh')),
+            # la seconde canopée, plus haute : on y grimpe, on la traverse de cabane en cabane
+            ('corniches', 22, dict(monte=8, lettres='acdfh')),
+            ('bloc', 22, dict(etages=6, lien='tyro', ecart=12, mat='W', lettres='acdfh')),
+            ('bloc', 20, dict(etages=5, lien='passerelle', ecart=10, mat='W', lettres='acdfh', monte=-3)),
+            ('bloc', 22, dict(etages=5, lien='passerelle', ecart=9, mat='W', lettres='acdfh')),
+            ('bloc', 20, dict(etages=3, lien=None, ecart=0, mat='W', lettres='acdfh', monte=-3)),
+            ('pont_singe', 18, dict(lettres='acdfh', butin='*')),
             ('plat', 10, dict(lettres='acdfh', digit='4', drones=2)),  # le lac et l'épée
-            ('plateau_caverne', 52, dict(monte=11, lettres='acdfh', butin='*')),
             ('arene', 44, dict(lettres='acdfh')),
         ],
     ),
     'port_refonte': dict(
         nom='Le Port de Lorient', theme='port', textes='08-port.ts', fichier='../refontes/08-port.ts',
-        constante='CARTE_PORT_REFONTE', graine=882, base=58, raccord='acdh', caves='acdh', reseau=True,
+        constante='CARTE_PORT_REFONTE', graine=883, base=58, raccord='acdh', caves='acdh', reseau=True,
         lieux=[
             ('plat', 12, dict(lettres='a', deco=3)),
             ('plat', 10, dict(lettres='achm', digit='1')),  # le festival
             ('maison', 14, dict(lettres='achm')),
             ('toits', 42, dict(lettres='acdhm')),  # les toits d'ardoise de la ville close
-            ('corniches', 22, dict(monte=8, lettres='acdhm')),
-            ('bloc', 26, dict(etages=4, lien='passerelle', ecart=10, mat='B', lettres='acdhm')),  # les maisons de la ville close
-            ('bloc', 28, dict(etages=5, lien='tyro', ecart=12, mat='B', lettres='acdhm', monte=-6)),
-            ('bloc', 24, dict(etages=3, lien=None, ecart=0, mat='B', lettres='acdhm')),
+            ('toits', 42, dict(lettres='acdhm')),
             ('forteresse', 34, dict(etages=3, lettres='acdhm', mat='B', cage=True)),  # la citadelle
-            ('descente', 24, dict(chute=10, lettres='acdhm')),  # on descend vers le port
             ('ponton', 42, dict(lettres='cdhm', digit='2')),  # les pontons du port de pêche
-            ('miradors', 30, dict(lettres='acdhm')),  # les grues du port
-            ('cuvette', 92, dict(profondeur=14, lettres='acdhm')),  # la forme de radoub, vidée : on descend, on remonte en face
-            ('gouffre', 20, dict(lettres='acdhm', nb=4)),
-            ('corniches', 22, dict(monte=8, lettres='acdfhm')),
-            ('bloc', 28, dict(etages=5, lien='metal', ecart=10, mat='D', lettres='acdfhm')),  # les entrepôts des docks
-            ('bloc', 26, dict(etages=6, lien='metal', ecart=10, mat='D', lettres='acdfhm')),
-            ('bloc', 24, dict(etages=4, lien=None, ecart=0, mat='D', lettres='acdfhm')),
-            ('descente', 24, dict(chute=8, lettres='acdfhm')),
-            ('grotte_traversante', 92, dict(profondeur=12, hauteur=10, lettres='acdfhm')),  # la base de sous-marins de Keroman
+            ('echafaudage', 22, dict(niveaux=3, lettres='acdhm')),  # les grues
+            ('ponton', 42, dict(lettres='cdhm')),
+            # le bassin de radoub, vidé : des terrasses douces, un bateau en cale sèche au fond
+            ('cuvette', 104, dict(profondeur=14, lettres='acdhm', pente=3, paliers=4, bateau=True)),
+            ('echafaudage', 22, dict(niveaux=4, lettres='acdfhm')),
+            ('bloc', 30, dict(etages=4, lien='metal', ecart=10, mat='D', lettres='acdfhm')),  # les entrepôts des docks
+            ('bloc', 28, dict(etages=3, lien='metal', ecart=10, mat='D', lettres='acdfhm')),
+            ('bloc', 30, dict(etages=4, lien=None, ecart=0, mat='D', lettres='acdfhm')),
+            ('gouffre', 20, dict(lettres='acdfhm', nb=4)),
+            # la base de sous-marins de Keroman : un toit de béton épais, une alvéole basse et longue où l'on descend
+            ('grotte_traversante', 112, dict(profondeur=8, hauteur=14, lettres='acdfhm')),
             ('plat', 10, dict(lettres='acdfhm', digit='3', drones=2)),  # le ferry est à quai
+            ('toits', 42, dict(lettres='acdfhm')),
             ('ponton', 42, dict(lettres='cdfhm')),
-            ('plateau_caverne', 52, dict(monte=11, lettres='acdfhm', butin='+')),
             ('plat', 16, dict(lettres='acdfhm')),  # le quai, et le van : le ferry est un niveau à part (La Traversée)
         ],
     ),
     'groix_refonte': dict(
         nom='L’Île de Groix', theme='groix', textes='09-groix.ts', fichier='../refontes/09-groix.ts',
-        constante='CARTE_GROIX_REFONTE', graine=992, base=58, raccord='acdh', caves='acdh', reseau=True,
+        constante='CARTE_GROIX_REFONTE', graine=993, base=62, raccord='acdh', caves='acdh', reseau=True,
         lieux=[
             ('plat', 12, dict(lettres='a', deco=3)),
             ('ponton', 42, dict(lettres='cdhm', digit='1')),  # Port-Tudy, l'arrivée du ferry
-            ('corniches', 22, dict(monte=8, lettres='achm')),
-            ('bloc', 24, dict(etages=3, lien='passerelle', ecart=10, mat='R', lettres='achm')),  # les maisons du bourg
-            ('bloc', 26, dict(etages=4, lien='tyro', ecart=12, mat='R', lettres='achm', monte=-4)),
-            ('bloc', 22, dict(etages=3, lien=None, ecart=0, mat='R', lettres='achm')),
-            ('falaise', 28, dict(lettres='acdhm', digit='2')),  # les falaises de la côte sauvage
+            ('bloc', 22, dict(etages=3, lien='passerelle', ecart=9, mat='R', lettres='achm')),  # les maisons du bourg
+            ('bloc', 22, dict(etages=2, lien=None, ecart=0, mat='R', lettres='achm', monte=-2)),
+            # la grande montée : les falaises de la côte sauvage, une corniche après l'autre
+            ('falaise', 28, dict(lettres='acdhm', digit='2')),
+            ('corniches', 22, dict(monte=8, lettres='acdhm')),
+            ('miradors', 30, dict(lettres='acdhm')),  # la lande et le sémaphore
             ('forteresse', 34, dict(etages=3, lettres='acdhm', mat='R', cage=True)),  # le fort
-            ('miradors', 30, dict(lettres='acdhm')),  # le sémaphore
-            ('cuvette', 92, dict(profondeur=14, lettres='acdhm')),  # le Trou de l'Enfer : on descend, on remonte en face
-            ('gouffre', 22, dict(lettres='acdhm', nb=4)),
-            ('traversee', 36, dict(lettres='acdhm', mode='iles')),
-            ('corniches', 22, dict(monte=10, lettres='acdfhm')),
-            ('tour', 22, dict(etages=3, lettres='acdfhm', mat='R', digit='3')),  # le phare de Pen-Men
+            ('corniches', 22, dict(monte=6, lettres='acdhm')),
+            ('tour', 22, dict(etages=4, lettres='acdfhm', mat='R', digit='3')),  # le phare de Pen-Men, tout en haut
             ('pont_singe', 18, dict(lettres='acdfhm', butin='*')),  # une faille au-dessus de la mer
-            ('descente', 24, dict(chute=8, lettres='acdfhm')),
-            ('grotte_traversante', 92, dict(profondeur=12, hauteur=10, lettres='acdfhm')),  # la grotte aux Moutons
-            ('forteresse', 38, dict(etages=4, lettres='acdfhm', mat='R', cage=True)),
+            # le Trou de l'Enfer : un versant à pic, l'autre en terrasses
+            ('cuvette', 96, dict(profondeur=16, lettres='acdfhm', pente=1, pente_d=2, paliers=4, fortin=False)),
+            ('traversee', 36, dict(lettres='acdfhm', mode='iles')),  # les rochers en mer
+            ('plateau_caverne', 56, dict(monte=11, lettres='acdfhm', butin='+')),  # le plateau et la grotte marine
+            # la longue descente vers la plage
+            ('descente', 24, dict(chute=10, lettres='acdfhm')),
+            ('forteresse', 36, dict(etages=4, lettres='acdfhm', mat='R', cage=True)),
+            ('descente', 24, dict(chute=10, lettres='acdfhm')),
+            ('gouffre', 22, dict(lettres='acdfhm', nb=4)),
             ('plat', 10, dict(lettres='acdfhm', digit='4', drones=2)),  # la plage des Grands Sables
-            ('plateau_caverne', 52, dict(monte=11, lettres='acdfhm', butin='+')),
             ('arene', 46, dict(lettres='acdfhm')),
         ],
     ),

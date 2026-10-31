@@ -239,8 +239,8 @@ class Recette:
     def p_miradors(self, x0, x1, lettres='a'):
         miradors(self.n, x0, x1 - x0, lettres)
 
-    def p_cuvette(self, x0, x1, profondeur=14, lettres='a'):
-        cuvette(self.n, x0, x1 - x0, profondeur, lettres)
+    def p_cuvette(self, x0, x1, profondeur=14, lettres='a', **forme):  # forme : pente, pente_d, paliers, fortin, bateau
+        cuvette(self.n, x0, x1 - x0, profondeur, lettres, **forme)
 
     def p_grotte_traversante(self, x0, x1, profondeur=12, hauteur=10, lettres='a'):
         grotte_traversante(self.n, x0, x1 - x0, profondeur, hauteur, lettres)
