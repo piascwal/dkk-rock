@@ -1,3 +1,6 @@
+import { CARTE_FORET_REFONTE } from './refontes/07-foret';
+import { CARTE_PORT_REFONTE } from './refontes/08-port';
+import { CARTE_GROIX_REFONTE } from './refontes/09-groix';
 import { CARTE_BEAUVAIS_REFONTE } from './refontes/17-beauvais';
 import { CARTE_LIMERICK_REFONTE, DECOR_LIMERICK_REFONTE } from './refontes/18-limerick';
 import { CARTE_LUND_REFONTE } from './refontes/19-lund';
@@ -22,6 +25,10 @@ export const REFONTES: Readonly<Record<string, Partial<DefNiveau>>> = {
   lund: { carte: CARTE_LUND_REFONTE },
   newyork: { carte: CARTE_NEW_YORK_REFONTE },
   ottawa: { carte: CARTE_OTTAWA_REFONTE, decor: DECOR_OTTAWA_REFONTE },
+  // le Breizh Tour, en essai
+  foret: { carte: CARTE_FORET_REFONTE },
+  port: { carte: CARTE_PORT_REFONTE },
+  groix: { carte: CARTE_GROIX_REFONTE },
 };
 
 /**
