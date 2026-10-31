@@ -5,29 +5,31 @@ quelque chose au-dessus et une raison de passer dessous. Ce qu'on y pose dépend
 - une butte : le terrain monte en marches jusqu'à un guetteur ; à son pied, une fosse et l'entrée d'une grotte qui la traverse ;
 - un trou : le sol s'effondre en marches jusqu'à un fond gardé, d'où partent des rampes vers les souterrains ;
 - des gradins, seulement là où il y en aurait vraiment (autour de la patinoire) : des pitons posés en l'air au-dessus de la glace ;
-- sur un lac gelé, une cabane de pêcheur : on la traverse par ses portes, ou l'on monte sur son toit.
+- sur un lac gelé, une cabane de pêcheur : on la traverse par ses portes, ou l'on monte sur son toit ;
+- et, selon le lieu, un kiosque à musique, une fontaine, un échafaudage de chantier, des ruines, un marché (voir formes.py).
 
-La fosse : trois marches qui descendent, juste devant (on la saute, ou l'on y entre en marchant), puis un passage dessous qui
+La fosse : quatre marches qui descendent, juste devant (on la saute, ou l'on y entre en marchant), puis un passage dessous qui
 ressort de l'autre côté ; un boyau en part vers le complexe souterrain le plus proche. Aucune échelle : c'est le terrain qui
 propose les deux chemins. `relief_des_plats` cherche ces étendues une fois les modules posés, avant le réseau souterrain.
 """
 from blocs import tour
 from massifs import _naturel
+import formes as autres
 
 HAUT = 8  # la hauteur des gradins, en rangées
 PRESERVE = set('0123456789!K*+@F&()$')  # les repères qu'on ne recouvre jamais : on les remonte dessus
 HORS = ('arene', 'avion', 'ferry')  # là où l'on ne pose rien
 # ce qui a du sens dans chaque lieu, dans l'ordre où on l'essaie (on tourne d'une étendue à l'autre)
 FORMES = {
-    'beauvais': ('batiment', 'trou'),
-    'limerick': ('butte', 'batiment', 'trou'),
-    'lund': ('batiment', 'butte', 'trou'),
-    'newyork': ('batiment', 'trou'),
-    'ottawa': ('butte', 'batiment', 'trou'),
-    'marseille': ('butte', 'batiment', 'trou'),
-    'foret': ('butte', 'trou'),
-    'port': ('batiment', 'trou'),
-    'groix': ('butte', 'batiment', 'trou'),
+    'beauvais': ('batiment', 'marche', 'trou', 'kiosque', 'echafaudage', 'fontaine'),
+    'limerick': ('butte', 'ruines', 'batiment', 'marche', 'trou'),
+    'lund': ('batiment', 'fontaine', 'butte', 'kiosque', 'marche', 'trou'),
+    'newyork': ('echafaudage', 'batiment', 'kiosque', 'trou', 'marche'),
+    'ottawa': ('butte', 'marche', 'batiment', 'kiosque', 'trou'),
+    'marseille': ('fontaine', 'butte', 'marche', 'batiment', 'trou'),
+    'foret': ('ruines', 'butte', 'trou'),
+    'port': ('echafaudage', 'marche', 'batiment', 'trou'),
+    'groix': ('butte', 'ruines', 'batiment', 'trou'),
 }
 GRADINS = ('patinoire',)  # les lieux qui appellent des gradins
 
@@ -41,18 +43,30 @@ def _sur_glace(n, x0, x1, g):
     return any(n.get(x, g) == 'G' or n.get(x, g + 1) == '~' for x in range(x0, x1))
 
 
+def _creuse_col(n, x, cible):
+    """Abaisse le sol de la colonne x à la rangée `cible` ; ce qui était posé dessus (un drapeau, un garde, un repère) descend avec lui."""
+    h = n.haut[x]
+    pose = [(y, n.get(x, y)) for y in range(h - 4, h) if n.get(x, y) in PRESERVE or n.get(x, y).islower()]
+    for y, _ in pose:
+        n.set(x, y, ' ')
+    n.base_col(x, cible)
+    for k, (_, c) in enumerate(reversed(pose)):
+        n.set(x, cible - 1 - k, c)
+
+
 def _fosse_et_passage(n, x0, x1, g, lettres):
-    """La fosse devant [x0 + 3, x1 - 3), le passage dessous, la sortie en face et le boyau vers les souterrains."""
-    debut, fin = x0 + 3, x1 - 3
-    for k in range(3):
-        n.base_col(x0 + k, g + 1 + k)
-    sol = g + 3
+    """La fosse devant [x0 + 4, x1 - 4), le passage dessous, la sortie en face et le boyau vers les souterrains."""
+    # quatre marches : le passage (trois rangées, comme un boyau) garde le sol de surface au-dessus de lui
+    debut, fin = x0 + 4, x1 - 4
+    for k in range(4):
+        _creuse_col(n, x0 + k, g + 1 + k)
+    sol = g + 4
     for x in range(debut, fin):
-        for y in range(sol - 2, sol):
+        for y in range(sol - 3, sol):
             if _naturel(n, n.get(x, y)):
                 n.set(x, y, ' ')
-    for k in range(3):
-        n.base_col(fin + k, g + 3 - k)
+    for k in range(4):
+        _creuse_col(n, fin + k, g + 4 - k)
     n.ennemis(debut, fin, lettres, 2, ymin=sol - 3)
     n.repere((debut + fin) // 2, '+', ymin=sol - 3)
     if not hasattr(n, 'acces'):
@@ -109,11 +123,11 @@ def trou(n, x0, x1, g, lettres, profondeur=7):
     a, c = x0 + 2, x1 - 2
     prof = min(profondeur, (c - a) // 3)
     for i in range(prof):
-        n.base_col(a + i, g + 1 + i)
-        n.base_col(c - 1 - i, g + 1 + i)
+        _creuse_col(n, a + i, g + 1 + i)
+        _creuse_col(n, c - 1 - i, g + 1 + i)
     fond = g + prof
     for x in range(a + prof, c - prof):
-        n.base_col(x, fond)
+        _creuse_col(n, x, fond)
     n.ennemis(a + prof, c - prof, lettres, 3, ymin=fond - 3)
     n.repere((a + c) // 2, '+', ymin=fond - 3)
     if not hasattr(n, 'acces'):
@@ -121,7 +135,21 @@ def trou(n, x0, x1, g, lettres, profondeur=7):
     n.acces += [(a + prof, fond, -1), (c - prof - 1, fond, 1)]
 
 
-def relief_des_plats(r, lettres, theme, longueur=34):
+def pose_forme(n, nom, x0, x1, g, lettres):
+    """Pose la forme `nom` sur [x0, x1), le sol à la rangée g (aussi depuis un plan : le module « forme » de genere-niveaux.py)."""
+    if nom == 'batiment':
+        batiment(n, x0, x1, g, lettres, n.t['mur'])
+    elif nom == 'butte':
+        butte(n, x0, x1, g, lettres)
+    elif nom == 'trou':
+        trou(n, x0, x1, g, lettres)
+    elif nom == 'gradins':
+        gradins(n, x0, x1, g, lettres)
+    else:  # kiosque, fontaine, échafaudage, ruines, marché (voir formes.py)
+        getattr(autres, nom)(n, x0, x1, g, lettres, n.t['mur'])
+
+
+def relief_des_plats(r, lettres, theme, longueur=28):
     """Chaque étendue plate d'au moins `longueur` colonnes, sans rien au-dessus, reçoit l'une des formes du lieu (on tourne)."""
     n = r.n
     hors = [(a, b) for a, b, genre in r.pieces if genre in HORS]
@@ -134,7 +162,8 @@ def relief_des_plats(r, lettres, theme, longueur=34):
         fin = x
         # du vrai sol : pas le fond d'un vide sans fond (entre deux tours, sous un pont)
         sol = g < n.bas - 4 and n.get(x, g) != ' '
-        while sol and fin < n.w - 24 and n.haut[fin] == g and _vide_dessus(n, fin, g) and not any(a <= fin < b for a, b in hors):
+        while (sol and fin < n.w - 24 and n.haut[fin] == g and n.get(fin, g) not in ' .~' and _vide_dessus(n, fin, g)
+               and not any(a <= fin < b for a, b in hors)):
             fin += 1
         if fin - x < longueur:
             x = fin + 1
@@ -149,12 +178,6 @@ def relief_des_plats(r, lettres, theme, longueur=34):
             w = min(14, largeur - 16)
             tour(n, (debut + x1) // 2 - w // 2, w, g, 1 + n.rng.randrange(2), 'W', lettres, [0], [0], n.rng, butin=debut)
         else:
-            forme = formes[tour_ % len(formes)]
+            pose_forme(n, formes[tour_ % len(formes)], debut, x1, g, lettres)
             tour_ += 1
-            if forme == 'batiment':
-                batiment(n, debut, x1, g, lettres, n.t['mur'])
-            elif forme == 'butte':
-                butte(n, debut, x1, g, lettres)
-            else:
-                trou(n, debut, x1, g, lettres)
         x = x1 + 20

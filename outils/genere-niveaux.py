@@ -20,7 +20,7 @@ from plans import NIVEAUX, enchaine
 from souterrain import souterrain, tonneaux_de_surface
 from massifs import reseau
 from acces import relie_l_inaccessible
-from relief import relief_des_plats
+from relief import pose_forme, relief_des_plats
 from blocs import bloc
 from plateaux import cuvette, grotte_traversante, miradors, plateau_caverne
 from ferry import ferry
@@ -239,6 +239,12 @@ class Recette:
 
     def p_miradors(self, x0, x1, lettres='a'):
         miradors(self.n, x0, x1 - x0, lettres)
+
+    def p_forme(self, x0, x1, nom='marche', lettres='a'):  # une forme de niveaux/relief.py ou formes.py, posée sur un sol plat
+        n = self.n
+        for x in range(x0, x1):
+            n.base_col(x, n.base)
+        pose_forme(n, nom, x0, x1, n.base, lettres)
 
     def p_cuvette(self, x0, x1, profondeur=14, lettres='a', **forme):  # forme : pente, pente_d, paliers, fortin, bateau
         cuvette(self.n, x0, x1 - x0, profondeur, lettres, **forme)

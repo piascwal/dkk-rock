@@ -179,7 +179,8 @@ def cuvette(n, x0, largeur, profondeur=14, lettres='a', pente=2, pente_d=None, p
     # le drapeau, hors de la rampe qui part du bord vers les souterrains (six colonnes, voir massifs._entrees)
     n.repere(g + 7 if d - g > 20 else (g + d) // 2, '!', ymin=fond - 3)
     n.repere(mid + (w // 2 + 1 if occupe else 0), 'K', ymin=fond - 3)
-    _acces(n, g, d - 1, fond)
+    if d - g >= 20:  # un fond trop étroit : les deux rampes vers les souterrains s'y rejoindraient, sous le drapeau
+        _acces(n, g, d - 1, fond)
 
 
 def _acces(n, gauche, droite, fond):

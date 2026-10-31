@@ -298,6 +298,7 @@ NIVEAUX = {
             ('pont_singe', 18, dict(lettres='adh', butin='+')),  # une gorge
             ('plat', 10, dict(lettres='ach', digit='2', drones=1)),  # la fontaine qui rend les guitares neuves
             ('forteresse', 34, dict(etages=3, lettres='adh', mat='R', cage=True)),  # le vieux manoir en ruine
+            ('forme', 40, dict(nom='ruines', lettres='adh')),  # les ruines de la chapelle
             ('cuvette', 60, dict(profondeur=16, lettres='adh', pente=1, fortin=False)),  # le Val sans Retour : un ravin raide
             ('traversee', 36, dict(lettres='acdh', mode='iles')),  # des rochers flottants au-dessus d'une gorge
             ('grotte', 20, dict(monte=8, lettres='acdfh', butin='+')),  # on remonte par l'intérieur, sous les racines
@@ -321,6 +322,7 @@ NIVEAUX = {
             ('plat', 12, dict(lettres='a', deco=3)),
             ('plat', 10, dict(lettres='achm', digit='1')),  # le festival
             ('maison', 14, dict(lettres='achm')),
+            ('forme', 34, dict(nom='marche', lettres='achm')),  # le marché aux poissons
             ('toits', 42, dict(lettres='acdhm')),  # les toits d'ardoise de la ville close
             ('toits', 42, dict(lettres='acdhm')),
             ('forteresse', 34, dict(etages=3, lettres='acdhm', mat='B', cage=True)),  # la citadelle
@@ -330,6 +332,7 @@ NIVEAUX = {
             # le bassin de radoub, vidé : des terrasses douces, un bateau en cale sèche au fond
             ('cuvette', 104, dict(profondeur=14, lettres='acdhm', pente=3, paliers=4, bateau=True)),
             ('echafaudage', 22, dict(niveaux=4, lettres='acdfhm')),
+            ('forme', 34, dict(nom='echafaudage', lettres='acdfhm')),  # le chantier naval
             ('bloc', 30, dict(etages=4, lien='metal', ecart=10, mat='D', lettres='acdfhm')),  # les entrepôts des docks
             ('bloc', 28, dict(etages=3, lien='metal', ecart=10, mat='D', lettres='acdfhm')),
             ('bloc', 30, dict(etages=4, lien=None, ecart=0, mat='D', lettres='acdfhm')),
@@ -355,6 +358,7 @@ NIVEAUX = {
             ('corniches', 22, dict(monte=8, lettres='acdhm')),
             ('miradors', 30, dict(lettres='acdhm')),  # la lande et le sémaphore
             ('forteresse', 34, dict(etages=3, lettres='acdhm', mat='R', cage=True)),  # le fort
+            ('forme', 40, dict(nom='ruines', lettres='acdhm')),  # les ruines du vieux fort
             ('corniches', 22, dict(monte=6, lettres='acdhm')),
             ('tour', 22, dict(etages=4, lettres='acdfhm', mat='R', digit='3')),  # le phare de Pen-Men, tout en haut
             ('pont_singe', 18, dict(lettres='acdfhm', butin='*')),  # une faille au-dessus de la mer
@@ -753,6 +757,7 @@ NIVEAUX = {
             ('bloc', 24, dict(etages=3, lien='passerelle', ecart=9, mat='{', lettres='ac')),  # une ville basse
             ('bloc', 22, dict(etages=2, lien=None, ecart=0, mat='{', lettres='ac')),
             ('remparts', 18, dict(haut=6, lettres='ac')),
+            ('forme', 34, dict(nom='marche', lettres='ac')),  # le marché de la place Jeanne-Hachette
             ('corniches', 22, dict(monte=8, lettres='ac')),  # on monte vers la cathédrale
             ('cathedrale_beauvais', 40, dict(lettres='ac', digit='2')),  # le chœur le plus haut du monde, sans nef
             ('plat', 10, dict(lettres='ac', digit='3', drones=2)),  # l'horloge astronomique ; les gargouilles s'envolent
@@ -760,6 +765,7 @@ NIVEAUX = {
             ('forteresse', 34, dict(etages=4, lettres='ac', mat='{', cage=True)),  # la place Jeanne-Hachette
             ('descente', 24, dict(chute=10, lettres='ac')),
             ('gymnase', 46, dict(lettres='ac', digit='4')),  # le gymnase de JBT
+            ('forme', 34, dict(nom='kiosque', lettres='ac')),  # le kiosque du jardin
             ('pont_singe', 22, dict(lettres='ac', butin='*')),
             ('descente', 24, dict(chute=8, lettres='ac')),
             # l'aéroport : tout en longueur, des parkings à étages, le tarmac
@@ -785,12 +791,14 @@ NIVEAUX = {
             ('descente', 24, dict(chute=8, lettres='ac')),
             ('descente', 24, dict(chute=6, lettres='ac')),  # on redescend vers la ville
             ('universite', 40, dict(lettres='ac', digit='3')),  # l'Université de Limerick, le stage de Mat
+            ('forme', 40, dict(nom='ruines', lettres='ac')),  # les ruines de l'abbaye
             ('shannon', 30, dict(lettres='ac')),  # la Shannon, le pont de Thomond
             ('traversee', 36, dict(lettres='ac', mode='pont')),
             ('bloc', 26, dict(etages=4, lien='passerelle', ecart=10, mat='B', lettres='ac')),  # les rues géorgiennes
             ('bloc', 26, dict(etages=4, lien='passerelle', ecart=10, mat='B', lettres='ac')),
             ('bloc', 24, dict(etages=3, lien=None, ecart=0, mat='B', lettres='ac')),
             ('pub', 26, dict(lettres='a', digit='4')),  # la session au pub
+            ('forme', 34, dict(nom='marche', lettres='ac')),  # le Milk Market
             # la carrière : des terrasses douces, rien au fond
             ('cuvette', 100, dict(profondeur=14, lettres='ac', pente=3, paliers=3, fortin=False)),
             ('plat', 10, dict(lettres='au', digit='5')),  # Thomond Park : les supporters du Munster
@@ -810,11 +818,13 @@ NIVEAUX = {
             ('bloc', 24, dict(etages=8, lien='tyro', ecart=12, mat='B', lettres='ac')),
             ('bloc', 22, dict(etages=6, lien=None, ecart=0, mat='D', lettres='ac', monte=-4)),
             ('plat', 10, dict(lettres='aa', digit='3', drones=2)),  # Wall Street ; les pigeons
+            ('forme', 34, dict(nom='kiosque', lettres='ac')),  # le kiosque de Central Park
             ('gratte_ciel', 28, dict(lettres='ac', etages=7)),
             ('echafaudage', 22, dict(niveaux=4, lettres='ac')),
             ('gratte_ciel', 28, dict(lettres='ac', etages=6)),
             ('metro', 44, dict(lettres='c', digit='4')),  # le métro sous la rue
             ('metro', 44, dict(lettres='c')),
+            ('forme', 34, dict(nom='echafaudage', lettres='ac')),  # un chantier
             # Downtown : la seconde forêt de tours
             ('bloc', 22, dict(etages=8, lien='metal', ecart=10, mat='B', lettres='ac')),
             ('bloc', 24, dict(etages=7, lien='passerelle', ecart=9, mat='D', lettres='ac')),
@@ -832,9 +842,10 @@ NIVEAUX = {
         lieux=[
             ('plat', 12, dict(lettres='cl', deco=3, digit='1')),  # la neige, les castors et un caribou
             ('maison', 14, dict(lettres='ac')),
+            ('forme', 34, dict(nom='kiosque', lettres='cl')),  # le kiosque du parc
             ('lac_gele', 36, dict(lettres='ac')),  # le canal Rideau gelé
             # les écluses du canal : des paliers qu'on descend, qu'on remonte en face
-            ('cuvette', 96, dict(profondeur=14, lettres='ac', pente=2, paliers=3, fortin=False)),
+            ('cuvette', 124, dict(profondeur=14, lettres='ac', pente=2, paliers=3, fortin=False)),
             ('lac_gele', 36, dict(lettres='aw')),
             ('glebe', 34, dict(lettres='acii', chute=6, digit='2')),  # le Glebe Collegiate : on n'en sort qu'en bas
             ('plat', 10, dict(lettres='ac', drones=2)),  # les bernaches
@@ -845,6 +856,7 @@ NIVEAUX = {
             ('parlement', 46, dict(lettres='acii', digit='4')),  # la tour de la Paix
             ('descente', 24, dict(chute=10, lettres='acl')),
             ('plat', 12, dict(lettres='cwl', digit='5', drones=2)),  # le marché By
+            ('forme', 34, dict(nom='marche', lettres='cwl')),  # les étals du marché By
             ('bloc', 26, dict(etages=4, lien='passerelle', ecart=10, mat='B', lettres='ac')),  # les maisons du marché
             ('bloc', 24, dict(etages=3, lien=None, ecart=0, mat='B', lettres='ac')),
             ('lac_gele', 36, dict(lettres='aw')),
@@ -862,6 +874,7 @@ NIVEAUX = {
             ('lac_gele', 44, dict(lettres='ac')),  # le lac gelé du parc
             ('cathedrale_lund', 48, dict(lettres='ac', digit='2')),  # la cathédrale romane, la crypte du géant Finn
             ('plat', 10, dict(lettres='ac', digit='3', plus=1)),  # l'horloge astronomique
+            ('forme', 34, dict(nom='fontaine', lettres='ac')),  # la fontaine de Stortorget
             ('bloc', 24, dict(etages=3, lien='passerelle', ecart=9, mat='B', lettres='ac')),  # les nations étudiantes
             ('bloc', 22, dict(etages=4, lien='tyro', ecart=12, mat='B', lettres='ac')),
             ('bloc', 22, dict(etages=2, lien=None, ecart=0, mat='B', lettres='ac', monte=-2)),
@@ -870,6 +883,7 @@ NIVEAUX = {
             ('luge', 44, dict(lettres='ac', haut=9)),  # la grande butte de luge
             ('luge', 44, dict(lettres='ac', haut=6)),
             ('maisons_rouges', 36, dict(lettres='ac', digit='4')),  # Kulturen
+            ('forme', 34, dict(nom='marche', lettres='ac')),  # le marché de Mårtenstorget
             ('traversee', 36, dict(lettres='ac', mode='iles')),  # les îlots du jardin botanique
             ('traversee', 36, dict(lettres='ac', mode='mixte')),
             ('plat', 12, dict(lettres='cj', digit='5', plus=1)),  # un élan sur la piste cyclable
@@ -890,9 +904,11 @@ NIVEAUX = {
             ('corniches', 22, dict(monte=8, lettres='ac')),
             ('forteresse', 34, dict(etages=3, lettres='ac', mat='{', cage=True)),  # le fort Saint-Jean
             ('plat', 14, dict(lettres='qq', digit='3')),  # la pétanque
+            ('forme', 34, dict(nom='fontaine', lettres='ac')),  # la fontaine du cours Julien
             ('pont_singe', 22, dict(lettres='ac', butin='+')),
             ('descente', 24, dict(chute=10, lettres='ac')),  # on plonge vers la mer
             ('plat', 10, dict(lettres='aa', digit='4', drones=2)),  # les supporters de l'OM ; les gabians
+            ('forme', 34, dict(nom='marche', lettres='ac')),  # le marché de Noailles
             ('calanques', 36, dict(lettres='ac', digit='5')),  # les calanques
             # une calanque à pic d'un côté, en pente douce de l'autre ; rien au fond
             ('cuvette', 80, dict(profondeur=16, lettres='ac', pente=1, pente_d=3, fortin=False)),
