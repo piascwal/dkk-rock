@@ -542,7 +542,7 @@ def fabrique(cle):
     if cfg.get('reseau'):  # un niveau en relief (une refonte) : des gradins sur les longues étendues plates (niveaux/relief.py), puis
         # les galeries dans ses massifs (voir niveaux/massifs.py)
         if cfg.get('relief', True):
-            relief_des_plats(r, cfg['caves'])
+            relief_des_plats(r, cfg['caves'], cfg['theme'])
         reseau(r, cfg['caves'])
     elif not cfg.get('sans_caves'):  # le ferry est un petit niveau : rien sous le quai
         souterrain(r, cfg['caves'])

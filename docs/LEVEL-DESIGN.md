@@ -57,10 +57,10 @@ coup d'œil : les comparer avant et après chaque refonte.
 
 - **Jamais une longue traversée sur le même plan.** Une étendue plate (une patinoire, un lac gelé, un pré, un quai) où l'on
   passe sans changer de hauteur reçoit quelque chose au-dessus et une raison de passer dessous (`relief.py`, appliqué à toute
-  étendue plate d'au moins 34 colonnes) : des gradins qu'on gravit marche après marche, des gardes en haut, une corniche de
-  pitons plus haut encore ; et juste devant, une fosse de trois marches où l'on entre en marchant, un passage sous les gradins
-  qui ressort de l'autre côté, un boyau vers les souterrains. Sur la glace ou l'eau, les gradins sont des pitons posés en l'air :
-  on patine dessous, on y grimpe d'un saut.
+  étendue plate d'au moins 34 colonnes). Ce qu'on y pose doit avoir du sens dans le lieu, et varie : un bâtiment (on monte dedans
+  ou sur le toit), une butte (un guetteur au sommet, une grotte à son pied), un trou (le sol s'effondre, des rampes partent du
+  fond vers les souterrains), une cabane de pêcheur sur un lac gelé ; des gradins seulement là où il y en aurait vraiment (autour
+  d'une patinoire). Devant le bâtiment ou la butte, une fosse de trois marches où l'on entre en marchant et un passage dessous.
 - **Une échelle ne suffit pas à donner envie de descendre.** L'entrée d'un souterrain se trouve sur le chemin, à l'horizontale :
   sur la remontée d'une cuvette, un palier et une ouverture dans la paroi où l'on entre en marchant (la courte échelle sert à
   passer par-dessus) ; au fond d'une fosse ; au bout d'une rampe.
