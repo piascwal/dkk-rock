@@ -19,6 +19,7 @@ from peintre import Niveau
 from plans import NIVEAUX, enchaine
 from souterrain import souterrain, tonneaux_de_surface
 from massifs import reseau
+from acces import relie_l_inaccessible
 from blocs import bloc
 from plateaux import cuvette, grotte_traversante, miradors, plateau_caverne
 from ferry import ferry
@@ -542,6 +543,8 @@ def fabrique(cle):
     elif not cfg.get('sans_caves'):  # le ferry est un petit niveau : rien sous le quai
         souterrain(r, cfg['caves'])
     tonneaux_de_surface(r, barils=cle in ('stc', 'ville', 'newyork'))
+    if cfg.get('reseau'):  # tout ce qu'on voit doit pouvoir s'atteindre (voir niveaux/acces.py)
+        relie_l_inaccessible(r.n)
     if cle == 'cimes':
         arene_du_yeti(r)
     if cle == 'club':

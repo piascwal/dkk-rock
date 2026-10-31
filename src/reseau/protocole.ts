@@ -25,7 +25,7 @@ import {
  *
  * Changer ce fichier de façon incompatible : augmenter VERSION_PROTOCOLE.
  */
-export const VERSION_PROTOCOLE = 42;
+export const VERSION_PROTOCOLE = 43;
 export const APP_DKK = { id: 'dkk-rock', version: VERSION_PROTOCOLE };
 
 const TYPE_ETAT = 1;

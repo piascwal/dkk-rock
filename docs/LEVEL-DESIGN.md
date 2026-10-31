@@ -34,7 +34,10 @@ coup d'œil : les comparer avant et après chaque refonte.
   épais ; dans la roche qui reste, des cavernes (un plafond irrégulier, des corniches, des gardes, du butin) reliées par un boyau.
 - **Tout ce qu'on voit doit pouvoir s'atteindre.** Une structure en hauteur sans accès (un château d'eau dont l'échelle s'arrête
   sous le plancher, un bloc dont on ne peut pas gagner le dessus) frustre : soit on la relie, soit on la retire. Les creux sans
-  issue sont reliés par une échelle à travers la roche (`_relie_les_isoles` dans `massifs.py`).
+  issue sont reliés par une échelle à travers la roche (`_relie_les_isoles` dans `massifs.py`). Être relié ne suffit pas : un
+  passage d'une case de haut, une échelle qui s'arrête sous un plafond bas laissent le héros dehors. En fin de génération,
+  `acces.py` refait le parcours du test (le même héros, deux cases de haut) et relie par une courte échelle, vers le haut ou
+  vers le bas, chaque endroit où l'on pourrait se tenir sans y arriver (une caverne, une pièce de bunker, l'étage d'une tour).
 - **Ne jamais creuser sous des marches ou un plancher.** Une caverne garde trois rangées de roche au-dessus d'elle, un boyau
   s'arrête avant de percer un sol par en dessous, une rampe ne passe jamais devant une porte : sinon l'escalier ou la porte du
   chemin principal disparaît (le test d'accessibilité le voit).
