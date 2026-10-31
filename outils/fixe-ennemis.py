@@ -96,13 +96,13 @@ TYPES = {
     'cycliste': ('CYCLISTE', 21),
     # le castor d'Ottawa (ennemi qui charge) : une image, dessinée à la main (pas d'animation pour l'instant)
     'castor': ('CASTOR', 12),
-    # le pigeon de New York (vole, puis pique) : deux apparences, le vol et le piqué (voir ETATS, comme le goéland)
+    # le pigeon de New York : trois images de vol (ailes levées, à mi-hauteur, baissées ; outils/anime-pigeon.py) et le piqué (voir ETATS)
     'pigeon': ('PIGEON', 14, 8),
 }
 
 # les lignes de la planche par état d'animation (ANIM dans jeu/vue.ts) : le vol au repos (0), le piqué en attaque (10).
 # Une planche à lignes : chaque apparence va dans sa ligne, les autres lignes restent vides.
-ETATS = {'goeland': (0, 10), 'pigeon': (0, 10), 'bmxpro': (0, 10), 'champion': (0, 10)}
+ETATS = {'goeland': (0, 10), 'pigeon': (0, 0, 0, 10), 'bmxpro': (0, 10), 'champion': (0, 10)}
 
 # les types dont la marche est tirée de la pose au repos (1er fichier : au repos, ligne 0 ; 2e : l'alerte, la recherche et l'attaque,
 # lignes 7, 8 et 10) : les jambes
@@ -249,12 +249,15 @@ def main():
         if animee:
             planche, compte = pose_animee(images, largeur, h)
         elif type_ in ETATS:
-            # une ligne par état : images[k] va dans la ligne ETATS[type_][k], la planche a autant de lignes que l'état le plus haut
-            rangees = [1 if k in ETATS[type_] else 0 for k in range(max(ETATS[type_]) + 1)]
-            planche = Image.new('RGBA', (largeur, h * len(rangees)), (0, 0, 0, 0))
+            # une ligne par état : images[k] va dans la ligne ETATS[type_][k], la planche a autant de lignes que l'état le plus haut ;
+            # plusieurs images pour une même ligne sont les images successives de cette animation (le battement d'ailes du pigeon)
+            compte = [ETATS[type_].count(k) for k in range(max(ETATS[type_]) + 1)]
+            planche = Image.new('RGBA', (largeur * max(compte), h * len(compte)), (0, 0, 0, 0))
+            suivante = [0] * len(compte)
             for im, ligne in zip(images, ETATS[type_]):
-                planche.alpha_composite(im, ((largeur - im.width) // 2, ligne * h + h - im.height))
-            compte = rangees
+                x = suivante[ligne] * largeur + (largeur - im.width) // 2
+                planche.alpha_composite(im, (x, ligne * h + h - im.height))
+                suivante[ligne] += 1
         else:
             planche = Image.new('RGBA', (largeur * len(images), h), (0, 0, 0, 0))
             for i, im in enumerate(images):
