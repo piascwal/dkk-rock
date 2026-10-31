@@ -8,7 +8,7 @@ Entrées : assets-sources/ennemis/presse-1-base.png (le passager pressé, en ple
           depuis leur image sur fond magenta par outils/prepare-magenta.py
 Sorties : assets-sources/ennemis/<type>-1-anim.png et <type>-1-anim.json (voir anime_commun.py)
 
-Chacun est découpé en calques : le corps, les deux jambes (décalées ligne à ligne depuis la ceinture), la valise et la main qui la
+Chacun est découpé en calques (Calques, dans anime_commun.py) : le corps, les deux jambes (décalées ligne à ligne depuis la ceinture), la valise et la main qui la
 tient (elle tourne autour de la poignée), le bras qui bouge (la montre du pressé tourne autour du coude ; la main du perdu se
 déplace sur ses cheveux, ses pixels restent aussi sur le corps : rien ne se découvre).
 """
@@ -19,51 +19,9 @@ import sys
 import numpy as np
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from anime_commun import MARGE, comble_entrejambe, ecrit_planche, incline, jambe, nettoie, pas, pose_sur, sprite, tourne
+from anime_commun import Calques, ecrit_planche, pas
 
-CORPS, BRAS, VALISE, JAMBE_AR, JAMBE_AV = range(5)
-
-
-class Passager:
-    """Un sprite découpé : `zones(xx, yy, op)` donne les masques du bras, de la valise, et la séparation des jambes."""
-
-    def __init__(self, type_, hanche, genou, cheville, poignee, coude, garde_bras=False):
-        self.nat = sprite(type_)
-        self.h, self.w = self.nat.shape[:2]
-        self.hanche, self.genou, self.cheville = hanche, genou, cheville
-        self.poignee, self.coude = poignee, coude
-        yy, xx = np.mgrid[0 : self.h, 0 : self.w]
-        op = self.nat[..., 3] > 0
-        bras, valise, separation = self.zones(xx, yy, op)
-        lab = np.zeros((self.h, self.w), int)
-        lab[op & bras] = BRAS
-        lab[op & valise & (lab == CORPS)] = VALISE
-        jambes = op & (yy >= hanche) & (lab == CORPS)
-        lab[jambes & (xx < separation)] = JAMBE_AR
-        lab[jambes & (xx >= separation)] = JAMBE_AV
-        self.c = {}
-        for i in (CORPS, BRAS, VALISE, JAMBE_AR, JAMBE_AV):
-            c = self.nat.copy()
-            garde = (lab == BRAS) if garde_bras and i == CORPS else np.zeros_like(op)
-            c[(lab != i) & ~garde] = 0
-            self.c[i] = c
-
-    def image(self, bob=0, bras=0.0, main=(0, 0), valise=0.0, ja=(0, 0), jv=(0, 0), penche=0.0):
-        """bob = descente du corps, bras = rotation autour du coude (degrés), main = décalage du bras (dx, dy), valise = rotation
-        autour de la poignée (degrés), ja / jv = (avance, lève) de chaque pied, penche = recul du buste (négatif : il se penche en avant)."""
-        toile = np.zeros((self.h + 2 * MARGE, self.w + 2 * MARGE, 4), np.uint8)
-        pose_sur(toile, jambe(self.c[JAMBE_AR], *ja, self.hanche, self.genou, self.cheville))
-        pose_sur(toile, jambe(self.c[JAMBE_AV], *jv, self.hanche, self.genou, self.cheville))
-        pose_sur(toile, self.c[CORPS], 0, bob)
-        pose_sur(toile, tourne(self.c[BRAS], self.coude, bras, marge=0), main[0], bob + main[1])
-        pose_sur(toile, tourne(self.c[VALISE], self.poignee, valise, marge=0), 0, bob)
-        comble_entrejambe(toile, self.hanche)
-        if penche:
-            toile = incline(toile, penche)
-        return nettoie(toile)
-
-
-class Presse(Passager):
+class Presse(Calques):
     def __init__(self):
         super().__init__('presse', hanche=112, genou=140, cheville=170, poignee=(55, 100), coude=(163, 82))
 
@@ -74,7 +32,7 @@ class Presse(Passager):
         return bras, valise, separation
 
 
-class Perdu(Passager):
+class Perdu(Calques):
     def __init__(self):
         super().__init__('perdu', hanche=118, genou=150, cheville=176, poignee=(45, 124), coude=(130, 50), garde_bras=True)
 

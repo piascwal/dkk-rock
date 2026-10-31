@@ -90,6 +90,10 @@ TYPES = {
     # les passagers de Beauvais, le perdu et le pressé : animés à la main (outils/anime-passagers.py)
     'perdu': ('PASSAGER', 20),
     'presse': ('PRESSE', 20),
+    # les gens de Lund : l'étudiant en salopette, et deux cyclistes (le cycliste du quotidien, le coureur en maillot de la Suède),
+    # animés à la main (outils/anime-lund.py) ; le jeu choisit l'apparence du cycliste selon son identifiant
+    'etudiant': ('ETUDIANT', 20),
+    'cycliste': ('CYCLISTE', 21),
 }
 
 # les lignes de la planche par état d'animation (ANIM dans jeu/vue.ts) : le vol au repos (0), le piqué en attaque (10).
@@ -105,7 +109,7 @@ ANIMES = {'habitue'}
 # <type>-<n>-anim.png (une ligne par animation) et <type>-<n>-anim.json (taille des images, nom et nombre d'images de chaque ligne).
 # Le projet Depix (<type>-<n>-projet.json, à rouvrir dans Depix) garde le découpage et les poses pour les retoucher.
 # Chaque animation va dans la ligne de son état (ANIM dans jeu/vue.ts) ; les apparences sont côte à côte, un bloc de colonnes chacune.
-DEPIX = {'bouliste', 'supporter', 'scooter', 'trader', 'perdu', 'presse', 'caribou', 'gardien', 'hockeyeur', 'pilier', 'fetard', 'danseur', 'lanceur', 'yeti', 'influenceur', 'videur', 'glaireux'}
+DEPIX = {'bouliste', 'supporter', 'scooter', 'trader', 'perdu', 'presse', 'etudiant', 'cycliste', 'caribou', 'gardien', 'hockeyeur', 'pilier', 'fetard', 'danseur', 'lanceur', 'yeti', 'influenceur', 'videur', 'glaireux'}
 LIGNES_DEPIX = {'repos': 0, 'marche': 1, 'touche': 9, 'attaque': 10}
 # les apparences dessinées vers la gauche : le jeu suppose un sprite tourné vers la droite (il le retourne quand l'ennemi va à
 # gauche), elles sont donc retournées ici

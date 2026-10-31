@@ -35,7 +35,7 @@ def prepare(chemin, hauteur=186):
                 nat[j, i, :3] = np.median(a[ya:yb, xa:xb][m], axis=0)
                 nat[j, i, 3] = 255
     rr, gg, bb = (nat[..., k].astype(int) for k in range(3))
-    liseré = (nat[..., 3] > 0) & (rr - gg > 30) & (bb - gg > 30) & (abs(rr - bb) < 70)
+    liseré = (nat[..., 3] > 0) & (rr - gg > 15) & (bb - gg > 15) & (abs(rr - bb) < 70)
     nat[liseré, :3] = CONTOUR
     up = np.repeat(np.repeat(nat, 2, 0), 2, 1)
     base = np.zeros((512, 512, 4), np.uint8)

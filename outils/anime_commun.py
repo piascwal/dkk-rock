@@ -19,9 +19,9 @@ SRC = pathlib.Path(__file__).resolve().parent.parent / 'assets-sources' / 'ennem
 MARGE = 24  # autour du sprite, pour les bras levés et le recul
 
 
-def sprite(type_):
-    """assets-sources/ennemis/<type>-1-base.png remis sur sa grille réelle, recadré sur sa silhouette."""
-    nat, _ = natif_et_case(SRC / f'{type_}-1-base.png')
+def sprite(type_, n=1):
+    """assets-sources/ennemis/<type>-<n>-base.png remis sur sa grille réelle, recadré sur sa silhouette."""
+    nat, _ = natif_et_case(SRC / f'{type_}-{n}-base.png')
     ys, xs = np.nonzero(nat[..., 3])
     return nat[ys.min() : ys.max() + 1, xs.min() : xs.max() + 1]
 
@@ -137,8 +137,8 @@ def incline(toile, penche):
     return sortie
 
 
-def ecrit_planche(type_, anims, regard='droite'):
-    """<type>-1-anim.png (une ligne par animation) et <type>-1-anim.json ; anims : [(nom, images, images par seconde)]."""
+def ecrit_planche(type_, anims, regard='droite', n=1):
+    """<type>-<n>-anim.png (une ligne par animation) et <type>-<n>-anim.json ; anims : [(nom, images, images par seconde)]."""
     fh, fw = anims[0][1][0].shape[:2]
     planche = np.zeros((fh * len(anims), fw * max(len(ims) for _, ims, _ in anims), 4), np.uint8)
     meta = []
@@ -146,8 +146,50 @@ def ecrit_planche(type_, anims, regard='droite'):
         for c, im in enumerate(ims):
             planche[r * fh : (r + 1) * fh, c * fw : (c + 1) * fw] = im
         meta.append({'name': nom, 'row': r, 'frames': len(ims), 'fps': fps})
-    Image.fromarray(planche).save(SRC / f'{type_}-1-anim.png')
-    (SRC / f'{type_}-1-anim.json').write_text(
+    Image.fromarray(planche).save(SRC / f'{type_}-{n}-anim.png')
+    (SRC / f'{type_}-{n}-anim.json').write_text(
         json.dumps({'frameWidth': fw, 'frameHeight': fh, 'animations': meta, 'regard': regard}, ensure_ascii=False) + '\n'
     )
-    print(f'{type_}-1-anim.png : {fw} x {fh} par image, {[(n, len(i)) for n, i, _ in anims]}')
+    print(f'{type_}-{n}-anim.png : {fw} x {fh} par image, {[(a, len(i)) for a, i, _ in anims]}')
+
+
+CORPS, BRAS, VALISE, JAMBE_AR, JAMBE_AV = range(5)
+
+
+class Calques:
+    """Un personnage découpé (voir anime-passagers.py) : `zones(xx, yy, op)` donne les masques du bras, de la valise, et la séparation des jambes."""
+
+    def __init__(self, type_, hanche, genou, cheville, poignee, coude, garde_bras=False):
+        self.nat = sprite(type_)
+        self.h, self.w = self.nat.shape[:2]
+        self.hanche, self.genou, self.cheville = hanche, genou, cheville
+        self.poignee, self.coude = poignee, coude
+        yy, xx = np.mgrid[0 : self.h, 0 : self.w]
+        op = self.nat[..., 3] > 0
+        bras, valise, separation = self.zones(xx, yy, op)
+        lab = np.zeros((self.h, self.w), int)
+        lab[op & bras] = BRAS
+        lab[op & valise & (lab == CORPS)] = VALISE
+        jambes = op & (yy >= hanche) & (lab == CORPS)
+        lab[jambes & (xx < separation)] = JAMBE_AR
+        lab[jambes & (xx >= separation)] = JAMBE_AV
+        self.c = {}
+        for i in (CORPS, BRAS, VALISE, JAMBE_AR, JAMBE_AV):
+            c = self.nat.copy()
+            garde = (lab == BRAS) if garde_bras and i == CORPS else np.zeros_like(op)
+            c[(lab != i) & ~garde] = 0
+            self.c[i] = c
+
+    def image(self, bob=0, bras=0.0, main=(0, 0), valise=0.0, ja=(0, 0), jv=(0, 0), penche=0.0):
+        """bob = descente du corps, bras = rotation autour du coude (degrés), main = décalage du bras (dx, dy), valise = rotation
+        autour de la poignée (degrés), ja / jv = (avance, lève) de chaque pied, penche = recul du buste (négatif : il se penche en avant)."""
+        toile = np.zeros((self.h + 2 * MARGE, self.w + 2 * MARGE, 4), np.uint8)
+        pose_sur(toile, jambe(self.c[JAMBE_AR], *ja, self.hanche, self.genou, self.cheville))
+        pose_sur(toile, jambe(self.c[JAMBE_AV], *jv, self.hanche, self.genou, self.cheville))
+        pose_sur(toile, self.c[CORPS], 0, bob)
+        pose_sur(toile, tourne(self.c[BRAS], self.coude, bras, marge=0), main[0], bob + main[1])
+        pose_sur(toile, tourne(self.c[VALISE], self.poignee, valise, marge=0), 0, bob)
+        comble_entrejambe(toile, self.hanche)
+        if penche:
+            toile = incline(toile, penche)
+        return nettoie(toile)
