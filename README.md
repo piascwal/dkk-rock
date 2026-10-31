@@ -397,6 +397,7 @@ validé.
 ### Ajouter du contenu
 
 - **Remplacer un personnage par un vrai sprite :** voir [docs/ASSETS.md](docs/ASSETS.md).
+- **Refaire ou créer un niveau :** les bonnes pratiques de level design sont dans [docs/LEVEL-DESIGN.md](docs/LEVEL-DESIGN.md).
 - **Le héros :** plus d'écran de choix, comme dans Broforce. Une partie neuve tire un membre au hasard, la reprise rend le
   dernier joué, et chaque fois qu'un nouveau arrive (début de partie, cage ouverte) une animation coupe la scène pour le
   présenter (`ui/recrue.ts`, détectée dans `app.ts` d'après la vue : aucun changement du protocole). Seul, la partie attend
@@ -410,8 +411,8 @@ validé.
   qu'on ne creuse pas, plusieurs routes) : la refonte s'écrit à côté de l'original, dans `src/niveaux/refontes/` (le plan
   `marseille_refonte` de `outils/niveaux/plans.py`, publiée : des suites de tours pleines de pièces séparées par le vide, qu'on
   franchit par une passerelle (de planches ou de métal) ou une tyrolienne, toujours en haut des tours : il faut y monter,
-  `outils/niveaux/blocs.py` ; des miradors sur pilotis, des cuvettes sans pont où l'on descend par des marches pour remonter
-  en face, et un plateau creusé d'une caverne qu'on traverse ou qu'on gravit, `outils/niveaux/plateaux.py` ; pas de mur dur
+  `outils/niveaux/blocs.py` ; des miradors sur pilotis, des cuvettes sans pont et des grottes sous les massifs où l'on descend
+  par des marches pour remonter en face (des rampes en partent vers les souterrains), et un plateau creusé d'une caverne qu'on traverse ou qu'on gravit, `outils/niveaux/plateaux.py` ; pas de mur dur
   à escalader : la verticalité vient du vide et du terrain ; et sous chaque plateau et chaque tour des
   complexes souterrains (des bunkers à étages reliés par des boyaux sinueux), `outils/niveaux/massifs.py` ; puis `python3 outils/pose-barils.py ../refontes/21-marseille`), et se
   déclare dans `src/niveaux/refontes.ts`. Elle garde l'`id` et la place du niveau : les sauvegardes ne bougent pas. Les joueurs

@@ -1,0 +1,73 @@
+# Level design : les bonnes pratiques
+
+Ce qu'on a appris en refaisant les niveaux à la manière de Broforce (Marseille d'abord, puis l'International Tour). À relire avant
+de refaire un niveau ou d'en créer un. Les outils sont dans `outils/niveaux/` (le générateur : `outils/genere-niveaux.py`, les
+plans : `outils/niveaux/plans.py`), et la mesure dans `outils/mesure-niveaux.py`.
+
+## Le défaut à éviter : la ligne droite
+
+Un niveau raté se traverse tout droit : une bande de sol à hauteur constante du départ au van, des bâtiments posés dessus, et il
+suffit de casser les murs pour filer. Les vues d'ensemble (une carte par niveau, une tuile = quelques pixels) le montrent d'un
+coup d'œil : les comparer avant et après chaque refonte.
+
+## Imposer la verticalité, sans mur
+
+- **Le vide plutôt que le mur.** Ce qui sépare deux parties du niveau est un vide sans fond, trop large pour être sauté (plus de
+  quatre tuiles), pas un mur. Un vide se contourne par le haut ou par le bas ; on ne le creuse pas.
+- **Jamais de montée forcée face à un mur dur.** Pas de mur incassable, ni de pierre de taille, ni d'à-pic à escalader pour passer
+  (le bastion, la passe haute, l'à-pic et son échafaudage ont été retirés des refontes) : le joueur voit tout de suite le truc et
+  n'aime pas ça. La verticalité vient du vide et du terrain.
+- **Du relief à grande échelle.** Le sol monte et descend tout au long du niveau (une ville se gravit : Marseille part du port pour
+  finir à la Bonne Mère). Il n'y a pas de hauteur de référence. Les couches du terrain suivent sa surface (`_strates` dans
+  `massifs.py`) : sinon une veine de terre tendre reste à la hauteur du terrain de départ et l'on y creuse tout droit.
+- **Descendre par le terrain, pas par une échelle.** Pour faire passer le joueur sous terre, le sol descend en marches (une rangée
+  toutes les deux colonnes) : une cuvette sans pont, ou une grotte qui traverse un massif. En allant tout droit, on se retrouve en
+  bas sans l'avoir choisi. Une échelle peut rester, pour qui veut remonter, mais elle n'est jamais le seul chemin.
+
+## Les bâtiments
+
+- **Séparés par le vide.** Deux tours voisines ne se touchent pas : entre elles, le vide. On passe de l'une à l'autre par une
+  passerelle (de planches qui ploie, ou de métal, droite) ou une tyrolienne depuis le toit vers la tour suivante, plus basse.
+- **Les passerelles en haut.** Elles partent d'un des deux derniers étages (les tyroliennes, du toit) : casser le mur du
+  rez-de-chaussée ne mène qu'au vide, il faut monter dans la tour.
+- **Pas de façade lisse.** D'un étage à l'autre, au hasard : il glisse à droite ou à gauche, déborde jusqu'au bord, rentre au
+  milieu, ou garde la même largeur (pas toujours le même décalage). Là où l'étage du dessous dépasse, son toit fait une terrasse,
+  avec une porte et un garde.
+- **L'intérieur se traverse.** Des pièces coupées par des cloisons (une porte au ras du sol), des échelles jamais l'une au-dessus de
+  l'autre (pour monter, il faut traverser l'étage), des gardes à chaque étage, des caisses, des caissons, des barils, du butin, des
+  guetteurs sur le toit.
+- **Rien dans les embrasures.** Jamais de caisse, de tonneau ou de cage dans une porte de cloison, au pied d'une échelle ou sur une
+  trappe : le test d'accessibilité l'attrape, mais autant ne pas le faire.
+
+## Les souterrains
+
+- **Des structures, pas des bandes.** Sous les plateaux et sous les tours : des bunkers bâtis comme les tours (un à quatre étages,
+  de largeurs différentes, des pièces, des échelles décalées), reliés par des boyaux qui serpentent, montent et descendent d'une
+  marche à la fois. Pas de galeries droites à hauteur fixe.
+- **Un treillis, pas un arbre.** Descendre doit mener plus loin, pas obliger à remonter par où l'on est venu : chaque passage
+  souterrain ressort de l'autre côté.
+- **On y entre en suivant le chemin.** Le fond des cuvettes et des grottes plonge en rampe vers les boyaux, qui passent sous les
+  marches (jamais à travers : on casserait l'escalier) jusqu'à la porte d'un bunker. Les puits d'échelle depuis la surface restent
+  un accès de plus, jamais le seul.
+- **Bien garnis.** Deux à quatre gardes par étage de bunker, des gardes tout le long des boyaux, des poches avec une arme, un
+  médiator, un tonneau ou une cage, une cage au fond de chaque bunker. Un souterrain vide ne vaut pas le détour.
+
+## Les autres idées prises à Broforce
+
+- **Le plateau creusé d'une caverne** : le terrain monte d'un coup, et au ras du sol on entre dans une vaste caverne qui le
+  traverse ; ou l'on grimpe dessus par l'échelle de sa face.
+- **Les miradors sur pilotis** : un guetteur en haut, une échelle pour pied, un poteau sous lequel on passe sans détour (un pied
+  plein barrait la route).
+- **Le pont de métal** : droit, avec un piton de place en place.
+- **Les cages** varient les héros, elles ne facilitent pas le jeu : on peut en mettre beaucoup.
+- **À venir** : des panneaux publicitaires sur les toits, avec un guetteur dessus (il faut les sprites).
+
+## La boucle de travail
+
+1. Écrire le plan de la refonte dans `outils/niveaux/plans.py` (`<niveau>_refonte`), en gardant les monuments du niveau.
+2. Générer : `python3 outils/genere-niveaux.py <niveau>_refonte`, puis `python3 outils/pose-barils.py ../refontes/<fichier>`.
+3. Vérifier : `npm test` (on atteint le van et chaque drapeau sans rien casser), `python3 outils/mesure-niveaux.py <fichier>`
+   (la montée imposée même en cassant tout doit rester élevée), et les vues d'ensemble avant / après.
+4. Déclarer la refonte dans `src/niveaux/refontes.ts` : elle se joue avec `?essai`, dans le menu « Niveaux refaits » (avant et
+   après), sans toucher aux joueurs.
+5. Une fois validée, l'ajouter à `REFONTES_PUBLIEES` et augmenter `VERSION_PROTOCOLE`.

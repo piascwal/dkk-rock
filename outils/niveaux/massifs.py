@@ -7,8 +7,9 @@ sous ses plateaux et sous ses tours de grands blocs de roche pleins, sans rien �
 - reliés deux à deux par des boyaux creusés dans la roche, qui partent d'un étage de l'un pour arriver à un autre étage du
   suivant : ils serpentent, montent et descendent d'une marche à la fois, gardés tout du long, et s'élargissent en poches où
   guette un garde près d'une arme, d'un médiator, d'un tonneau ou d'une cage ;
-- entrés par des puits d'échelle depuis la surface (ou le rez-de-chaussée d'une tour) : le premier bunker de chaque massif en a
-  un, les autres une fois sur deux. On descend dans un bunker, on traverse, on file par un boyau et on ressort plus loin.
+- entrés par le terrain : du fond des cuvettes et des grottes traversantes (voir plateaux.py), un boyau part au ras du sol vers
+  le bunker voisin ; en suivant le chemin, on tombe dessus. Et aussi par des puits d'échelle depuis la surface (ou le
+  rez-de-chaussée d'une tour) : le premier bunker de chaque massif en a un, les autres une fois sur deux.
 
 Rien n'y est obligatoire : la surface ne change pas (le toit d'un bunker laisse trois rangées de terre au-dessus de lui), et le
 chemin de tout le monde reste dehors. On ne creuse que la terre et la roche naturelles : les forts, les puits et les grottes des
@@ -96,6 +97,7 @@ def reseau(r, lettres='a'):
     mat = n.t['mur']
     _strates(n)
     morceaux, toit = _massifs(n)
+    tous = []
     for a, fin in morceaux:
         bunkers = []
         x = a + rng.randrange(0, 4)
@@ -133,3 +135,30 @@ def reseau(r, lettres='a'):
         for b1, j1, b2, j2 in liens:
             ya, yb = b1['g'] - j1 * ETAGE, b2['g'] - j2 * ETAGE
             _boyau(n, b1['x'] + b1['w'], ya, b2['x'] - 1, yb, toit, rng, lettres)
+        tous += bunkers
+    _entrees(n, tous, toit, rng, lettres)
+
+
+def _entrees(n, bunkers, toit, rng, lettres, portee=45, rampe=6):
+    """Les complexes s'ouvrent sur les descentes : au fond d'une cuvette ou d'une grotte (les accès que ces modules notent dans
+    `n.acces` : la colonne du bord, la rangée du fond, le côté où creuser), le sol plonge en marches (une rangée par colonne, sur
+    `rampe` colonnes) dans un boyau qui passe sous les marches du bord, bien en dessous, et entre par une porte au rez-de-chaussée
+    du bunker le plus proche de ce côté. En suivant le chemin, on tombe dessus : pas d'échelle."""
+    for x, sol, cote in getattr(n, 'acces', []):
+        proches = [b for b in bunkers if (b['x'] + b['w'] <= x if cote < 0 else b['x'] > x)]
+        b = min(proches, key=lambda b: abs((b['x'] + b['w'] if cote < 0 else b['x']) - x), default=None)
+        if not b or b['g'] < sol + rampe:
+            continue
+        mur = b['x'] + b['w'] - 1 if cote < 0 else b['x']
+        bas = sol + rampe
+        xa, ya, xb, yb = (mur + 1, b['g'], x - 1, bas) if cote < 0 else (x + 1, bas, mur - 1, b['g'])
+        if not 4 <= xb - xa <= portee or abs(ya - yb) > xb - xa - 2:
+            continue
+        # la rampe : du fond, vers le bord, le sol descend d'une rangée par colonne (on y entre en marchant)
+        for k in range(rampe + 1):
+            cx = x - cote * (rampe - k)
+            for y in range(sol + k - CHAMBRE, sol + k):
+                if _naturel(n, n.get(cx, y)):
+                    n.set(cx, y, ' ')
+        n.rect(mur, b['g'] - 2, mur + 1, b['g'], ' ')  # la porte du rez-de-chaussée
+        _boyau(n, xa, ya, xb, yb, toit, rng, lettres)

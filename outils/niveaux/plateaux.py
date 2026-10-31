@@ -7,7 +7,10 @@
   d'un pied ; on s'y bat à découvert, et l'on passe sous eux sans détour ;
 - `cuvette` : le sol s'ouvre sur une large cuvette, bien trop large pour être sautée, sans pont : on y descend par des escaliers
   taillés dans le terrain (pas d'échelle), on se bat au fond (un fortin, des gardes sur les marches, du butin, une cage) et l'on
-  remonte en face par d'autres marches. La verticalité vers le bas, imposée par le terrain et non par un mur.
+  remonte en face par d'autres marches. La verticalité vers le bas, imposée par le terrain et non par un mur ;
+- `grotte_traversante` : la même descente, mais sous un massif : en allant tout droit, on entre dans une grotte au ras du sol,
+  le sol descend en marches et l'on se retrouve sous terre, sans avoir pris d'échelle.
+Au fond des cuvettes et des grottes, des boyaux partent vers les complexes souterrains voisins (voir massifs.py).
 """
 from blocs import tour
 
@@ -95,7 +98,7 @@ def cuvette(n, x0, largeur, profondeur=14, lettres='a'):
     for i, x in enumerate(range(c - marches, c)):  # ... et on remonte en face
         n.base_col(x, fond - i // 2 - 1)
     # le fortin, au milieu du fond, ses deux portes au rez-de-chaussée
-    w = min(16, c - a - 2 * marches - 8)
+    w = min(16, c - a - 2 * marches - 16)  # huit colonnes de fond de chaque côté : la rampe vers les souterrains y passe
     mid = (a + c) // 2
     fortin = range(mid - w // 2 - 2, mid + w // 2 + 3) if w >= 10 else range(0)
     if w >= 10:
@@ -108,4 +111,69 @@ def cuvette(n, x0, largeur, profondeur=14, lettres='a'):
         if px not in fortin and n.get(px, fond - 1) == ' ' and n.get(px, fond - 2) == ' ':  # jamais devant une porte du fortin
             n.set(px, fond - 1, PROPS[k])
     n.repere(a + marches + 2, '!', ymin=fond - 3)
-    n.repere(c - marches - 3, 'K', ymin=fond - 3)
+    n.repere(mid + (w // 2 + 1 if w >= 10 else 0), 'K', ymin=fond - 3)
+    _acces(n, a + marches, c - marches - 1, fond)
+
+
+def _acces(n, gauche, droite, fond):
+    """Note les deux bords du fond (colonnes, rangée du sol) : le réseau souterrain (massifs.py) y fera partir ses boyaux."""
+    if not hasattr(n, 'acces'):
+        n.acces = []
+    n.acces += [(gauche, fond, -1), (droite, fond, 1)]
+
+
+def grotte_traversante(n, x0, largeur, profondeur=12, hauteur=10, lettres='a'):
+    """Un massif de `hauteur` rangées sur [x0 + 2, x0 + largeur - 2), et une grotte qui le traverse : on y entre au ras du sol, le
+    sol descend en marches (une rangée toutes les deux colonnes) jusqu'au fond, à `profondeur` rangées, puis remonte vers la
+    sortie. La corniche d'en face, au niveau de l'entrée, est bien trop loin pour être sautée : on descend. Le plafond, irrégulier,
+    laisse toujours trois rangées de roche ; une échelle remonte du fond sur le massif. `base` ne change pas."""
+    rng = n.rng
+    base = n.base
+    fond = min(base + profondeur, n.bas - 4)
+    prof = fond - base
+    a, c = x0 + 2, x0 + largeur - 2
+    top = base - hauteur
+    for x in range(a, c):
+        n.base_col(x, top)
+    marches = 2 * prof
+    entree = 4  # le palier de l'entrée et de la sortie, au niveau du sol
+
+    def sol(x):
+        if x < a + entree:
+            return base
+        if x < a + entree + marches:
+            return base + (x - a - entree) // 2 + 1
+        if x >= c - entree:
+            return base
+        if x >= c - entree - marches:
+            return base + (c - entree - 1 - x) // 2 + 1
+        return fond
+
+    plafond = base - 5
+    for x in range(a, c):
+        if a + entree <= x < c - entree:
+            plafond = max(top + 3, min(base - 4, plafond + rng.choice((-1, 0, 0, 1))))
+        haut = base - 4 if x < a + entree or x >= c - entree else plafond
+        for y in range(haut, sol(x)):
+            n.set(x, y, ' ')
+        if n.get(x, sol(x)) == ' ':
+            n.set(x, sol(x), n.t['sous'])
+    g, d = a + entree + marches, c - entree - marches - 1
+    # au fond : des gardes, des caisses et des barils, du butin, une cage, un drapeau ; des gardes sur les marches
+    n.ennemis(g, d, lettres, 3 + (d - g) // 10, ymin=fond - 6)
+    n.ennemis(a + entree, g, lettres, 2, ymin=base - 4)
+    n.ennemis(d, c - entree, lettres, 2, ymin=base - 4)
+    for k in range(4):
+        px = rng.randrange(g + 2, d - 1)
+        if n.get(px, fond - 1) == ' ' and n.get(px, fond - 2) == ' ':
+            n.set(px, fond - 1, PROPS[k])
+    n.repere(g + 1, '!', ymin=fond - 4)
+    n.repere(rng.randrange(g + 3, d - 2), '*', ymin=fond - 4)
+    n.repere((g + d) // 2 + 2, 'K', ymin=fond - 4)
+    # l'échelle du fond jusqu'en haut du massif (pour qui veut remonter) ; des gardes et un médiator là-haut
+    mx = (g + d) // 2
+    for y in range(top, fond):
+        n.set(mx, y, 'H')
+    n.ennemis(a + 2, c - 2, lettres, 2, ymin=top - 3)
+    n.repere(c - 4, '+', ymin=top - 3)
+    _acces(n, g, d, fond)

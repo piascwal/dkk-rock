@@ -28,6 +28,9 @@ remplace un par un (voir `docs/ASSETS.md`, et `outils/fixe-objets.py` pour les p
 
 ## Niveaux
 
+- **Panneaux publicitaires sur les toits des tours** (vus dans Broforce) : une grande affiche sur le toit, un guetteur dessus.
+  Il faut les sprites ; ensuite, les poser dans `outils/niveaux/blocs.py` (voir docs/LEVEL-DESIGN.md).
+
 - **Niveau 6 (le Club Infini) :** généré comme les autres (salle close, deux scènes, arène du DJ) ; lui ajouter une approche extérieure avant l'entrée.
 - **Arc de l'histoire en Jamaïque** (les reggae-men deviennent des amis) : le mécanisme d'arcs est prêt (`niveaux/arcs.ts`),
   il manque les niveaux, les textes et les ennemis.
