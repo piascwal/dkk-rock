@@ -24,7 +24,9 @@ import { aUnClavier, contenuTouches } from './touches-ui';
 import { animeTitre } from './titre-anime';
 import { transitionVan } from './transition-van';
 import { compteSibylles } from '../jeu/sibylles';
-import { versionsDuModeEssai } from './essai';
+import { ecranRefontes } from './menus-refontes';
+import type { DefNiveau } from '../niveaux/format';
+import { versionsEnEssai } from '../niveaux';
 
 /** Ce que les menus demandent à l'application. */
 export interface Actions {
@@ -44,6 +46,8 @@ export interface Actions {
   appliqueOptions(): void;
   /** l'éditeur de niveau (menu principal) */
   ouvreEditeur(): void;
+  /** l'essai d'un niveau sans rien sauvegarder (de l'éditeur, ou un niveau refait) ; à la fin, `retour` */
+  teste(def: DefNiveau, retour: () => void): void;
   /** le battle royale : contre `ia` joueurs de l'ordinateur, ou (0) un salon en ligne */
   lanceArene(carte: CarteArene, regles: ReglesArene, ia: number): void;
   readonly estArene: boolean;
@@ -86,7 +90,6 @@ export class Menus {
   }
 
   titre(): void {
-    versionsDuModeEssai(); // de retour d'une partie rejointe : le mode essai reprend ses niveaux refaits
     const boutons = el('div', '', 'boutons-menu une-colonne');
     boutons.append(
       bouton('Continuer', () => this.carte(), 'principal'),
@@ -96,6 +99,8 @@ export class Menus {
       bouton('Éditeur de niveau', () => this.a.ouvreEditeur()),
       bouton('Options', () => this.options()),
     );
+    if (versionsEnEssai())
+      boutons.append(bouton('Niveaux refaits (essai)', () => ecranRefontes(this, this.a)));
     if (peutInstaller())
       boutons.append(bouton('Installer le jeu', () => void installe().then(() => this.rafraichitTitre())));
     this.montre(

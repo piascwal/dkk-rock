@@ -96,16 +96,16 @@ const ORIGINAUX = NIVEAUX.slice();
 let essai = false;
 
 /**
- * Chaque niveau du jeu prend sa version : sa refonte publiée, ou en mode essai toute refonte (voir refontes.ts). Les niveaux
- * déjà lus sont oubliés. Au chargement : les refontes publiées.
+ * Chaque niveau du jeu prend sa version : sa refonte si elle est publiée (voir refontes.ts), l'original sinon ; les niveaux déjà
+ * lus sont oubliés. Le mode essai ne change aucun niveau : il ouvre le menu des niveaux refaits, joués à part (menus-refontes.ts).
  */
 export function choisitVersions(enEssai: boolean): void {
   essai = enEssai;
-  ORIGINAUX.forEach((def, i) => (NIVEAUX[i] = versionDe(def, enEssai)));
+  ORIGINAUX.forEach((def, i) => (NIVEAUX[i] = versionDe(def, false)));
   lus.clear();
 }
 
-/** Vrai si les refontes en essai sont jouées (le mode essai, en solo). */
+/** Vrai en mode essai (le menu des niveaux refaits s'affiche). */
 export function versionsEnEssai(): boolean {
   return essai;
 }

@@ -32,7 +32,8 @@ import { SuiviRecrue } from './ui/suivi-recrue';
 import { NIVEAUX } from './niveaux';
 import type { ReglesArene } from './jeu/arene';
 import type { CarteArene } from './ui/menus-arene';
-import { partieArene, partieEssai } from './ui/app-arene';
+import { ouvreEditeurDe, partieArene, partieEssai } from './ui/app-arene';
+import type { DefNiveau } from './niveaux/format';
 import { PanneauArene } from './ui/arene-ui';
 
 const PAS_MS = 1000 / 60;
@@ -155,16 +156,13 @@ export class App implements Actions {
     this.joue(p);
   }
 
-  /** L'éditeur de niveau, chargé à la première ouverture seulement (il ne pèse pas sur le jeu). */
   ouvreEditeur(): void {
-    this.menus.ferme();
-    void import('./editeur/editeur').then(({ ouvreEditeur }) =>
-      ouvreEditeur({
-        // l'essai d'un niveau, sans rien sauvegarder ; au bilan (ou en quittant), on revient à l'éditeur
-        teste: (def, retour) => this.joue(partieEssai(def, this.sauvegarde.membre), retour),
-        quitte: () => this.menus.titre(),
-      }),
-    );
+    ouvreEditeurDe(this.menus, (def, retour) => this.teste(def, retour));
+  }
+
+  /** L'essai d'un niveau (de l'éditeur, ou refait), sans rien sauvegarder ; au bilan (ou en quittant), `retour`. */
+  teste(def: DefNiveau, retour: () => void): void {
+    this.joue(partieEssai(def, this.sauvegarde.membre), retour);
   }
 
   /** Le battle royale : contre l'ordinateur, ou (sans IA) un salon ouvert sur le Wi-Fi, en attendant les amis. */

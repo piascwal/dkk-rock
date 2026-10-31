@@ -80,10 +80,21 @@ def _boyau(n, xa, ya, xb, yb, toit, rng, lettres):
             n.pose_sur_sol(x, rng.choice(lettres), f - CHAMBRE)
 
 
+def _strates(n, epaisseur=6):
+    """Les couches du terrain suivent sa surface : `epaisseur` rangées de sous-sol sous chaque colonne, la roche profonde plus bas.
+    Sinon la limite des couches reste à la hauteur du terrain de départ, d'un bout à l'autre du niveau, même sous les massifs qui
+    ont monté : une veine de terre tendre qu'on creuse tout droit."""
+    for x in range(n.w):
+        for y in range(n.haut[x] + 1, n.bas + 6):
+            if n.get(x, y) in (n.t['sous'], n.t['profond']):
+                n.set(x, y, n.t['sous'] if y <= n.haut[x] + epaisseur else n.t['profond'])
+
+
 def reseau(r, lettres='a'):
     """Les complexes souterrains de tous les massifs du niveau (voir en tête de fichier)."""
     n, rng = r.n, r.n.rng
     mat = n.t['mur']
+    _strates(n)
     morceaux, toit = _massifs(n)
     for a, fin in morceaux:
         bunkers = []

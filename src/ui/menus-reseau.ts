@@ -1,7 +1,6 @@
 import { lienInvitation, nettoiePseudo, normaliseCode, texteLatence, type Annonce } from '@piascwal/lan-kit';
 import { JOUEURS_HISTOIRE, MAX_JOUEURS } from '../config';
-import { NIVEAUX, versionsEnEssai } from '../niveaux';
-import { versionsDeLHote } from './essai';
+import { NIVEAUX } from '../niveaux';
 import type { AnnonceDkk } from '../reseau/annonce';
 import { Recherche } from '../reseau/client';
 import { bouton, el } from './elements';
@@ -9,17 +8,6 @@ import type { Actions, Menus } from './menus';
 
 /** L'hôte ouvre sa partie : Wi-Fi automatiquement, Internet avec un code. */
 export function ecranInviter(m: Menus, a: Actions): void {
-  // en mode essai, les niveaux refaits se jouent en solo : les invités, eux, ont les versions publiées
-  if (versionsEnEssai())
-    return m.montre(
-      el('h2', 'Mode essai'),
-      el(
-        'p',
-        'Les niveaux refaits ne se jouent qu’en solo. Pour inviter des amis : rouvrir le jeu avec ?essai=0 à la fin de l’adresse.',
-        'aide',
-      ),
-      bouton('Retour', () => m.pause()),
-    );
   const hote = a.ouvreHote();
   if (!hote) return m.pause();
   const statut = el('p', '', 'statut');
@@ -115,7 +103,6 @@ export function ecranRejoindre(m: Menus, a: Actions, codeInitial: string): void 
   const tente = async (r: Recherche, an: Annonce<AnnonceDkk>) => {
     statut.textContent = `Connexion à ${an.nom}...`;
     try {
-      versionsDeLHote();
       await a.rejoins(r, an, nom(), s.membre);
     } catch (e) {
       statut.textContent = `Échec : ${(e as Error).message === 'complet' ? 'la partie est pleine' : 'connexion impossible'}.`;

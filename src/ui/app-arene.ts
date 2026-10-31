@@ -5,6 +5,7 @@ import type { DefNiveau } from '../niveaux/format';
 import { Partie } from '../jeu/partie';
 import { ajouteNiveauEssai } from '../niveaux';
 import type { CarteArene } from './menus-arene';
+import type { Menus } from './menus';
 
 /**
  * Une partie de battle royale : la carte (un niveau du jeu, ou un des siens ajouté le temps de la partie), le joueur, et
@@ -26,4 +27,12 @@ export function partieEssai(def: DefNiveau, membre: number): Partie {
   const p = new Partie({ niveau: ajouteNiveauEssai(def), drapeau: -1, vies: VIES_DEPART, score: 0 });
   p.ajouteJoueur(0, membre);
   return p;
+}
+
+/** L'éditeur de niveau, chargé à la première ouverture seulement (il ne pèse pas sur le jeu) ; ses essais passent par `teste`. */
+export function ouvreEditeurDe(menus: Menus, teste: (def: DefNiveau, retour: () => void) => void): void {
+  menus.ferme();
+  void import('../editeur/editeur').then(({ ouvreEditeur }) =>
+    ouvreEditeur({ teste, quitte: () => menus.titre() }),
+  );
 }

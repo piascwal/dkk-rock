@@ -1,4 +1,9 @@
+import { CARTE_BEAUVAIS_REFONTE } from './refontes/17-beauvais';
+import { CARTE_LIMERICK_REFONTE, DECOR_LIMERICK_REFONTE } from './refontes/18-limerick';
+import { CARTE_LUND_REFONTE } from './refontes/19-lund';
+import { CARTE_NEW_YORK_REFONTE } from './refontes/20-new-york';
 import { CARTE_MARSEILLE_REFONTE } from './refontes/21-marseille';
+import { CARTE_OTTAWA_REFONTE, DECOR_OTTAWA_REFONTE } from './refontes/23-ottawa';
 import type { DefNiveau } from './format';
 
 /**
@@ -7,10 +12,16 @@ import type { DefNiveau } from './format';
  *
  * Une refonte remplace ce qu'elle donne (la carte, le décor...) dans le niveau du même `id`, qui garde sa place dans la liste :
  * les sauvegardes (niveaux faits, partie en cours) ne bougent pas. Les joueurs n'ont une refonte qu'une fois publiée ; avant,
- * seul le mode essai (`?essai` dans l'adresse, voir ui/essai.ts) la fait jouer, et seulement en solo.
+ * le mode essai (`?essai` dans l'adresse, voir ui/essai.ts) la fait jouer à part, à côté de l'original (menus-refontes.ts).
  */
 export const REFONTES: Readonly<Record<string, Partial<DefNiveau>>> = {
   marseille: { carte: CARTE_MARSEILLE_REFONTE },
+  // l'International Tour, en essai
+  beauvais: { carte: CARTE_BEAUVAIS_REFONTE },
+  limerick: { carte: CARTE_LIMERICK_REFONTE, decor: DECOR_LIMERICK_REFONTE },
+  lund: { carte: CARTE_LUND_REFONTE },
+  newyork: { carte: CARTE_NEW_YORK_REFONTE },
+  ottawa: { carte: CARTE_OTTAWA_REFONTE, decor: DECOR_OTTAWA_REFONTE },
 };
 
 /**

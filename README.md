@@ -413,8 +413,9 @@ validé.
   complexes souterrains (des bunkers à étages reliés par des boyaux sinueux), `outils/niveaux/massifs.py` ; puis `python3 outils/pose-barils.py ../refontes/21-marseille`), et se
   déclare dans `src/niveaux/refontes.ts`. Elle garde l'`id` et la place du niveau : les sauvegardes ne bougent pas. Les joueurs
   ne l'ont qu'une fois son `id` ajouté à `REFONTES_PUBLIEES` (augmenter alors `VERSION_PROTOCOLE`) ; avant, on l'essaie en
-  ouvrant le jeu avec `?essai` à la fin de l'adresse (l'appareil s'en souvient ; `?essai=0` l'éteint ; un bandeau le
-  rappelle). En essai, on joue seul : inviter est indisponible, et rejoindre un ami reprend les versions publiées.
+  ouvrant le jeu avec `?essai` à la fin de l'adresse (rien n'est retenu : sans lui, c'est le jeu de tout le monde ; un
+  bandeau le rappelle) : le menu « Niveaux refaits » propose chaque niveau refait dans sa version d'avant et dans sa version
+  refaite, sans rien sauvegarder.
   `python3 outils/mesure-niveaux.py` compare les cartes : la montée et la casse du chemin le moins cher, la montée imposée
   même en cassant tout (faible : on traverse tout droit en cassant les murs), les gouffres et les falaises.
   **Les forteresses ne se grimpent pas par la façade** : à chaque étage, un balcon de quatre tuiles à gauche (un ennemi dessus : on
