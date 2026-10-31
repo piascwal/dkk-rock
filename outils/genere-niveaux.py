@@ -20,7 +20,7 @@ from plans import NIVEAUX, enchaine
 from souterrain import souterrain, tonneaux_de_surface
 from massifs import reseau
 from blocs import bloc
-from plateaux import miradors, plateau_caverne
+from plateaux import cuvette, miradors, plateau_caverne
 from ferry import ferry
 from fise import bigair, breakdance, densite, entree, flat_bmx, food_court, gradins, halfpipe_bois, parc_street, soirees, spine, village
 from plage import festival
@@ -237,6 +237,9 @@ class Recette:
 
     def p_miradors(self, x0, x1, lettres='a'):
         miradors(self.n, x0, x1 - x0, lettres)
+
+    def p_cuvette(self, x0, x1, profondeur=14, lettres='a'):
+        cuvette(self.n, x0, x1 - x0, profondeur, lettres)
 
     # ---- le vide et l'escalade (voir niveaux/hauteurs.py)
     def p_pont_singe(self, x0, x1, lettres='a', butin=None):

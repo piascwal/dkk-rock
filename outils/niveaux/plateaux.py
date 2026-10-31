@@ -1,11 +1,15 @@
-"""Deux idées prises à Broforce (le chantier du level design, voir src/niveaux/refontes.ts) :
+"""Des idées prises à Broforce (le chantier du level design, voir src/niveaux/refontes.ts) :
 
 - `plateau_caverne` : le terrain monte d'un coup, bien plus haut que la rue ; au ras du sol, on entre dans une vaste caverne
   creusée sous le plateau (un plafond irrégulier, des piliers de roche, des corniches, des gardes, du butin, une cage). On choisit :
   grimper sur le plateau par l'échelle de sa face, ou s'enfoncer dans la caverne. Le sol continue à la même hauteur après lui ;
 - `miradors` : une étendue de terrain dégagé où se dressent des miradors sur pilotis, un guetteur sur chacun, une échelle le long
-  d'un pied ; on s'y bat à découvert, et l'on passe sous eux sans détour.
+  d'un pied ; on s'y bat à découvert, et l'on passe sous eux sans détour ;
+- `cuvette` : le sol s'ouvre sur une large cuvette, bien trop large pour être sautée, sans pont : on y descend par des escaliers
+  taillés dans le terrain (pas d'échelle), on se bat au fond (un fortin, des gardes sur les marches, du butin, une cage) et l'on
+  remonte en face par d'autres marches. La verticalité vers le bas, imposée par le terrain et non par un mur.
 """
+from blocs import tour
 
 PROPS = ['C', '%', 'T', 'O', 'C', '%']
 
@@ -72,3 +76,36 @@ def miradors(n, x0, largeur, lettres='a'):
         n.ennemis(x + 2, x + 4, lettres, 1, ymin=haut - 3)
         x += rng.randrange(11, 15)
     n.ennemis(x0 + 2, x0 + largeur - 2, lettres, 2, ymin=base - 3)
+
+
+def cuvette(n, x0, largeur, profondeur=14, lettres='a'):
+    """Une cuvette de `profondeur` rangées sur [x0 + 2, x0 + largeur - 2) : des marches d'une rangée toutes les deux colonnes pour
+    y descendre et pour en remonter, le fond plat entre les deux, un fortin au milieu du fond (son toit reste sous le bord : ce
+    n'est pas un pont). `base` ne change pas."""
+    rng = n.rng
+    base = n.base
+    fond = min(base + profondeur, n.bas - 4)
+    prof = fond - base
+    a, c = x0 + 2, x0 + largeur - 2
+    marches = 2 * prof
+    for i, x in enumerate(range(a, a + marches)):  # on descend...
+        n.base_col(x, base + i // 2 + 1)
+    for x in range(a + marches, c - marches):
+        n.base_col(x, fond)
+    for i, x in enumerate(range(c - marches, c)):  # ... et on remonte en face
+        n.base_col(x, fond - i // 2 - 1)
+    # le fortin, au milieu du fond, ses deux portes au rez-de-chaussée
+    w = min(16, c - a - 2 * marches - 8)
+    mid = (a + c) // 2
+    fortin = range(mid - w // 2 - 2, mid + w // 2 + 3) if w >= 10 else range(0)
+    if w >= 10:
+        tour(n, mid - w // 2, w, fond, max(1, (prof - 4) // 5), n.t['mur'], lettres, [0], [0], rng, butin=x0)
+    n.ennemis(a, a + marches, lettres, 2, ymin=base - 2)  # des gardes sur les marches
+    n.ennemis(c - marches, c, lettres, 2, ymin=base - 2)
+    n.ennemis(a + marches, c - marches, lettres, 3, ymin=fond - 3)
+    for k in range(3):
+        px = rng.randrange(a + marches + 1, c - marches - 1)
+        if px not in fortin and n.get(px, fond - 1) == ' ' and n.get(px, fond - 2) == ' ':  # jamais devant une porte du fortin
+            n.set(px, fond - 1, PROPS[k])
+    n.repere(a + marches + 2, '!', ymin=fond - 3)
+    n.repere(c - marches - 3, 'K', ymin=fond - 3)
