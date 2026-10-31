@@ -478,6 +478,41 @@ NIVEAUX = {
             ('arene', 40, dict(lettres='acqg')),
         ],
     ),
+    # Marseille, nouvelle version en essai (la refonte publiée reste celle des joueurs) : les règles de docs/LEVEL-DESIGN.md
+    # appliquées comme à l'International Tour (cuvette, grotte traversante, plateau creusé, miradors ; ni barrage ni puits)
+    'marseille_essai': dict(
+        nom='Marseille', theme='marseille', textes='21-marseille.ts', fichier='../refontes/21-marseille-essai.ts',
+        constante='CARTE_MARSEILLE_ESSAI', graine=213, base=60, raccord='ac', caves='ac', reseau=True,
+        lieux=[
+            ('plat', 12, dict(lettres='a', deco=3)),
+            ('ponton', 42, dict(lettres='ac', digit='1')),  # le Vieux-Port, au ras de l'eau ; les gabians
+            ('corniches', 22, dict(monte=8, lettres='ac')),  # on monte au Panier
+            ('bloc', 28, dict(etages=4, lien='passerelle', ecart=10, mat='{', lettres='ac', digit='2')),  # le Panier
+            ('bloc', 30, dict(etages=5, lien='tyro', ecart=12, mat='{', lettres='ac', monte=-6)),
+            ('bloc', 26, dict(etages=3, lien='passerelle', ecart=9, mat='{', lettres='ac')),
+            ('bloc', 24, dict(etages=4, lien=None, mat='{', lettres='ac')),
+            ('miradors', 30, dict(lettres='ac')),  # du terrain dégagé, des miradors sur pilotis
+            ('cuvette', 92, dict(profondeur=14, lettres='ac')),  # on descend par les marches, on remonte en face
+            ('plat', 14, dict(lettres='qq', digit='3')),  # la pétanque
+            ('gouffre', 20, dict(lettres='ac', nb=4)),
+            ('corniches', 22, dict(monte=10, lettres='ac')),  # la paroi du fort Saint-Jean
+            ('forteresse', 34, dict(etages=3, lettres='ac', mat='{', cage=True)),  # le fort Saint-Jean
+            ('pont_singe', 22, dict(lettres='ac', butin='+')),
+            ('descente', 24, dict(chute=10, lettres='ac')),  # on plonge vers la mer
+            ('plat', 10, dict(lettres='aa', digit='4', drones=2)),  # les supporters de l'OM ; les gabians
+            ('bloc', 28, dict(etages=6, lien='passerelle', ecart=10, mat='D', lettres='ac')),  # les tours de la Joliette
+            ('bloc', 26, dict(etages=5, lien='tyro', ecart=12, mat='D', lettres='ac', monte=-4)),
+            ('bloc', 30, dict(etages=4, lien='passerelle', ecart=8, mat='D', lettres='acq')),
+            ('bloc', 24, dict(etages=5, lien=None, mat='D', lettres='ac')),
+            ('calanques', 36, dict(lettres='ac', digit='5')),  # les calanques
+            ('grotte', 20, dict(monte=8, lettres='ac', butin='+')),  # et la longue montée vers la Bonne Mère
+            ('corniches', 22, dict(monte=10, lettres='ac')),
+            ('grotte_traversante', 92, dict(profondeur=12, hauteur=10, lettres='ac')),  # en allant tout droit, on entre sous le massif
+            ('bonne_mere', 44, dict(lettres='acq')),  # Notre-Dame de la Garde, tout en haut
+            ('plateau_caverne', 52, dict(monte=11, lettres='acq', butin='*')),
+            ('arene', 40, dict(lettres='acqg')),
+        ],
+    ),
     # L'International Tour refait (le chantier du level design, voir src/niveaux/refontes.ts et le Marseille refait plus haut) : à
     # chaque ville son relief, ses quartiers de tours séparées par le vide (passerelles, tyroliennes ; niveaux/blocs.py) ou par une
     # passerelle métallique, toujours en haut des tours ; ses miradors, ses cuvettes et ses grottes qu'on traverse par en bas en
@@ -508,7 +543,7 @@ NIVEAUX = {
             ('bloc', 24, dict(etages=3, lien=None, ecart=0, mat='B', lettres='ac')),
             ('pont_singe', 22, dict(lettres='ac', butin='+')),
             ('grotte', 20, dict(monte=8, lettres='acl', butin='+')),
-            ('grotte_traversante', 80, dict(profondeur=12, hauteur=10, lettres='ac')),  # en allant tout droit, on entre sous le massif
+            ('grotte_traversante', 92, dict(profondeur=12, hauteur=10, lettres='ac')),  # en allant tout droit, on entre sous le massif
             ('descente', 24, dict(chute=8, lettres='ac')),
             ('plat', 10, dict(lettres='ac', digit='5', drones=1)),  # le dernier appel
             ('plateau_caverne', 52, dict(monte=11, lettres='ac', butin='*')),  # le plateau, et la caverne qui le traverse
@@ -538,9 +573,8 @@ NIVEAUX = {
             ('gouffre', 20, dict(lettres='ac', nb=4)),
             ('corniches', 22, dict(monte=10, lettres='ac')),
             ('pont_singe', 22, dict(lettres='ac', butin='+')),
-            ('puits', 24, dict(lettres='ac')),
             ('descente', 24, dict(chute=8, lettres='ac')),
-            ('grotte_traversante', 80, dict(profondeur=12, hauteur=10, lettres='ac')),  # en allant tout droit, on entre sous le massif
+            ('grotte_traversante', 92, dict(profondeur=12, hauteur=10, lettres='ac')),  # en allant tout droit, on entre sous le massif
             ('plat', 10, dict(lettres='au', digit='5')),  # Thomond Park : les supporters du Munster
             ('gradins', 30, dict(haut=6, lettres='au', cage=True, mat='R')),  # les tribunes du stade
             ('plateau_caverne', 52, dict(monte=11, lettres='ac', butin='*')),  # le plateau, et la caverne qui le traverse
@@ -571,7 +605,7 @@ NIVEAUX = {
             ('grotte', 20, dict(monte=8, lettres='ac', butin='+')),
             ('plat', 12, dict(lettres='cj', digit='5', plus=1)),  # un élan sur la piste cyclable
             ('lac_gele', 36, dict(lettres='cj')),  # les élans sur la glace
-            ('grotte_traversante', 80, dict(profondeur=12, hauteur=10, lettres='ac')),  # en allant tout droit, on entre sous le massif
+            ('grotte_traversante', 92, dict(profondeur=12, hauteur=10, lettres='ac')),  # en allant tout droit, on entre sous le massif
             ('descente', 24, dict(chute=8, lettres='acj')),
             ('gouffre', 20, dict(lettres='acj', nb=4)),
             ('plateau_caverne', 52, dict(monte=11, lettres='ac', butin='*')),  # le plateau, et la caverne qui le traverse
@@ -602,8 +636,7 @@ NIVEAUX = {
             ('grotte', 20, dict(monte=8, lettres='ac', butin='+')),
             ('pont_singe', 22, dict(lettres='ac', butin='+')),
             ('descente', 24, dict(chute=8, lettres='ac')),
-            ('grotte_traversante', 80, dict(profondeur=12, hauteur=10, lettres='ac')),  # en allant tout droit, on entre sous le massif
-            ('puits', 24, dict(lettres='ac')),
+            ('grotte_traversante', 92, dict(profondeur=12, hauteur=10, lettres='ac')),  # en allant tout droit, on entre sous le massif
             ('gouffre', 20, dict(lettres='ac', nb=4)),
             ('plateau_caverne', 52, dict(monte=11, lettres='ac', butin='*')),  # le plateau, et la caverne qui le traverse
             ('pont_brooklyn', 56, dict(lettres='ac', digit='5')),  # le pont de Brooklyn
@@ -635,8 +668,7 @@ NIVEAUX = {
             ('bloc', 24, dict(etages=4, lien=None, ecart=0, mat='D', lettres='ac')),
             ('grotte', 20, dict(monte=8, lettres='ac', butin='+')),
             ('pont_singe', 22, dict(lettres='ac', butin='+')),
-            ('grotte_traversante', 80, dict(profondeur=12, hauteur=10, lettres='ac')),  # en allant tout droit, on entre sous le massif
-            ('puits', 24, dict(lettres='ac')),
+            ('grotte_traversante', 92, dict(profondeur=12, hauteur=10, lettres='ac')),  # en allant tout droit, on entre sous le massif
             ('lac_gele', 36, dict(lettres='aw')),  # le canal gelé
             ('plateau_caverne', 52, dict(monte=11, lettres='ac', butin='*')),  # le plateau, et la caverne qui le traverse
             ('tour', 18, dict(etages=3, tyro=9, apres=13, lettres='ac', mat='B')),

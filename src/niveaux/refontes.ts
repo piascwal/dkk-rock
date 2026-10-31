@@ -3,6 +3,7 @@ import { CARTE_LIMERICK_REFONTE, DECOR_LIMERICK_REFONTE } from './refontes/18-li
 import { CARTE_LUND_REFONTE } from './refontes/19-lund';
 import { CARTE_NEW_YORK_REFONTE } from './refontes/20-new-york';
 import { CARTE_MARSEILLE_REFONTE } from './refontes/21-marseille';
+import { CARTE_MARSEILLE_ESSAI } from './refontes/21-marseille-essai';
 import { CARTE_OTTAWA_REFONTE, DECOR_OTTAWA_REFONTE } from './refontes/23-ottawa';
 import type { DefNiveau } from './format';
 
@@ -30,13 +31,21 @@ export const REFONTES: Readonly<Record<string, Partial<DefNiveau>>> = {
  */
 export const REFONTES_PUBLIEES: ReadonlySet<string> = new Set<string>(['marseille']);
 
-/** La version d'un niveau à jouer : sa refonte si elle est publiée, ou en mode essai ; sinon l'original. */
+/**
+ * Les nouvelles versions de niveaux déjà publiés, le temps de les essayer : le mode essai les joue à la place de la version
+ * publiée (« après »), les joueurs gardent la publiée. Validée, une nouvelle version prend la place de la refonte ci-dessus.
+ */
+export const ESSAIS: Readonly<Record<string, Partial<DefNiveau>>> = {
+  marseille: { carte: CARTE_MARSEILLE_ESSAI },
+};
+
+/** La version d'un niveau à jouer : en essai, sa nouvelle version ou sa refonte ; sinon sa refonte publiée, ou l'original. */
 export function versionDe(def: DefNiveau, essai: boolean): DefNiveau {
-  const r = REFONTES[def.id];
+  const r = (essai && ESSAIS[def.id]) || REFONTES[def.id];
   return r && (essai || REFONTES_PUBLIEES.has(def.id)) ? { ...def, ...r } : def;
 }
 
 /** Vrai si le niveau a une refonte que les joueurs n'ont pas encore (le mode essai la fait jouer). */
 export function refonteEnEssai(id: string): boolean {
-  return id in REFONTES && !REFONTES_PUBLIEES.has(id);
+  return id in ESSAIS || (id in REFONTES && !REFONTES_PUBLIEES.has(id));
 }

@@ -248,6 +248,7 @@ def gratte_ciel(n, x0, largeur, lettres='a', etages=6):
     n.rect(cx - 2, top - 6, cx + 3, top - 4, '.')
     n.set(cx - 3, top - 5, ' ')  # une porte dans le château d'eau
     n.set(cx - 3, top - 4, ' ')
+    n.set(cx - 2, top - 4, 'H')  # l'échelle du pied traverse le plancher : on entre dans le château d'eau
     n.repere(cx, '*', ymin=top - 5)
     n.ennemis(x0 + 7, x0 + 6 + w - 1, lettres, 2, ymin=top - 1)
 

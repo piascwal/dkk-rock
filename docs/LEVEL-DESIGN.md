@@ -24,6 +24,21 @@ coup d'œil : les comparer avant et après chaque refonte.
   toutes les deux colonnes) : une cuvette sans pont, ou une grotte qui traverse un massif. En allant tout droit, on se retrouve en
   bas sans l'avoir choisi. Une échelle peut rester, pour qui veut remonter, mais elle n'est jamais le seul chemin.
 
+## De l'action partout
+
+- **Pas de longue échelle dans le vide.** Une échelle de dix rangées plantée dans le ciel n'est qu'une ligne droite sans intérêt.
+  Pour monter, on comble : un bâtiment (ses étages, ses échelles intérieures), ou des corniches de pitons en zigzag devant une
+  paroi (quatre rangées entre deux, une courte échelle chaque fois, un garde sur chacune). Une échelle à travers la roche, d'une
+  pièce à une autre, reste permise : elle est courte et mène quelque part.
+- **Pas de grande étendue de roche pleine sous terre.** Sous les complexes, une seconde rangée de bunkers quand le massif est
+  épais ; dans la roche qui reste, des cavernes (un plafond irrégulier, des corniches, des gardes, du butin) reliées par un boyau.
+- **Tout ce qu'on voit doit pouvoir s'atteindre.** Une structure en hauteur sans accès (un château d'eau dont l'échelle s'arrête
+  sous le plancher, un bloc dont on ne peut pas gagner le dessus) frustre : soit on la relie, soit on la retire. Les creux sans
+  issue sont reliés par une échelle à travers la roche (`_relie_les_isoles` dans `massifs.py`).
+- **Ne jamais creuser sous des marches ou un plancher.** Une caverne garde trois rangées de roche au-dessus d'elle, un boyau
+  s'arrête avant de percer un sol par en dessous, une rampe ne passe jamais devant une porte : sinon l'escalier ou la porte du
+  chemin principal disparaît (le test d'accessibilité le voit).
+
 ## Les bâtiments
 
 - **Séparés par le vide.** Deux tours voisines ne se touchent pas : entre elles, le vide. On passe de l'une à l'autre par une
@@ -69,5 +84,7 @@ coup d'œil : les comparer avant et après chaque refonte.
 3. Vérifier : `npm test` (on atteint le van et chaque drapeau sans rien casser), `python3 outils/mesure-niveaux.py <fichier>`
    (la montée imposée même en cassant tout doit rester élevée), et les vues d'ensemble avant / après.
 4. Déclarer la refonte dans `src/niveaux/refontes.ts` : elle se joue avec `?essai`, dans le menu « Niveaux refaits » (avant et
-   après), sans toucher aux joueurs.
-5. Une fois validée, l'ajouter à `REFONTES_PUBLIEES` et augmenter `VERSION_PROTOCOLE`.
+   après), sans toucher aux joueurs. Pour un niveau déjà publié, la nouvelle version va dans `ESSAIS` (plan `<niveau>_essai`) :
+   « avant » est alors la version publiée.
+5. Une fois validée, l'ajouter à `REFONTES_PUBLIEES` (ou, pour une nouvelle version, la mettre à la place de la refonte publiée)
+   et augmenter `VERSION_PROTOCOLE`.

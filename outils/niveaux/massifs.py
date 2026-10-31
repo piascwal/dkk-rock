@@ -4,6 +4,8 @@ sous ses plateaux et sous ses tours de grands blocs de roche pleins, sans rien �
 - des bunkers, construits comme les tours (voir blocs.py) mais sous la roche : un à quatre étages selon l'épaisseur du massif,
   de largeurs différentes, coupés en pièces, des échelles décalées d'un étage à l'autre ; plus garnis que les tours : deux à
   quatre gardes par étage, des caisses et des barils pour se couvrir, du butin à chaque étage, une cage au fond de chacun ;
+- une seconde rangée de bunkers plus bas quand le massif est épais (une courte échelle à travers la roche les relie à ceux du
+  dessus), et des cavernes dans la roche qui reste pleine : pas de grande étendue de pierre sans rien ;
 - reliés deux à deux par des boyaux creusés dans la roche, qui partent d'un étage de l'un pour arriver à un autre étage du
   suivant : ils serpentent, montent et descendent d'une marche à la fois, gardés tout du long, et s'élargissent en poches où
   guette un garde près d'une arme, d'un médiator, d'un tonneau ou d'une cage ;
@@ -18,7 +20,7 @@ modules restent tels quels.
 from blocs import ETAGE, place_libre, tour
 
 BUNKER = (12, 23)  # la largeur d'un bunker
-ENTRE = (8, 17)  # la roche entre deux bunkers, où passe le boyau
+ENTRE = (5, 10)  # la roche entre deux bunkers, où passe le boyau
 CHAMBRE = 3  # la hauteur d'un boyau (un héros en fait deux)
 POCHES = ['*', '+', 'O', '%', '*', 'K']  # ce qu'on trouve au fond des poches des boyaux
 
@@ -111,7 +113,9 @@ def reseau(r, lettres='a'):
         # deux bunkers voisins : un boyau d'un étage de l'un à un étage de l'autre
         liens = []
         for b1, b2 in zip(bunkers, bunkers[1:]):
-            j1, j2 = rng.randrange(b1['etages']), rng.randrange(b2['etages'])
+            # les deux étages les plus proches en hauteur : le boyau doit pouvoir les relier (une marche par colonne au plus)
+            j1, j2 = min(((i, j) for i in range(b1['etages']) for j in range(b2['etages'])),
+                         key=lambda p: (abs((b1['g'] - p[0] * ETAGE) - (b2['g'] - p[1] * ETAGE)), rng.random()))
             b1['pd'].append(j1)
             b2['pg'].append(j2)
             liens.append((b1, j1, b2, j2))
@@ -125,7 +129,7 @@ def reseau(r, lettres='a'):
                     n.set(px, sol - 1, 'K')
                     break
             # le puits d'entrée, depuis la surface (ou le rez-de-chaussée d'une tour) jusqu'au dernier étage
-            if i == 0 or rng.random() < 0.5:
+            if True:  # chaque bunker a son puits (le boyau vers le voisin n'est qu'un chemin de plus)
                 plancher = b['g'] - (b['etages'] - 1) * ETAGE
                 for px in rng.sample(range(ta + 2, tb - 2), max(0, tb - ta - 4)):
                     if n.get(px, n.haut[px] - 1) in ' .' and n.get(px, n.haut[px] - 2) in ' .':
@@ -135,8 +139,89 @@ def reseau(r, lettres='a'):
         for b1, j1, b2, j2 in liens:
             ya, yb = b1['g'] - j1 * ETAGE, b2['g'] - j2 * ETAGE
             _boyau(n, b1['x'] + b1['w'], ya, b2['x'] - 1, yb, toit, rng, lettres)
-        tous += bunkers
+        tous += bunkers + _rangee_profonde(n, bunkers, toit, rng, lettres, mat)
     _entrees(n, tous, toit, rng, lettres)
+    _cavernes(n, rng, lettres)
+    _relie_les_isoles(n)
+
+
+def _rangee_profonde(n, dessus, toit, rng, lettres, mat):
+    """Sous les bunkers, quand le massif est assez épais, une seconde rangée : chaque bunker profond est relié à celui du dessus par
+    une courte échelle à travers la roche (de son rez-de-chaussée au dernier étage du profond), et à son voisin profond par un
+    boyau. Pas de roche pleine sous les complexes."""
+    profonds = []
+    for b in dessus:
+        top = b['g'] + 3
+        etages = min(3, (n.bas - 3 - top) // ETAGE)
+        x, w = b['x'] + rng.randrange(-3, 4), b['w']
+        if etages < 1 or not _plein(n, x - 1, x + w + 1, top - 1, top + etages * ETAGE + 1):
+            continue
+        p = dict(x=x, w=w, g=top + etages * ETAGE, etages=etages, pg=[], pd=[])
+        profonds.append((b, p))
+    for (_, p1), (_, p2) in zip(profonds, profonds[1:]):
+        p1['pd'].append(0)
+        p2['pg'].append(0)
+    for b, p in profonds:
+        tour(n, p['x'], p['w'], p['g'], p['etages'], mat, lettres, p['pg'], p['pd'], rng, butin=p['x'] // 3, dehors=False)
+        # la courte échelle : du rez-de-chaussée du bunker du dessus au dernier étage du profond, là où ils se recouvrent
+        a, z = max(b['x'], p['x']) + 2, min(b['x'] + b['w'], p['x'] + p['w']) - 2
+        if z > a:
+            ex = rng.randrange(a, z)
+            for y in range(b['g'] - 1, p['g'] - (p['etages'] - 1) * ETAGE):
+                n.set(ex, y, 'H')
+    for (_, p1), (_, p2) in zip(profonds, profonds[1:]):
+        _boyau(n, p1['x'] + p1['w'], p1['g'], p2['x'] - 1, p2['g'], toit, rng, lettres)
+    return [p for _, p in profonds]
+
+
+def _cavernes(n, rng, lettres, largeur=18, hauteur=9, portee=40):
+    """Ce qui reste de roche pleine sous la surface (des blocs de `largeur` × `hauteur`) devient des cavernes : un plafond
+    irrégulier, des corniches de pitons, des gardes, du butin ; un boyau part de leur flanc vers le creux le plus proche (une porte
+    s'ouvre si c'est le mur d'un bunker). Partout, de l'action."""
+    for y0 in range(8, n.bas - hauteur - 1, 4):
+        for x0 in range(12, n.w - largeur - 12, 6):
+            # de la roche pleine tout autour, et trois rangées au-dessus : on ne creuse jamais sous des marches ou un plancher
+            if y0 < max(n.haut[x0 : x0 + largeur]) + 4 or not _plein(n, x0 - 2, x0 + largeur + 2, y0 - 3, y0 + hauteur + 1):
+                continue
+            sol = y0 + hauteur - 2
+            h = 4
+            for x in range(x0 + 1, x0 + largeur - 1):
+                h = max(3, min(hauteur - 3, h + rng.choice((-1, 0, 1))))
+                for y in range(sol - h, sol):
+                    n.set(x, y, ' ')
+            for x in range(x0 + 6, x0 + 10):
+                if n.get(x, sol - 4) == ' ' and n.get(x, sol - 5) == ' ':
+                    n.set(x, sol - 3, '=')
+            n.ennemis(x0 + 2, x0 + largeur - 2, lettres, 3, ymin=sol - h - 1)
+            n.pose_sur_sol(x0 + largeur - 4, rng.choice(POCHES), sol - 3)
+            # le boyau vers le creux le plus proche, à gauche ou à droite, au niveau du sol
+            for pas, depart in ((-1, x0), (1, x0 + largeur - 1)):
+                x = depart + pas
+                for _ in range(portee):
+                    c = n.get(x, sol - 1)
+                    if c in ' .' and n.get(x, sol - 2) in ' .':
+                        break
+                    if not _naturel(n, c):  # le mur d'un bunker : une porte
+                        if c != 'X':
+                            n.set(x, sol - 1, '.')
+                            n.set(x, sol - 2, '.')
+                        break
+                    if not _naturel(n, n.get(x, sol - CHAMBRE - 1)):  # on percerait un sol par en dessous : on s'arrête
+                        break
+                    for y in range(sol - CHAMBRE, sol):
+                        _creuse(n, x, y)
+                    x += pas
+                else:
+                    continue
+                break
+            else:
+                # aucun boyau n'a trouvé de creux : une échelle à travers la roche, du fond de la caverne jusqu'au premier creux
+                # au-dessus de son plafond (une trappe dans le sol d'en haut, s'il le faut)
+                ex = x0 + largeur // 2
+                creux = next((yy for yy in range(sol - h - 1, max(0, sol - h - 30), -1) if n.get(ex, yy) in ' .'), None)
+                if creux is not None:
+                    for yy in range(creux, sol):
+                        n.set(ex, yy, 'H')
 
 
 def _entrees(n, bunkers, toit, rng, lettres, portee=45, rampe=6):
@@ -162,3 +247,49 @@ def _entrees(n, bunkers, toit, rng, lettres, portee=45, rampe=6):
                     n.set(cx, y, ' ')
         n.rect(mur, b['g'] - 2, mur + 1, b['g'], ' ')  # la porte du rez-de-chaussée
         _boyau(n, xa, ya, xb, yb, toit, rng, lettres)
+
+
+def _relie_les_isoles(n, taille=10, portee=40):
+    """Aucun creux sans issue : on remplit depuis le ciel tout ce qui communique (le vide, les pièces, les échelles, les repères) ;
+    chaque creux qui reste isolé (plus de `taille` cases) est relié, par une échelle à travers la roche depuis son point le plus
+    haut, au premier creux relié au-dessus (`portee` rangées au plus)."""
+    from collections import deque
+    from peintre import SOLIDES
+
+    passe = lambda c: c not in SOLIDES or c in '-='
+    relie = [[False] * n.w for _ in range(n.h)]
+
+    def remplit(depart):
+        file = deque(depart)
+        for x, y in depart:
+            relie[y][x] = True
+        while file:
+            x, y = file.popleft()
+            for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+                if 0 <= nx < n.w and 0 <= ny < n.h and not relie[ny][nx] and passe(n.g[ny][nx]):
+                    relie[ny][nx] = True
+                    file.append((nx, ny))
+
+    remplit([(x, 0) for x in range(n.w) if passe(n.g[0][x])])
+    for y0 in range(n.h):
+        for x0 in range(n.w):
+            if relie[y0][x0] or not passe(n.g[y0][x0]):
+                continue
+            # le creux isolé : ses cases, et la plus haute
+            vu, file, cases = {(x0, y0)}, deque([(x0, y0)]), []
+            while file:
+                x, y = file.popleft()
+                cases.append((x, y))
+                for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+                    if 0 <= nx < n.w and 0 <= ny < n.h and (nx, ny) not in vu and not relie[ny][nx] and passe(n.g[ny][nx]):
+                        vu.add((nx, ny))
+                        file.append((nx, ny))
+            if len(cases) <= taille:
+                continue
+            ex, ey = min(cases, key=lambda p: (p[1], p[0]))
+            haut = next((y for y in range(ey - 1, max(0, ey - portee), -1) if relie[y][ex]), None)
+            if haut is None:
+                continue
+            for y in range(haut, ey + 1):
+                n.set(ex, y, 'H')
+            remplit(cases + [(ex, y) for y in range(haut, ey + 1)])

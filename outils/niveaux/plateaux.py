@@ -2,7 +2,7 @@
 
 - `plateau_caverne` : le terrain monte d'un coup, bien plus haut que la rue ; au ras du sol, on entre dans une vaste caverne
   creusée sous le plateau (un plafond irrégulier, des piliers de roche, des corniches, des gardes, du butin, une cage). On choisit :
-  grimper sur le plateau par l'échelle de sa face, ou s'enfoncer dans la caverne. Le sol continue à la même hauteur après lui ;
+  grimper sur le plateau par les corniches de sa face, ou s'enfoncer dans la caverne. Le sol continue à la même hauteur après lui ;
 - `miradors` : une étendue de terrain dégagé où se dressent des miradors sur pilotis, un guetteur sur chacun, une échelle le long
   d'un pied ; on s'y bat à découvert, et l'on passe sous eux sans détour ;
 - `cuvette` : le sol s'ouvre sur une large cuvette, bien trop large pour être sautée, sans pont : on y descend par des escaliers
@@ -19,7 +19,7 @@ PROPS = ['C', '%', 'T', 'O', 'C', '%']
 
 def plateau_caverne(n, x0, largeur, monte=11, lettres='a', butin='*'):
     """Un plateau de `monte` rangées au-dessus du sol sur [x0 + 3, x0 + largeur - 3), creusé au ras du sol d'une caverne qui le
-    traverse de part en part ; une échelle sur la face de gauche mène au sommet. `base` ne change pas."""
+    traverse de part en part ; des corniches en zigzag sur la face de gauche mènent au sommet. `base` ne change pas."""
     rng = n.rng
     base = n.base
     a, b = x0 + 3, x0 + largeur - 3
@@ -53,10 +53,26 @@ def plateau_caverne(n, x0, largeur, monte=11, lettres='a', butin='*'):
     n.repere(rng.randrange(a + 3, b - 3), butin, ymin=base - 7)
     n.repere(rng.randrange(a + 3, b - 3), 'K', ymin=base - 7)
     # l'échelle de la face de gauche, du sol au sommet, et des gardes là-haut
-    for y in range(top, base):
-        n.set(a, y, 'H')
+    _corniches(n, a, base, top, lettres)
     n.ennemis(a + 3, b - 2, lettres, 2, ymin=top - 3)
     n.repere(b - 4, '+', ymin=top - 3)
+
+
+def _corniches(n, a, base, top, lettres):
+    """La face d'un massif (sa première colonne : a) se gravit par des corniches de pitons en zigzag devant elle : quatre rangées
+    entre deux, une courte échelle chaque fois, un garde sur chacune ; jamais une longue échelle dans le vide."""
+    sol, k = base, 0
+    while sol - 4 > top:
+        y = sol - 4
+        for x in range(a - 4, a):
+            n.set(x, y, '=')
+        ex = a - 4 if k % 2 else a - 1
+        for yy in range(y, sol):
+            n.set(ex, yy, 'H')
+        n.ennemis(a - 4, a, lettres, 1, ymin=y - 2)
+        sol, k = y, k + 1
+    for yy in range(top, sol):
+        n.set(a - 1, yy, 'H')
 
 
 def miradors(n, x0, largeur, lettres='a'):
@@ -126,7 +142,8 @@ def grotte_traversante(n, x0, largeur, profondeur=12, hauteur=10, lettres='a'):
     """Un massif de `hauteur` rangées sur [x0 + 2, x0 + largeur - 2), et une grotte qui le traverse : on y entre au ras du sol, le
     sol descend en marches (une rangée toutes les deux colonnes) jusqu'au fond, à `profondeur` rangées, puis remonte vers la
     sortie. La corniche d'en face, au niveau de l'entrée, est bien trop loin pour être sautée : on descend. Le plafond, irrégulier,
-    laisse toujours trois rangées de roche ; une échelle remonte du fond sur le massif. `base` ne change pas."""
+    laisse toujours trois rangées de roche ; un fortin d'un étage garde le fond (pas de longue échelle dans le vide). `base` ne
+    change pas."""
     rng = n.rng
     base = n.base
     fond = min(base + profondeur, n.bas - 4)
@@ -170,10 +187,11 @@ def grotte_traversante(n, x0, largeur, profondeur=12, hauteur=10, lettres='a'):
     n.repere(g + 1, '!', ymin=fond - 4)
     n.repere(rng.randrange(g + 3, d - 2), '*', ymin=fond - 4)
     n.repere((g + d) // 2 + 2, 'K', ymin=fond - 4)
-    # l'échelle du fond jusqu'en haut du massif (pour qui veut remonter) ; des gardes et un médiator là-haut
-    mx = (g + d) // 2
-    for y in range(top, fond):
-        n.set(mx, y, 'H')
+    # le sommet du massif se gagne par les corniches de sa face (les puits des souterrains y débouchent), où guettent des gardes
+    _corniches(n, a, base - 4, top, lettres)
     n.ennemis(a + 2, c - 2, lettres, 2, ymin=top - 3)
-    n.repere(c - 4, '+', ymin=top - 3)
+    # au milieu du fond, un fortin d'un étage (son toit reste loin du plafond) : on s'y bat, on n'y grimpe pas vers le haut
+    w = min(12, d - g - 18)  # neuf colonnes de fond de chaque côté : les rampes vers les souterrains y passent
+    if w >= 8:
+        tour(n, (g + d) // 2 - w // 2, w, fond, 1, n.t['mur'], lettres, [0], [0], rng, butin=x0 + 1)
     _acces(n, g, d, fond)

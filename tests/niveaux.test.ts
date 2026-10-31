@@ -3,7 +3,7 @@ import { NIVEAUX, niveauLu } from '../src/niveaux';
 import { ErreurNiveau, litNiveau } from '../src/niveaux/format';
 import { ENNEMIS_PAR_LETTRE } from '../src/entites/ennemis/definitions';
 import { casesAccessibles } from './accessibilite';
-import { REFONTES, versionDe } from '../src/niveaux/refontes';
+import { ESSAIS, REFONTES, versionDe } from '../src/niveaux/refontes';
 
 describe('les niveaux', () => {
   it.each(NIVEAUX.map((n, i) => [n.id, i] as const))('%s se lit sans erreur', (_id, i) => {
@@ -52,7 +52,9 @@ describe('les niveaux', () => {
 
 // les niveaux refaits (voir niveaux/refontes.ts), publiés ou encore en essai : les mêmes exigences que les originaux
 describe('les niveaux refaits', () => {
-  const refaits = NIVEAUX.filter((n) => n.id in REFONTES).map((n) => litNiveau(versionDe(n, true)));
+  const refaits = NIVEAUX.filter((n) => n.id in REFONTES || n.id in ESSAIS).map((n) =>
+    litNiveau(versionDe(n, true)),
+  );
   it.each(refaits.map((lu) => [lu.def.id, lu] as const))(
     '%s : on atteint la fin et chaque drapeau sans rien détruire',
     (_id, lu) => {

@@ -414,7 +414,8 @@ validé.
   `outils/niveaux/blocs.py` ; des miradors sur pilotis, des cuvettes sans pont et des grottes sous les massifs où l'on descend
   par des marches pour remonter en face (des rampes en partent vers les souterrains), et un plateau creusé d'une caverne qu'on traverse ou qu'on gravit, `outils/niveaux/plateaux.py` ; pas de mur dur
   à escalader : la verticalité vient du vide et du terrain ; et sous chaque plateau et chaque tour des
-  complexes souterrains (des bunkers à étages reliés par des boyaux sinueux), `outils/niveaux/massifs.py` ; puis `python3 outils/pose-barils.py ../refontes/21-marseille`), et se
+  complexes souterrains (des bunkers à étages reliés par des boyaux sinueux, une seconde rangée plus bas, des cavernes ;
+  aucun creux sans issue), `outils/niveaux/massifs.py` ; puis `python3 outils/pose-barils.py ../refontes/21-marseille`), et se
   déclare dans `src/niveaux/refontes.ts`. Elle garde l'`id` et la place du niveau : les sauvegardes ne bougent pas. Les joueurs
   ne l'ont qu'une fois son `id` ajouté à `REFONTES_PUBLIEES` (augmenter alors `VERSION_PROTOCOLE`) ; avant, on l'essaie en
   ouvrant le jeu avec `?essai` à la fin de l'adresse (rien n'est retenu : sans lui, c'est le jeu de tout le monde ; un
