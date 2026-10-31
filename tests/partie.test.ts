@@ -131,7 +131,7 @@ describe('la partie', () => {
     },
   );
 
-  it('les ennemis vaincus sont comptés par type, remis à zéro à chaque niveau', () => {
+  it('les ennemis vaincus sont comptés par type depuis le début du niveau, remis à zéro au niveau suivant', () => {
     const p = nouvelle();
     p.ennemiVaincu(0, 0, 100, G.FETARD);
     p.ennemiVaincu(0, 0, 100, G.FETARD);
@@ -141,7 +141,9 @@ describe('la partie', () => {
     expect(v.convertis[GENRES_CONVERTIS.indexOf(G.FETARD)]).toBe(2);
     expect(v.convertis[GENRES_CONVERTIS.indexOf(G.VIDEUR)]).toBe(1);
     expect(v.convertis.reduce((a, b) => a + b, 0)).toBe(3);
-    p.recommence(true);
+    p.recommence(true); // recommencer garde le compte depuis le début du niveau
+    expect(p.vue().convertis.reduce((a, b) => a + b, 0)).toBe(3);
+    p.charge(1, -1); // un nouveau niveau repart de zéro
     expect(p.vue().convertis.every((n) => n === 0)).toBe(true);
   });
 

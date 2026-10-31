@@ -22,7 +22,7 @@ export function changePhase(p: Partie): void {
     } else p.phase = 'fin';
   } else if (p.phase === 'perdu') {
     p.vies = VIES_DEPART;
-    p.charge(p.niveau, p.drapeau);
+    p.charge(p.niveau, p.drapeau, true); // le temps et les convertis du niveau continuent
     p.phase = 'jeu';
   } else if (p.phase === 'fin' && arcOuvertPar(p.niveau) !== null) {
     // l'épilogue lu, la route continue vers l'arc suivant

@@ -38,14 +38,16 @@ describe('le protocole réseau', () => {
     expect(d.entites[0]).toMatchObject({ id: e.id, g: e.g, x: Math.round(e.x), gauche: e.gauche });
   });
 
-  it('le temps de la run court avec le jeu, traverse le réseau, et repart de zéro quand le niveau est refait', () => {
+  it('le temps de la run court avec le jeu, traverse le réseau, et repart de zéro au niveau suivant', () => {
     const p = new Partie({ niveau: 0, drapeau: -1, vies: 5, score: 0 });
     p.ajouteJoueur(0, 0);
     while (p.phase === 'histoire') p.suivant();
     for (let t = 0; t < 60 * 7 + 30; t++) p.avance();
     expect(p.vue().temps).toBe(7);
     expect(decodeEtat(encodeEtat(p.vue()))!.temps).toBe(7);
-    p.recommence(true);
+    p.recommence(true); // recommencer ne remet pas le temps à zéro : il compte depuis le début du niveau
+    expect(p.vue().temps).toBe(7);
+    p.charge(1, -1);
     expect(p.vue().temps).toBe(0);
   });
 

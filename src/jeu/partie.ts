@@ -253,12 +253,16 @@ export class Partie implements Contexte {
   }
 
   // ——— niveaux ———
-  charge(niveau: number, drapeau: number): void {
+  /**
+   * Charge le niveau, au départ ou au drapeau. `reprise` : le même niveau qui recommence (une défaite, « recommencer ») ; les
+   * convertis et le temps continuent de compter depuis le début du niveau, pour l'écran de fin.
+   */
+  charge(niveau: number, drapeau: number, reprise = false): void {
+    if (!reprise || niveau !== this.niveau)
+      [this.convertis, this.tempsNiveau] = [GENRES_CONVERTIS.map(() => 0), 0];
     this.niveau = niveau;
     this.drapeau = drapeau;
     this.generation++;
-    this.convertis = GENRES_CONVERTIS.map(() => 0);
-    this.tempsNiveau = 0;
     this.lu = niveauLu(niveau);
     this.carte = new Carte(this.lu.largeur, this.lu.hauteur, this.lu.tuiles, this.lu.fond);
     // les tuiles de l'ancienne carte n'ont plus de sens
@@ -284,7 +288,7 @@ export class Partie implements Contexte {
    */
   recommence(depuisLeDebut: boolean): void {
     if (this.phase !== 'jeu') return;
-    this.charge(this.niveau, depuisLeDebut ? -1 : this.drapeau);
+    this.charge(this.niveau, depuisLeDebut ? -1 : this.drapeau, true);
     this.onProgression(this.progression(), false);
   }
 
