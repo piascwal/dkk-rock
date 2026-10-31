@@ -443,46 +443,12 @@ NIVEAUX = {
         ],
     ),
     # Marseille refait (le chantier du level design, voir src/niveaux/refontes.ts) : à la manière de Broforce, la ville se gravit et
-    # se traverse d'immeuble en immeuble. Du Vieux-Port au ras de l'eau, on monte au Panier : une suite de tours pleines de pièces,
-    # séparées par le vide, qu'on franchit par des passerelles et des tyroliennes (voir niveaux/blocs.py) ; le fort Saint-Jean,
-    # puis on plonge vers la mer et les tours de la Joliette ; enfin les calanques et la longue montée vers la Bonne Mère. Sous
-    # chaque plateau et chaque tour, un réseau de galeries à plusieurs étages (voir niveaux/massifs.py)
+    # se traverse d'immeuble en immeuble, avec les règles de docs/LEVEL-DESIGN.md (cuvette, grotte traversante, plateau creusé,
+    # miradors ; ni barrage ni puits). Du Vieux-Port au ras de l'eau, on monte au Panier, puis le fort Saint-Jean, les tours de la
+    # Joliette, les calanques et la longue montée vers la Bonne Mère
     'marseille_refonte': dict(
         nom='Marseille', theme='marseille', textes='21-marseille.ts', fichier='../refontes/21-marseille.ts',
-        constante='CARTE_MARSEILLE_REFONTE', graine=212, base=60, raccord='ac', caves='ac', reseau=True,
-        lieux=[
-            ('plat', 12, dict(lettres='a', deco=3)),
-            ('ponton', 42, dict(lettres='ac', digit='1')),  # le Vieux-Port, au ras de l'eau ; les gabians
-            ('corniches', 22, dict(monte=8, lettres='ac')),  # on monte au Panier
-            ('bloc', 28, dict(etages=4, lien='passerelle', ecart=10, mat='{', lettres='ac', digit='2')),  # le Panier
-            ('bloc', 30, dict(etages=5, lien='tyro', ecart=12, mat='{', lettres='ac', monte=-6)),
-            ('bloc', 26, dict(etages=3, lien='passerelle', ecart=9, mat='{', lettres='ac')),
-            ('bloc', 24, dict(etages=4, lien=None, mat='{', lettres='ac')),
-            ('plat', 14, dict(lettres='qq', digit='3')),  # la pétanque
-            ('gouffre', 20, dict(lettres='ac', nb=4)),
-            ('corniches', 22, dict(monte=10, lettres='ac')),  # la paroi du fort Saint-Jean
-            ('forteresse', 34, dict(etages=3, lettres='ac', mat='{', cage=True)),  # le fort Saint-Jean
-            ('pont_singe', 22, dict(lettres='ac', butin='+')),
-            ('descente', 24, dict(chute=10, lettres='ac')),  # on plonge vers la mer
-            ('plat', 10, dict(lettres='aa', digit='4', drones=2)),  # les supporters de l'OM ; les gabians
-            ('bloc', 28, dict(etages=6, lien='passerelle', ecart=10, mat='D', lettres='ac')),  # les tours de la Joliette
-            ('bloc', 26, dict(etages=5, lien='tyro', ecart=12, mat='D', lettres='ac', monte=-4)),
-            ('bloc', 30, dict(etages=4, lien='passerelle', ecart=8, mat='D', lettres='acq')),
-            ('bloc', 24, dict(etages=5, lien=None, mat='D', lettres='ac')),
-            ('calanques', 36, dict(lettres='ac', digit='5')),  # les calanques
-            ('grotte', 20, dict(monte=8, lettres='ac', butin='+')),  # et la longue montée vers la Bonne Mère
-            ('corniches', 22, dict(monte=10, lettres='ac')),
-            ('puits', 24, dict(lettres='acq')),
-            ('bonne_mere', 44, dict(lettres='acq')),  # Notre-Dame de la Garde, tout en haut
-            ('barrage', 20, dict(haut=12, lettres='acq', butin='+')),
-            ('arene', 40, dict(lettres='acqg')),
-        ],
-    ),
-    # Marseille, nouvelle version en essai (la refonte publiée reste celle des joueurs) : les règles de docs/LEVEL-DESIGN.md
-    # appliquées comme à l'International Tour (cuvette, grotte traversante, plateau creusé, miradors ; ni barrage ni puits)
-    'marseille_essai': dict(
-        nom='Marseille', theme='marseille', textes='21-marseille.ts', fichier='../refontes/21-marseille-essai.ts',
-        constante='CARTE_MARSEILLE_ESSAI', graine=213, base=60, raccord='ac', caves='ac', reseau=True,
+        constante='CARTE_MARSEILLE_REFONTE', graine=213, base=60, raccord='ac', caves='ac', reseau=True,
         lieux=[
             ('plat', 12, dict(lettres='a', deco=3)),
             ('ponton', 42, dict(lettres='ac', digit='1')),  # le Vieux-Port, au ras de l'eau ; les gabians

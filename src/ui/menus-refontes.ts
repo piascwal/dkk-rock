@@ -23,7 +23,9 @@ export function ecranRefontes(m: Menus, a: Actions): void {
       'Chaque niveau dans sa version d’avant et dans sa version refaite. Rien n’est sauvegardé.',
       'aide',
     ),
-    liste,
+    liste.childElementCount
+      ? liste
+      : el('p', 'Aucun niveau en essai pour l’instant : tous sont publiés.', 'aide'),
     bouton('Retour', () => m.titre()),
   );
 }
