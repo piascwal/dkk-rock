@@ -546,202 +546,13 @@ NIVEAUX = {
     # se traverse d'immeuble en immeuble, avec les règles de docs/LEVEL-DESIGN.md (cuvette, grotte traversante, plateau creusé,
     # miradors ; ni barrage ni puits). Du Vieux-Port au ras de l'eau, on monte au Panier, puis le fort Saint-Jean, les tours de la
     # Joliette, les calanques et la longue montée vers la Bonne Mère
-    'marseille_refonte': dict(
-        nom='Marseille', theme='marseille', textes='21-marseille.ts', fichier='../refontes/21-marseille.ts',
-        constante='CARTE_MARSEILLE_REFONTE', graine=213, base=60, raccord='ac', caves='ac', reseau=True,
-        lieux=[
-            ('plat', 12, dict(lettres='a', deco=3)),
-            ('ponton', 42, dict(lettres='ac', digit='1')),  # le Vieux-Port, au ras de l'eau ; les gabians
-            ('corniches', 22, dict(monte=8, lettres='ac')),  # on monte au Panier
-            ('bloc', 28, dict(etages=4, lien='passerelle', ecart=10, mat='{', lettres='ac', digit='2')),  # le Panier
-            ('bloc', 30, dict(etages=5, lien='tyro', ecart=12, mat='{', lettres='ac', monte=-6)),
-            ('bloc', 26, dict(etages=3, lien='passerelle', ecart=9, mat='{', lettres='ac')),
-            ('bloc', 24, dict(etages=4, lien=None, mat='{', lettres='ac')),
-            ('miradors', 30, dict(lettres='ac')),  # du terrain dégagé, des miradors sur pilotis
-            ('cuvette', 92, dict(profondeur=14, lettres='ac')),  # on descend par les marches, on remonte en face
-            ('plat', 14, dict(lettres='qq', digit='3')),  # la pétanque
-            ('gouffre', 20, dict(lettres='ac', nb=4)),
-            ('corniches', 22, dict(monte=10, lettres='ac')),  # la paroi du fort Saint-Jean
-            ('forteresse', 34, dict(etages=3, lettres='ac', mat='{', cage=True)),  # le fort Saint-Jean
-            ('pont_singe', 22, dict(lettres='ac', butin='+')),
-            ('descente', 24, dict(chute=10, lettres='ac')),  # on plonge vers la mer
-            ('plat', 10, dict(lettres='aa', digit='4', drones=2)),  # les supporters de l'OM ; les gabians
-            ('bloc', 28, dict(etages=6, lien='passerelle', ecart=10, mat='D', lettres='ac')),  # les tours de la Joliette
-            ('bloc', 26, dict(etages=5, lien='tyro', ecart=12, mat='D', lettres='ac', monte=-4)),
-            ('bloc', 30, dict(etages=4, lien='passerelle', ecart=8, mat='D', lettres='acq')),
-            ('bloc', 24, dict(etages=5, lien=None, mat='D', lettres='ac')),
-            ('calanques', 36, dict(lettres='ac', digit='5')),  # les calanques
-            ('grotte', 20, dict(monte=8, lettres='ac', butin='+')),  # et la longue montée vers la Bonne Mère
-            ('corniches', 22, dict(monte=10, lettres='ac')),
-            ('grotte_traversante', 92, dict(profondeur=12, hauteur=10, lettres='ac')),  # en allant tout droit, on entre sous le massif
-            ('bonne_mere', 44, dict(lettres='acq')),  # Notre-Dame de la Garde, tout en haut
-            ('plateau_caverne', 52, dict(monte=11, lettres='acq', butin='*')),
-            ('arene', 40, dict(lettres='acqg')),
-        ],
-    ),
     # L'International Tour refait (le chantier du level design, voir src/niveaux/refontes.ts et le Marseille refait plus haut) : à
     # chaque ville son relief, ses quartiers de tours séparées par le vide (passerelles, tyroliennes ; niveaux/blocs.py) ou par une
     # passerelle métallique, toujours en haut des tours ; ses miradors, ses cuvettes et ses grottes qu'on traverse par en bas en
     # descendant des marches (des boyaux en partent vers les souterrains), un plateau creusé d'une caverne (niveaux/plateaux.py) et ses complexes souterrains (niveaux/massifs.py). Pas de
     # mur dur à escalader (ni bastion, ni passe haute, ni barrage) : la verticalité vient du vide et du terrain.
     # Les monuments restent : la cathédrale, le château, le pub, le pont de Brooklyn...
-    'beauvais_refonte': dict(
-        nom='Beauvais', theme='beauvais', textes='17-beauvais.ts', fichier='../refontes/17-beauvais.ts',
-        constante='CARTE_BEAUVAIS_REFONTE', graine=172, base=58, raccord='ac', caves='ac', reseau=True,
-        lieux=[
-            ('plat', 12, dict(lettres='a', digit='1')),  # le centre-ville, ses voyageurs perdus
-            ('corniches', 22, dict(monte=8, lettres='ac')),
-            ('bloc', 28, dict(etages=4, lien='passerelle', ecart=10, mat='{', lettres='ac')),  # les immeubles du centre
-            ('bloc', 26, dict(etages=5, lien='tyro', ecart=12, mat='{', lettres='ac', monte=-6)),
-            ('bloc', 24, dict(etages=3, lien=None, ecart=0, mat='{', lettres='ac')),
-            ('miradors', 30, dict(lettres='ac')),  # du terrain dégagé, des miradors sur pilotis
-            ('cuvette', 92, dict(profondeur=14, lettres='ac')),  # on descend par les marches, on remonte en face
-            ('cathedrale_beauvais', 40, dict(lettres='ac', digit='2')),  # le chœur le plus haut du monde, sans nef
-            ('plat', 10, dict(lettres='ac', digit='3', drones=2)),  # l'horloge astronomique ; les gargouilles s'envolent
-            ('gouffre', 20, dict(lettres='ac', nb=4)),
-            ('corniches', 24, dict(monte=10, lettres='ac')),  # on monte sur les remparts de la cité
-            ('remparts', 18, dict(haut=6, lettres='ac', digit='4')),  # la place Jeanne-Hachette
-            ('forteresse', 34, dict(etages=3, lettres='ac', mat='{', cage=True)),
-            ('descente', 24, dict(chute=10, lettres='ac')),
-            ('gymnase', 46, dict(lettres='ac')),  # le gymnase de JBT
-            ('bloc', 26, dict(etages=4, lien='metal', ecart=10, mat='B', lettres='ac')),  # le lycée et ses bâtiments
-            ('bloc', 28, dict(etages=5, lien='metal', ecart=10, mat='B', lettres='ac')),
-            ('bloc', 24, dict(etages=3, lien=None, ecart=0, mat='B', lettres='ac')),
-            ('pont_singe', 22, dict(lettres='ac', butin='+')),
-            ('grotte', 20, dict(monte=8, lettres='acl', butin='+')),
-            ('grotte_traversante', 92, dict(profondeur=12, hauteur=10, lettres='ac')),  # en allant tout droit, on entre sous le massif
-            ('descente', 24, dict(chute=8, lettres='ac')),
-            ('plat', 10, dict(lettres='ac', digit='5', drones=1)),  # le dernier appel
-            ('plateau_caverne', 52, dict(monte=11, lettres='ac', butin='*')),  # le plateau, et la caverne qui le traverse
-            ('avion', 52, dict(lettres='c')),  # l'avion low-cost sur le tarmac de Beauvais-Tillé
-            ('arene', 40, dict(lettres='acz')),
-        ],
-    ),
-    'limerick_refonte': dict(
-        nom='Limerick', theme='limerick', textes='18-limerick.ts', fichier='../refontes/18-limerick.ts',
-        constante='CARTE_LIMERICK_REFONTE', graine=182, base=56, raccord='ac', caves='ac', reseau=True,
-        lieux=[
-            ('plat', 12, dict(lettres='c', deco=3)),
-            ('pres', 30, dict(lettres='c', digit='1')),  # les prés à murets, leurs moutons
-            ('corniches', 22, dict(monte=8, lettres='ac')),
-            ('corniches', 22, dict(monte=8, lettres='ac')),  # on monte au château
-            ('chateau_roi_jean', 44, dict(lettres='ac', digit='2')),  # le château du roi Jean
-            ('descente', 24, dict(chute=10, lettres='ac')),  # on redescend vers la ville
-            ('plat', 8, dict(lettres='ac')),
-            ('universite', 40, dict(lettres='ac', digit='3')),  # l'Université de Limerick, le stage de Mat
-            ('shannon', 30, dict(lettres='ac')),  # la Shannon, le pont de Thomond
-            ('bloc', 26, dict(etages=4, lien='passerelle', ecart=10, mat='B', lettres='ac')),  # les maisons de brique géorgiennes
-            ('bloc', 28, dict(etages=5, lien='tyro', ecart=12, mat='B', lettres='ac', monte=-6)),
-            ('bloc', 24, dict(etages=3, lien=None, ecart=0, mat='B', lettres='ac')),
-            ('miradors', 30, dict(lettres='ac')),  # du terrain dégagé, des miradors sur pilotis
-            ('cuvette', 92, dict(profondeur=14, lettres='ac')),  # on descend par les marches, on remonte en face
-            ('pub', 26, dict(lettres='a', digit='4')),  # la session au pub
-            ('gouffre', 20, dict(lettres='ac', nb=4)),
-            ('corniches', 22, dict(monte=10, lettres='ac')),
-            ('pont_singe', 22, dict(lettres='ac', butin='+')),
-            ('descente', 24, dict(chute=8, lettres='ac')),
-            ('grotte_traversante', 92, dict(profondeur=12, hauteur=10, lettres='ac')),  # en allant tout droit, on entre sous le massif
-            ('plat', 10, dict(lettres='au', digit='5')),  # Thomond Park : les supporters du Munster
-            ('gradins', 30, dict(haut=6, lettres='au', cage=True, mat='R')),  # les tribunes du stade
-            ('plateau_caverne', 52, dict(monte=11, lettres='ac', butin='*')),  # le plateau, et la caverne qui le traverse
-            ('arene', 40, dict(lettres='acu')),
-        ],
-    ),
-    'lund_refonte': dict(
-        nom='Lund', theme='lund', textes='19-lund.ts', fichier='../refontes/19-lund.ts',
-        constante='CARTE_LUND_REFONTE', graine=192, base=58, raccord='ac', caves='ac', reseau=True,
-        lieux=[
-            ('plat', 12, dict(lettres='a', digit='1')),  # les étudiants en salopette
-            ('maisons_rouges', 36, dict(lettres='ac')),
-            ('lac_gele', 44, dict(lettres='ac')),  # le lac gelé du parc
-            ('corniches', 22, dict(monte=8, lettres='ac')),
-            ('bloc', 26, dict(etages=4, lien='passerelle', ecart=10, mat='B', lettres='ac')),  # les résidences étudiantes
-            ('bloc', 28, dict(etages=5, lien='tyro', ecart=12, mat='B', lettres='ac', monte=-6)),
-            ('bloc', 24, dict(etages=3, lien=None, ecart=0, mat='B', lettres='ac')),
-            ('miradors', 30, dict(lettres='ac')),  # du terrain dégagé, des miradors sur pilotis
-            ('cuvette', 92, dict(profondeur=14, lettres='ac')),  # on descend par les marches, on remonte en face
-            ('cathedrale_lund', 48, dict(lettres='ac', digit='2')),  # la cathédrale romane, la crypte du géant Finn
-            ('plat', 10, dict(lettres='ac', digit='3', plus=1)),  # l'horloge astronomique
-            ('corniches', 22, dict(monte=10, lettres='ac')),  # on monte sur la colline de l'université
-            ('forteresse', 34, dict(etages=3, lettres='ac', mat='B', cage=True)),  # l'université
-            ('descente', 24, dict(chute=10, lettres='ac')),
-            ('luge', 44, dict(lettres='ac')),  # la butte de luge
-            ('maisons_rouges', 36, dict(lettres='ac', digit='4')),  # Kulturen
-            ('traversee', 36, dict(lettres='ac', mode='iles')),
-            ('grotte', 20, dict(monte=8, lettres='ac', butin='+')),
-            ('plat', 12, dict(lettres='cj', digit='5', plus=1)),  # un élan sur la piste cyclable
-            ('lac_gele', 36, dict(lettres='cj')),  # les élans sur la glace
-            ('grotte_traversante', 92, dict(profondeur=12, hauteur=10, lettres='ac')),  # en allant tout droit, on entre sous le massif
-            ('descente', 24, dict(chute=8, lettres='acj')),
-            ('gouffre', 20, dict(lettres='acj', nb=4)),
-            ('plateau_caverne', 52, dict(monte=11, lettres='ac', butin='*')),  # le plateau, et la caverne qui le traverse
-            ('tour', 18, dict(etages=3, tyro=9, apres=13, lettres='ac', mat='B')),
-            ('arene', 40, dict(lettres='acj')),
-        ],
-    ),
-    'newyork_refonte': dict(
-        nom='New York', theme='newyork', textes='20-new-york.ts', fichier='../refontes/20-new-york.ts',
-        constante='CARTE_NEW_YORK_REFONTE', graine=202, base=62, raccord='ac', caves='ac', reseau=True,
-        lieux=[
-            ('plat', 12, dict(lettres='c', digit='1')),  # les rats, leur part de pizza
-            ('bloc', 26, dict(etages=6, lien='passerelle', ecart=10, mat='B', lettres='ac', digit='2')),  # Manhattan : des tours de brique et de béton
-            ('bloc', 24, dict(etages=7, lien='tyro', ecart=12, mat='D', lettres='ac', monte=-4)),
-            ('bloc', 28, dict(etages=5, lien='passerelle', ecart=9, mat='B', lettres='ac')),
-            ('bloc', 22, dict(etages=6, lien=None, ecart=0, mat='D', lettres='ac')),
-            ('miradors', 30, dict(lettres='ac')),  # du terrain dégagé, des miradors sur pilotis
-            ('cuvette', 92, dict(profondeur=14, lettres='ac')),  # on descend par les marches, on remonte en face
-            ('plat', 10, dict(lettres='aa', digit='3', drones=2)),  # Wall Street ; les pigeons
-            ('echafaudage', 22, dict(niveaux=3, lettres='ac')),
-            ('corniches', 22, dict(monte=8, lettres='ac')),
-            ('bloc', 28, dict(etages=6, lien='metal', ecart=10, mat='B', lettres='ac')),
-            ('bloc', 26, dict(etages=5, lien='metal', ecart=10, mat='D', lettres='ac')),
-            ('bloc', 24, dict(etages=4, lien=None, ecart=0, mat='B', lettres='ac')),
-            ('descente', 24, dict(chute=8, lettres='ac')),
-            ('metro', 44, dict(lettres='c', digit='4')),  # le métro sous la rue
-            ('gratte_ciel', 28, dict(lettres='ac', etages=5)),
-            ('grotte', 20, dict(monte=8, lettres='ac', butin='+')),
-            ('pont_singe', 22, dict(lettres='ac', butin='+')),
-            ('descente', 24, dict(chute=8, lettres='ac')),
-            ('grotte_traversante', 92, dict(profondeur=12, hauteur=10, lettres='ac')),  # en allant tout droit, on entre sous le massif
-            ('gouffre', 20, dict(lettres='ac', nb=4)),
-            ('plateau_caverne', 52, dict(monte=11, lettres='ac', butin='*')),  # le plateau, et la caverne qui le traverse
-            ('pont_brooklyn', 56, dict(lettres='ac', digit='5')),  # le pont de Brooklyn
-            ('arene', 40, dict(lettres='acn')),
-        ],
-    ),
-    'ottawa_refonte': dict(
-        nom='Ottawa', theme='ottawa', textes='23-ottawa.ts', fichier='../refontes/23-ottawa.ts',
-        constante='CARTE_OTTAWA_REFONTE', graine=232, base=60, profondeur=36, raccord='ac', caves='ac', reseau=True,
-        lieux=[
-            ('plat', 12, dict(lettres='cl', deco=3, digit='1')),  # la neige, les castors et un caribou
-            ('maison', 14, dict(lettres='ac')),
-            ('corniches', 22, dict(monte=8, lettres='ac')),
-            ('bloc', 26, dict(etages=4, lien='passerelle', ecart=10, mat='B', lettres='acl')),  # les maisons de brique du Glebe
-            ('bloc', 24, dict(etages=3, lien='tyro', ecart=12, mat='B', lettres='ac', monte=-6)),
-            ('bloc', 26, dict(etages=3, lien=None, ecart=0, mat='B', lettres='ac')),
-            ('miradors', 30, dict(lettres='ac')),  # du terrain dégagé, des miradors sur pilotis
-            ('cuvette', 92, dict(profondeur=14, lettres='ac')),  # on descend par les marches, on remonte en face
-            ('glebe', 34, dict(lettres='acii', chute=6, digit='2')),  # le Glebe Collegiate : on n'en sort qu'en bas
-            ('plat', 10, dict(lettres='ac', drones=2)),  # les bernaches
-            ('gouffre', 20, dict(lettres='acii', nb=4)),
-            ('patinoire', 64, dict(lettres='a', digit='3')),  # la patinoire sur la rivière gelée
-            ('corniches', 22, dict(monte=10, lettres='ac')),  # on monte sur la colline du Parlement
-            ('parlement', 46, dict(lettres='acii', digit='4')),  # la tour de la Paix
-            ('descente', 24, dict(chute=10, lettres='acl')),
-            ('plat', 12, dict(lettres='cwl', digit='5', drones=2)),  # le marché By
-            ('bloc', 28, dict(etages=5, lien='metal', ecart=10, mat='D', lettres='ac')),  # les tours du centre-ville
-            ('bloc', 26, dict(etages=6, lien='metal', ecart=10, mat='D', lettres='ac')),
-            ('bloc', 24, dict(etages=4, lien=None, ecart=0, mat='D', lettres='ac')),
-            ('grotte', 20, dict(monte=8, lettres='ac', butin='+')),
-            ('pont_singe', 22, dict(lettres='ac', butin='+')),
-            ('grotte_traversante', 92, dict(profondeur=12, hauteur=10, lettres='ac')),  # en allant tout droit, on entre sous le massif
-            ('lac_gele', 36, dict(lettres='aw')),  # le canal gelé
-            ('plateau_caverne', 52, dict(monte=11, lettres='ac', butin='*')),  # le plateau, et la caverne qui le traverse
-            ('tour', 18, dict(etages=3, tyro=9, apres=13, lettres='ac', mat='B')),
-            ('arene', 40, dict(lettres='acwi')),
-        ],
-    ),
-    # L'International Tour, nouvelles versions en essai (les refontes publiées restent celles des joueurs) : chaque ville sa
+    # L'International Tour refait (publié après essai) : chaque ville sa
     # structure, plus le même gabarit avec un autre décor (voir « Chaque niveau sa structure » dans docs/LEVEL-DESIGN.md).
     # - Beauvais : une petite ville basse, la cathédrale à gravir, puis l'aéroport tout en longueur (parkings à étages, tarmac) ;
     # - Limerick : les prés à murets, le château sur sa butte, la Shannon, les rues géorgiennes, la carrière en terrasses, le stade ;
@@ -749,9 +560,9 @@ NIVEAUX = {
     # - Ottawa : la glace. Le canal gelé et ses écluses (des paliers qu'on descend), la patinoire, la colline du Parlement ;
     # - Lund : la ville étudiante, les maisons rouges, la cathédrale et sa crypte, la grande butte de luge, les îlots du jardin ;
     # - Marseille : du Vieux-Port à la Bonne Mère, une ville qui se gravit : les toits serrés du Panier, le fort, une calanque à pic
-    'beauvais_essai': dict(
-        nom='Beauvais', theme='beauvais', textes='17-beauvais.ts', fichier='../refontes/17-beauvais-essai.ts',
-        constante='CARTE_BEAUVAIS_ESSAI', graine=173, base=58, raccord='ac', caves='ac', reseau=True,
+    'beauvais_refonte': dict(
+        nom='Beauvais', theme='beauvais', textes='17-beauvais.ts', fichier='../refontes/17-beauvais.ts',
+        constante='CARTE_BEAUVAIS_REFONTE', graine=173, base=58, raccord='ac', caves='ac', reseau=True,
         lieux=[
             ('plat', 12, dict(lettres='a', digit='1')),  # le centre-ville, ses voyageurs perdus
             ('bloc', 24, dict(etages=3, lien='passerelle', ecart=9, mat='{', lettres='ac')),  # une ville basse
@@ -778,9 +589,9 @@ NIVEAUX = {
             ('arene', 40, dict(lettres='acz')),
         ],
     ),
-    'limerick_essai': dict(
-        nom='Limerick', theme='limerick', textes='18-limerick.ts', fichier='../refontes/18-limerick-essai.ts',
-        constante='CARTE_LIMERICK_ESSAI', graine=183, base=56, raccord='ac', caves='ac', reseau=True,
+    'limerick_refonte': dict(
+        nom='Limerick', theme='limerick', textes='18-limerick.ts', fichier='../refontes/18-limerick.ts',
+        constante='CARTE_LIMERICK_REFONTE', graine=183, base=56, raccord='ac', caves='ac', reseau=True,
         lieux=[
             ('plat', 12, dict(lettres='c', deco=3)),
             ('pres', 30, dict(lettres='c', digit='1')),  # les prés à murets, leurs moutons
@@ -807,9 +618,9 @@ NIVEAUX = {
             ('arene', 40, dict(lettres='acu')),
         ],
     ),
-    'newyork_essai': dict(
-        nom='New York', theme='newyork', textes='20-new-york.ts', fichier='../refontes/20-new-york-essai.ts',
-        constante='CARTE_NEW_YORK_ESSAI', graine=203, base=66, raccord='ac', caves='ac', reseau=True,
+    'newyork_refonte': dict(
+        nom='New York', theme='newyork', textes='20-new-york.ts', fichier='../refontes/20-new-york.ts',
+        constante='CARTE_NEW_YORK_REFONTE', graine=203, base=66, raccord='ac', caves='ac', reseau=True,
         lieux=[
             ('plat', 12, dict(lettres='c', digit='1')),  # les rats, leur part de pizza
             # Midtown : de très hautes tours, reliées en haut
@@ -836,9 +647,9 @@ NIVEAUX = {
             ('arene', 40, dict(lettres='acn')),
         ],
     ),
-    'ottawa_essai': dict(
-        nom='Ottawa', theme='ottawa', textes='23-ottawa.ts', fichier='../refontes/23-ottawa-essai.ts',
-        constante='CARTE_OTTAWA_ESSAI', graine=233, base=60, profondeur=36, raccord='ac', caves='ac', reseau=True,
+    'ottawa_refonte': dict(
+        nom='Ottawa', theme='ottawa', textes='23-ottawa.ts', fichier='../refontes/23-ottawa.ts',
+        constante='CARTE_OTTAWA_REFONTE', graine=233, base=60, profondeur=36, raccord='ac', caves='ac', reseau=True,
         lieux=[
             ('plat', 12, dict(lettres='cl', deco=3, digit='1')),  # la neige, les castors et un caribou
             ('maison', 14, dict(lettres='ac')),
@@ -864,9 +675,9 @@ NIVEAUX = {
             ('arene', 40, dict(lettres='acwi')),
         ],
     ),
-    'lund_essai': dict(
-        nom='Lund', theme='lund', textes='19-lund.ts', fichier='../refontes/19-lund-essai.ts',
-        constante='CARTE_LUND_ESSAI', graine=193, base=58, raccord='ac', caves='ac', reseau=True,
+    'lund_refonte': dict(
+        nom='Lund', theme='lund', textes='19-lund.ts', fichier='../refontes/19-lund.ts',
+        constante='CARTE_LUND_REFONTE', graine=193, base=58, raccord='ac', caves='ac', reseau=True,
         lieux=[
             ('plat', 12, dict(lettres='a', digit='1')),  # les étudiants en salopette
             ('maisons_rouges', 36, dict(lettres='ac')),
@@ -892,9 +703,9 @@ NIVEAUX = {
             ('arene', 40, dict(lettres='acj')),
         ],
     ),
-    'marseille_essai': dict(
-        nom='Marseille', theme='marseille', textes='21-marseille.ts', fichier='../refontes/21-marseille-essai.ts',
-        constante='CARTE_MARSEILLE_ESSAI', graine=214, base=62, raccord='ac', caves='ac', reseau=True,
+    'marseille_refonte': dict(
+        nom='Marseille', theme='marseille', textes='21-marseille.ts', fichier='../refontes/21-marseille.ts',
+        constante='CARTE_MARSEILLE_REFONTE', graine=214, base=62, raccord='ac', caves='ac', reseau=True,
         lieux=[
             ('plat', 12, dict(lettres='a', deco=3)),
             ('ponton', 42, dict(lettres='ac', digit='1')),  # le Vieux-Port, au ras de l'eau ; les gabians
