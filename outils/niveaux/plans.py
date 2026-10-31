@@ -479,8 +479,9 @@ NIVEAUX = {
         ],
     ),
     # L'International Tour refait (le chantier du level design, voir src/niveaux/refontes.ts et le Marseille refait plus haut) : à
-    # chaque ville son relief, ses quartiers de tours séparées par le vide (passerelles, tyroliennes ; niveaux/blocs.py) et ses
-    # complexes souterrains (niveaux/massifs.py). Les monuments restent : la cathédrale, le château, le pub, le pont de Brooklyn...
+    # chaque ville son relief, ses quartiers de tours séparées par le vide (passerelles, tyroliennes ; niveaux/blocs.py) ou par une
+    # rue sous une passerelle métallique, ses miradors, un plateau creusé d'une caverne (niveaux/plateaux.py) et ses complexes
+    # souterrains (niveaux/massifs.py). Les monuments restent : la cathédrale, le château, le pub, le pont de Brooklyn...
     'beauvais_refonte': dict(
         nom='Beauvais', theme='beauvais', textes='17-beauvais.ts', fichier='../refontes/17-beauvais.ts',
         constante='CARTE_BEAUVAIS_REFONTE', graine=172, base=58, raccord='ac', caves='ac', reseau=True,
@@ -490,6 +491,7 @@ NIVEAUX = {
             ('bloc', 28, dict(etages=4, lien='passerelle', ecart=10, mat='{', lettres='ac')),  # les immeubles du centre
             ('bloc', 26, dict(etages=5, lien='tyro', ecart=12, mat='{', lettres='ac', monte=-6)),
             ('bloc', 24, dict(etages=3, lien=None, ecart=0, mat='{', lettres='ac')),
+            ('miradors', 30, dict(lettres='ac')),  # du terrain dégagé, des miradors sur pilotis
             ('cathedrale_beauvais', 40, dict(lettres='ac', digit='2')),  # le chœur le plus haut du monde, sans nef
             ('plat', 10, dict(lettres='ac', digit='3', drones=2)),  # l'horloge astronomique ; les gargouilles s'envolent
             ('gouffre', 20, dict(lettres='ac', nb=4)),
@@ -498,13 +500,14 @@ NIVEAUX = {
             ('forteresse', 34, dict(etages=3, lettres='ac', mat='{', cage=True)),
             ('descente', 24, dict(chute=10, lettres='ac')),
             ('gymnase', 46, dict(lettres='ac')),  # le gymnase de JBT
-            ('bloc', 26, dict(etages=4, lien='passerelle', ecart=10, mat='B', lettres='ac')),  # le lycée et ses bâtiments
-            ('bloc', 28, dict(etages=5, lien='tyro', ecart=12, mat='B', lettres='ac', monte=-4)),
+            ('bloc', 26, dict(etages=4, lien='rue', ecart=8, mat='B', lettres='ac')),  # le lycée et ses bâtiments
+            ('bloc', 28, dict(etages=5, lien='rue', ecart=8, mat='B', lettres='ac')),
             ('bloc', 24, dict(etages=3, lien=None, ecart=0, mat='B', lettres='ac')),
             ('pont_singe', 22, dict(lettres='ac', butin='+')),
             ('grotte', 20, dict(monte=8, lettres='acl', butin='+')),
             ('descente', 24, dict(chute=8, lettres='ac')),
             ('plat', 10, dict(lettres='ac', digit='5', drones=1)),  # le dernier appel
+            ('plateau_caverne', 52, dict(monte=11, lettres='ac', butin='*')),  # le plateau, et la caverne qui le traverse
             ('avion', 52, dict(lettres='c')),  # l'avion low-cost sur le tarmac de Beauvais-Tillé
             ('arene', 40, dict(lettres='acz')),
         ],
@@ -526,6 +529,7 @@ NIVEAUX = {
             ('bloc', 26, dict(etages=4, lien='passerelle', ecart=10, mat='B', lettres='ac')),  # les maisons de brique géorgiennes
             ('bloc', 28, dict(etages=5, lien='tyro', ecart=12, mat='B', lettres='ac', monte=-6)),
             ('bloc', 24, dict(etages=3, lien=None, ecart=0, mat='B', lettres='ac')),
+            ('miradors', 30, dict(lettres='ac')),  # du terrain dégagé, des miradors sur pilotis
             ('pub', 26, dict(lettres='a', digit='4')),  # la session au pub
             ('gouffre', 20, dict(lettres='ac', nb=4)),
             ('corniches', 22, dict(monte=10, lettres='ac')),
@@ -534,6 +538,7 @@ NIVEAUX = {
             ('descente', 24, dict(chute=8, lettres='ac')),
             ('plat', 10, dict(lettres='au', digit='5')),  # Thomond Park : les supporters du Munster
             ('gradins', 30, dict(haut=6, lettres='au', cage=True, mat='R')),  # les tribunes du stade
+            ('plateau_caverne', 52, dict(monte=11, lettres='ac', butin='*')),  # le plateau, et la caverne qui le traverse
             ('barrage', 20, dict(haut=12, lettres='acu', butin='+')),
             ('arene', 40, dict(lettres='acu')),
         ],
@@ -549,6 +554,7 @@ NIVEAUX = {
             ('bloc', 26, dict(etages=4, lien='passerelle', ecart=10, mat='B', lettres='ac')),  # les résidences étudiantes
             ('bloc', 28, dict(etages=5, lien='tyro', ecart=12, mat='B', lettres='ac', monte=-6)),
             ('bloc', 24, dict(etages=3, lien=None, ecart=0, mat='B', lettres='ac')),
+            ('miradors', 30, dict(lettres='ac')),  # du terrain dégagé, des miradors sur pilotis
             ('cathedrale_lund', 48, dict(lettres='ac', digit='2')),  # la cathédrale romane, la crypte du géant Finn
             ('plat', 10, dict(lettres='ac', digit='3', plus=1)),  # l'horloge astronomique
             ('corniches', 22, dict(monte=10, lettres='ac')),  # on monte sur la colline de l'université
@@ -563,6 +569,7 @@ NIVEAUX = {
             ('descente', 24, dict(chute=8, lettres='acj')),
             ('gouffre', 20, dict(lettres='acj', nb=4)),
             ('barrage', 20, dict(haut=12, lettres='acj', tyro=11, butin='+')),
+            ('plateau_caverne', 52, dict(monte=11, lettres='ac', butin='*')),  # le plateau, et la caverne qui le traverse
             ('tour', 18, dict(etages=3, tyro=9, apres=13, lettres='ac', mat='B')),
             ('arene', 40, dict(lettres='acj')),
         ],
@@ -576,12 +583,13 @@ NIVEAUX = {
             ('bloc', 24, dict(etages=7, lien='tyro', ecart=12, mat='D', lettres='ac', monte=-4)),
             ('bloc', 28, dict(etages=5, lien='passerelle', ecart=9, mat='B', lettres='ac')),
             ('bloc', 22, dict(etages=6, lien=None, ecart=0, mat='D', lettres='ac')),
+            ('miradors', 30, dict(lettres='ac')),  # du terrain dégagé, des miradors sur pilotis
             ('bastion', 26, dict(haut=8, lettres='ac')),  # le socle de granit d'une banque
             ('plat', 10, dict(lettres='aa', digit='3', drones=2)),  # Wall Street ; les pigeons
             ('echafaudage', 22, dict(niveaux=3, lettres='ac')),
             ('corniches', 22, dict(monte=8, lettres='ac')),
-            ('bloc', 28, dict(etages=6, lien='tyro', ecart=12, mat='B', lettres='ac')),
-            ('bloc', 26, dict(etages=5, lien='passerelle', ecart=10, mat='D', lettres='ac')),
+            ('bloc', 28, dict(etages=6, lien='rue', ecart=8, mat='B', lettres='ac')),
+            ('bloc', 26, dict(etages=5, lien='rue', ecart=8, mat='D', lettres='ac')),
             ('bloc', 24, dict(etages=4, lien=None, ecart=0, mat='B', lettres='ac')),
             ('descente', 24, dict(chute=8, lettres='ac')),
             ('metro', 44, dict(lettres='c', digit='4')),  # le métro sous la rue
@@ -592,6 +600,7 @@ NIVEAUX = {
             ('descente', 24, dict(chute=8, lettres='ac')),
             ('puits', 24, dict(lettres='ac')),
             ('gouffre', 20, dict(lettres='ac', nb=4)),
+            ('plateau_caverne', 52, dict(monte=11, lettres='ac', butin='*')),  # le plateau, et la caverne qui le traverse
             ('pont_brooklyn', 56, dict(lettres='ac', digit='5')),  # le pont de Brooklyn
             ('arene', 40, dict(lettres='acn')),
         ],
@@ -606,6 +615,7 @@ NIVEAUX = {
             ('bloc', 26, dict(etages=4, lien='passerelle', ecart=10, mat='B', lettres='acl')),  # les maisons de brique du Glebe
             ('bloc', 24, dict(etages=3, lien='tyro', ecart=12, mat='B', lettres='ac', monte=-6)),
             ('bloc', 26, dict(etages=3, lien=None, ecart=0, mat='B', lettres='ac')),
+            ('miradors', 30, dict(lettres='ac')),  # du terrain dégagé, des miradors sur pilotis
             ('glebe', 34, dict(lettres='acii', chute=6, digit='2')),  # le Glebe Collegiate : on n'en sort qu'en bas
             ('plat', 10, dict(lettres='ac', drones=2)),  # les bernaches
             ('bastion', 26, dict(haut=8, lettres='ac')),
@@ -615,14 +625,15 @@ NIVEAUX = {
             ('parlement', 46, dict(lettres='acii', digit='4')),  # la tour de la Paix
             ('descente', 24, dict(chute=10, lettres='acl')),
             ('plat', 12, dict(lettres='cwl', digit='5', drones=2)),  # le marché By
-            ('bloc', 28, dict(etages=5, lien='passerelle', ecart=10, mat='D', lettres='ac')),  # les tours du centre-ville
-            ('bloc', 26, dict(etages=6, lien='tyro', ecart=12, mat='D', lettres='ac', monte=-4)),
+            ('bloc', 28, dict(etages=5, lien='rue', ecart=8, mat='D', lettres='ac')),  # les tours du centre-ville
+            ('bloc', 26, dict(etages=6, lien='rue', ecart=8, mat='D', lettres='ac')),
             ('bloc', 24, dict(etages=4, lien=None, ecart=0, mat='D', lettres='ac')),
             ('grotte', 20, dict(monte=8, lettres='ac', butin='+')),
             ('pont_singe', 22, dict(lettres='ac', butin='+')),
             ('puits', 24, dict(lettres='ac')),
             ('lac_gele', 36, dict(lettres='aw')),  # le canal gelé
             ('barrage', 20, dict(haut=12, lettres='acw', butin='+')),
+            ('plateau_caverne', 52, dict(monte=11, lettres='ac', butin='*')),  # le plateau, et la caverne qui le traverse
             ('tour', 18, dict(etages=3, tyro=9, apres=13, lettres='ac', mat='B')),
             ('arene', 40, dict(lettres='acwi')),
         ],

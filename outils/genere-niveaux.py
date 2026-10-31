@@ -20,6 +20,7 @@ from plans import NIVEAUX, enchaine
 from souterrain import souterrain, tonneaux_de_surface
 from massifs import reseau
 from blocs import bloc
+from plateaux import miradors, plateau_caverne
 from ferry import ferry
 from fise import bigair, breakdance, densite, entree, flat_bmx, food_court, gradins, halfpipe_bois, parc_street, soirees, spine, village
 from plage import festival
@@ -230,6 +231,12 @@ class Recette:
 
     def p_bloc(self, x0, x1, **kw):  # une tour d'une suite de blocs d'immeubles (voir niveaux/blocs.py)
         bloc(self, x0, x1, **kw)
+
+    def p_plateau_caverne(self, x0, x1, monte=11, lettres='a', butin='*'):  # voir niveaux/plateaux.py
+        plateau_caverne(self.n, x0, x1 - x0, monte, lettres, butin)
+
+    def p_miradors(self, x0, x1, lettres='a'):
+        miradors(self.n, x0, x1 - x0, lettres)
 
     # ---- le vide et l'escalade (voir niveaux/hauteurs.py)
     def p_pont_singe(self, x0, x1, lettres='a', butin=None):

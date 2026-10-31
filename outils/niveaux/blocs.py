@@ -149,6 +149,8 @@ def tour(n, x0, w, g, etages, mat, lettres, portes_g=(), portes_d=(), rng=None, 
 
 def bloc(r, x0, x1, etages=4, ecart=8, lien='passerelle', lettres='ac', mat=None, monte=0):
     """Une tour sur son massif, puis (sauf pour le dernier bloc d'une suite) le vide jusqu'au bloc suivant et ce qui le franchit.
+    `lien` : 'passerelle' ou 'tyro' (au-dessus du vide), 'rue' (pas de vide : la rue entre les deux tours, au même niveau, et une
+    passerelle métallique droite au-dessus, d'un étage à l'autre) ou None (le dernier bloc de la suite).
     `monte` : la tour se pose plus haut (négatif) ou plus bas que le terrain courant, quand rien ne l'impose."""
     n, rng = r.n, r.n.rng
     mat = mat or n.t['mur']
@@ -156,7 +158,13 @@ def bloc(r, x0, x1, etages=4, ecart=8, lien='passerelle', lettres='ac', mat=None
     attente = getattr(r, 'lien', None)
     voulu = n.base + monte
     portes_g = [0]
-    if attente and attente[0] == 'passerelle':
+    if attente and attente[0] == 'rue':
+        # de l'autre côté de la rue, au même niveau : la passerelle arrive à un étage de cette tour (au besoin le dernier)
+        g = attente[2]
+        portes_g = [0, min(attente[3], etages - 1)]
+        if attente[3] > etages - 1:
+            etages = attente[3] + 1
+    elif attente and attente[0] == 'passerelle':
         # un plancher de cette tour doit tomber sur la passerelle : le rez-de-chaussée en est à un nombre entier d'étages
         yb = attente[1]
         j = min(range(1, etages), key=lambda j: abs(yb + j * ETAGE - voulu))
@@ -170,9 +178,9 @@ def bloc(r, x0, x1, etages=4, ecart=8, lien='passerelle', lettres='ac', mat=None
     g = min(g, n.bas - 14)
     for x in range(x0, x0 + w):
         n.base_col(x, g)
-    portes_d = [] if lien else [0]
+    portes_d = [] if lien in ('passerelle', 'tyro') else [0]
     jp = None
-    if lien == 'passerelle':
+    if lien in ('passerelle', 'rue'):
         jp = rng.randrange(1, etages)
         portes_d.append(jp)
     top, ta, tb = tour(n, x0, w, g, etages, mat, lettres, portes_g, portes_d, rng, butin=x0 // 7)
@@ -181,6 +189,13 @@ def bloc(r, x0, x1, etages=4, ecart=8, lien='passerelle', lettres='ac', mat=None
     n.repere(x0 + 3, '!', ymin=g - ETAGE + 1)  # un drapeau au rez-de-chaussée de chaque tour
     if not lien:
         r.lien = None
+        n.base = g
+        return
+    if lien == 'rue':  # la rue reste au sol, la passerelle passe au-dessus, droite et métallique (des pitons de place en place)
+        yb = _plancher(g, jp)
+        for x in range(x0 + w, x1):
+            n.set(x, yb, '=' if (x - x0 - w) % 4 == 0 else '-')
+        r.lien = ('rue', x1, g, jp)
         n.base = g
         return
     abime(n, x0 + w, x1)
