@@ -146,3 +146,76 @@ export function habilleMur(c: CanvasRenderingContext2D, source: HTMLCanvasElemen
   if (bas && g) coinRond(pi, true, false, 4 * D, lisere);
   if (bas && d) coinRond(pi, false, false, 4 * D, lisere);
 }
+
+/** Un moellon : une pierre aux coins adoucis, sa face, son arête claire en haut et à gauche, son ombre en bas et à droite. */
+function moellon(pi: Pinceau, x: number, y: number, w: number, h: number, base: string): void {
+  pi.p(x + 1, y, w - 2, h, base);
+  pi.p(x, y + 1, w, h - 2, base);
+  pi.p(x + 1, y, w - 2, 1, teinte(base, 0.28));
+  pi.p(x, y + 1, 1, h - 2, teinte(base, 0.14));
+  pi.p(x + 1, y + h - 1, w - 2, 1, teinte(base, -0.3));
+  pi.p(x + w - 1, y + 1, 1, h - 2, teinte(base, -0.2));
+}
+
+/** La pierre calcaire (Provence, Beauvais) : des moellons clairs et inégaux en assises, aux joints de mortier en retrait. */
+export function pierre(pi: Pinceau, graine: number): void {
+  const joint = '#7c6e55';
+  pi.p(0, 0, N, N, joint);
+  const assises = graine % 2 ? [0, 5, 11, 16] : [0, 6, 10, 16];
+  for (let i = 0; i < 3; i++) {
+    const y = assises[i]! * D + 1;
+    const h = (assises[i + 1]! - assises[i]!) * D - 2;
+    let x = (i + graine) % 2 ? -4 * D : 0;
+    let k = 0;
+    while (x < N) {
+      const w = (6 + ((graine + i * 3 + k) % 3)) * D;
+      const v = hasard(graine + k, i, 66);
+      const base = v < 0.33 ? '#c2b28e' : v < 0.66 ? '#cfc09c' : '#d9cba8';
+      moellon(pi, x + 1, y, w - 2, h, base);
+      // le grain du calcaire, et parfois une épaufrure
+      pi.p(x + 4 + ((graine * 7 + k * 5) % Math.max(1, w - 8)), y + 3, 2, 1, teinte(base, -0.15));
+      if (v > 0.85) pi.p(x + w - 6, y + h - 3, 4, 3, joint);
+      x += w;
+      k++;
+    }
+  }
+  pi.grain('#a89878', 10, graine + 1, 1);
+}
+
+/** La pierre de taille (granit) : deux assises de gros blocs gris aux arêtes taillées, joints sombres ; presque incassable. */
+export function granit(pi: Pinceau, graine: number): void {
+  pi.p(0, 0, N, N, '#30303a');
+  for (const [y0, dx] of [
+    [0, graine % 2 ? 8 : 0],
+    [8, graine % 2 ? 0 : 8],
+  ] as const)
+    for (const x0 of [dx - 16, dx - 8, dx, dx + 8]) {
+      if (x0 >= 16 || x0 + 8 <= 0) continue;
+      const v = hasard(graine + x0, y0, 67);
+      moellon(pi, x0 * D + 2, y0 * D + 2, 8 * D - 3, 8 * D - 3, v < 0.5 ? '#6e6e7a' : '#767684');
+      pi.p(x0 * D + 8, y0 * D + 10, 3, 2, '#5c5c68');
+      pi.p(x0 * D + 18, y0 * D + 20, 2, 2, '#86869a');
+    }
+}
+
+/** Le toit : des rangs de tuiles canal qui se chevauchent, en terre cuite, chaque tuile arrondie en bas, plus ou moins rouge. */
+export function toit(pi: Pinceau, graine: number): void {
+  pi.p(0, 0, N, N, '#5a2216');
+  const larg = 4 * D;
+  for (let r = 0; r < 4; r++) {
+    const y = r * 4 * D;
+    const dec = r % 2 ? larg / 2 : 0;
+    for (let x = -larg + dec; x < N; x += larg) {
+      const v = hasard(graine + x, r, 68);
+      const base = v < 0.3 ? '#a8432c' : v < 0.75 ? '#b84e33' : '#c55c3c';
+      // la tuile : un demi-tube, clair au milieu, sombre sur les bords, le bas arrondi
+      pi.p(x + 1, y, larg - 2, 4 * D - 1, base);
+      pi.p(x + 2, y + 4 * D - 1, larg - 4, 1, base);
+      pi.p(x + larg / 2 - 2, y + 1, 3, 4 * D - 4, teinte(base, 0.25));
+      pi.p(x + 1, y, 1, 4 * D - 1, teinte(base, -0.3));
+      pi.p(x + larg - 2, y, 1, 4 * D - 1, teinte(base, -0.25));
+      pi.p(x + 2, y + 4 * D, larg - 4, 1, 'rgba(0,0,0,0.35)');
+      if (v > 0.9) pi.p(x + 4, y + 6, 3, 2, '#7a7a52'); // un peu de mousse
+    }
+  }
+}

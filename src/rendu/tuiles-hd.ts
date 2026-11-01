@@ -3,7 +3,7 @@ import { T } from '../monde/tuiles';
 import { COTE, DEBORD } from './bords-tuiles';
 import { THEMES, type Theme } from './themes';
 import { BOIS, BOIS_SCELLE, BOIS_VIEUX, echelle, madrier, planche, poutrelle } from './tuiles-hd-bois';
-import { beton, brique, habilleMur, metal, paroi, vitre } from './tuiles-hd-murs';
+import { beton, brique, granit, habilleMur, metal, paroi, pierre, toit, vitre } from './tuiles-hd-murs';
 import { D, N, Pinceau, coinRond, hasard } from './tuiles-hd-outils';
 import { habilleSol, sol } from './tuiles-hd-sols';
 
@@ -40,8 +40,16 @@ const HD = new Set<number>([
   T.BETON,
   T.METAL,
   T.VITRE,
+  T.PIERRE,
+  T.GRANIT,
+  T.TOIT,
   ...SOLS,
 ]);
+/** les murs qui s'habillent comme la terre (bords ombrés, coins arrondis) */
+const MURS_HABILLES = new Set<number>([T.BRIQUE, T.PIERRE, T.GRANIT, T.TOIT]);
+/** les tuiles HD validées : tout le monde les a, même sans le mode essai */
+const PUBLIEES = new Set<number>([T.BRIQUE, T.SABLE]);
+const hd = (t: number) => (actives ? HD.has(t) : PUBLIEES.has(t));
 
 const caches = new WeakMap<Theme, Map<string, HTMLCanvasElement>>();
 
@@ -79,8 +87,9 @@ export function tuileHD(
   theme: Theme,
   enBois = false,
 ): TuileHD | null {
-  if (!actives || !HD.has(t)) return null;
-  const graine = Math.floor(hasard(tx, ty, 3) * 4);
+  if (!hd(t)) return null;
+  // la roche suit un motif de 2 × 2 tuiles (ses pierres se raccordent) : sa graine est la parité de la case
+  const graine = t === T.ROCHE ? (tx & 1) + 2 * (ty & 1) : Math.floor(hasard(tx, ty, 3) * 4);
   if (SOLS.has(t)) {
     const brute = toile(theme, `s${t}:${graine}`, N, (c) => sol(new Pinceau(c), t, theme.terre, graine));
     if (!cotes) return { toile: brute, debord: false };
@@ -116,17 +125,24 @@ export function tuileHD(
     const allumee = hasard(tx, ty, 75) < 0.5;
     cle = `v:${graine}:${allumee}`;
     peins = (pi) => vitre(pi, graine, allumee);
-  } else if (t === T.BRIQUE && cotes) {
-    // la brique à l'air libre : ses bords ombrés et ses coins arrondis, comme la terre
+  } else if (MURS_HABILLES.has(t) && cotes) {
+    // un mur à l'air libre (brique, pierre, granit, toit) : ses bords ombrés et ses coins arrondis, comme la terre
     const brute = tuileHD(t, 0, tx, ty, theme)!.toile;
     return {
-      toile: toile(theme, `bh:${graine}:${cotes}`, N, (c) => habilleMur(c, brute, cotes)),
+      toile: toile(theme, `mh${t}:${graine}:${cotes}`, N, (c) => habilleMur(c, brute, cotes)),
       debord: false,
     };
   } else {
     cle = `m${t}:${graine}`;
-    peins = (pi) =>
-      t === T.BRIQUE ? brique(pi, graine) : t === T.BETON ? beton(pi, graine) : metal(pi, graine);
+    const peintres: Partial<Record<number, (pi: Pinceau, graine: number) => void>> = {
+      [T.BRIQUE]: brique,
+      [T.BETON]: beton,
+      [T.PIERRE]: pierre,
+      [T.GRANIT]: granit,
+      [T.TOIT]: toit,
+    };
+    const peintre = peintres[t] ?? metal;
+    peins = (pi) => peintre(pi, graine);
   }
   return { toile: toile(theme, cle, N, (c) => peins(new Pinceau(c))), debord: false };
 }
@@ -149,9 +165,9 @@ export function paroiHD(theme: Theme, cotes: number, tx: number, ty: number): HT
   });
 }
 
-/** Les côtés libres d'une brique (elle s'arrondit en mode essai ; ailleurs, `cotes` est rendu tel quel). */
+/** Les côtés libres d'un mur qui s'habille (brique, pierre, granit, toit) en haute définition ; sinon `cotes` tel quel. */
 export function cotesHD(carte: Carte, t: number, tx: number, ty: number, cotes: number): number {
-  if (!actives || t !== T.BRIQUE) return cotes;
+  if (!MURS_HABILLES.has(t) || !hd(t)) return cotes;
   let c = 0;
   if (!carte.solide(tx, ty - 1)) c |= COTE.HAUT;
   if (!carte.solide(tx + 1, ty)) c |= COTE.DROITE;

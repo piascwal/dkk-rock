@@ -47,11 +47,13 @@ export function dessineTuiles(
         else ctx.drawImage(atlas.paroiHabillee(cp), x, y);
       } else if (plein && aUnCoin(cotes)) {
         const fond = hd ? paroiHD(atlas.theme, 0, tx, ty) : null;
-        for (const [dx, dy] of coinsDeParoi(carte, tx, ty, cotes))
-          if (fond) {
-            const [cx, cy] = [dx ? TUILE - 4 : 0, dy ? TUILE - 4 : 0];
-            ctx.drawImage(fond, cx * 4, cy * 4, 16, 16, x + cx, y + cy, 4, 4);
-          } else ctx.drawImage(atlas.paroi, dx, dy, 3, 3, x + dx, y + dy, 3, 3);
+        for (const [dx, dy] of coinsDeParoi(carte, tx, ty, cotes)) {
+          // une tuile HD a des coins plus grands (4 pixels) : la paroi les remplit d'autant (la HD, ou l'ancienne hors essai)
+          const [cx, cy] = [dx ? TUILE - 4 : 0, dy ? TUILE - 4 : 0];
+          if (fond) ctx.drawImage(fond, cx * 4, cy * 4, 16, 16, x + cx, y + cy, 4, 4);
+          else if (hd) ctx.drawImage(atlas.paroi, cx, cy, 4, 4, x + cx, y + cy, 4, 4);
+          else ctx.drawImage(atlas.paroi, dx, dy, 3, 3, x + dx, y + dy, 3, 3);
+        }
       }
       if (t === T.VIDE) continue;
       // bords à l'air libre : coins arrondis, ombrage, dessus herbeux (voir bords-tuiles.ts)

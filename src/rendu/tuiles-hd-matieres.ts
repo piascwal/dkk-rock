@@ -1,9 +1,9 @@
 import { bruit } from '../moteur/maths';
-import { N, type Pinceau } from './tuiles-hd-outils';
+import { N, type Pinceau, teinte } from './tuiles-hd-outils';
 
 /**
  * Les matières naturelles en haute définition : la roche, le sable, la glace et le socle (voir tuiles-hd-sols.ts). Pas de blocs
- * taillés : des masses de tons irrégulières, tirées d'un bruit qui se répète exactement d'une tuile à l'autre (les tuiles voisines
+ * taillés : des pierres arrondies, des masses de tons irrégulières, tirées d'un bruit qui se répète exactement d'une tuile à l'autre (les tuiles voisines
  * se raccordent, on ne voit pas la grille), puis des détails propres à chaque case (fissures, éclats, grains).
  */
 
@@ -57,14 +57,55 @@ function fissure(pi: Pinceau, graine: number, long: number, sombre: string, clai
   }
 }
 
-/** La roche : des masses de gris irrégulières, une ou deux fissures, des éclats clairs, quelques cailloux incrustés. */
-export function roche(pi: Pinceau, graine: number): void {
-  masses(pi, ['#55555f', '#62626d', '#6e6e7a', '#7b7b88', '#8a8a97'], 7);
-  fissure(pi, graine, 14 + (graine % 3) * 4, '#3e3e47', '#9898a6');
-  if (graine % 2) fissure(pi, graine + 11, 9, '#3e3e47', '#9898a6');
-  // des éclats clairs et des creux sombres, épars
-  pi.grain('#a2a2b0', 10, graine + 3, 1);
-  pi.grain('#464650', 12, graine + 5, 2);
+/**
+ * La roche : des pierres arrondies de tailles variées, serrées dans une gangue sombre, chacune éclairée en haut à gauche et ombrée
+ * en bas à droite. Le motif s'étend sur 2 × 2 tuiles et se répète sans couture : `quart` dit quel quart de ce motif peindre
+ * (la parité de la case en x et en y), les tuiles voisines se raccordent exactement.
+ */
+export function roche(pi: Pinceau, quart: number): void {
+  const P = 2 * N; // la période du motif
+  const qx = (quart & 1) * N;
+  const qy = (quart >> 1) * N;
+  // la gangue : un gris brun sombre, piqué
+  pi.p(0, 0, N, N, '#4a4650');
+  for (let i = 0; i < 40; i++) {
+    const x = Math.floor(bruit(i, quart, 91) * N);
+    const y = Math.floor(bruit(quart, i, 92) * N);
+    pi.p(x, y, 1, 1, i % 2 ? '#3c3842' : '#57535e');
+  }
+  // les pierres : une par maille de 16 pixels d'art, décalée au hasard, de rayon variable
+  const pas = 16;
+  for (let gy = 0; gy < P / pas; gy++)
+    for (let gx = 0; gx < P / pas; gx++) {
+      const cx = gx * pas + 3 + bruit(gx, gy, 93) * (pas - 6);
+      const cy = gy * pas + 3 + bruit(gy, gx, 94) * (pas - 6);
+      const rx = 5 + bruit(gx, gy, 95) * 6;
+      const ry = rx * (0.7 + bruit(gy, gx, 96) * 0.3);
+      const v = bruit(gx + 7, gy + 3, 97);
+      const base = v < 0.33 ? '#6c6874' : v < 0.66 ? '#77737f' : '#827e8a';
+      // la pierre et ses copies (le motif se répète) : on ne peint que ce qui tombe dans ce quart
+      for (const ox of [-P, 0, P])
+        for (const oy of [-P, 0, P]) {
+          const sx = cx + ox - qx;
+          const sy = cy + oy - qy;
+          if (sx + rx < 0 || sx - rx > N || sy + ry < 0 || sy - ry > N) continue;
+          for (let y = Math.floor(sy - ry); y <= Math.ceil(sy + ry); y++)
+            for (let x = Math.floor(sx - rx); x <= Math.ceil(sx + rx); x++) {
+              if (x < 0 || y < 0 || x >= N || y >= N) continue;
+              const dx = (x + 0.5 - sx) / rx;
+              const dy = (y + 0.5 - sy) / ry;
+              const d = dx * dx + dy * dy;
+              if (d > 1) continue;
+              let c = base;
+              if (d > 0.78)
+                c = '#34303a'; // le contour, là où la pierre s'enfonce dans la gangue
+              else if (dx + dy < -0.75)
+                c = teinte(base, 0.28); // l'éclat de lumière, en haut à gauche
+              else if (dx + dy > 0.55) c = teinte(base, -0.25); // l'ombre, en bas à droite
+              pi.p(x, y, 1, 1, c);
+            }
+        }
+    }
 }
 
 /** Le sable : un ocre doux, des rides de vent qui ondulent, des grains clairs et sombres, un coquillage parfois. */
