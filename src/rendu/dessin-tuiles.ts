@@ -4,7 +4,7 @@ import type { Tyrolienne } from '../jeu/contexte';
 import type { Carte } from '../monde/carte';
 import { T, TUILES_LEGERES } from '../monde/tuiles';
 import type { AtlasTuiles } from './atlas-tuiles';
-import { tuileHD } from './tuiles-hd';
+import { paroiHD, tuileHD } from './tuiles-hd';
 import { dessineVegetation } from './vegetation';
 import { aUnCoin, coinsDeParoi, cotesLibres, cotesParoi, DEBORD } from './bords-tuiles';
 
@@ -34,20 +34,27 @@ export function dessineTuiles(
       const cotes = t === T.VIDE || t === T.EAU ? 0 : cotesLibres(carte, t, tx, ty);
       // la paroi de fond, aux coins extérieurs arrondis ; derrière un coin arrondi d'une tuile pleine, elle remplit
       // les angles où elle continue (sinon on verrait le ciel par ces angles)
-      if (carte.aFond(tx, ty) && (!plein || aUnCoin(cotes)))
-        ctx.drawImage(atlas.paroiHabillee(cotesParoi(carte, tx, ty)), x, y);
-      else if (plein && aUnCoin(cotes))
+      // une tuile peinte en haute définition (mode essai, voir tuiles-hd.ts) : ses coins arrondis sont plus grands (4 pixels)
+      const hd = t === T.VIDE ? null : tuileHD(t, cotes, tx, ty, atlas.theme);
+      if (carte.aFond(tx, ty) && (!plein || aUnCoin(cotes))) {
+        const cp = cotesParoi(carte, tx, ty);
+        const fond = paroiHD(atlas.theme, cp, tx, ty);
+        if (fond) dessineFin(ctx, fond, x, y, TUILE, TUILE, finesse);
+        else ctx.drawImage(atlas.paroiHabillee(cp), x, y);
+      } else if (plein && aUnCoin(cotes)) {
+        const fond = hd ? paroiHD(atlas.theme, 0, tx, ty) : null;
         for (const [dx, dy] of coinsDeParoi(carte, tx, ty, cotes))
-          ctx.drawImage(atlas.paroi, dx, dy, 3, 3, x + dx, y + dy, 3, 3);
+          if (fond) {
+            const [cx, cy] = [dx ? TUILE - 4 : 0, dy ? TUILE - 4 : 0];
+            ctx.drawImage(fond, cx * 4, cy * 4, 16, 16, x + cx, y + cy, 4, 4);
+          } else ctx.drawImage(atlas.paroi, dx, dy, 3, 3, x + dx, y + dy, 3, 3);
+      }
       if (t === T.VIDE) continue;
       // bords à l'air libre : coins arrondis, ombrage, dessus herbeux (voir bords-tuiles.ts)
-      const hd = tuileHD(t, cotes);
       const habillee = !hd && cotes ? atlas.habillee(t, tx, ty, cotes) : null;
       if (hd) {
-        // une tuile peinte en haute définition (mode essai) : lissée sur un affichage moins fin, comme un sprite fourni
-        ctx.imageSmoothingEnabled = finesse < 6;
-        ctx.drawImage(hd, x, y, TUILE, TUILE);
-        ctx.imageSmoothingEnabled = false;
+        const h = hd.debord ? DEBORD : 0;
+        dessineFin(ctx, hd.toile, x, y - h, TUILE, TUILE + h, finesse);
       } else if (habillee) ctx.drawImage(habillee, x, y - DEBORD);
       else {
         const toile = atlas.toile(t, tx, ty);
@@ -163,4 +170,19 @@ function refletOr(ctx: CanvasRenderingContext2D, x0: number, y0: number, cote: n
     }
   }
   ctx.restore();
+}
+
+/** Une toile plus fine que le jeu (une tuile HD) : lissée sur un affichage moins fin, comme un sprite fourni. */
+function dessineFin(
+  ctx: CanvasRenderingContext2D,
+  toile: HTMLCanvasElement,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  finesse: number,
+): void {
+  ctx.imageSmoothingEnabled = finesse < 4;
+  ctx.drawImage(toile, x, y, w, h);
+  ctx.imageSmoothingEnabled = false;
 }
