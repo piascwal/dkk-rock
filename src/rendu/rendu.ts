@@ -10,7 +10,8 @@ import { Camera } from './camera';
 import { dessineCarteMonde } from './carte-monde';
 import { dessineEntite } from './dessin-entites';
 import { dessineDecor, semeDecor, type CoucheDecor } from './decor';
-import { dessineTuiles, dessineTyroliennes } from './dessin-tuiles';
+import { dessineTyroliennes } from './dessin-tuiles';
+import { PlaqueTuiles } from './plaque-tuiles';
 import { Emojis } from './emojis';
 import { Fond } from './fonds';
 import { PremierPlan } from './premier-plan';
@@ -46,6 +47,8 @@ export class Rendu {
   private readonly restes = new RockersRestes();
   private readonly braises = new Braises();
   private readonly traits = new TraitsPersos();
+  /** la photo des tuiles, recollée à chaque image (voir plaque-tuiles.ts) */
+  private readonly plaque = new PlaqueTuiles();
   /** le concours de drift du pré du Clos (phase `drift`) */
   private readonly drift = new RenduDrift();
   /** le concours de plongeon du pont des Tuves (phase `plongeon`) */
@@ -305,7 +308,7 @@ export class Rendu {
         this.theme.lointain,
       );
     decore('fond');
-    dessineTuiles(ctx, carte, this.atlas, camX, camY, this.largeur, this.tick);
+    this.plaque.dessine(ctx, carte, this.atlas, camX, camY, this.largeur, this.tick);
     navire?.navire(ctx, camX, camY, vue.navire, this.tick);
     decore('interieur');
     // les projecteurs du club éclairent les murs, sous les personnages (et la nuit tombe sur la plage)
