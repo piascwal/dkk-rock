@@ -1,8 +1,9 @@
+import type { Carte } from '../monde/carte';
 import { T } from '../monde/tuiles';
 import { COTE, DEBORD } from './bords-tuiles';
 import { THEMES, type Theme } from './themes';
 import { BOIS, BOIS_SCELLE, BOIS_VIEUX, echelle, madrier, planche, poutrelle } from './tuiles-hd-bois';
-import { beton, brique, metal, paroi, vitre } from './tuiles-hd-murs';
+import { beton, brique, habilleMur, metal, paroi, vitre } from './tuiles-hd-murs';
 import { D, N, Pinceau, coinRond, hasard } from './tuiles-hd-outils';
 import { habilleSol, sol } from './tuiles-hd-sols';
 
@@ -29,7 +30,7 @@ const URBAINS = new Set<Theme>([
   THEMES.port,
   THEMES.ottawa,
 ]);
-const SOLS = new Set<number>([T.TERRE, T.ROCHE, T.NEIGE]);
+const SOLS = new Set<number>([T.TERRE, T.ROCHE, T.NEIGE, T.SABLE, T.GLACE, T.SOCLE]);
 const HD = new Set<number>([
   T.ECHELLE,
   T.ECHELON,
@@ -70,7 +71,14 @@ export interface TuileHD {
 }
 
 /** La tuile `t` de la case (tx, ty) en haute définition, ou null si elle n'en a pas ou si l'essai est éteint. */
-export function tuileHD(t: number, cotes: number, tx: number, ty: number, theme: Theme): TuileHD | null {
+export function tuileHD(
+  t: number,
+  cotes: number,
+  tx: number,
+  ty: number,
+  theme: Theme,
+  enBois = false,
+): TuileHD | null {
   if (!actives || !HD.has(t)) return null;
   const graine = Math.floor(hasard(tx, ty, 3) * 4);
   if (SOLS.has(t)) {
@@ -100,13 +108,21 @@ export function tuileHD(t: number, cotes: number, tx: number, ty: number, theme:
     cle = `p:${graine}:${bouts}:${vieux}:${console}`;
     peins = (pi) => planche(pi, bouts, vieux ? BOIS_VIEUX : BOIS, console, graine);
   } else if (t === T.PITON) {
-    const urbain = URBAINS.has(theme);
+    // un piton relié à une plateforme de planches est en bois lui aussi : deux matériaux sur un même pont, ce serait étrange
+    const urbain = URBAINS.has(theme) && !enBois;
     cle = `i:${graine}:${bouts}:${urbain}`;
     peins = (pi) => (urbain ? poutrelle(pi, bouts) : madrier(pi, bouts, graine));
   } else if (t === T.VITRE) {
     const allumee = hasard(tx, ty, 75) < 0.5;
     cle = `v:${graine}:${allumee}`;
     peins = (pi) => vitre(pi, graine, allumee);
+  } else if (t === T.BRIQUE && cotes) {
+    // la brique à l'air libre : ses bords ombrés et ses coins arrondis, comme la terre
+    const brute = tuileHD(t, 0, tx, ty, theme)!.toile;
+    return {
+      toile: toile(theme, `bh:${graine}:${cotes}`, N, (c) => habilleMur(c, brute, cotes)),
+      debord: false,
+    };
   } else {
     cle = `m${t}:${graine}`;
     peins = (pi) =>
@@ -131,4 +147,26 @@ export function paroiHD(theme: Theme, cotes: number, tx: number, ty: number): HT
     if (b && g) coinRond(pi, true, false, 4 * D);
     if (b && d) coinRond(pi, false, false, 4 * D);
   });
+}
+
+/** Les côtés libres d'une brique (elle s'arrondit en mode essai ; ailleurs, `cotes` est rendu tel quel). */
+export function cotesHD(carte: Carte, t: number, tx: number, ty: number, cotes: number): number {
+  if (!actives || t !== T.BRIQUE) return cotes;
+  let c = 0;
+  if (!carte.solide(tx, ty - 1)) c |= COTE.HAUT;
+  if (!carte.solide(tx + 1, ty)) c |= COTE.DROITE;
+  if (!carte.solide(tx, ty + 1)) c |= COTE.BAS;
+  if (!carte.solide(tx - 1, ty)) c |= COTE.GAUCHE;
+  return c;
+}
+
+/** Un piton relié, de proche en proche sur sa rangée, à une plateforme de planches : il sera en bois. */
+export function pitonEnBois(carte: Carte, tx: number, ty: number): boolean {
+  for (const pas of [-1, 1])
+    for (let x = tx + pas, k = 0; k < 24; x += pas, k++) {
+      const v = carte.get(x, ty);
+      if (v === T.PLATEFORME) return true;
+      if (v !== T.PITON) break;
+    }
+  return false;
 }

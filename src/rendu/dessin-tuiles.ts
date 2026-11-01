@@ -4,7 +4,7 @@ import type { Tyrolienne } from '../jeu/contexte';
 import type { Carte } from '../monde/carte';
 import { T, TUILES_LEGERES } from '../monde/tuiles';
 import type { AtlasTuiles } from './atlas-tuiles';
-import { paroiHD, tuileHD } from './tuiles-hd';
+import { cotesHD, paroiHD, pitonEnBois, tuileHD } from './tuiles-hd';
 import { dessineVegetation } from './vegetation';
 import { aUnCoin, coinsDeParoi, cotesLibres, cotesParoi, DEBORD } from './bords-tuiles';
 
@@ -31,11 +31,15 @@ export function dessineTuiles(
       const y = ty * TUILE - camY;
       const plein = t !== T.VIDE && !TUILES_LEGERES.has(t);
       // l'eau n'a ni herbe ni bords arrondis : elle épouse ce qui l'entoure
-      const cotes = t === T.VIDE || t === T.EAU ? 0 : cotesLibres(carte, t, tx, ty);
+      const cotes =
+        t === T.VIDE || t === T.EAU ? 0 : cotesHD(carte, t, tx, ty, cotesLibres(carte, t, tx, ty));
       // la paroi de fond, aux coins extérieurs arrondis ; derrière un coin arrondi d'une tuile pleine, elle remplit
       // les angles où elle continue (sinon on verrait le ciel par ces angles)
       // une tuile peinte en haute définition (mode essai, voir tuiles-hd.ts) : ses coins arrondis sont plus grands (4 pixels)
-      const hd = t === T.VIDE ? null : tuileHD(t, cotes, tx, ty, atlas.theme);
+      const hd =
+        t === T.VIDE
+          ? null
+          : tuileHD(t, cotes, tx, ty, atlas.theme, t === T.PITON && pitonEnBois(carte, tx, ty));
       if (carte.aFond(tx, ty) && (!plein || aUnCoin(cotes))) {
         const cp = cotesParoi(carte, tx, ty);
         const fond = paroiHD(atlas.theme, cp, tx, ty);

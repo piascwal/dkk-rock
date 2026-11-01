@@ -1,10 +1,11 @@
 import { bruit } from '../moteur/maths';
 import { T } from '../monde/tuiles';
 import { COTE, DEBORD } from './bords-tuiles';
+import { glace, roche, sable, socle } from './tuiles-hd-matieres';
 import { D, N, Pinceau, coinRond, teinte } from './tuiles-hd-outils';
 
 /**
- * La terre, la roche et la neige en haute définition (voir tuiles-hd.ts), et leur habillage selon les côtés libres : le dessus
+ * La terre, la roche, la neige, le sable, la glace et le socle en haute définition (voir tuiles-hd.ts), et leur habillage selon les côtés libres : le dessus
  * herbeux de la terre (une bande irrégulière, des touffes qui dépassent), l'ombre des flancs et du dessous, et les coins
  * arrondis en vraies courbes (un quart de cercle de quatre pixels du jeu, plus les paliers 3-2-1 de la tuile de 16).
  */
@@ -26,35 +27,15 @@ export function sol(pi: Pinceau, t: number, terre: string, graine: number): void
       pi.p(x, y, 3, 1, '#9a948a');
       pi.p(x + 1, y + 3, 3, 1, teinte(terre, -0.35));
     }
-  } else if (t === T.ROCHE) {
-    pi.p(0, 0, N, N, '#6d6d78');
-    // des blocs de pierre aux arêtes adoucies, décalés d'une case à l'autre (sinon on voit la grille des tuiles)
-    const dec = (graine * 21) % N;
-    for (const [x, y, w, h] of [
-      [2, 2, 28, 18],
-      [32, 4, 30, 20],
-      [4, 24, 22, 20],
-      [28, 28, 34, 16],
-      [2, 46, 30, 16],
-      [34, 46, 28, 16],
-    ] as const) {
-      const v = (graine + x + y) % 3;
-      const coul = v === 0 ? '#74747f' : v === 1 ? '#686873' : '#7c7c88';
-      for (const k of [0, -N]) {
-        const xx = x + dec + k;
-        pi.p(xx + 1, y, w - 2, h, coul);
-        pi.p(xx, y + 1, w, h - 2, coul);
-        pi.p(xx + 1, y, w - 2, 1, '#9393a0');
-        pi.p(xx + 1, y + h - 1, w - 2, 1, '#50505a');
-      }
-    }
-    pi.grain('#5a5a64', 14, graine, 1);
-  } else {
+  } else if (t === T.ROCHE) roche(pi, graine);
+  else if (t === T.SABLE) sable(pi, graine);
+  else if (t === T.GLACE) glace(pi, graine);
+  else if (t === T.SOCLE) socle(pi, graine);
+  else {
     // la neige : un blanc bleuté, des creux d'ombre bleue, quelques scintillements
     pi.p(0, 0, N, N, '#e6f0fb');
     pi.grain('#c9daee', 20, graine, 3);
     pi.grain('#ffffff', 10, graine + 4, 1);
-    pi.p(0, N - 2, N, 2, '#b8cbe2');
   }
 }
 

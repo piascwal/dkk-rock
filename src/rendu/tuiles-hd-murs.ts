@@ -1,4 +1,5 @@
-import { CONTOUR, D, N, type Pinceau, hasard, teinte } from './tuiles-hd-outils';
+import { COTE } from './bords-tuiles';
+import { CONTOUR, D, N, Pinceau, coinRond, hasard, teinte } from './tuiles-hd-outils';
 
 /**
  * Les murs en haute définition (voir tuiles-hd.ts) : la brique, le béton, le métal, la vitre et la paroi de fond. Chaque tuile a
@@ -125,4 +126,23 @@ export function paroi(pi: Pinceau, couleur: string, graine: number): void {
   pi.grain(teinte(couleur, -0.3), 18, graine, 2);
   pi.grain(teinte(couleur, 0.08), 10, graine + 5, 1);
   pi.p(0, 0, N, 1, 'rgba(0,0,0,0.25)');
+}
+
+/** Un mur habillé selon ses côtés libres, comme la terre : le dessous et les flancs ombrés, l'arête du haut éclairée, les coins arrondis. */
+export function habilleMur(c: CanvasRenderingContext2D, source: HTMLCanvasElement, cotes: number): void {
+  const pi = new Pinceau(c);
+  c.drawImage(source, 0, 0);
+  const g = (cotes & COTE.GAUCHE) !== 0;
+  const d = (cotes & COTE.DROITE) !== 0;
+  const haut = (cotes & COTE.HAUT) !== 0;
+  const bas = (cotes & COTE.BAS) !== 0;
+  if (bas) pi.p(0, N - 2 * D, N, 2 * D, 'rgba(0,0,0,0.22)');
+  if (g) pi.p(0, 0, D, N, 'rgba(0,0,0,0.12)');
+  if (d) pi.p(N - D, 0, D, N, 'rgba(0,0,0,0.24)');
+  if (haut) pi.p(0, 0, N, 2, 'rgba(255,255,255,0.25)');
+  const lisere = 'rgba(0,0,0,0.35)';
+  if (haut && g) coinRond(pi, true, true, 4 * D);
+  if (haut && d) coinRond(pi, false, true, 4 * D);
+  if (bas && g) coinRond(pi, true, false, 4 * D, lisere);
+  if (bas && d) coinRond(pi, false, false, 4 * D, lisere);
 }
