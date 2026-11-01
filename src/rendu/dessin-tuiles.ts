@@ -4,9 +4,9 @@ import type { Tyrolienne } from '../jeu/contexte';
 import type { Carte } from '../monde/carte';
 import { T, TUILES_LEGERES } from '../monde/tuiles';
 import type { AtlasTuiles } from './atlas-tuiles';
-import { cotesHD, paroiHD, pitonEnBois, tuileHD } from './tuiles-hd';
+import { bordIrregulier, cotesHD, paroiHD, pitonEnBois, tuileHD } from './tuiles-hd';
 import { dessineVegetation } from './vegetation';
-import { aUnCoin, coinsDeParoi, cotesLibres, cotesParoi, DEBORD } from './bords-tuiles';
+import { aUnCoin, COTE, coinsDeParoi, cotesLibres, cotesParoi, DEBORD } from './bords-tuiles';
 
 /** Dessine les tuiles visibles : parois de fond, tuiles, dessus herbeux ou enneigés, fissures. */
 export function dessineTuiles(
@@ -55,6 +55,7 @@ export function dessineTuiles(
           else ctx.drawImage(atlas.paroi, dx, dy, 3, 3, x + dx, y + dy, 3, 3);
         }
       }
+      if (hd && cotes && bordIrregulier(t)) paroiDerriereLeBord(ctx, carte, atlas, tx, ty, x, y, cotes);
       if (t === T.VIDE) continue;
       // bords à l'air libre : coins arrondis, ombrage, dessus herbeux (voir bords-tuiles.ts)
       const habillee = !hd && cotes ? atlas.habillee(t, tx, ty, cotes) : null;
@@ -191,4 +192,31 @@ function dessineFin(
   ctx.imageSmoothingEnabled = finesse < 4;
   ctx.drawImage(toile, x, y, w, h);
   ctx.imageSmoothingEnabled = false;
+}
+
+/** Derrière les pierres en retrait d'un bord irrégulier (deux pixels), la paroi de fond quand la case voisine en a une. */
+function paroiDerriereLeBord(
+  ctx: CanvasRenderingContext2D,
+  carte: Carte,
+  atlas: AtlasTuiles,
+  tx: number,
+  ty: number,
+  x: number,
+  y: number,
+  cotes: number,
+): void {
+  const fond = paroiHD(atlas.theme, 0, tx, ty);
+  if (!fond) return;
+  const e = 2;
+  const bandes: [number, number, number, number, number][] = [
+    [COTE.GAUCHE, -1, 0, 0, 0],
+    [COTE.DROITE, 1, 0, TUILE - e, 0],
+    [COTE.HAUT, 0, -1, 0, 0],
+    [COTE.BAS, 0, 1, 0, TUILE - e],
+  ];
+  for (const [cote, dx, dy, bx, by] of bandes) {
+    if (!(cotes & cote) || !carte.aFond(tx + dx, ty + dy)) continue;
+    const [w, h] = dx ? [e, TUILE] : [TUILE, e];
+    ctx.drawImage(fond, bx * 4, by * 4, w * 4, h * 4, x + bx, y + by, w, h);
+  }
 }

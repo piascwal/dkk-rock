@@ -137,7 +137,6 @@ export function habilleMur(
 ): void {
   const pi = new Pinceau(c);
   c.drawImage(source, 0, 0);
-  bord?.(pi);
   const g = (cotes & COTE.GAUCHE) !== 0;
   const d = (cotes & COTE.DROITE) !== 0;
   const haut = (cotes & COTE.HAUT) !== 0;
@@ -146,6 +145,8 @@ export function habilleMur(
   if (g) pi.p(0, 0, D, N, 'rgba(0,0,0,0.12)');
   if (d) pi.p(N - D, 0, D, N, 'rgba(0,0,0,0.24)');
   if (haut) pi.p(0, 0, N, 2, 'rgba(255,255,255,0.25)');
+  // un bord irrégulier (la pierre) se découpe après l'ombrage : pas d'ombre peinte dans le vide des pierres en retrait
+  bord?.(pi);
   const lisere = 'rgba(0,0,0,0.35)';
   if (haut && g) coinRond(pi, true, true, 4 * D);
   if (haut && d) coinRond(pi, false, true, 4 * D);
