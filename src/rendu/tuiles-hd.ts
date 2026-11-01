@@ -6,7 +6,7 @@ import { BOIS, BOIS_SCELLE, BOIS_VIEUX, echelle, madrier, planche, poutrelle } f
 import { beton, brique, granit, habilleMur, metal, pierre, toit, vitre } from './tuiles-hd-murs';
 import { D, N, Pinceau, coinRond, hasard } from './tuiles-hd-outils';
 import { habilleSol, sol } from './tuiles-hd-sols';
-import { type Contexte, motif16, paroi16 } from './tuiles-16';
+import { type Contexte, bordPierre16, motif16, paroi16 } from './tuiles-16';
 
 /**
  * Les tuiles en haute définition (mode essai, voir ui/essai.ts) : peintes à quatre pixels d'art par pixel du jeu, en quelques tons,
@@ -150,11 +150,18 @@ export function tuileHD(
     // un mur à l'air libre (brique, pierre, granit, toit) : ses bords ombrés et ses coins arrondis, comme la terre
     const brute = tuileHD(t, 0, tx, ty, theme)!.toile;
     return {
-      toile: toile(theme, `mh${t}:${graine}:${cotes}`, N, (c) => habilleMur(c, brute, cotes)),
+      toile: toile(theme, `mh${t}:${graine}:${quart}:${cotes}`, N, (c) =>
+        habilleMur(
+          c,
+          brute,
+          cotes,
+          actives && t === T.PIERRE ? (pi) => bordPierre16(pi, cotes, quart) : undefined,
+        ),
+      ),
       debord: false,
     };
   } else {
-    cle = `m${t}:${graine}`;
+    cle = `m${t}:${graine}:${quart}`;
     const peintres: Partial<Record<number, (pi: Pinceau, graine: number) => void>> = {
       [T.BRIQUE]: brique,
       [T.BETON]: beton,

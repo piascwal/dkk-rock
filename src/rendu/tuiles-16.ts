@@ -1,64 +1,17 @@
 import { bruit } from '../moteur/maths';
 import { T } from '../monde/tuiles';
 import { COTE } from './bords-tuiles';
+import { type Contexte, bloc, points, q } from './tuiles-16-outils';
+import { sol16 } from './tuiles-16-sols';
 import { D, N, type Pinceau, teinte } from './tuiles-hd-outils';
+
+export type { Contexte };
 
 /**
  * Les motifs des tuiles dans le style 16-bit du jeu (mode essai) : une grille de 16 × 16 gros pixels (un pixel du jeu), plus
  * détaillée que la tuile de 16 d'origine (quatre ou cinq tons, des arêtes claires et sombres, du grain, des éclats, des variantes),
  * sur la toile haute définition dont seuls les bords et les coins arrondis restent fins (voir tuiles-hd.ts).
  */
-
-/** Ce qu'un motif sait de sa case : les variantes et le décor. */
-export interface Contexte {
-  graine: number;
-  terre: string;
-  bouts: number;
-  vieux: boolean;
-  casse: number;
-  console: boolean;
-  allumee: boolean;
-  urbain: boolean;
-  /** la parité de la case (la roche et les matières naturelles se raccordent sur 2 × 2 tuiles) */
-  quart: number;
-}
-
-/** Un gros pixel (un pixel du jeu) : `q(x, y, w, h)` en pixels du jeu. */
-const q = (pi: Pinceau, x: number, y: number, w: number, h: number, c: string) =>
-  pi.p(x * D, y * D, w * D, h * D, c);
-
-/** Un bloc à la façon 16-bit : sa face, une arête claire en haut et à gauche, sombre en bas et à droite. */
-function bloc(pi: Pinceau, x: number, y: number, w: number, h: number, base: string): void {
-  q(pi, x, y, w, h, base);
-  q(pi, x, y, w, 1, teinte(base, 0.25));
-  q(pi, x, y + 1, 1, h - 1, teinte(base, 0.1));
-  q(pi, x, y + h - 1, w, 1, teinte(base, -0.3));
-  q(pi, x + w - 1, y + 1, 1, h - 1, teinte(base, -0.18));
-}
-
-/** Des gros pixels épars d'une couleur, tirés d'un bruit fixe. */
-function points(pi: Pinceau, c: string, n: number, graine: number, sel: number): void {
-  for (let i = 0; i < n; i++)
-    q(pi, Math.floor(bruit(i, graine, sel) * 16), Math.floor(bruit(graine, i, sel + 1) * 16), 1, 1, c);
-}
-
-/** Les tons d'une matière naturelle, gros pixel par gros pixel, d'un bruit doux qui se raccorde sur 2 × 2 tuiles. */
-function masses(pi: Pinceau, tons: readonly string[], quart: number, sel: number): void {
-  const ox = (quart & 1) * 16;
-  const oy = (quart >> 1) * 16;
-  const v = (i: number, j: number) => bruit(((i % 8) + 8) % 8, ((j % 8) + 8) % 8, sel);
-  for (let y = 0; y < 16; y++)
-    for (let x = 0; x < 16; x++) {
-      const gx = (x + ox) / 4;
-      const gy = (y + oy) / 4;
-      const [i, j] = [Math.floor(gx), Math.floor(gy)];
-      const [fx, fy] = [gx - i, gy - j];
-      const a = v(i, j) + (v(i + 1, j) - v(i, j)) * fx;
-      const b = v(i, j + 1) + (v(i + 1, j + 1) - v(i, j + 1)) * fx;
-      const r = a + (b - a) * fy + (bruit(x + ox, y + oy, sel + 5) - 0.5) * 0.18;
-      q(pi, x, y, 1, 1, tons[Math.max(0, Math.min(tons.length - 1, Math.floor(r * tons.length)))]!);
-    }
-}
 
 const BOIS = ['#6b4420', '#a06c35', '#c99558'];
 const BOIS_VIEUX = ['#57472f', '#85704f', '#a99272'];
@@ -157,25 +110,76 @@ function brique(pi: Pinceau, cx: Contexte): void {
     }
 }
 
-function pierre(pi: Pinceau, cx: Contexte): void {
-  q(pi, 0, 0, 16, 16, '#7c6e55');
-  const assises = cx.graine % 2 ? [0, 5, 11, 16] : [0, 6, 10, 16];
-  for (let i = 0; i < 3; i++) {
-    let x = (i + cx.graine) % 2 ? -3 : 0;
-    for (let k = 0; x < 16; k++) {
-      const w = 5 + ((cx.graine + i * 3 + k) % 3);
-      const v = bruit(cx.graine + k, i, 66);
-      bloc(
-        pi,
-        x,
-        assises[i]!,
-        w - 1,
-        assises[i + 1]! - assises[i]! - 1,
-        v < 0.33 ? '#c2b28e' : v < 0.66 ? '#cfc09c' : '#d9cba8',
-      );
-      q(pi, x + 1 + (k % 2), assises[i]! + 2, 1, 1, '#a8987a');
+interface Moellon {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  base: string;
+  id: number;
+}
+
+/** Les moellons qui tombent dans la case : un appareil de 2 × 2 tuiles (deux assises par tuile), qui se raccorde d'une case à l'autre. */
+function moellons(quart: number): Moellon[] {
+  const [ox, oy] = [(quart & 1) * 16, (quart >> 1) * 16];
+  const rangs = [0, 7, 16, 23, 32];
+  const tous: Moellon[] = [];
+  for (let r = 0; r < 4; r++) {
+    const y = rangs[r]! - oy;
+    const h = rangs[r + 1]! - rangs[r]! - 1;
+    if (y + h <= 0 || y >= 16) continue;
+    const debut = Math.floor(bruit(r, 0, 111) * 6);
+    for (let x = debut, k = 0; x < debut + 32; k++) {
+      let w = 8 + Math.floor(bruit(r, k, 112) * 4);
+      if (debut + 32 - x < w + 6) w = debut + 32 - x;
+      const v = bruit(r, k, 113);
+      const base = v < 0.33 ? '#c2b28e' : v < 0.66 ? '#cfc09c' : '#d9cba8';
+      for (const d of [-32, 0, 32]) {
+        const sx = x + d - ox;
+        if (sx + w > 0 && sx < 16) tous.push({ x: sx, y, w: w - 1, h, base, id: r * 16 + k });
+      }
       x += w;
     }
+  }
+  return tous;
+}
+
+function pierre(pi: Pinceau, cx: Contexte): void {
+  q(pi, 0, 0, 16, 16, '#7c6e55');
+  for (const m of moellons(cx.quart)) {
+    bloc(pi, m.x, m.y, m.w, m.h, m.base);
+    q(pi, m.x + 2 + (m.id % 3), m.y + 2 + (m.id % 2), 1, 1, '#a8987a');
+  }
+}
+
+/**
+ * Le bord d'un mur de pierre qui donne sur le vide : pas une coupe lisse, des moellons qui dépassent un peu les uns des autres
+ * (un sur deux, au hasard, recule d'un pixel du jeu sur chaque côté libre).
+ */
+export function bordPierre16(pi: Pinceau, cotes: number, quart: number): void {
+  const [g, d, h, b] = [COTE.GAUCHE, COTE.DROITE, COTE.HAUT, COTE.BAS].map((c) => (cotes & c) !== 0);
+  if (g) pi.efface(0, 0, D, N);
+  if (d) pi.efface(N - D, 0, D, N);
+  if (h) pi.efface(0, 0, N, D);
+  if (b) pi.efface(0, N - D, N, D);
+  for (const m of moellons(quart)) {
+    const recule = (sel: number) => bruit(m.id, quart >> 1, sel) < 0.5;
+    const tg = g && m.x <= 0;
+    const td = d && m.x + m.w >= 16;
+    const th = h && m.y <= 0;
+    const tb = b && m.y + m.h >= 15;
+    if (!(tg || td || th || tb)) continue;
+    const x1 = tg ? (recule(114) ? 1 : 0) : m.x;
+    const x2 = td ? (recule(115) ? 15 : 16) : m.x + m.w;
+    const y1 = th ? (recule(116) ? 1 : 0) : m.y;
+    const y2 = tb ? (recule(117) ? 14 : 15) : m.y + m.h;
+    pi.efface(
+      Math.max(0, m.x) * D,
+      Math.max(0, m.y) * D,
+      (Math.min(16, m.x + m.w) - Math.max(0, m.x)) * D,
+      (Math.min(16, m.y + m.h) - Math.max(0, m.y)) * D,
+    );
+    bloc(pi, x1, y1, x2 - x1, y2 - y1, m.base);
   }
 }
 
@@ -194,24 +198,30 @@ function granit(pi: Pinceau, cx: Contexte): void {
 }
 
 function toit(pi: Pinceau, cx: Contexte): void {
-  q(pi, 0, 0, 16, 16, '#5a2216');
-  for (let r = 0; r < 4; r++)
-    for (let x = r % 2 ? -2 : 0; x < 16; x += 4) {
-      const v = bruit(x + cx.graine, r, 68);
+  const joint = '#5a2216';
+  q(pi, 0, 0, 16, 16, joint);
+  const ox = (cx.quart & 1) * 16;
+  for (let r = 0; r < 2; r++)
+    for (let x = (r + (cx.quart >> 1)) % 2 ? -4 : 0; x < 16; x += 8) {
+      const v = bruit(x + ox, r + (cx.quart >> 1) * 2, 68);
       const base = v < 0.3 ? '#a8432c' : v < 0.75 ? '#b84e33' : '#c55c3c';
-      q(pi, x, r * 4, 4, 3, base);
-      q(pi, x, r * 4, 1, 3, teinte(base, -0.3));
-      q(pi, x + 2, r * 4, 1, 2, teinte(base, 0.25));
-      q(pi, x + 1, r * 4 + 3, 2, 1, teinte(base, -0.15));
-      if (v > 0.92) q(pi, x + 1, r * 4 + 1, 1, 1, '#7a7a52');
+      const y = r * 8;
+      q(pi, x, y, 8, 7, base);
+      q(pi, x, y, 1, 7, teinte(base, -0.3));
+      q(pi, x + 3, y + 1, 2, 4, teinte(base, 0.2));
+      q(pi, x + 1, y + 5, 6, 1, teinte(base, -0.15));
+      // le bas de la tuile, arrondi en écaille
+      q(pi, x, y + 6, 1, 1, joint);
+      q(pi, x + 7, y + 6, 1, 1, joint);
+      if (v > 0.9) q(pi, x + 5, y + 2, 2, 1, '#7a7a52');
     }
 }
 
 function beton(pi: Pinceau, cx: Contexte): void {
   q(pi, 0, 0, 16, 16, '#8d8d86');
-  points(pi, '#7b7b74', 14, cx.graine, 70);
-  points(pi, '#a2a29a', 8, cx.graine, 72);
-  points(pi, '#666660', 4, cx.graine, 74);
+  points(pi, '#7b7b74', 7, cx.graine, 70);
+  points(pi, '#a2a29a', 4, cx.graine, 72);
+  points(pi, '#666660', 2, cx.graine, 74);
   q(pi, 0, 8, 16, 1, '#6f6f68');
   q(pi, 0, 9, 16, 1, '#a0a098');
   if (cx.graine === 2) for (let y = 1; y < 14; y++) q(pi, 6 + ((y * 3) % 4 > 1 ? 1 : 0), y, 1, 1, '#55554f');
@@ -257,51 +267,8 @@ export function paroi16(pi: Pinceau, paroi: string, graine: number): void {
   q(pi, 0, 8, 16, 1, teinte(paroi, -0.2));
   q(pi, graine % 2 ? 4 : 10, 0, 1, 8, teinte(paroi, -0.2));
   q(pi, graine % 2 ? 12 : 2, 8, 1, 8, teinte(paroi, -0.2));
-  points(pi, teinte(paroi, -0.3), 7, graine, 76);
-  points(pi, teinte(paroi, 0.1), 4, graine, 78);
-}
-
-function terre(pi: Pinceau, cx: Contexte): void {
-  masses(pi, [teinte(cx.terre, -0.18), cx.terre, cx.terre, teinte(cx.terre, 0.1)], cx.quart, 80);
-  points(pi, teinte(cx.terre, -0.32), 8, cx.graine, 82);
-  for (let i = 0; i < 2; i++) {
-    const x = 2 + Math.floor(bruit(cx.graine, i, 84) * 12);
-    const y = 3 + Math.floor(bruit(i, cx.graine, 85) * 11);
-    q(pi, x, y, 2, 1, '#7d776d');
-    q(pi, x, y, 1, 1, '#a39d92');
-    q(pi, x, y + 1, 2, 1, teinte(cx.terre, -0.35));
-  }
-}
-
-const NATURELLES: Partial<Record<number, { tons: string[]; sel: number }>> = {
-  [T.ROCHE]: { tons: ['#4f4f59', '#5f5f6a', '#6d6d78', '#7b7b87', '#8a8a96'], sel: 90 },
-  [T.SABLE]: { tons: ['#d4b26c', '#dcbc78', '#e3c47e', '#ebd08e'], sel: 92 },
-  [T.GLACE]: { tons: ['#6fbde0', '#7fc8e8', '#8fd0ee', '#a6dcf3'], sel: 94 },
-  [T.SOCLE]: { tons: ['#1c1a21', '#232028', '#2b2731', '#34303b'], sel: 96 },
-  [T.NEIGE]: { tons: ['#c9daee', '#d8e6f6', '#e6f0fb', '#f4f9ff'], sel: 98 },
-};
-
-function naturelle(pi: Pinceau, t: number, cx: Contexte): void {
-  const n = NATURELLES[t]!;
-  masses(pi, n.tons, cx.quart, n.sel);
-  if (t === T.ROCHE) {
-    // une fissure d'un gros pixel qui serpente, des éclats clairs
-    let x = 3 + ((cx.graine * 3) % 10);
-    for (let y = 1 + cx.graine; y < 14; y++) {
-      q(pi, x, y, 1, 1, '#3c3c45');
-      x += bruit(cx.graine, y, 99) < 0.5 ? 0 : bruit(y, cx.graine, 99) < 0.5 ? -1 : 1;
-    }
-    points(pi, '#9c9caa', 4, cx.graine, 100);
-  } else if (t === T.SABLE) {
-    for (const y0 of [3, 8, 13])
-      for (let x = 0; x < 16; x++) q(pi, x, y0 + (((x + y0) >> 2) % 2), 1, 1, '#c4a35e');
-    points(pi, '#fbeec4', 5, cx.graine, 102);
-  } else if (t === T.GLACE) {
-    for (let i = 0; i < 4; i++) q(pi, 3 + i + cx.graine * 2, 9 - i, 1, 1, '#e8fbff');
-    points(pi, '#e8fbff', 3, cx.graine, 104);
-  } else if (t === T.SOCLE) {
-    for (let i = 0; i < 6; i++) q(pi, 4 + i + cx.graine, 3 + i + (i >> 1), 1, 1, '#5a4680');
-  } else points(pi, '#ffffff', 5, cx.graine, 106);
+  points(pi, teinte(paroi, -0.3), 4, graine, 76);
+  points(pi, teinte(paroi, 0.1), 2, graine, 78);
 }
 
 /** Peint le motif 16-bit de la tuile `t` ; faux si elle n'en a pas (le peintre haute définition prend le relais). */
@@ -316,8 +283,6 @@ export function motif16(pi: Pinceau, t: number, cx: Contexte): boolean {
   else if (t === T.BETON) beton(pi, cx);
   else if (t === T.METAL) metal(pi, cx);
   else if (t === T.VITRE) vitre(pi, cx);
-  else if (t === T.TERRE) terre(pi, cx);
-  else if (NATURELLES[t]) naturelle(pi, t, cx);
-  else return false;
+  else return sol16(pi, t, cx);
   return true;
 }

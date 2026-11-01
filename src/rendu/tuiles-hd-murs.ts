@@ -129,9 +129,15 @@ export function paroi(pi: Pinceau, couleur: string, graine: number): void {
 }
 
 /** Un mur habillé selon ses côtés libres, comme la terre : le dessous et les flancs ombrés, l'arête du haut éclairée, les coins arrondis. */
-export function habilleMur(c: CanvasRenderingContext2D, source: HTMLCanvasElement, cotes: number): void {
+export function habilleMur(
+  c: CanvasRenderingContext2D,
+  source: HTMLCanvasElement,
+  cotes: number,
+  bord?: (pi: Pinceau) => void,
+): void {
   const pi = new Pinceau(c);
   c.drawImage(source, 0, 0);
+  bord?.(pi);
   const g = (cotes & COTE.GAUCHE) !== 0;
   const d = (cotes & COTE.DROITE) !== 0;
   const haut = (cotes & COTE.HAUT) !== 0;
