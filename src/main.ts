@@ -8,11 +8,15 @@ import { installeAntiZoom } from './entrees/anti-zoom';
 import { installeCurseurVoile } from './ui/curseur-voile';
 import { choisitVersions } from './niveaux';
 import { afficheBandeauEssai, modeEssai } from './ui/essai';
+import { activeTuilesHD } from './rendu/tuiles-hd';
 
 /** Point d'entrée : DKK : Rock Never Dies. */
 // le mode essai d'abord : les niveaux refaits remplacent les originaux avant que rien ne soit lu
 choisitVersions(modeEssai());
-if (modeEssai()) afficheBandeauEssai();
+if (modeEssai()) {
+  afficheBandeauEssai();
+  activeTuilesHD(); // les tuiles en haute définition, à l'essai
+}
 const app = new App();
 app.demarre();
 installeCurseurVoile();

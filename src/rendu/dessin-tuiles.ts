@@ -4,6 +4,7 @@ import type { Tyrolienne } from '../jeu/contexte';
 import type { Carte } from '../monde/carte';
 import { T, TUILES_LEGERES } from '../monde/tuiles';
 import type { AtlasTuiles } from './atlas-tuiles';
+import { tuileHD } from './tuiles-hd';
 import { dessineVegetation } from './vegetation';
 import { aUnCoin, coinsDeParoi, cotesLibres, cotesParoi, DEBORD } from './bords-tuiles';
 
@@ -40,8 +41,14 @@ export function dessineTuiles(
           ctx.drawImage(atlas.paroi, dx, dy, 3, 3, x + dx, y + dy, 3, 3);
       if (t === T.VIDE) continue;
       // bords à l'air libre : coins arrondis, ombrage, dessus herbeux (voir bords-tuiles.ts)
-      const habillee = cotes ? atlas.habillee(t, tx, ty, cotes) : null;
-      if (habillee) ctx.drawImage(habillee, x, y - DEBORD);
+      const hd = tuileHD(t, cotes);
+      const habillee = !hd && cotes ? atlas.habillee(t, tx, ty, cotes) : null;
+      if (hd) {
+        // une tuile peinte en haute définition (mode essai) : lissée sur un affichage moins fin, comme un sprite fourni
+        ctx.imageSmoothingEnabled = finesse < 6;
+        ctx.drawImage(hd, x, y, TUILE, TUILE);
+        ctx.imageSmoothingEnabled = false;
+      } else if (habillee) ctx.drawImage(habillee, x, y - DEBORD);
       else {
         const toile = atlas.toile(t, tx, ty);
         // un sprite fourni (96 px) sur un affichage moins fin : lissé, sinon des pixels sautent au hasard
