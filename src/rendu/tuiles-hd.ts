@@ -7,7 +7,7 @@ import { beton, brique, granit, habilleMur, metal, pierre, toit, vitre } from '.
 import { D, N, Pinceau, coinRond, hasard } from './tuiles-hd-outils';
 import { habilleSol, sol } from './tuiles-hd-sols';
 import { type Contexte, motif16, paroi16 } from './tuiles-16';
-import { bordPierre16 } from './tuiles-16-pierre';
+import { bordAppareil16 } from './tuiles-16-appareil';
 
 /**
  * Les tuiles en haute définition (mode essai, voir ui/essai.ts) : peintes à quatre pixels d'art par pixel du jeu, en quelques tons,
@@ -156,7 +156,7 @@ export function tuileHD(
           c,
           brute,
           cotes,
-          actives && t === T.PIERRE ? (pi) => bordPierre16(pi, cotes, quart) : undefined,
+          bordIrregulier(t) ? (pi) => bordAppareil16(pi, t, cotes, quart, graine) : undefined,
         ),
       ),
       debord: false,
@@ -216,5 +216,6 @@ export function pitonEnBois(carte: Carte, tx: number, ty: number): boolean {
   return false;
 }
 
-/** La tuile a un bord irrégulier sur le vide (la pierre, en essai) : la paroi de fond doit se voir derrière ses pierres en retrait. */
-export const bordIrregulier = (t: number): boolean => actives && t === T.PIERRE;
+/** La tuile a un bord irrégulier sur le vide (pierre, brique, granit, en essai) : la paroi de fond doit se voir derrière ses blocs en retrait. */
+export const bordIrregulier = (t: number): boolean =>
+  actives && (t === T.PIERRE || t === T.BRIQUE || t === T.GRANIT);

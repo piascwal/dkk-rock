@@ -46,7 +46,8 @@ export function teinte(hex: string, k: number): string {
   const vers = k > 0 ? 255 : 0;
   const a = Math.abs(k);
   const c = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => Math.round(v + (vers - v) * a));
-  return `rgb(${c[0]},${c[1]},${c[2]})`;
+  // en hexadécimal : une teinte peut se reteinter (sinon le canvas ignore la couleur et garde la précédente)
+  return '#' + c.map((v) => v.toString(16).padStart(2, '0')).join('');
 }
 
 /**

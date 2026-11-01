@@ -1,8 +1,8 @@
 import { bruit } from '../moteur/maths';
 import { T } from '../monde/tuiles';
 import { COTE } from './bords-tuiles';
-import { type Contexte, bloc, points, q } from './tuiles-16-outils';
-import { pierre16 } from './tuiles-16-pierre';
+import { type Contexte, points, q } from './tuiles-16-outils';
+import { appareil16 } from './tuiles-16-appareil';
 import { sol16 } from './tuiles-16-sols';
 import { D, N, type Pinceau, teinte } from './tuiles-hd-outils';
 
@@ -99,49 +99,21 @@ function piton(pi: Pinceau, cx: Contexte): void {
   if (cx.bouts & COTE.DROITE) bout(pi, false, 5);
 }
 
-function brique(pi: Pinceau, cx: Contexte): void {
-  q(pi, 0, 0, 16, 16, '#4e3e36');
-  for (let r = 0; r < 4; r++)
-    for (let k = -1; k < 2; k++) {
-      const x = k * 8 + (r % 2 ? 4 : 0);
-      const v = bruit(cx.graine + k, r, 61);
-      bloc(pi, x, r * 4, 7, 3, v < 0.3 ? '#93382b' : v < 0.7 ? '#a3402f' : '#b04a36');
-      q(pi, x + 2 + ((cx.graine + k + r) % 4), r * 4 + 1, 1, 1, '#7e2e22');
-      if (v > 0.9) q(pi, x + 6, r * 4, 1, 1, '#4e3e36');
-    }
-}
-
-function granit(pi: Pinceau, cx: Contexte): void {
-  q(pi, 0, 0, 16, 16, '#30303a');
-  for (const [y0, dx] of [
-    [0, cx.graine % 2 ? 8 : 0],
-    [8, cx.graine % 2 ? 0 : 8],
-  ] as const)
-    for (const x0 of [dx - 16, dx - 8, dx, dx + 8]) {
-      if (x0 >= 16 || x0 + 8 <= 0) continue;
-      bloc(pi, x0, y0, 7, 7, bruit(x0 + cx.graine, y0, 67) < 0.5 ? '#6e6e7a' : '#767684');
-      q(pi, x0 + 2, y0 + 3, 1, 1, '#55555f');
-      q(pi, x0 + 4, y0 + 5, 1, 1, '#8a8a98');
-    }
-}
-
+/** Le toit : le motif d'origine (des rangs de tuiles de 3 × 3 en quinconce), avec du relief (ombre portée, flanc, reflet) et un peu de grain. */
 function toit(pi: Pinceau, cx: Contexte): void {
-  const joint = '#5a2216';
-  q(pi, 0, 0, 16, 16, joint);
-  const ox = (cx.quart & 1) * 16;
-  for (let r = 0; r < 2; r++)
-    for (let x = (r + (cx.quart >> 1)) % 2 ? -4 : 0; x < 16; x += 8) {
-      const v = bruit(x + ox, r + (cx.quart >> 1) * 2, 68);
-      const base = v < 0.3 ? '#a8432c' : v < 0.75 ? '#b84e33' : '#c55c3c';
-      const y = r * 8;
-      q(pi, x, y, 8, 7, base);
-      q(pi, x, y, 1, 7, teinte(base, -0.3));
-      q(pi, x + 3, y + 1, 2, 4, teinte(base, 0.2));
-      q(pi, x + 1, y + 5, 6, 1, teinte(base, -0.15));
-      // le bas de la tuile, arrondi en écaille
-      q(pi, x, y + 6, 1, 1, joint);
-      q(pi, x + 7, y + 6, 1, 1, joint);
-      if (v > 0.9) q(pi, x + 5, y + 2, 2, 1, '#7a7a52');
+  q(pi, 0, 0, 16, 16, '#8a3020');
+  for (let r = 0; r < 4; r++)
+    for (let x = r % 2 ? -2 : 0; x < 16; x += 4) {
+      const v = bruit(x + (cx.quart & 1) * 16, r + (cx.quart >> 1) * 4, 68);
+      const base = r % 2 ? '#c8603a' : '#b8492e';
+      const ton = v < 0.2 ? teinte(base, -0.08) : v > 0.85 ? teinte(base, 0.06) : base;
+      const y = r * 4;
+      q(pi, x, y + 3, 3, 1, '#7a2a1c'); // l'ombre douce de la tuile sur le rang du dessous
+      q(pi, x, y, 3, 3, ton);
+      q(pi, x, y, 3, 1, teinte(ton, 0.18));
+      q(pi, x + 2, y + 1, 1, 2, teinte(ton, -0.14));
+      if (v > 0.55 && v < 0.62) q(pi, x + 1, y + 1, 1, 1, teinte(ton, 0.1));
+      if (v > 0.93) q(pi, x, y + 2, 1, 1, '#7a7a52'); // un peu de lichen
     }
 }
 
@@ -204,9 +176,7 @@ export function motif16(pi: Pinceau, t: number, cx: Contexte): boolean {
   if (t === T.ECHELLE || t === T.ECHELON) echelle(pi, cx, t === T.ECHELON);
   else if (t === T.PLATEFORME) planche(pi, cx);
   else if (t === T.PITON) piton(pi, cx);
-  else if (t === T.BRIQUE) brique(pi, cx);
-  else if (t === T.PIERRE) pierre16(pi, cx.quart);
-  else if (t === T.GRANIT) granit(pi, cx);
+  else if (appareil16(pi, t, cx.quart, cx.graine)) return true;
   else if (t === T.TOIT) toit(pi, cx);
   else if (t === T.BETON) beton(pi, cx);
   else if (t === T.METAL) metal(pi, cx);
