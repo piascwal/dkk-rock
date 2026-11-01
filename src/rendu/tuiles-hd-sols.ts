@@ -1,43 +1,16 @@
 import { bruit } from '../moteur/maths';
 import { T } from '../monde/tuiles';
 import { COTE, DEBORD } from './bords-tuiles';
-import { glace, roche, sable, socle } from './tuiles-hd-matieres';
 import { D, N, Pinceau, coinRond, teinte } from './tuiles-hd-outils';
 
 /**
- * La terre, la roche, la neige, le sable, la glace et le socle en haute définition (voir tuiles-hd.ts), et leur habillage selon les côtés libres : le dessus
+ * L'habillage des sols (terre, roche, neige, sable, glace, socle ; leurs motifs : voir tuiles-16-sols.ts) selon les côtés libres : le dessus
  * herbeux de la terre (une bande irrégulière, des touffes qui dépassent), l'ombre des flancs et du dessous, et les coins
  * arrondis en vraies courbes (un quart de cercle de quatre pixels du jeu, plus les paliers 3-2-1 de la tuile de 16).
  */
 
 /** le rayon des coins arrondis, en pixels d'art */
 const RAYON = 4 * D;
-
-/** La matière seule (sans habillage), sur une toile carrée. */
-export function sol(pi: Pinceau, t: number, terre: string, graine: number): void {
-  if (t === T.TERRE) {
-    pi.p(0, 0, N, N, terre);
-    pi.grain(teinte(terre, -0.22), 26, graine, 2);
-    pi.grain(teinte(terre, 0.14), 12, graine + 9, 2);
-    // des cailloux
-    for (let i = 0; i < 3; i++) {
-      const x = 6 + ((graine * 13 + i * 19) % (N - 14));
-      const y = 8 + ((graine * 7 + i * 23) % (N - 16));
-      pi.p(x, y, 4, 3, '#6f6a62');
-      pi.p(x, y, 3, 1, '#9a948a');
-      pi.p(x + 1, y + 3, 3, 1, teinte(terre, -0.35));
-    }
-  } else if (t === T.ROCHE) roche(pi, graine);
-  else if (t === T.SABLE) sable(pi, graine);
-  else if (t === T.GLACE) glace(pi, graine);
-  else if (t === T.SOCLE) socle(pi, graine);
-  else {
-    // la neige : un blanc bleuté, des creux d'ombre bleue, quelques scintillements
-    pi.p(0, 0, N, N, '#e6f0fb');
-    pi.grain('#c9daee', 20, graine, 3);
-    pi.grain('#ffffff', 10, graine + 4, 1);
-  }
-}
 
 /** La tuile habillée (toile de 16 × (16 + DEBORD) pixels du jeu) : `source` est la matière seule. */
 export function habilleSol(

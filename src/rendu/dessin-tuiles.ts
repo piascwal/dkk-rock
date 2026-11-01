@@ -35,7 +35,7 @@ export function dessineTuiles(
         t === T.VIDE || t === T.EAU ? 0 : cotesHD(carte, t, tx, ty, cotesLibres(carte, t, tx, ty));
       // la paroi de fond, aux coins extérieurs arrondis ; derrière un coin arrondi d'une tuile pleine, elle remplit
       // les angles où elle continue (sinon on verrait le ciel par ces angles)
-      // une tuile peinte en haute définition (mode essai, voir tuiles-hd.ts) : ses coins arrondis sont plus grands (4 pixels)
+      // une tuile peinte en haute définition (voir tuiles-hd.ts) : ses coins arrondis sont plus grands (4 pixels)
       const hd =
         t === T.VIDE
           ? null
@@ -48,7 +48,7 @@ export function dessineTuiles(
       } else if (plein && aUnCoin(cotes)) {
         const fond = hd ? paroiHD(atlas.theme, 0, tx, ty) : null;
         for (const [dx, dy] of coinsDeParoi(carte, tx, ty, cotes)) {
-          // une tuile HD a des coins plus grands (4 pixels) : la paroi les remplit d'autant (la HD, ou l'ancienne hors essai)
+          // une tuile HD a des coins plus grands (4 pixels) : la paroi les remplit d'autant
           const [cx, cy] = [dx ? TUILE - 4 : 0, dy ? TUILE - 4 : 0];
           if (fond) ctx.drawImage(fond, cx * 4, cy * 4, 16, 16, x + cx, y + cy, 4, 4);
           else if (hd) ctx.drawImage(atlas.paroi, cx, cy, 4, 4, x + cx, y + cy, 4, 4);

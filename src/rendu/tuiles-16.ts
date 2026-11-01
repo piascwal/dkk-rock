@@ -9,7 +9,7 @@ import { D, N, type Pinceau, teinte } from './tuiles-hd-outils';
 export type { Contexte };
 
 /**
- * Les motifs des tuiles dans le style 16-bit du jeu (mode essai) : une grille de 16 × 16 gros pixels (un pixel du jeu), plus
+ * Les motifs des tuiles dans le style 16-bit du jeu : une grille de 16 × 16 gros pixels (un pixel du jeu), plus
  * détaillée que la tuile de 16 d'origine (quatre ou cinq tons, des arêtes claires et sombres, du grain, des éclats, des variantes),
  * sur la toile haute définition dont seuls les bords et les coins arrondis restent fins (voir tuiles-hd.ts).
  */

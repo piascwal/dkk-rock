@@ -9,8 +9,6 @@ import { bruit } from '../moteur/maths';
 export const D = 4;
 /** côté de la toile d'une tuile */
 export const N = 16 * D;
-/** le contour sombre, partout le même */
-export const CONTOUR = '#24160c';
 
 /** Un pinceau sur une toile : `p` remplit un rectangle en pixels d'art, `pj` en pixels du jeu. */
 export class Pinceau {
