@@ -3,9 +3,10 @@ import { T } from '../monde/tuiles';
 import { COTE, DEBORD } from './bords-tuiles';
 import { THEMES, type Theme } from './themes';
 import { BOIS, BOIS_SCELLE, BOIS_VIEUX, echelle, madrier, planche, poutrelle } from './tuiles-hd-bois';
-import { beton, brique, granit, habilleMur, metal, paroi, pierre, toit, vitre } from './tuiles-hd-murs';
+import { beton, brique, granit, habilleMur, metal, pierre, toit, vitre } from './tuiles-hd-murs';
 import { D, N, Pinceau, coinRond, hasard } from './tuiles-hd-outils';
 import { habilleSol, sol } from './tuiles-hd-sols';
+import { type Contexte, motif16, paroi16 } from './tuiles-16';
 
 /**
  * Les tuiles en haute définition (mode essai, voir ui/essai.ts) : peintes à quatre pixels d'art par pixel du jeu, en quelques tons,
@@ -90,12 +91,28 @@ export function tuileHD(
   if (!hd(t)) return null;
   // la roche suit un motif de 2 × 2 tuiles (ses pierres se raccordent) : sa graine est la parité de la case
   const graine = t === T.ROCHE ? (tx & 1) + 2 * (ty & 1) : Math.floor(hasard(tx, ty, 3) * 4);
+  const quart = (tx & 1) + 2 * (ty & 1);
+  // en essai, les motifs suivent le style 16-bit du jeu (plus détaillé) ; les bords et les coins arrondis restent fins
+  const cx = (o: Partial<Contexte> = {}): Contexte => ({
+    graine,
+    terre: theme.terre,
+    bouts: cotes & (COTE.GAUCHE | COTE.DROITE),
+    vieux: false,
+    casse: -1,
+    console: false,
+    allumee: false,
+    urbain: false,
+    quart,
+    ...o,
+  });
   if (SOLS.has(t)) {
-    const brute = toile(theme, `s${t}:${graine}`, N, (c) => sol(new Pinceau(c), t, theme.terre, graine));
+    const brute = actives
+      ? toile(theme, `s16${t}:${graine}:${quart}`, N, (c) => motif16(new Pinceau(c), t, cx()))
+      : toile(theme, `s${t}:${graine}`, N, (c) => sol(new Pinceau(c), t, theme.terre, graine));
     if (!cotes) return { toile: brute, debord: false };
     const h = (16 + DEBORD) * D;
     return {
-      toile: toile(theme, `h${t}:${graine}:${cotes}`, h, (c) =>
+      toile: toile(theme, `h${t}:${graine}:${quart}:${cotes}`, h, (c) =>
         habilleSol(c, brute, t, cotes, theme.dessus, graine),
       ),
       debord: true,
@@ -110,21 +127,25 @@ export function tuileHD(
     const casse = t === T.ECHELLE && hasard(tx, ty, 71) < 0.1 ? Math.floor(hasard(tx, ty, 73) * 3) : -1;
     const b = t === T.ECHELON ? BOIS_SCELLE : vieux ? BOIS_VIEUX : BOIS;
     cle = `e${t}:${graine}:${vieux}:${casse}`;
-    peins = (pi) => echelle(pi, b, casse, graine);
+    peins = (pi) => (actives ? motif16(pi, t, cx({ vieux, casse })) : echelle(pi, b, casse, graine));
   } else if (t === T.PLATEFORME) {
     const vieux = hasard(tx, ty, 74) < 0.2;
     const console = tx % 2 === 0;
     cle = `p:${graine}:${bouts}:${vieux}:${console}`;
-    peins = (pi) => planche(pi, bouts, vieux ? BOIS_VIEUX : BOIS, console, graine);
+    peins = (pi) =>
+      actives
+        ? motif16(pi, t, cx({ vieux, console }))
+        : planche(pi, bouts, vieux ? BOIS_VIEUX : BOIS, console, graine);
   } else if (t === T.PITON) {
     // un piton relié à une plateforme de planches est en bois lui aussi : deux matériaux sur un même pont, ce serait étrange
     const urbain = URBAINS.has(theme) && !enBois;
     cle = `i:${graine}:${bouts}:${urbain}`;
-    peins = (pi) => (urbain ? poutrelle(pi, bouts) : madrier(pi, bouts, graine));
+    peins = (pi) =>
+      actives ? motif16(pi, t, cx({ urbain })) : urbain ? poutrelle(pi, bouts) : madrier(pi, bouts, graine);
   } else if (t === T.VITRE) {
     const allumee = hasard(tx, ty, 75) < 0.5;
     cle = `v:${graine}:${allumee}`;
-    peins = (pi) => vitre(pi, graine, allumee);
+    peins = (pi) => (actives ? motif16(pi, t, cx({ allumee })) : vitre(pi, graine, allumee));
   } else if (MURS_HABILLES.has(t) && cotes) {
     // un mur à l'air libre (brique, pierre, granit, toit) : ses bords ombrés et ses coins arrondis, comme la terre
     const brute = tuileHD(t, 0, tx, ty, theme)!.toile;
@@ -142,7 +163,7 @@ export function tuileHD(
       [T.TOIT]: toit,
     };
     const peintre = peintres[t] ?? metal;
-    peins = (pi) => peintre(pi, graine);
+    peins = (pi) => (actives ? motif16(pi, t, cx()) : peintre(pi, graine));
   }
   return { toile: toile(theme, cle, N, (c) => peins(new Pinceau(c))), debord: false };
 }
@@ -153,7 +174,7 @@ export function paroiHD(theme: Theme, cotes: number, tx: number, ty: number): HT
   const graine = Math.floor(hasard(tx, ty, 5) * 4);
   return toile(theme, `f:${graine}:${cotes}`, N, (c) => {
     const pi = new Pinceau(c);
-    paroi(pi, theme.paroi, graine);
+    paroi16(pi, theme.paroi, graine);
     const h = (cotes & COTE.HAUT) !== 0;
     const b = (cotes & COTE.BAS) !== 0;
     const g = (cotes & COTE.GAUCHE) !== 0;
