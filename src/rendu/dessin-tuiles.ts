@@ -40,7 +40,7 @@ export function dessineTuiles(
         t === T.VIDE
           ? null
           : tuileHD(t, cotes, tx, ty, atlas.theme, t === T.PITON && pitonEnBois(carte, tx, ty));
-      if (carte.aFond(tx, ty) && (!plein || aUnCoin(cotes))) {
+      if (fondDerriere(carte, t, tx, ty) && (!plein || aUnCoin(cotes))) {
         const cp = cotesParoi(carte, tx, ty);
         const fond = paroiHD(atlas.theme, cp, tx, ty);
         if (fond) dessineFin(ctx, fond, x, y, TUILE, TUILE, finesse);
@@ -219,4 +219,20 @@ function paroiDerriereLeBord(
     const [w, h] = dx ? [e, TUILE] : [TUILE, e];
     ctx.drawImage(fond, bx * 4, by * 4, w * 4, h * 4, x + bx, y + by, w, h);
   }
+}
+
+/**
+ * La case a-t-elle une paroi de fond ? Sous un piton, une plateforme ou une échelle, le générateur la laisse parfois de côté :
+ * si la paroi l'entoure (des deux côtés, ou sur trois côtés), on la reprend, sinon on verrait le vide à travers le pont.
+ */
+function fondDerriere(carte: Carte, t: number, tx: number, ty: number): boolean {
+  if (carte.aFond(tx, ty)) return true;
+  if (t === T.VIDE || !TUILES_LEGERES.has(t)) return false;
+  const [g, d, h, b] = [
+    carte.aFond(tx - 1, ty),
+    carte.aFond(tx + 1, ty),
+    carte.aFond(tx, ty - 1),
+    carte.aFond(tx, ty + 1),
+  ];
+  return (g && d) || (h && b) || [g, d, h, b].filter(Boolean).length >= 3;
 }

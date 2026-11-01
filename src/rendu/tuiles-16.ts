@@ -102,18 +102,20 @@ function piton(pi: Pinceau, cx: Contexte): void {
 /** Le toit : le motif d'origine (des rangs de tuiles de 3 × 3 en quinconce), avec du relief (ombre portée, flanc, reflet) et un peu de grain. */
 function toit(pi: Pinceau, cx: Contexte): void {
   q(pi, 0, 0, 16, 16, '#8a3020');
-  for (let r = 0; r < 4; r++)
+  for (let r = 0; r < 2; r++)
     for (let x = r % 2 ? -2 : 0; x < 16; x += 4) {
-      const v = bruit(x + (cx.quart & 1) * 16, r + (cx.quart >> 1) * 4, 68);
+      const v = bruit(x + (cx.quart & 1) * 16, r + (cx.quart >> 1) * 2, 68);
       const base = r % 2 ? '#c8603a' : '#b8492e';
       const ton = v < 0.2 ? teinte(base, -0.08) : v > 0.85 ? teinte(base, 0.06) : base;
-      const y = r * 4;
-      q(pi, x, y + 3, 3, 1, '#7a2a1c'); // l'ombre douce de la tuile sur le rang du dessous
-      q(pi, x, y, 3, 3, ton);
+      const y = r * 8;
+      // des tuiles longues (3 × 7) : le haut éclairé, le flanc droit dans l'ombre, l'ombre douce sur le rang du dessous
+      q(pi, x, y + 7, 3, 1, '#7a2a1c');
+      q(pi, x, y, 3, 7, ton);
       q(pi, x, y, 3, 1, teinte(ton, 0.18));
-      q(pi, x + 2, y + 1, 1, 2, teinte(ton, -0.14));
-      if (v > 0.55 && v < 0.62) q(pi, x + 1, y + 1, 1, 1, teinte(ton, 0.1));
-      if (v > 0.93) q(pi, x, y + 2, 1, 1, '#7a7a52'); // un peu de lichen
+      q(pi, x + 2, y + 1, 1, 6, teinte(ton, -0.14));
+      q(pi, x, y + 6, 2, 1, teinte(ton, -0.08));
+      if (v > 0.5 && v < 0.6) q(pi, x + 1, y + 2 + (Math.floor(v * 30) % 3), 1, 1, teinte(ton, 0.1));
+      if (v > 0.93) q(pi, x, y + 5, 1, 1, '#7a7a52'); // un peu de lichen
     }
 }
 

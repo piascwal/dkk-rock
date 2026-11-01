@@ -5,7 +5,7 @@ import { bloc, q } from './tuiles-16-outils';
 import { D, N, type Pinceau, teinte } from './tuiles-hd-outils';
 
 /**
- * Les murs appareillés dans le style 16-bit (voir tuiles-16.ts) : la pierre calcaire, la brique et le granit. Des blocs usés
+ * Les murs appareillés dans le style 16-bit (voir tuiles-16.ts) : la pierre calcaire et le granit. Des blocs usés
  * (taches, piqûres, arêtes émoussées, coins écornés ; la pierre, la plus vieille, a des moellons déformés, de la mousse et
  * parfois un trou), et sur le vide un bord irrégulier où les blocs dépassent un peu les uns des autres.
  */
@@ -77,21 +77,6 @@ const PIERRE: Appareil = {
   ),
 };
 
-const BRIQUE_TONS = ['#93382b', '#a3402f', '#b04a36', '#9c3a2c'];
-const BRIQUE: Appareil = {
-  joint: '#4e3e36',
-  recul: 1,
-  vieux: false,
-  blocs: rangees(
-    [0, 4, 8, 12, 16],
-    16,
-    () => 8,
-    (r) => (r % 2 ? -4 : 0),
-    BRIQUE_TONS,
-    61,
-  ),
-};
-
 const GRANIT_TONS = ['#6a6a76', '#6e6e7a', '#767684', '#72727e'];
 const GRANIT: Appareil = {
   joint: '#30303a',
@@ -109,7 +94,6 @@ const GRANIT: Appareil = {
 
 const APPAREILS: Partial<Record<number, Appareil>> = {
   [T.PIERRE]: PIERRE,
-  [T.BRIQUE]: BRIQUE,
   [T.GRANIT]: GRANIT,
 };
 
@@ -139,7 +123,7 @@ function abime(
   q(pi, x + 1 + dans(3, w - 2), y + 1 + dans(4, h - 2), 1, 1, teinte(m.base, 0.12));
   q(pi, x + 1 + dans(5, w - 2), y + 1 + dans(6, h - 2), 1, 1, teinte(m.base, -0.28));
   q(pi, x + 1 + dans(7, w - 2), y, 1 + dans(8, 2), 1, m.base);
-  // les coins écornés : un au plus pour la brique et le granit, plusieurs pour les vieux moellons, parfois en double marche
+  // les coins écornés : un au plus pour le granit, plusieurs pour les vieux moellons, parfois en double marche
   const coins: [number, number, number, number][] = [
     [x, y, 1, 1],
     [x + w - 1, y, -1, 1],
@@ -163,7 +147,7 @@ function abime(
   }
 }
 
-/** Peint le mur appareillé `t` (pierre, brique, granit) ; faux si ce n'en est pas un. */
+/** Peint le mur appareillé `t` (pierre, granit) ; faux si ce n'en est pas un. */
 export function appareil16(pi: Pinceau, t: number, quart: number, graine: number): boolean {
   const a = APPAREILS[t];
   if (!a) return false;
@@ -196,13 +180,16 @@ export function bordAppareil16(pi: Pinceau, t: number, cotes: number, quart: num
     const th = h && m.y <= a.recul - 1;
     const tb = b && m.y + m.h >= 15 - a.recul;
     if (!(tg || td || th || tb)) continue;
-    const x1 = tg ? recul(114) : m.x;
-    const x2 = td ? 16 - recul(115) : m.x + m.w;
-    const y1 = th ? recul(116) : m.y;
-    const y2 = tb ? 15 - recul(117) : m.y + m.h;
+    // un bloc à peine entamé par le bord (un bout de 2 ou 3 pixels) reste au ras : en reculant, il disparaîtrait et laisserait un trou
+    const [ex2, ey2] = [Math.min(16, m.x + m.w), Math.min(16, m.y + m.h)];
+    let x1 = tg ? recul(114) : m.x;
+    let x2 = td ? 16 - recul(115) : m.x + m.w;
+    let y1 = th ? recul(116) : m.y;
+    let y2 = tb ? 15 - recul(117) : m.y + m.h;
+    if (x2 - x1 < 3) [x1, x2] = [Math.max(0, m.x), ex2];
+    if (y2 - y1 < 3) [y1, y2] = [Math.max(0, m.y), ey2];
     const [ex, ey] = [Math.max(0, m.x), Math.max(0, m.y)];
     pi.efface(ex * D, ey * D, (Math.min(16, m.x + m.w) - ex) * D, (Math.min(16, m.y + m.h) - ey) * D);
-    if (x2 - x1 < 2 || y2 - y1 < 2) continue;
     abime(pi, a, m, x1, y1, x2 - x1, y2 - y1, true);
   }
 }

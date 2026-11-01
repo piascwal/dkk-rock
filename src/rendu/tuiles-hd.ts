@@ -171,7 +171,8 @@ export function tuileHD(
       [T.TOIT]: toit,
     };
     const peintre = peintres[t] ?? metal;
-    peins = (pi) => (actives ? motif16(pi, t, cx()) : peintre(pi, graine));
+    // la brique garde sa version validée (publiée), même en essai
+    peins = (pi) => (actives && t !== T.BRIQUE ? motif16(pi, t, cx()) : peintre(pi, graine));
   }
   return { toile: toile(theme, cle, N, (c) => peins(new Pinceau(c))), debord: false };
 }
@@ -216,6 +217,5 @@ export function pitonEnBois(carte: Carte, tx: number, ty: number): boolean {
   return false;
 }
 
-/** La tuile a un bord irrégulier sur le vide (pierre, brique, granit, en essai) : la paroi de fond doit se voir derrière ses blocs en retrait. */
-export const bordIrregulier = (t: number): boolean =>
-  actives && (t === T.PIERRE || t === T.BRIQUE || t === T.GRANIT);
+/** La tuile a un bord irrégulier sur le vide (pierre, granit, en essai) : la paroi de fond doit se voir derrière ses blocs en retrait. */
+export const bordIrregulier = (t: number): boolean => actives && (t === T.PIERRE || t === T.GRANIT);
