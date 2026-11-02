@@ -32,7 +32,7 @@ export const REFONTES: Readonly<Record<string, Partial<DefNiveau>>> = {
   foret: { carte: CARTE_FORET_REFONTE },
   port: { carte: CARTE_PORT_REFONTE },
   groix: { carte: CARTE_GROIX_REFONTE },
-  // la tournée (le pont des Tuves est publié ; Gréau et le Club, encore à l'essai)
+  // la tournée (Club Infini encore à l'essai)
   tuves: { carte: CARTE_TUVES_REFONTE, decor: DECOR_TUVES_REFONTE },
   club: { carte: CARTE_CLUB_REFONTE },
   cimes: { carte: CARTE_CIMES_REFONTE },
@@ -53,6 +53,7 @@ export const REFONTES_PUBLIEES: ReadonlySet<string> = new Set<string>([
   'port',
   'groix',
   'tuves',
+  'cimes',
 ]);
 
 /**
