@@ -35,7 +35,7 @@ export function joueEvenements(
     if (e.k === 'son') {
       const d = moi && (e.x || e.y) ? Math.hypot(e.x - moi.x, e.y - moi.y) : 0;
       bruitages.joue(e.n, d);
-    } else if (e.k === 'bulle') bulles.ajoute(e.qui, e.texte);
+    } else if (e.k === 'bulle') bulles.ajoute(e.qui, e.texte, e.arme);
     else if (e.k === 'elim') elimination(e);
   }
 }

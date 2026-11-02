@@ -380,7 +380,8 @@ export type Evenement =
   | { k: 'texte'; x: number; y: number; s: string; c: string }
   | { k: 'impact'; x: number; y: number; c: string }
   | { k: 'confettis'; x: number; y: number }
-  | { k: 'bulle'; qui: string; texte: string }
+  /** `arme` : la variante de l'arme ramassée, pour que chaque client ne montre sa réplique qu'à la première découverte */
+  | { k: 'bulle'; qui: string; texte: string; arme?: number }
   /** battle royale : un joueur est éliminé d'une vie (sièges ; `tueur` -1 : il s'est tué tout seul) */
   | { k: 'elim'; tueur: number; victime: number }
   | { k: 'tuile'; x: number; y: number; t: number; avant: number };

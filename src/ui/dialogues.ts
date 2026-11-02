@@ -1,5 +1,6 @@
 import { pagesDe } from '../histoire/pages';
 import { PHASES_MINI_JEUX } from '../jeu/mini-jeux';
+import { enregistre, type Sauvegarde } from '../jeu/sauvegarde';
 import type { EtatVue } from '../jeu/vue';
 import { NIVEAUX } from '../niveaux';
 import type { Qui } from '../niveaux/format';
@@ -38,10 +39,19 @@ export class Bulles {
   private file: { qui: Qui; texte: string }[] = [];
   private finA = 0;
 
-  constructor(private readonly element: HTMLElement) {}
+  constructor(
+    private readonly element: HTMLElement,
+    private readonly sauvegarde: Sauvegarde,
+  ) {}
 
-  ajoute(qui: string, texte: string): void {
+  /** `arme` : la variante de l'arme ramassée ; sa réplique ne se dit qu'à la première découverte, puis on s'en souvient. */
+  ajoute(qui: string, texte: string, arme?: number): void {
     if (!estQui(qui) || typeof texte !== 'string') return;
+    if (arme !== undefined) {
+      if (this.sauvegarde.armesVues.includes(arme)) return;
+      this.sauvegarde.armesVues.push(arme);
+      enregistre(this.sauvegarde);
+    }
     // une file trop longue (beaucoup de morts d'affilée) : on garde les plus récentes
     if (this.file.length >= FILE_MAX) this.file.shift();
     this.file.push({ qui, texte: texte.slice(0, 300) });

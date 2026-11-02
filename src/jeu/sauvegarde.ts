@@ -36,6 +36,8 @@ export interface Sauvegarde {
   recordAvion: number;
   /** les cartes Sibylle des fontaines acquises, par niveau (son `id`) : les numéros de leurs cachettes */
   sibylles: Record<string, number[]>;
+  /** les armes spéciales déjà découvertes (leur variante) : leur réplique ne se dit qu'à la première */
+  armesVues: number[];
 }
 
 const CLE = 'dkk-rock.sauvegarde';
@@ -54,6 +56,7 @@ export const SAUVEGARDE_VIDE: Sauvegarde = {
   recordReve: 0,
   recordAvion: 0,
   sibylles: {},
+  armesVues: [],
 };
 
 const entier = (v: unknown, min: number, max: number, defaut: number): number =>
@@ -97,6 +100,9 @@ export function valideSauvegarde(brut: unknown, nbNiveaux: number): Sauvegarde {
     recordReve: entier(o.recordReve, 0, 65534, 0),
     recordAvion: entier(o.recordAvion, 0, 65534, 0),
     sibylles: sibyllesLues(o.sibylles),
+    armesVues: Array.isArray(o.armesVues)
+      ? [...new Set(o.armesVues.filter((n): n is number => Number.isInteger(n) && n >= 0 && n < 64))]
+      : [],
   };
 }
 

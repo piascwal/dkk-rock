@@ -65,7 +65,7 @@ export function interactions(p: Partie): void {
           e.fini = true;
           p.son('ramasse', e.corps.x, e.corps.y);
           p.texte(e.corps.x, e.corps.y - 10, a.nom.toUpperCase(), '#ffd23f');
-          p.evenement({ k: 'bulle', qui: j.def.qui, texte: p.rng.choix(a.repliques) });
+          p.evenement({ k: 'bulle', qui: j.def.qui, texte: p.rng.choix(a.repliques), arme: e.variante });
           break;
         }
         case 'coeur': {
