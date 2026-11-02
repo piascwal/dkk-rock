@@ -3,10 +3,13 @@
 
 Usage : python3 outils/prepare-mat-essai.py      (Pillow et numpy requis)
 
-Entrées : assets-sources/heros/mat-essai/
-          repos.jpg, saut.jpg, echelle.jpg (de dos), mur.jpg (de profil contre la paroi) : sur fond magenta, à la même échelle
-          marche.png : six images de marche côte à côte, sur fond transparent
-          corsa-dos.jpg, corsa-biais-droite.jpg : l'Opel Corsa du concours de drift (pré du Clos), Mat à bord, sur fond magenta
+Entrées : assets-sources/heros/mat-essai/guitare/ (Mat avec sa guitare)
+          repos.jpg, saut.jpg, mur.jpg (de profil contre la paroi), echelle-1.jpg et echelle-2.jpg (de dos, les deux temps de la
+          montée) : sur fond magenta, à la même échelle ; marche.jpg : six images de marche côte à côte, sur fond magenta ;
+          (marche-seule.jpg : une pose de marche de plus, inutilisée) ; les fonds magenta ne sont pas tous du même ton : tout ce qui
+          en approche est retiré
+          assets-sources/heros/mat-essai/corsa-dos.jpg, corsa-biais-droite.jpg : l'Opel Corsa du concours de drift (pré du Clos), Mat
+          à bord, sur fond magenta
 Sorties : public/sprites/mat-essai.png (la planche du héros, mêmes lignes que les autres : voir feuilles-heros.ts),
           mat-essai-saut.png, mat-essai-echelle.png (de dos, et son miroir : les deux temps de la montée), mat-essai-mur.png,
           drift-matt-essai-dos.png, drift-matt-essai-biais-droite.png, public/portraits/mat-essai.png,
@@ -24,6 +27,7 @@ from PIL import Image
 
 RACINE = pathlib.Path(__file__).resolve().parent.parent
 SRC = RACINE / 'assets-sources' / 'heros' / 'mat-essai'
+GUITARE = SRC / 'guitare'
 SPRITES = RACINE / 'public' / 'sprites'
 CONTOUR = (28, 22, 30)
 HAUTEUR = 120  # le personnage debout, en pixels de planche
@@ -56,32 +60,38 @@ def regrille(a, op, f):
 
 
 def magenta(nom, f):
-    a = np.array(Image.open(SRC / nom).convert('RGB')).astype(float)
+    a = np.array(Image.open(GUITARE / nom).convert('RGB')).astype(float)
     return regrille(a, masque_magenta(a), f)
 
 
 # l'échelle commune des images sur fond magenta : celle où Mat debout fait HAUTEUR pixels
 def facteur_magenta():
-    a = np.array(Image.open(SRC / 'repos.jpg').convert('RGB')).astype(float)
+    a = np.array(Image.open(GUITARE / 'repos.jpg').convert('RGB')).astype(float)
     ys = np.nonzero(masque_magenta(a).any(1))[0]
     return (ys.max() + 1 - ys.min()) / HAUTEUR
 
 
 def marche():
-    """Les six images de marche, à la taille de Mat debout (la plus haute fait 98 % de sa hauteur : il fléchit un peu)."""
-    a = np.array(Image.open(SRC / 'marche.png').convert('RGBA')).astype(float)
-    op = a[..., 3] > 128
-    cols = op.any(0)
-    bandes, debut = [], None
-    for x, c in enumerate(list(cols) + [False]):
-        if c and debut is None:
-            debut = x
-        elif not c and debut is not None:
-            bandes.append((debut, x))
-            debut = None
-    haut = max(np.ptp(np.nonzero(op[:, x0:x1].any(1))[0]) + 1 for x0, x1 in bandes)
+    """Les six images de marche (fond magenta), à la taille de Mat debout (la plus haute fait 98 % de sa hauteur : il fléchit un peu)."""
+    a = np.array(Image.open(GUITARE / 'marche.jpg').convert('RGB')).astype(float)
+    op = masque_magenta(a)
+    # la guitare d'une image frôle l'image d'à côté : un seul blob par image (les morceaux voisins sont réunis par une dilatation
+    # d'un pas), les six plus gros ; chaque image est rognée sur ses seules colonnes
+    from scipy import ndimage
+
+    lien = ndimage.binary_dilation(op, structure=np.ones((3, 3)), iterations=6)
+    etiquettes, n = ndimage.label(lien)
+    tailles = ndimage.sum(op, etiquettes, range(1, n + 1))
+    gros = sorted(np.argsort(tailles)[-6:] + 1, key=lambda e: np.nonzero(etiquettes == e)[1].min())
+    bandes = []
+    for e in gros:
+        xs = np.nonzero((etiquettes == e).any(0))[0]
+        bandes.append((xs.min(), xs.max() + 1))
+    op_images = [op & (etiquettes == e) for e in gros]
+    haut = max(np.ptp(np.nonzero(m.any(1))[0]) + 1 for m in op_images)
     f = haut / (HAUTEUR * 0.98)
-    return [regrille(a[:, x0:x1, :3], op[:, x0:x1], f) for x0, x1 in bandes]
+    print(f'marche : {len(bandes)} images')
+    return [regrille(a[:, x0:x1], m[:, x0:x1], f) for (x0, x1), m in zip(bandes, op_images)]
 
 
 def hanches(nat):
@@ -128,7 +138,7 @@ def couche(nat):
     return np.array(Image.fromarray(nat).rotate(90, expand=True, resample=Image.NEAREST))
 
 
-def planche_heros(repos, pas, saut, echelle, mur):
+def planche_heros(repos, pas, saut, echelle_a, echelle_b, mur):
     pied = 62
     r = dans_la_case(repos, hanches(repos), pied)
     respirant = dans_la_case(respire(repos, 1), hanches(repos), pied)
@@ -137,7 +147,7 @@ def planche_heros(repos, pas, saut, echelle, mur):
         0: [r, respirant, respirant, r],
         1: course,
         2: [dans_la_case(saut, hanches(saut), pied)],
-        3: [dans_la_case(echelle, hanches(echelle), pied), dans_la_case(echelle[:, ::-1], hanches(echelle[:, ::-1]), pied)],
+        3: [dans_la_case(echelle_a, hanches(echelle_a), pied), dans_la_case(echelle_b, hanches(echelle_b), pied)],
         4: [dans_la_case(saut, hanches(saut), pied)],
         5: [dans_la_case(mur, pieds(mur), pied)],
         6: [dans_la_case(couche(repos), couche(repos).shape[1] / 2, pied)],
@@ -161,14 +171,20 @@ def image_seule(nat, nom, pied_x=None):
     print(f"{nom}.png : w {im.width}, h {im.height}, pied {p}")
 
 
-def echelle_deux_temps(nat):
-    im = Image.fromarray(nat)
-    im = im.crop(im.getbbox())
-    planche = Image.new('RGBA', (im.width, im.height * 2), (0, 0, 0, 0))
-    planche.alpha_composite(im, (0, 0))
-    planche.alpha_composite(im.transpose(Image.FLIP_LEFT_RIGHT), (0, im.height))
+def echelle_deux_temps(a, b):
+    """Les deux temps de la montée : deux images de dos, l'une sous l'autre, recadrées à la même taille (le héros tient sur l'échelle)."""
+    ims = [Image.fromarray(n) for n in (a, b)]
+    boites = [i.getbbox() for i in ims]
+    # le même cadre pour les deux : le milieu du corps (hanches) sur la même colonne, la hauteur du plus grand
+    xs = [hanches(n) - bb[0] for n, bb in zip((a, b), boites)]
+    g, d = max(xs), max(bb[2] - bb[0] - x for x, bb in zip(xs, boites))
+    w = int(round(g + d))
+    h = max(bb[3] - bb[1] for bb in boites)
+    planche = Image.new('RGBA', (w, h * 2), (0, 0, 0, 0))
+    for k, (i, bb, x) in enumerate(zip(ims, boites, xs)):
+        planche.alpha_composite(i.crop(bb), (int(round(g - x)), k * h + h - (bb[3] - bb[1])))
     planche.save(SPRITES / 'mat-essai-echelle.png', optimize=True)
-    print(f"mat-essai-echelle.png : w {im.width}, h {im.height}, pied {im.width // 2}")
+    print(f"mat-essai-echelle.png : w {w}, h {h}, pied {int(round(g))}")
 
 
 def voiture(nom, largeur_jeu):
@@ -215,13 +231,14 @@ def main():
     f = facteur_magenta()
     repos = magenta('repos.jpg', f)
     saut = magenta('saut.jpg', f)
-    echelle = magenta('echelle.jpg', f)
+    echelle_a = magenta('echelle-1.jpg', f)
+    echelle_b = magenta('echelle-2.jpg', f)
     mur = magenta('mur.jpg', f)
     pas = marche()
-    planche_heros(repos, pas, saut, echelle, mur)
+    planche_heros(repos, pas, saut, echelle_a, echelle_b, mur)
     image_seule(saut, 'mat-essai-saut')
     image_seule(mur, 'mat-essai-mur', pieds(mur) - np.nonzero((mur[..., 3] > 0).any(0))[0].min())
-    echelle_deux_temps(echelle)
+    echelle_deux_temps(echelle_a, echelle_b)
     voiture('dos', 58)
     voiture('biais-droite', 66)
     portrait(repos)

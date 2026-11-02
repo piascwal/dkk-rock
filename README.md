@@ -420,7 +420,7 @@ validé.
   ne l'ont qu'une fois son `id` ajouté à `REFONTES_PUBLIEES` (augmenter alors `VERSION_PROTOCOLE`) ; avant, on l'essaie en
   ouvrant le jeu avec `?essai` à la fin de l'adresse (rien n'est retenu : sans lui, c'est le jeu de tout le monde ; un
   bandeau le rappelle) : le menu « Niveaux refaits » propose chaque niveau refait dans sa version d'avant et dans sa version
-  refaite, sans rien sauvegarder. Le mode essai montre aussi le nouveau Mat (sans sa basse, comme sur ses images) : ses planches
+  refaite, sans rien sauvegarder. Le mode essai montre aussi le nouveau Mat : ses planches
   (`outils/prepare-mat-essai.py`, sources dans `assets-sources/heros/mat-essai/`) remplacent celles de l'ancien en jeu, à
   l'écran titre, dans l'intro, à la découverte des cages, dans la Corsa du concours de drift et dans les dialogues
   (`src/rendu/essai-mat.ts`).

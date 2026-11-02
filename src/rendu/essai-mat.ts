@@ -6,8 +6,7 @@ import { FEUILLES_DECOR } from './feuilles-objets';
 /**
  * Le nouveau Mat, à l'essai (mode `?essai`) : ses planches remplacent celles de l'ancien partout où il paraît (en jeu, l'écran
  * titre, l'intro et ses cases de bande dessinée, la découverte des cages, la transition du van), sa Corsa au concours de drift,
- * son portrait dans les dialogues. Les images sortent de outils/prepare-mat-essai.py. Il se joue sans sa basse : les images
- * fournies n'en ont pas.
+ * son portrait dans les dialogues. Les images sortent de outils/prepare-mat-essai.py.
  */
 export const essaiMat = { actif: false };
 
@@ -27,8 +26,8 @@ export function activeMatEssai(): void {
     densite: 6,
   });
   FEUILLES_DECOR['mat-saut'] = decor('mat-essai-saut.png', 109, 95, 54);
-  FEUILLES_DECOR['mat-mur'] = decor('mat-essai-mur.png', 57, 110, 43);
-  FEUILLES_DECOR['mat-echelle'] = decor('mat-essai-echelle.png', 58, 119, 29, [1, 1]);
+  FEUILLES_DECOR['mat-mur'] = decor('mat-essai-mur.png', 73, 110, 59);
+  FEUILLES_DECOR['mat-echelle'] = decor('mat-essai-echelle.png', 82, 120, 37, [1, 1]);
 }
 
 /** Le fichier d'une vue de voiture du drift (`<pilote>-<vue>`) : la Corsa du nouveau Mat à l'essai (de trois quarts vers la
