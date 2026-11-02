@@ -382,7 +382,7 @@ src/
   jeu/               la Partie (simulation), règles, explosions, sauvegarde, la vue (EtatVue)
   niveaux/           format ASCII, cartes/, textes/ (dialogues), index
   histoire/          épilogue et défaite
-  rendu/             caméra, trois plans de fond, décor du plan proche, tuiles (motifs 16-bit détaillés `tuiles-16*.ts`, bords et coins arrondis `tuiles-hd*.ts`, gardées en photo par dalles de 4 × 4 cases `plaque-tuiles.ts`), sprites, particules
+  rendu/             caméra, trois plans de fond, décor du plan proche, tuiles (motifs 16-bit détaillés `tuiles-16*.ts`, bords et coins arrondis `tuiles-hd*.ts`), sprites, particules
   audio/             synthé, bruitages, séquenceur musical
   entrees/           clavier, touches (réaffectables), manette, tactile
   reseau/            protocole binaire, hôte, client (sur lan-kit)

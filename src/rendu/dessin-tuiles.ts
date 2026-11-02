@@ -8,22 +8,7 @@ import { bordIrregulier, cotesHD, paroiHD, pitonEnBois, tuileHD } from './tuiles
 import { dessineVegetation } from './vegetation';
 import { aUnCoin, COTE, coinsDeParoi, cotesLibres, cotesParoi, DEBORD } from './bords-tuiles';
 
-/** Les cases visibles (bornes comprises, dans la carte). */
-export function casesVisibles(
-  carte: Carte,
-  camX: number,
-  camY: number,
-  largeur: number,
-): [number, number, number, number] {
-  return [
-    Math.max(0, Math.floor(camX / TUILE)),
-    Math.max(0, Math.floor(camY / TUILE)),
-    Math.min(carte.largeur - 1, Math.floor((camX + largeur) / TUILE)),
-    Math.min(carte.hauteur - 1, Math.floor((camY + HAUTEUR_VUE) / TUILE)),
-  ];
-}
-
-/** Dessine les tuiles visibles : parois de fond, tuiles, dessus herbeux ou enneigés, fissures (tout, à chaque image : l'éditeur). */
+/** Dessine les tuiles visibles : parois de fond, tuiles, dessus herbeux ou enneigés, fissures. */
 export function dessineTuiles(
   ctx: CanvasRenderingContext2D,
   carte: Carte,
@@ -33,29 +18,11 @@ export function dessineTuiles(
   largeur: number,
   tick: number,
 ): void {
-  const [tx0, ty0, tx1, ty1] = casesVisibles(carte, camX, camY, largeur);
-  dessineZone(ctx, carte, atlas, tx0, ty0, tx1, ty1, camX, camY);
-  dessineAnimees(ctx, carte, tx0, ty0, tx1, ty1, camX, camY, tick);
-  dessineVegetation(ctx, carte, camX, camY, largeur, atlas.theme.decor, tick);
-}
+  const tx0 = Math.max(0, Math.floor(camX / TUILE));
+  const ty0 = Math.max(0, Math.floor(camY / TUILE));
+  const tx1 = Math.min(carte.largeur - 1, Math.floor((camX + largeur) / TUILE));
+  const ty1 = Math.min(carte.hauteur - 1, Math.floor((camY + HAUTEUR_VUE) / TUILE));
 
-/**
- * Ce qui ne bouge pas, des cases (tx0, ty0) à (tx1, ty1) bornes comprises : parois, tuiles, bords, fissures. Le jeu le garde
- * en photo (voir plaque-tuiles.ts) et ne le redessine que là où la carte change.
- */
-export function dessineZone(
-  ctx: CanvasRenderingContext2D,
-  carte: Carte,
-  atlas: AtlasTuiles,
-  tx0: number,
-  ty0: number,
-  tx1: number,
-  ty1: number,
-  camX: number,
-  camY: number,
-): void {
-  [tx0, ty0] = [Math.max(0, tx0), Math.max(0, ty0)];
-  [tx1, ty1] = [Math.min(carte.largeur - 1, tx1), Math.min(carte.hauteur - 1, ty1)];
   const finesse = Math.hypot(ctx.getTransform().a, ctx.getTransform().b);
   for (let ty = ty0; ty <= ty1; ty++) {
     for (let tx = tx0; tx <= tx1; tx++) {
@@ -104,53 +71,22 @@ export function dessineZone(
           // les tonneaux WOG débordent de leur case, vers le haut : l'inscription doit se lire (la collision reste d'une tuile)
           const cote = Math.round(TUILE * GROSSEUR_TONNEAU);
           ctx.drawImage(toile, x - Math.round((cote - TUILE) / 2), y - (cote - TUILE), cote, cote);
+          if (t === T.TONNEAU_OR)
+            refletOr(ctx, x - (cote - TUILE) / 2, y - (cote - TUILE), cote, tick + tx * 37);
         } else if (toile) ctx.drawImage(toile, x, y, TUILE, TUILE);
         ctx.imageSmoothingEnabled = false;
       }
-      const usure = carte.usure(tx, ty);
-      if (usure < 0.7) fissures(ctx, x, y, usure, tx, ty);
-    }
-  }
-}
-
-/** Ce qui bouge, sur les cases visibles : la surface de l'eau qui ondule, le reflet qui traverse le tonneau d'or. */
-export function dessineAnimees(
-  ctx: CanvasRenderingContext2D,
-  carte: Carte,
-  tx0: number,
-  ty0: number,
-  tx1: number,
-  ty1: number,
-  camX: number,
-  camY: number,
-  tick: number,
-): void {
-  for (let ty = ty0; ty <= ty1; ty++)
-    for (let tx = tx0; tx <= tx1; tx++) {
-      const t = carte.get(tx, ty);
-      const x = tx * TUILE - camX;
-      const y = ty * TUILE - camY;
       // la surface de l'eau, à l'air libre : une ligne claire qui ondule
       if (t === T.EAU && carte.get(tx, ty - 1) !== T.EAU) {
         ctx.fillStyle = 'rgba(200, 240, 250, 0.8)';
         for (let i = 0; i < TUILE; i += 4)
           ctx.fillRect(x + i, y + ((tick / 12 + tx + i / 4) % 2 < 1 ? 0 : 1), 3, 1);
-      } else if (t === T.TONNEAU_OR) {
-        const cote = Math.round(TUILE * GROSSEUR_TONNEAU);
-        refletOr(ctx, x - (cote - TUILE) / 2, y - (cote - TUILE), cote, tick + tx * 37);
       }
+      const usure = carte.usure(tx, ty);
+      if (usure < 0.7) fissures(ctx, x, y, usure, tx, ty);
     }
-}
-
-/** Peint d'avance (sans rien dessiner) les toiles dont la case (tx, ty) aura besoin : sa tuile, sa paroi de fond. */
-export function prepareCase(carte: Carte, atlas: AtlasTuiles, tx: number, ty: number): void {
-  const t = carte.get(tx, ty);
-  if (t !== T.VIDE) {
-    const cotes = t === T.EAU ? 0 : cotesHD(carte, t, tx, ty, cotesLibres(carte, t, tx, ty));
-    const hd = tuileHD(t, cotes, tx, ty, atlas.theme, t === T.PITON && pitonEnBois(carte, tx, ty));
-    if (!hd) atlas.toile(t, tx, ty);
   }
-  paroiHD(atlas.theme, fondDerriere(carte, t, tx, ty) ? cotesParoi(carte, tx, ty) : 0, tx, ty);
+  dessineVegetation(ctx, carte, camX, camY, largeur, atlas.theme.decor, tick);
 }
 
 /** Le tonneau WOG est dessiné un peu plus grand que sa case (voir plus haut). */
