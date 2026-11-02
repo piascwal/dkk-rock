@@ -176,7 +176,6 @@ export class Client {
     const lu = niveauLu(niveau);
     this.niveau = niveau;
     this.carte = new Carte(lu.largeur, lu.hauteur, lu.tuiles, lu.fond);
-    this.carte.plancherActif = lu.def.plancher === true;
     this.carte.appliqueTexte(texte);
   }
 

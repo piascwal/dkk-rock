@@ -89,41 +89,6 @@ export class Carte {
     return this.solide(Math.floor(px / TUILE), Math.floor(py / TUILE));
   }
 
-  /** la carte est allégée (DefNiveau.plancher) : le plancher suit le bas du terrain ; sinon, il est au bas de la carte */
-  plancherActif = false;
-  /** la rangée la plus basse du terrain d'origine (la matière, les murs de fond) de chaque colonne ; -1 : rien (un gouffre) */
-  private basColonnes: Int16Array | null = null;
-
-  /**
-   * Le plancher (en pixels) sous les colonnes `tx0` à `tx1` : le bas du terrain d'origine le moins profond d'entre elles (les
-   * gouffres, sans terrain, ne comptent pas). Sous lui il n'y a plus rien : on y est tombé. Une carte pleine jusqu'en bas a son
-   * plancher au bas de la carte ; une carte allégée (la roche s'arrête sous les galeries, voir outils/niveaux/plancher.py) l'a
-   * plus haut, et la caméra s'y arrête : on ne voit jamais le vide sous le terrain.
-   */
-  plancherEntre(tx0: number, tx1: number): number {
-    if (!this.plancherActif) return this.hauteur * TUILE;
-    if (!this.basColonnes) {
-      this.basColonnes = new Int16Array(this.largeur).fill(-1);
-      for (let x = 0; x < this.largeur; x++)
-        for (let y = this.hauteur - 1; y >= 0; y--)
-          if (this.fond[y * this.largeur + x]) {
-            this.basColonnes[x] = y;
-            break;
-          }
-    }
-    let bas = Infinity;
-    for (let x = Math.max(0, tx0); x <= Math.min(this.largeur - 1, tx1); x++) {
-      const b = this.basColonnes[x]!;
-      if (b >= 0 && b < bas) bas = b;
-    }
-    return bas === Infinity ? this.hauteur * TUILE : (bas + 1) * TUILE;
-  }
-
-  /** Le plancher sous la colonne `tx` : celui des colonnes à moins de vingt cases (la largeur d'un demi-écran). */
-  plancher(tx: number): number {
-    return this.plancherEntre(tx - 20, tx + 20);
-  }
-
   aFond(tx: number, ty: number): boolean {
     return this.dedans(tx, ty) && this.fond[ty * this.largeur + tx] === 1;
   }

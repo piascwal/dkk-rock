@@ -56,8 +56,7 @@ export class Joueur extends JoueurBase {
     else if (this.echelle) this.majEchelle(ctx);
     else this.majNormal(ctx);
     this.majTir(ctx);
-    // tombé sous le plancher (le bas du terrain alentour, voir Carte.plancher) : la caméra ne l'y suit pas, il est perdu
-    if (this.corps.y > ctx.carte.plancher(Math.floor(this.corps.x / TUILE)) + 32) this.meurt(ctx);
+    if (this.corps.y > ctx.carte.hauteur * TUILE + 32) this.meurt(ctx);
   }
 
   private majNormal(ctx: Contexte): void {

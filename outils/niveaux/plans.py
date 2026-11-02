@@ -132,11 +132,10 @@ NIVEAUX = {
             ('vide', 64, dict()),  # l'arène du Yéti Alpha, au sommet, peinte après coup
         ],
     ),
-    # Gréau refait : le même chemin jusqu'au Yéti Alpha, mais la roche est percée de galeries (ses massifs ne sont plus pleins), et
-    # elle s'arrête sous elles : sous le terrain, le vide (`plancher`, voir niveaux/plancher.py).
+    # Gréau refait : le même chemin jusqu'au Yéti Alpha, mais la roche est percée de galeries (ses massifs ne sont plus pleins).
     'cimes_refonte': dict(
         nom='Gréau', theme='cimes', textes='03-cimes.ts', fichier='../refontes/03-cimes.ts',
-        constante='CARTE_CIMES_REFONTE', graine=333, base=86, raccord='y', caves='y', altitude=True, reseau=True, relief=False, plancher=True,
+        constante='CARTE_CIMES_REFONTE', graine=333, base=86, raccord='y', caves='y', altitude=True, reseau=True, relief=False,
         # un niveau en hauteur (voir niveaux/hauteurs.py) : on ne fait que monter, de massif en massif, au-dessus du vide,
         # par des corniches, des grottes et des forteresses, jusqu'à l'arène du Yéti Alpha au sommet ; le van s'envole de là-haut
         lieux=[
@@ -234,12 +233,11 @@ NIVEAUX = {
     ),
     # Le Club Infini refait : une boîte de nuit sur plusieurs étages, presque rien sous terre. Les mezzanines du hall, les loges
     # et l'espace VIP sont des blocs de plusieurs étages reliés par des passerelles de métal (on passe de l'un à l'autre en haut,
-    # ou par le bas) ; la régie est un échafaudage ; la piste de danse est une fosse en gradins doux ; deux scènes. Sous le sol,
-    # le vide (`plancher`, voir niveaux/plancher.py).
+    # ou par le bas) ; la régie est un échafaudage ; la piste de danse est une fosse en gradins doux ; deux scènes.
     'club_refonte': dict(
         nom='Le Club Infini', theme='club', textes='06-club.ts', fichier='../refontes/06-club.ts',
         constante='CARTE_CLUB_REFONTE', graine=666, base=38, raccord='abc', caves='abc', van=False, interieur=True,
-        sans_caves=True, acces=True, plancher=True,
+        sans_caves=True, acces=True,
         lieux=[
             ('plat', 14, dict(lettres='ab', deco=3, digit='1')),  # les videurs de l'entrée
             # le hall et ses mezzanines : trois blocs reliés en haut par des passerelles de métal
@@ -434,12 +432,11 @@ NIVEAUX = {
     ),
     # Le pont des Tuves refait : la montagne, ses ruisseaux et ses arbres. L'eau est partout (un torrent en terrasses et ses
     # cascades, la rivière où l'on passe de cabane sur pilotis en cabane, une grotte où on la retrouve sous la montagne) ; le Viet
-    # Cong glaireux n'est plus une partie à part : son camp est sur la rivière, un figuier sur chaque toit. Pas de roche jusqu'au
-    # bas de la carte : sous les galeries, le vide (`plancher`, voir niveaux/plancher.py).
+    # Cong glaireux n'est plus une partie à part : son camp est sur la rivière, un figuier sur chaque toit.
     'tuves_refonte': dict(
         nom='Le Pont des Tuves', theme='tuves', textes='13-tuves.ts', fichier='../refontes/13-tuves.ts',
         constante='CARTE_TUVES_REFONTE', graine=1313, base=40, profondeur=34, raccord='a', caves='ac', reseau=True,
-        plancher=True, drapeaux=30,
+        drapeaux=30,
         lieux=[
             ('sentier', 22, dict(lettres='a', digit='1')),  # le départ du sentier, sa balise
             ('lacets', 30, dict(chute=6, lettres='a')),

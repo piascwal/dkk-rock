@@ -94,12 +94,23 @@ describe('le pont des Tuves', () => {
 
   it('les glaireux lancent des figues', () => {
     const p = partie();
+    // un glaireux amené au départ, sur le sol sec et plat du sentier (dans le niveau, ils vivent sur la rivière et ses cabanes,
+    // où il recule à l'eau en gardant ses distances) ; le héros à cinq cases devant lui (en patrouille, il ne voit que devant lui)
     const v = p.entites.find((e): e is Ennemi => e instanceof Ennemi && e.def.genre === G.GLAIREUX)!;
+    const depart = p.joueurs[0]!.corps;
+    Object.assign(v.corps, { x: depart.x + 10 * TUILE, y: depart.y + depart.h - v.corps.h, vx: 0, vy: 0 });
     const j = p.joueurs[0]!;
     let figues = 0;
-    for (let i = 0; i < 300; i++) {
+    // tourné vers la droite, le héros devant lui (à gauche du départ, une échelle : le héros y serait accroché)
+    v.dir = 1;
+    for (let i = 0; i < 600; i++) {
       j.invulnerable = 99999;
-      Object.assign(j.corps, { x: v.cx - 80, y: v.corps.y + v.corps.h - j.corps.h, vx: 0, vy: 0 });
+      Object.assign(j.corps, {
+        x: v.cx + 80 - j.corps.w / 2,
+        y: v.corps.y + v.corps.h - j.corps.h,
+        vx: 0,
+        vy: 0,
+      });
       p.avance();
       figues = Math.max(figues, p.entites.filter((e) => e instanceof Projectile && e.def === FIGUE).length);
     }

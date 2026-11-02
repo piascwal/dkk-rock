@@ -20,7 +20,6 @@ from plans import NIVEAUX, enchaine
 from souterrain import souterrain, tonneaux_de_surface
 from massifs import reseau
 from acces import relie_l_inaccessible
-from plancher import allege
 from relief import pose_forme, relief_des_plats
 from blocs import bloc
 from plateaux import cuvette, grotte_traversante, miradors, plateau_caverne
@@ -579,8 +578,6 @@ def fabrique(cle):
         r.n.zones = [(x0, x1) for x0, x1, g in r.pieces if g not in ('raccord', 'entree', 'plat', 'vide')]
     if cfg.get('interieur'):
         interieur(r.n)
-    if cfg.get('plancher'):  # pas de roche jusqu'au bas de la carte : le plancher (niveaux/plancher.py)
-        allege(r.n)
     r.ecrit(0, cfg['fichier'], cfg['constante'])
     return r
 
