@@ -25,9 +25,9 @@ export function activeMatEssai(): void {
     rythme: 1,
     densite: 6,
   });
-  FEUILLES_DECOR['mat-saut'] = decor('mat-essai-saut.png', 109, 95, 54);
-  FEUILLES_DECOR['mat-mur'] = decor('mat-essai-mur.png', 73, 110, 59);
-  FEUILLES_DECOR['mat-echelle'] = decor('mat-essai-echelle.png', 82, 120, 37, [1, 1]);
+  FEUILLES_DECOR['mat-saut'] = decor('mat-essai-saut.png', 99, 108, 50);
+  FEUILLES_DECOR['mat-mur'] = decor('mat-essai-mur.png', 88, 116, 68);
+  FEUILLES_DECOR['mat-echelle'] = decor('mat-essai-echelle.png', 82, 128, 41, [1, 1]);
 }
 
 /** Le fichier d'une vue de voiture du drift (`<pilote>-<vue>`) : la Corsa du nouveau Mat à l'essai (de trois quarts vers la

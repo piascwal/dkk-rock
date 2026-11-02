@@ -421,9 +421,10 @@ validé.
   ouvrant le jeu avec `?essai` à la fin de l'adresse (rien n'est retenu : sans lui, c'est le jeu de tout le monde ; un
   bandeau le rappelle) : le menu « Niveaux refaits » propose chaque niveau refait dans sa version d'avant et dans sa version
   refaite, sans rien sauvegarder. Le mode essai montre aussi le nouveau Mat : ses planches
-  (`outils/prepare-mat-essai.py`, sources dans `assets-sources/heros/mat-essai/`) remplacent celles de l'ancien en jeu, à
+  (`outils/prepare-mat-essai.py`, sources dans `assets-sources/heros/mat-essai/trapu/` ; sa marche, son saut et les deux
+  temps de l'échelle sont tirés d'une seule pose par `outils/mat_marche.py`) remplacent celles de l'ancien en jeu, à
   l'écran titre, dans l'intro, à la découverte des cages, dans la Corsa du concours de drift et dans les dialogues
-  (`src/rendu/essai-mat.ts`).
+  (`src/rendu/essai-mat.ts`) ; et JBM plus large (`outils/prepare-jbm-essai.py`, `src/rendu/essai-jbm.ts`).
   `python3 outils/mesure-niveaux.py` compare les cartes : la montée et la casse du chemin le moins cher, la montée imposée
   même en cassant tout (faible : on traverse tout droit en cassant les murs), les gouffres et les falaises.
   **Les forteresses ne se grimpent pas par la façade** : à chaque étage, un balcon de quatre tuiles à gauche (un ennemi dessus : on
