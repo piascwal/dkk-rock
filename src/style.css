@@ -1711,3 +1711,24 @@ h2 {
   pointer-events: none;
   opacity: 0.85;
 }
+
+/* la mesure de fluidité du mode essai, en haut au milieu (voir ui/essai.ts) */
+#mesures-essai {
+  position: fixed;
+  top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  padding: 1px 5px;
+  font:
+    700 9px Silkscreen,
+    monospace;
+  color: #7cfc7c;
+  background: rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+#mesures-essai.mauvais {
+  color: #ff5a5a;
+}

@@ -7,7 +7,7 @@ import { App } from './app';
 import { installeAntiZoom } from './entrees/anti-zoom';
 import { installeCurseurVoile } from './ui/curseur-voile';
 import { choisitVersions } from './niveaux';
-import { afficheBandeauEssai, modeEssai } from './ui/essai';
+import { afficheBandeauEssai, afficheMesuresEssai, modeEssai } from './ui/essai';
 import { activeMatEssai } from './rendu/essai-mat';
 
 /** Point d'entrée : DKK : Rock Never Dies. */
@@ -19,6 +19,8 @@ if (modeEssai()) {
 }
 const app = new App();
 app.demarre();
+// en essai, la fluidité mesurée en haut de l'écran (la finesse : le début du diagnostic, « 3× »)
+if (modeEssai()) afficheMesuresEssai(() => app.diagnostic().split(' ')[0] ?? '');
 installeCurseurVoile();
 installeAntiZoom();
 // le jeu a démarré : le filet de secours (public/secours.js) n'a rien à faire

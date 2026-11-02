@@ -23,3 +23,38 @@ export function afficheBandeauEssai(): void {
   b.textContent = 'ESSAI : niveaux refaits';
   document.body.append(b);
 }
+
+/**
+ * La mesure de fluidité du mode essai, en haut de l'écran : les images par seconde, la plus longue image de la dernière
+ * seconde, le nombre d'à-coups (images de plus de 50 ms) des dix dernières secondes, et la finesse d'affichage (`finesse()`,
+ * « 3× »). Mesurée sur les images de l'écran (requestAnimationFrame) : un blocage du jeu ou du navigateur s'y voit.
+ */
+export function afficheMesuresEssai(finesse: () => string): void {
+  const m = document.createElement('div');
+  m.id = 'mesures-essai';
+  document.body.append(m);
+  let avant = performance.now();
+  let affiche = avant;
+  let images = 0;
+  let pire = 0;
+  const acoups: number[] = [];
+  const image = (t: number) => {
+    const ecart = t - avant;
+    avant = t;
+    images++;
+    pire = Math.max(pire, ecart);
+    // un onglet caché ne dessine plus : son retour n'est pas un à-coup
+    if (ecart > 50 && ecart < 2000) acoups.push(t);
+    while (acoups.length && acoups[0]! < t - 10000) acoups.shift();
+    if (t - affiche >= 500) {
+      const ips = Math.round((images * 1000) / (t - affiche));
+      m.textContent = `${ips} i/s · pire ${Math.round(pire)} ms · ${acoups.length} à-coups/10 s · ${finesse()}`;
+      m.classList.toggle('mauvais', pire > 50);
+      affiche = t;
+      images = 0;
+      pire = 0;
+    }
+    requestAnimationFrame(image);
+  };
+  requestAnimationFrame(image);
+}
