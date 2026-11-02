@@ -151,7 +151,8 @@ export function dessineEntite(
   // monde sombre : un liseré lumineux détache les personnages du fond (cyan pour les héros, rose pour ceux d'en face)
   if (lueur && estPersonnage(v.g) && !aTerre) {
     ctx.shadowColor = heros ? lueur.heros : lueur.ennemis;
-    ctx.shadowBlur = heros ? 10 : 6;
+    // un flou coûte cher (surtout sur téléphone) : court pour les ennemis, nombreux à l'écran
+    ctx.shadowBlur = heros ? 10 : 3;
   }
   ctx.translate(x, y);
   if (v.g === G.VAN_REACTEUR && v.e === 4) ctx.rotate(CABRE); // il décolle, nez en l'air
