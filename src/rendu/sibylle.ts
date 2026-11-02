@@ -18,7 +18,11 @@ let image: HTMLImageElement | null = null;
 
 export function chargeSibylle(base: string): void {
   const img = new Image();
-  img.onload = () => (image = img);
+  img.onload = () =>
+    void img.decode().then(
+      () => (image = img),
+      () => (image = img),
+    );
   img.src = `${base}sprites/carte-sibylle.png?v=${VERSION}`;
 }
 

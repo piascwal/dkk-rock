@@ -89,6 +89,24 @@ export function dessineTuiles(
   dessineVegetation(ctx, carte, camX, camY, largeur, atlas.theme.decor, tick);
 }
 
+/** Peint d'avance (sans rien dessiner) les toiles dont la case (tx, ty) aura besoin : sa tuile, sa paroi de fond. */
+export function prepareCase(carte: Carte, atlas: AtlasTuiles, tx: number, ty: number): void {
+  const t = carte.get(tx, ty);
+  if (t !== T.VIDE) {
+    const cotes = t === T.EAU ? 0 : cotesHD(carte, t, tx, ty, cotesLibres(carte, t, tx, ty));
+    const hd = tuileHD(t, cotes, tx, ty, atlas.theme, t === T.PITON && pitonEnBois(carte, tx, ty));
+    if (!hd) {
+      atlas.toile(t, tx, ty);
+      if (cotes) atlas.habillee(t, tx, ty, cotes);
+    }
+  }
+  if (carte.aFond(tx, ty) || fondDerriere(carte, t, tx, ty)) {
+    const cp = cotesParoi(carte, tx, ty);
+    if (!paroiHD(atlas.theme, cp, tx, ty)) atlas.paroiHabillee(cp);
+  }
+  paroiHD(atlas.theme, 0, tx, ty);
+}
+
 /** Le tonneau WOG est dessiné un peu plus grand que sa case (voir plus haut). */
 export const GROSSEUR_TONNEAU = 1.4;
 

@@ -11,6 +11,7 @@ import { dessineCarteMonde } from './carte-monde';
 import { dessineEntite } from './dessin-entites';
 import { dessineDecor, semeDecor, type CoucheDecor } from './decor';
 import { dessineTuiles, dessineTyroliennes } from './dessin-tuiles';
+import { Prechauffage } from './prechauffage';
 import { Emojis } from './emojis';
 import { Fond } from './fonds';
 import { PremierPlan } from './premier-plan';
@@ -48,6 +49,7 @@ export class Rendu {
   private readonly traits = new TraitsPersos();
   /** le concours de drift du pré du Clos (phase `drift`) */
   private readonly drift = new RenduDrift();
+  private readonly prechauffage = new Prechauffage();
   /** le concours de plongeon du pont des Tuves (phase `plongeon`) */
   private readonly plongeon = new RenduPlongeon();
   /** le rêve de JBT (phase `reve`) */
@@ -193,6 +195,9 @@ export class Rendu {
   }
 
   dessine(vue: EtatVue, carte: Carte, siegeLocal: number): void {
+    // le préchauffage du niveau (voir prechauffage.ts) : beaucoup avant que le jeu ne démarre, très peu ensuite
+    this.prepareNiveau(vue.niveau);
+    this.prechauffage.maj(vue, carte, this.atlas, siegeLocal);
     // une image par pas de la partie, pas une de plus : sur un écran à 120 Hz, sans cela, une image sur deux redessinait la même
     // scène, et le dessin dérivait par rapport à la partie (deux pas d'un coup, puis aucun : de petits à-coups). Chez un client,
     // la vue est lissée à chaque image : le limiteur. Sinon la toile garde l'image précédente.

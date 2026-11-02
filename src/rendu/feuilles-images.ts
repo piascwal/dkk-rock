@@ -27,9 +27,14 @@ export const progresEssentielles = (): number => 1 - essentiellesRestantes / TOT
 
 function chargeImage(src: string, charge: (img: HTMLImageElement) => void, fini?: () => void): void {
   const img = new Image();
+  // décodée tout de suite (hors du fil du jeu) : sinon le navigateur la décode à son premier dessin, en pleine partie (un à-coup)
   img.onload = () => {
-    charge(img);
-    fini?.();
+    const pret = () => {
+      charge(img);
+      fini?.();
+    };
+    if (img.decode) img.decode().then(pret, pret);
+    else pret();
   };
   img.onerror = () => fini?.();
   // la version dans l'adresse : après une mise à jour, le navigateur ne ressert pas l'ancienne image

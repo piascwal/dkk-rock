@@ -217,7 +217,12 @@ const imagesTuiles = new Map<number, HTMLImageElement>();
 export function chargeTuiles(base: string, version: string): void {
   for (const [t, fichier] of Object.entries(IMAGES_TUILES)) {
     const img = new Image();
-    img.onload = () => imagesTuiles.set(Number(t), img);
+    // décodée avant de servir : pas de décodage au premier dessin, en pleine partie
+    img.onload = () =>
+      void img.decode().then(
+        () => imagesTuiles.set(Number(t), img),
+        () => imagesTuiles.set(Number(t), img),
+      );
     img.src = `${base}sprites/${fichier}?v=${version}`;
   }
 }
