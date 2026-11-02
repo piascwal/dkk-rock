@@ -20,6 +20,7 @@ from plans import NIVEAUX, enchaine
 from souterrain import souterrain, tonneaux_de_surface
 from massifs import reseau
 from acces import relie_l_inaccessible
+from plancher import allege
 from relief import pose_forme, relief_des_plats
 from blocs import bloc
 from plateaux import cuvette, grotte_traversante, miradors, plateau_caverne
@@ -28,6 +29,7 @@ from fise import bigair, breakdance, densite, entree, flat_bmx, food_court, grad
 from plage import festival
 from stc import calade, chapelle, clos, place, remparts, restanques
 from tuves import canal, figuiers, lacets, pont_des_tuves, riviere, sentier
+from tuves_jungle import grotte_riviere, pilotis, torrent
 from hauteurs import corniches, descente, grotte, pont_de_singe, tours, vide_partout
 from signatures import falaise, glacier, parking, ponton, scene, toits
 from structures import forteresse, traversee
@@ -306,6 +308,16 @@ class Recette:
     def p_figuiers(self, x0, x1, lettres='v'):
         figuiers(self.n, x0, x1 - x0, lettres)
 
+    # ---- le pont des Tuves refait (voir niveaux/tuves_jungle.py) : l'eau partout, des structures de bois
+    def p_torrent(self, x0, x1, chute=8, lettres='a'):
+        torrent(self.n, x0, x1 - x0, chute, lettres)
+
+    def p_pilotis(self, x0, x1, lettres='a', prof=3, figuiers=False):
+        pilotis(self.n, x0, x1 - x0, lettres, prof, figuiers)
+
+    def p_grotte_riviere(self, x0, x1, profondeur=8, hauteur=14, lettres='a'):
+        grotte_riviere(self.n, x0, x1 - x0, profondeur, hauteur, lettres)
+
     # ---- le FISE (voir niveaux/fise.py) : chaque zone du festival, son décor placé à la main
     def p_entree(self, x0, x1, lettres='s'):
         entree(self.n, x0, x1 - x0, lettres)
@@ -553,11 +565,11 @@ def fabrique(cle):
     elif not cfg.get('sans_caves'):  # le ferry est un petit niveau : rien sous le quai
         souterrain(r, cfg['caves'])
     tonneaux_de_surface(r, barils=cle in ('stc', 'ville', 'newyork'))
-    if cfg.get('reseau'):  # tout ce qu'on voit doit pouvoir s'atteindre (voir niveaux/acces.py)
+    if cfg.get('reseau') or cfg.get('acces'):  # tout ce qu'on voit doit pouvoir s'atteindre (voir niveaux/acces.py)
         relie_l_inaccessible(r.n)
-    if cle == 'cimes':
+    if cle in ('cimes', 'cimes_refonte'):
         arene_du_yeti(r)
-    if cle == 'club':
+    if cle in ('club', 'club_refonte'):
         arene_du_dj(r)
     if cle == 'fise':
         arene_du_champion(r)
@@ -567,6 +579,8 @@ def fabrique(cle):
         r.n.zones = [(x0, x1) for x0, x1, g in r.pieces if g not in ('raccord', 'entree', 'plat', 'vide')]
     if cfg.get('interieur'):
         interieur(r.n)
+    if cfg.get('plancher'):  # pas de roche jusqu'au bas de la carte : le plancher (niveaux/plancher.py)
+        allege(r.n)
     r.ecrit(0, cfg['fichier'], cfg['constante'])
     return r
 

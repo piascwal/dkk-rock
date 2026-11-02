@@ -1,6 +1,9 @@
+import { CARTE_CIMES_REFONTE } from './refontes/03-cimes';
+import { CARTE_CLUB_REFONTE } from './refontes/06-club';
 import { CARTE_FORET_REFONTE } from './refontes/07-foret';
 import { CARTE_PORT_REFONTE } from './refontes/08-port';
 import { CARTE_GROIX_REFONTE } from './refontes/09-groix';
+import { CARTE_TUVES_REFONTE, DECOR_TUVES_REFONTE } from './refontes/13-tuves';
 import { CARTE_BEAUVAIS_REFONTE } from './refontes/17-beauvais';
 import { CARTE_LIMERICK_REFONTE, DECOR_LIMERICK_REFONTE } from './refontes/18-limerick';
 import { CARTE_LUND_REFONTE } from './refontes/19-lund';
@@ -29,6 +32,10 @@ export const REFONTES: Readonly<Record<string, Partial<DefNiveau>>> = {
   foret: { carte: CARTE_FORET_REFONTE },
   port: { carte: CARTE_PORT_REFONTE },
   groix: { carte: CARTE_GROIX_REFONTE },
+  // la tournée : à l'essai (pas encore dans REFONTES_PUBLIEES)
+  tuves: { carte: CARTE_TUVES_REFONTE, decor: DECOR_TUVES_REFONTE, plancher: true },
+  club: { carte: CARTE_CLUB_REFONTE, plancher: true },
+  cimes: { carte: CARTE_CIMES_REFONTE, plancher: true },
 };
 
 /**

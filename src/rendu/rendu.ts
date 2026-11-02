@@ -251,7 +251,10 @@ export class Rendu {
     this.prepareNiveau(vue.niveau);
     const moi = vue.joueurs[siegeLocal];
     const suivi = moi && moi.present && !moi.mort ? moi : vue.joueurs.find((j) => j.present && !j.mort);
-    if (suivi) this.camera.suit(suivi.x, suivi.y, this.largeur, carte.largeur * TUILE, carte.hauteur * TUILE);
+    if (suivi)
+      this.camera.suit(suivi.x, suivi.y, this.largeur, carte.largeur * TUILE, carte.hauteur * TUILE, (a, b) =>
+        carte.plancherEntre(a, b),
+      );
     const s = vue.secousse;
     // la caméra se cale sur les pixels de la toile (1/densité de pixel du jeu), pas sur les pixels du jeu entiers : le héros
     // court à 2,5 pixels du jeu par pas, et un décor arrondi au pixel entier avancerait de 2, 3, 2, 3... (le défilement

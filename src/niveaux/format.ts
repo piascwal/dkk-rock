@@ -65,6 +65,11 @@ export interface DefNiveau {
   envol?: boolean;
   /** un mini-jeu à la place du niveau de plateforme (l'intro lue, il commence ; voir jeu/drift.ts) */
   miniJeu?: 'drift' | 'plongeon' | 'reve' | 'avion' | 'kart';
+  /**
+   * La carte s'arrête sous ses galeries (pas de roche jusqu'en bas, voir outils/niveaux/plancher.py) : on meurt en tombant sous le
+   * bas du terrain alentour, et la caméra ne descend pas plus bas (Carte.plancher).
+   */
+  plancher?: boolean;
   /** le décor placé à la main (nom d'accessoire, colonne, rangée du sol) : il remplace le décor semé au hasard */
   decor?: readonly DecorFixe[];
   /** le décor placé à la main s'ajoute au semis au hasard au lieu de le remplacer (Saint-Cézaire, les gorges de la Siagne) */

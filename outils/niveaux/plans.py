@@ -132,6 +132,34 @@ NIVEAUX = {
             ('vide', 64, dict()),  # l'arène du Yéti Alpha, au sommet, peinte après coup
         ],
     ),
+    # Gréau refait : le même chemin jusqu'au Yéti Alpha, mais la roche est percée de galeries (ses massifs ne sont plus pleins), et
+    # elle s'arrête sous elles : sous le terrain, le vide (`plancher`, voir niveaux/plancher.py).
+    'cimes_refonte': dict(
+        nom='Gréau', theme='cimes', textes='03-cimes.ts', fichier='../refontes/03-cimes.ts',
+        constante='CARTE_CIMES_REFONTE', graine=333, base=86, raccord='y', caves='y', altitude=True, reseau=True, relief=False, plancher=True,
+        # un niveau en hauteur (voir niveaux/hauteurs.py) : on ne fait que monter, de massif en massif, au-dessus du vide,
+        # par des corniches, des grottes et des forteresses, jusqu'à l'arène du Yéti Alpha au sommet ; le van s'envole de là-haut
+        lieux=[
+            ('plat', 12, dict(lettres='y', deco=2, digit='1')),  # le premier yéti
+            ('colline', 16, dict(haut=2, lettres='y')),
+            ('corniches', 14, dict(monte=9, lettres='y')),
+            ('pont_singe', 16, dict(lettres='y')),
+            ('tours', 46, dict(etages=3, mode='pont', lettres='y', mat='R')),  # deux tours reliées par une passerelle
+            ('plat', 10, dict(lettres='y', digit='2')),  # la glace et la neige qui tombe
+            ('glacier', 44, dict(lettres='y', nb=2)),
+            ('pont_singe', 18, dict(lettres='ya', butin='*')),
+            ('barrage', 20, dict(haut=12, lettres='y', butin='*')),  # l'à-pic
+            ('descente', 22, dict(chute=12, lettres='ya')),  # d'une montagne à l'autre, bien plus bas : le vide se voit
+            ('grotte', 18, dict(monte=12, lettres='ya', butin='K')),
+            ('tours', 46, dict(etages=3, mode='tyro', lettres='ya', mat='R')),  # une tyrolienne de toit en toit
+            ('pont_singe', 16, dict(lettres='ya')),
+            ('cheminee', 24, dict(haut=11, lettres='ya')),
+            ('corniches', 14, dict(monte=9, lettres='ya')),
+            ('plat', 10, dict(lettres='yy', digit='3')),  # flash spécial : Detroit
+            ('pont_singe', 16, dict(lettres='ya')),
+            ('vide', 64, dict()),  # l'arène du Yéti Alpha, au sommet, peinte après coup
+        ],
+    ),
     'plage': dict(
         nom='Les Plages Électroniques', theme='plage', textes='04-plage.ts', fichier='04-plage.ts',
         constante='CARTE_PLAGE', graine=44, base=30, raccord='acd', caves='acd',
@@ -200,6 +228,35 @@ NIVEAUX = {
             ('forteresse', 38, dict(etages=4, lettres='abcd', mat='M', cage=True)),  # l'espace VIP
             ('scene', 36, dict(lettres='bcdf')),  # la grande scène
             ('mur', 18, dict(haut=7, lettres='bcd')),
+            ('plat', 12, dict(lettres='bcdr', digit='3', drones=1)),  # le DJ, juste derrière
+            ('vide', 70, dict()),  # l'arène de DJ Boucle (outils/genere-niveaux.py : arene_du_dj)
+        ],
+    ),
+    # Le Club Infini refait : une boîte de nuit sur plusieurs étages, presque rien sous terre. Les mezzanines du hall, les loges
+    # et l'espace VIP sont des blocs de plusieurs étages reliés par des passerelles de métal (on passe de l'un à l'autre en haut,
+    # ou par le bas) ; la régie est un échafaudage ; la piste de danse est une fosse en gradins doux ; deux scènes. Sous le sol,
+    # le vide (`plancher`, voir niveaux/plancher.py).
+    'club_refonte': dict(
+        nom='Le Club Infini', theme='club', textes='06-club.ts', fichier='../refontes/06-club.ts',
+        constante='CARTE_CLUB_REFONTE', graine=666, base=38, raccord='abc', caves='abc', van=False, interieur=True,
+        sans_caves=True, acces=True, plancher=True,
+        lieux=[
+            ('plat', 14, dict(lettres='ab', deco=3, digit='1')),  # les videurs de l'entrée
+            # le hall et ses mezzanines : trois blocs reliés en haut par des passerelles de métal
+            ('bloc', 24, dict(etages=3, lien='metal', ecart=8, mat='M', lettres='abc')),
+            ('bloc', 22, dict(etages=4, lien='metal', ecart=9, mat='M', lettres='abc', monte=-2)),
+            ('bloc', 24, dict(etages=3, lien=None, ecart=0, mat='M', lettres='abc')),
+            ('scene', 36, dict(lettres='acf')),  # la première scène, ses basses et ses projecteurs
+            ('plat', 10, dict(lettres='bc', digit='2')),  # la ligne de basse
+            ('echafaudage', 22, dict(niveaux=3, lettres='cdf')),  # la régie
+            # la piste de danse : une fosse en gradins doux, où l'on descend et d'où l'on remonte
+            ('cuvette', 64, dict(profondeur=8, lettres='cdf', pente=3, paliers=3, fortin=False)),
+            # les loges et l'espace VIP : des étages vitrés, une tyrolienne de l'un à l'autre
+            ('bloc', 22, dict(etages=5, lien='tyro', ecart=12, mat='M', lettres='abcd')),
+            ('bloc', 22, dict(etages=4, lien='metal', ecart=9, mat='M', lettres='abcd', monte=-3)),
+            ('bloc', 22, dict(etages=3, lien=None, ecart=0, mat='M', lettres='abcd')),
+            ('forme', 34, dict(nom='echafaudage', lettres='bcdf')),  # les structures des lumières
+            ('scene', 36, dict(lettres='bcdf')),  # la grande scène
             ('plat', 12, dict(lettres='bcdr', digit='3', drones=1)),  # le DJ, juste derrière
             ('vide', 70, dict()),  # l'arène de DJ Boucle (outils/genere-niveaux.py : arene_du_dj)
         ],
@@ -373,6 +430,31 @@ NIVEAUX = {
             ('gouffre', 22, dict(lettres='acdfhm', nb=4)),
             ('plat', 10, dict(lettres='acdfhm', digit='4', drones=2)),  # la plage des Grands Sables
             ('arene', 46, dict(lettres='acdfhm')),
+        ],
+    ),
+    # Le pont des Tuves refait : la montagne, ses ruisseaux et ses arbres. L'eau est partout (un torrent en terrasses et ses
+    # cascades, la rivière où l'on passe de cabane sur pilotis en cabane, une grotte où on la retrouve sous la montagne) ; le Viet
+    # Cong glaireux n'est plus une partie à part : son camp est sur la rivière, un figuier sur chaque toit. Pas de roche jusqu'au
+    # bas de la carte : sous les galeries, le vide (`plancher`, voir niveaux/plancher.py).
+    'tuves_refonte': dict(
+        nom='Le Pont des Tuves', theme='tuves', textes='13-tuves.ts', fichier='../refontes/13-tuves.ts',
+        constante='CARTE_TUVES_REFONTE', graine=1313, base=40, profondeur=34, raccord='a', caves='ac', reseau=True,
+        plancher=True, drapeaux=30,
+        lieux=[
+            ('sentier', 22, dict(lettres='a', digit='1')),  # le départ du sentier, sa balise
+            ('lacets', 30, dict(chute=6, lettres='a')),
+            ('forteresse', 32, dict(etages=3, lettres='ac', cage=True)),  # un fort, sur le chemin
+            ('torrent', 44, dict(chute=8, lettres='ac', digit='2')),  # le torrent qui dévale, ses vasques et ses cascades
+            ('canal', 34, dict(lettres='ac', digit='3')),  # le canal de la Siagne
+            ('pilotis', 66, dict(lettres='ac')),  # un premier bras de rivière, des cabanes de pêcheurs
+            ('pont_singe', 18, dict(lettres='ac')),
+            ('descente', 24, dict(chute=6, lettres='ac')),  # une tyrolienne jusqu'au fond des gorges
+            ('pont_des_tuves', 62, dict(lettres='ac', digit='4')),  # le pont de 1802, la rivière dessous
+            ('grotte_riviere', 96, dict(profondeur=8, hauteur=14, lettres='av')),  # sous la montagne, on retrouve la rivière
+            ('pilotis', 78, dict(lettres='v', figuiers=True, digit='5')),  # le camp du Viet Cong glaireux
+            ('torrent', 34, dict(chute=6, lettres='v')),
+            ('pilotis', 70, dict(lettres='vv', figuiers=True, prof=4, digit='6')),
+            ('arene', 40, dict(lettres='av')),
         ],
     ),
     # le ferry : un niveau à part entre le port et Groix, rejouable depuis la carte (voir outils/niveaux/ferry.py)

@@ -115,3 +115,14 @@ coup d'œil : les comparer avant et après chaque refonte.
    « avant » est alors la version publiée.
 5. Une fois validée, l'ajouter à `REFONTES_PUBLIEES` (ou, pour une nouvelle version, la mettre à la place de la refonte publiée)
    et augmenter `VERSION_PROTOCOLE`.
+
+## Le plancher : pas de roche jusqu'en bas
+
+- **On ne peint pas la roche qu'on n'atteindra jamais.** Une refonte avec `plancher=True` (dans son plan) s'arrête trois rangées sous
+  ses galeries les plus basses ; dessous, le vide (`outils/niveaux/plancher.py`). Le jeu y voit le bas du terrain
+  (`Carte.plancher`, activé par `DefNiveau.plancher`) : la caméra ne descend pas plus bas que la dernière bande de terre à
+  l'écran, et le héros qui tombe dans un gouffre sort de l'écran par le bas et meurt, comme dans Broforce, sans aller jusqu'au
+  fond de la carte.
+- **Jamais de vide sous le terrain à l'écran.** Le bas du terrain d'une colonne est le plus profond de ce qu'il faut porter à moins
+  d'une largeur d'écran (28 colonnes) de part et d'autre : toutes les colonnes visibles descendent au moins aussi bas que ce
+  qu'on voit, et l'on ne meurt jamais alors qu'on voit encore de la roche plus bas à côté.

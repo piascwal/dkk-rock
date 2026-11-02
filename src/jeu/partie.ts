@@ -265,6 +265,7 @@ export class Partie implements Contexte {
     this.generation++;
     this.lu = niveauLu(niveau);
     this.carte = new Carte(this.lu.largeur, this.lu.hauteur, this.lu.tuiles, this.lu.fond);
+    this.carte.plancherActif = this.lu.def.plancher === true;
     // les tuiles de l'ancienne carte n'ont plus de sens
     this.evenements = this.evenements.filter((e) => e.k !== 'tuile');
     this.tyroliennes = this.lu.tyroliennes;
