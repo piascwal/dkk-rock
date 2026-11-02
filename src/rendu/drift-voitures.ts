@@ -1,5 +1,4 @@
 import { VERSION } from '../version';
-import { fichierVoiture } from './essai-mat';
 import { roues, type Pose } from '../jeu/drift-pelouse';
 import { FOCALE, HAUTEUR, HORIZON, type Regard } from './drift-sol';
 
@@ -16,11 +15,9 @@ const images = new Map<string, HTMLImageElement>();
 export function chargeVoitures(base: string): void {
   for (const nom of NOMS)
     for (const vue of ['dos', 'biais', 'biais-droite']) {
-      const fichier = fichierVoiture(nom, vue);
-      if (!fichier) continue;
       const img = new Image();
       img.onload = () => images.set(`${nom}-${vue}`, img);
-      img.src = `${base}sprites/${fichier}?v=${VERSION}`;
+      img.src = `${base}sprites/drift-${nom}-${vue}.png?v=${VERSION}`;
     }
 }
 

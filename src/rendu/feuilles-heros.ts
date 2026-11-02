@@ -20,7 +20,7 @@ const heros = (fichier: string, w: number, h: number, pied: number): Feuille => 
 
 export const FEUILLES_HEROS: Partial<Record<Genre, Feuille>> = {
   [G.JBT]: heros('jbt-instrument.png', 121, 122, 65),
-  [G.JBM]: heros('jbm-instrument.png', 118, 123, 68),
+  [G.JBM]: heros('jbm-instrument.png', 142, 123, 82),
   [G.JBG]: heros('jbg-instrument.png', 121, 123, 67),
   [G.MAT]: heros('mat-instrument.png', 124, 124, 70),
   [G.TOM]: heros('tom-instrument.png', 125, 144, 73),

@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-"""JBM plus large (mode essai) : ses planches étirées en largeur, pour qu'il ait le gabarit des autres héros (Tom, le nouveau Mat).
+"""JBM plus large : ses planches étirées en largeur, pour qu'il ait le gabarit des autres héros (Tom, JBT).
 
-Usage : python3 outils/prepare-jbm-essai.py      (Pillow requis)
+Usage : python3 outils/elargit-jbm.py      (Pillow requis)
+        Une seule fois, juste après avoir refait ses planches (anime-instrument.py jbm, fixe-objets.py) : il refuse une planche
+        déjà étirée.
 
-Entrées : public/sprites/jbm-instrument.png (la planche du héros, cases de 118 × 123), jbm-saut.png, jbm-mur.png, jbm-echelle.png
-Sorties : les mêmes, suffixées -essai (jbm-instrument-essai.png…) ; les tailles et les pieds s'affichent (voir essai-jbm.ts).
+Entrées et sorties : public/sprites/jbm-instrument.png (la planche du héros, cases de 118 × 123 avant), jbm-saut.png,
+          jbm-mur.png, jbm-echelle.png, réécrites en place ; les tailles et les pieds s'affichent : les reporter dans
+          feuilles-heros.ts (et assets-sources/heros/meta-jbm.json) et feuilles-objets.ts.
 
 Chaque case est étirée sans lissage (au plus proche voisin) : une colonne sur cinq est doublée, le pixel art reste net.
 """
@@ -23,13 +26,15 @@ def etire(im):
 def planche(nom, w, h, pied, colonnes=1, lignes=1):
     """La planche `nom`, découpée en cases de w × h, chaque case étirée ; le pied suit."""
     src = Image.open(SPRITES / f'{nom}.png').convert('RGBA')
+    if src.width != w * colonnes:
+        raise SystemExit(f'{nom}.png fait {src.width} de large, pas {w * colonnes} : déjà étirée ?')
     w2 = round(w * LARGEUR)
     res = Image.new('RGBA', (w2 * colonnes, h * lignes), (0, 0, 0, 0))
     for j in range(lignes):
         for i in range(colonnes):
             res.alpha_composite(etire(src.crop((i * w, j * h, (i + 1) * w, (j + 1) * h))), (i * w2, j * h))
-    res.save(SPRITES / f'{nom}-essai.png', optimize=True)
-    print(f'{nom}-essai.png : w {w2}, h {h}, pied {round(pied * LARGEUR)}')
+    res.save(SPRITES / f'{nom}.png', optimize=True)
+    print(f'{nom}.png : w {w2}, h {h}, pied {round(pied * LARGEUR)}')
 
 
 def main():

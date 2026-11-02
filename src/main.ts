@@ -8,16 +8,12 @@ import { installeAntiZoom } from './entrees/anti-zoom';
 import { installeCurseurVoile } from './ui/curseur-voile';
 import { choisitVersions } from './niveaux';
 import { afficheBandeauEssai, afficheMesuresEssai, modeEssai } from './ui/essai';
-import { activeJbmEssai } from './rendu/essai-jbm';
-import { activeMatEssai } from './rendu/essai-mat';
 
 /** Point d'entrée : DKK : Rock Never Dies. */
 // le mode essai d'abord : les niveaux refaits remplacent les originaux avant que rien ne soit lu
 choisitVersions(modeEssai());
 if (modeEssai()) {
   afficheBandeauEssai();
-  activeMatEssai(); // le nouveau Mat, à l'essai
-  activeJbmEssai(); // JBM plus large
 }
 const app = new App();
 app.demarre();
