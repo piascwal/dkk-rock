@@ -104,7 +104,8 @@ def portrait(repos):
     """Le portrait des dialogues (44 × 44, comme les autres) : la tête et les épaules de Mat debout."""
     al = repos[..., 3] > 0
     haut = np.nonzero(al.any(1))[0].min()
-    xs = np.nonzero(al[haut : haut + 25].any(0))[0]
+    # le milieu de la tête : les cheveux, les 14 premières rangées (plus bas, la tête de la basse dépasse à droite)
+    xs = np.nonzero(al[haut : haut + 14].any(0))[0]
     cx = (xs.min() + xs.max()) // 2
     Image.fromarray(repos).crop((cx - 22, haut - 2, cx + 22, haut + 42)).save(
         RACINE / 'public' / 'portraits' / 'mat-essai.png', optimize=True
