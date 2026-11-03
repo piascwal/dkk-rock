@@ -107,10 +107,10 @@ def portrait(repos):
     # le milieu de la tête : les cheveux, les 14 premières rangées (plus bas, la tête de la basse dépasse à droite)
     xs = np.nonzero(al[haut : haut + 14].any(0))[0]
     cx = (xs.min() + xs.max()) // 2
-    Image.fromarray(repos).crop((cx - 22, haut - 2, cx + 22, haut + 42)).save(
+    Image.fromarray(repos).crop((cx - 17, haut - 2, cx + 17, haut + 32)).resize((44, 44), Image.NEAREST).save(
         RACINE / 'public' / 'portraits' / 'mat-essai.png', optimize=True
     )
-    print('portraits/mat-essai.png : 44 x 44')
+    print('portraits/mat-essai.png : 44 x 44')  # le cadrage de la tête, agrandi au format des autres portraits
 
 
 def intro(repos):
