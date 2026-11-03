@@ -13,7 +13,8 @@ export const essaiMat = { actif: false };
 
 /** Pixels de planche par pixel du jeu (6 pour les autres héros) : plus petit, c'est un Mat plus grand. */
 const DENSITE = 5.6; // en jeu (la course, le tir) : un dixième de plus
-const DENSITE_ESCALADE = 4.3; // l'échelle et la paroi : un tiers de plus, son image est étroite et il paraissait petit
+const DENSITE_ECHELLE = 4.3; // l'échelle : un tiers de plus, son image est étroite et il paraissait petit
+const DENSITE_PAROI = 4.7; // la paroi : un peu moins, 4,3 était légèrement trop grand
 const DENSITE_SAUT = 5.2;
 
 /** Branche le nouveau Mat (au démarrage, avant le chargement des planches). */
@@ -41,6 +42,6 @@ export function activeMatEssai(): void {
     FEUILLES_DECOR[cle] = { fichier, w, h, pied, images, rythme: 1, densite };
   };
   decor('mat-saut', 'mat-essai-saut.png', 92, 97, 46, DENSITE_SAUT);
-  decor('mat-mur', 'mat-essai-mur.png', 61, 112, 36, DENSITE_ESCALADE);
-  decor('mat-echelle', 'mat-essai-echelle.png', 52, 118, 26, DENSITE_ESCALADE, [1, 1]);
+  decor('mat-mur', 'mat-essai-mur.png', 61, 112, 36, DENSITE_PAROI);
+  decor('mat-echelle', 'mat-essai-echelle.png', 52, 118, 26, DENSITE_ECHELLE, [1, 1]);
 }
