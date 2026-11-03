@@ -1,7 +1,6 @@
 import { ANIM, G } from '../jeu/vue';
 import { VERSION } from '../version';
 import type { Qui } from '../niveaux/format';
-import { essaiMat } from '../rendu/essai-mat';
 import { HEROS } from '../entites/heros';
 import { DESSINS_BOSS } from '../rendu/dessins-boss';
 import { dessineHeros, dessineKiwi } from '../rendu/dessins-heros';
@@ -83,7 +82,7 @@ const IMAGES: Partial<Record<Qui, string>> = {
 };
 
 export function portrait(qui: Qui): string {
-  const fichier = qui === 'MAT' && essaiMat.actif ? 'mat-essai' : IMAGES[qui];
+  const fichier = IMAGES[qui];
   if (fichier) return `${import.meta.env.BASE_URL}portraits/${fichier}.png?v=${VERSION}`;
   let url = cache.get(qui);
   if (url) return url;

@@ -420,10 +420,11 @@ validé.
   ne l'ont qu'une fois son `id` ajouté à `REFONTES_PUBLIEES` (augmenter alors `VERSION_PROTOCOLE`) ; avant, on l'essaie en
   ouvrant le jeu avec `?essai` à la fin de l'adresse (rien n'est retenu : sans lui, c'est le jeu de tout le monde ; un
   bandeau le rappelle) : le menu « Niveaux refaits » propose chaque niveau refait dans sa version d'avant et dans sa version
-  refaite, sans rien sauvegarder. Le mode essai montre aussi le nouveau Mat : ses images (`assets-sources/heros/mat-essai/`)
-  passent par `outils/prepare-mat-essai.py` puis `outils/anime-instrument.py mat-essai` (la marche et la visée, comme les autres
-  héros) et remplacent celles de l'ancien en jeu, à l'écran titre, dans l'intro, à la découverte des cages et dans les dialogues
-  (`src/rendu/essai-mat.ts`).
+  refaite, sans rien sauvegarder.
+  Mat est fait à partir de ses images (`assets-sources/heros/mat-source/`) : `outils/prepare-mat.py` (saut, mur, échelle de dos
+  et son miroir, portrait, intro), puis `outils/anime-instrument.py mat` (la planche du héros : marche et visée, la basse et les
+  bras pivotant ensemble). Sa taille par situation est dans `DENSITE_HEROS` (`outils/anime-instrument.py`) et dans
+  `src/rendu/feuilles-objets.ts` pour le décor (`fixe-objets.py` ne sait pas encore les refaire : à reporter à la main).
   `python3 outils/mesure-niveaux.py` compare les cartes : la montée et la casse du chemin le moins cher, la montée imposée
   même en cassant tout (faible : on traverse tout droit en cassant les murs), les gouffres et les falaises.
   **Les forteresses ne se grimpent pas par la façade** : à chaque étage, un balcon de quatre tuiles à gauche (un ennemi dessus : on

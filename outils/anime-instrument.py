@@ -155,11 +155,15 @@ def fabrique(nom):
     ap.alpha_composite(planche)
     ap.resize((ap.width // 2, ap.height // 2), Image.NEAREST).save(SRC / f'apercu-{nom}-instrument.png')
     meta = {'fichier': f'{nom}-instrument.png', 'w': w, 'h': h, 'pied': (ancre + MARGE - x0) // REDUCTION}
+    if nom in DENSITE_HEROS:
+        meta['densite'] = DENSITE_HEROS[nom]
     (SRC / f'meta-{nom}.json').write_text(json.dumps(meta, indent=2) + '\n')
     print(nom, json.dumps(meta))
 
 
 GENRES = {'jbt': 'JBT', 'jbm': 'JBM', 'jbg': 'JBG', 'mat': 'MAT', 'tom': 'TOM'}
+# pixels de planche par pixel du jeu, quand le héros n'est pas à 6 (un Mat plus grand : son image est plus petite)
+DENSITE_HEROS = {'mat': 5.6}
 
 
 def ecrit_ts():
@@ -169,16 +173,17 @@ def ecrit_ts():
         f = SRC / f'meta-{nom}.json'
         if f.exists():
             m = json.loads(f.read_text())
-            lignes.append(f"  [G.{genre}]: heros('{m['fichier']}', {m['w']}, {m['h']}, {m['pied']}),")
+            dens = f", {m['densite']}" if 'densite' in m else ''
+            lignes.append(f"  [G.{genre}]: heros('{m['fichier']}', {m['w']}, {m['h']}, {m['pied']}{dens}),")
     (RACINE / 'src' / 'rendu' / 'feuilles-heros.ts').write_text(
         "// Fichier généré par outils/anime-instrument.py : ne pas modifier à la main.\n"
         "import { G, type Genre } from '../jeu/vue';\n"
         "import type { Feuille } from './feuilles';\n\n"
         "// repos 4, course 6, saut, échelle 2, tyrolienne, mur, mort, tir 2, puis la course en visant (codes 1 à 4)\n"
         "const ANIMATIONS_HEROS = [4, 6, 1, 2, 1, 1, 1, 0, 0, 0, 2, 6, 6, 6, 6];\n\n"
-        "/** Un héros avec son instrument dans le sprite ; `pied` : milieu des pieds dans l'image. */\n"
-        "const heros = (fichier: string, w: number, h: number, pied: number): Feuille => ({\n"
-        "  fichier,\n  w,\n  h,\n  pied,\n  densite: 6,\n  visees: 11,\n  images: ANIMATIONS_HEROS,\n  rythme: 5,\n  cycle: 12,\n});\n\n"
+        "/** Un héros avec son instrument dans le sprite ; `pied` : milieu des pieds dans l'image ; `densite` : pixels de planche par pixel du jeu. */\n"
+        "const heros = (fichier: string, w: number, h: number, pied: number, densite = 6): Feuille => ({\n"
+        "  fichier,\n  w,\n  h,\n  pied,\n  densite,\n  visees: 11,\n  images: ANIMATIONS_HEROS,\n  rythme: 5,\n  cycle: 12,\n});\n\n"
         "export const FEUILLES_HEROS: Partial<Record<Genre, Feuille>> = {\n" + '\n'.join(lignes) + '\n};\n'
     )
 

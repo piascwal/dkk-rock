@@ -1,1 +1,7 @@
-{ "fichier": "mat-instrument.png", "w": 124, "h": 124, "pied": 70 }
+{
+  "fichier": "mat-instrument.png",
+  "w": 127,
+  "h": 120,
+  "pied": 68,
+  "densite": 5.6
+}

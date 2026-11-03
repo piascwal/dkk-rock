@@ -45,26 +45,7 @@ def source_jbm(x, y, rgb):
     return r + g + b > 180 and abs(r - b) < 25
 
 
-# ---- Mat : basse tenue comme la guitare de Tom
-MAT = [
-    Membre('arme', [(36, 96), (62, 96), (66, 122), (98, 120), (108, 108), (140, 96), (176, 70), (222, 60), (224, 100),
-                    (170, 108), (168, 128), (142, 134), (120, 152), (118, 164), (100, 194), (36, 194)],
-           (60, 102), filtre=pas_noir, z=1, epure=True),
-] + jambes(
-    [(100, 150), (140, 150), (140, 205), (100, 205)], [(104, 205), (154, 205), (154, 250), (104, 250)],
-    [(58, 186), (102, 186), (102, 214), (58, 214)], [(54, 212), (102, 212), (102, 252), (54, 252)],
-    (122, 158), (122, 206), (84, 186), (76, 212), ((122, 206), (0, 1)), ((76, 212), (0, 1)), retient=12)
-CORPS_MAT = [(52, 96), (126, 92), (134, 130), (128, 172), (80, 172), (50, 130)]
-
-
-def source_mat(x, y, rgb):
-    r, g, b = rgb
-    if y < 152:
-        return 18 <= r <= 48 and 18 <= g <= 48 and 18 <= b <= 52
-    return b > r + 25 and b < 140 and r < 70
-
-
-# ---- Mat à l'essai (outils/prepare-mat-essai.py) : la basse et les deux bras pivotent ensemble ; les points sont donnés sur sa
+# ---- Mat (outils/prepare-mat-essai.py) : la basse et les deux bras pivotent ensemble ; les points sont donnés sur sa
 # grille d'origine (Mat debout, 118 pixels), posée à 14 pixels du bord et agrandie deux fois dans l'espace de travail
 def _me(*points):
     return [(2 * (x + 14), 2 * (y + 2)) for x, y in points]
@@ -133,8 +114,7 @@ VISEES_BRAS = {1: -40, 2: -75, 3: 35, 4: 70}
 HEROS = {
     'tom': (MEMBRES_TOM, CORPS_TOM, SOURCE_TOM, 262, VISEES_GUITARE),
     'jbm': (JBM, CORPS_JBM, source_jbm, 117, VISEES_BRAS),
-    'mat': (MAT, CORPS_MAT, source_mat, 112, VISEES_GUITARE),
     'jbt': (JBT, CORPS_JBT, source_jbt, 118, VISEES_BRAS),
     'jbg': (JBG, CORPS_JBG, None, 118, VISEES_GUITARE),
-    'mat-essai': (MAT_ESSAI, CORPS_MAT_ESSAI, source_mat_essai, 98, VISEES_GUITARE),
+    'mat': (MAT_ESSAI, CORPS_MAT_ESSAI, source_mat_essai, 98, VISEES_GUITARE),
 }

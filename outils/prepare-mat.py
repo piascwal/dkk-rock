@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-"""Le nouveau Mat (mode essai) : ses images fournies → les planches du jeu, à côté de celles de l'ancien Mat.
+"""Mat : ses images fournies → les planches du jeu.
 
-Usage : python3 outils/prepare-mat-essai.py && python3 outils/anime-instrument.py mat-essai
+Usage : python3 outils/prepare-mat.py && python3 outils/anime-instrument.py mat
         (Pillow, numpy et scipy requis)
 
-Entrées : assets-sources/heros/mat-essai/ : repos.jpg (debout, la basse en main), saut.jpg, mur.jpg (de profil contre la
+Entrées : assets-sources/heros/mat-source/ : repos.jpg (debout, la basse en main), saut.jpg, mur.jpg (de profil contre la
           paroi), echelle.jpg (de dos) ; sur fond magenta, à la même échelle (une case de pixel art fait 9,75 pixels).
-Sorties : assets-sources/heros/mat-essai-instrument-base.png : Mat debout, remis sur sa grille, dans un carré : la référence
+Sorties : assets-sources/heros/mat-instrument-base.png : Mat debout, remis sur sa grille, dans un carré : la référence
           d'où anime-instrument.py tire la planche du héros (la marche, la visée : la basse et les bras pivotent ensemble,
           voir gabarits_instrument.py) ;
-          public/sprites/mat-essai-saut.png, mat-essai-mur.png, mat-essai-echelle.png (de dos, puis son miroir : les deux
-          temps de la montée, les jambes alternent), public/portraits/mat-essai.png, intro-heros-essai.png (les silhouettes de
-          l'intro, celle de Mat remplacée) ; les tailles et les pieds s'affichent (à reporter dans src/rendu/essai-mat.ts).
+          public/sprites/mat-saut.png, mat-mur.png, mat-echelle.png (de dos, puis son miroir : les deux temps de la montée,
+          les jambes alternent), public/portraits/mat.png, intro-heros.png (les silhouettes de l'intro, celle de Mat remplacée).
+          Les tailles et les pieds s'affichent : à reporter dans src/rendu/feuilles-objets.ts (les planches du décor).
 
 Chaque image est remise sur sa grille : la grille est retrouvée sur les contours, chaque case prend la couleur médiane de son
 centre ; le liseré violet que laisse le fond magenta devient le contour sombre. Un pixel de la grille est un pixel de planche
@@ -24,7 +24,7 @@ from PIL import Image
 from scipy import ndimage
 
 RACINE = pathlib.Path(__file__).resolve().parent.parent
-SRC = RACINE / 'assets-sources' / 'heros' / 'mat-essai'
+SRC = RACINE / 'assets-sources' / 'heros' / 'mat-source'
 SPRITES = RACINE / 'public' / 'sprites'
 CASE = 9.75  # la taille d'une case de pixel art dans les images fournies
 CONTOUR = (28, 22, 30)
@@ -81,8 +81,8 @@ def reference(repos):
     h, w = repos.shape[:2]
     carre = Image.new('RGBA', (CARRE, CARRE), (0, 0, 0, 0))
     carre.alpha_composite(Image.fromarray(repos), (14, CARRE - h))
-    carre.save(RACINE / 'assets-sources' / 'heros' / 'mat-essai-instrument-base.png')
-    print(f'mat-essai-instrument-base.png : {CARRE} x {CARRE}')
+    carre.save(RACINE / 'assets-sources' / 'heros' / 'mat-instrument-base.png')
+    print(f'mat-instrument-base.png : {CARRE} x {CARRE}')
 
 
 def image_seule(nat, nom, pied):
@@ -96,8 +96,8 @@ def echelle_deux_temps(nat):
     planche = Image.new('RGBA', (im.width, im.height * 2), (0, 0, 0, 0))
     planche.alpha_composite(im, (0, 0))
     planche.alpha_composite(im.transpose(Image.FLIP_LEFT_RIGHT), (0, im.height))
-    planche.save(SPRITES / 'mat-essai-echelle.png', optimize=True)
-    print(f'mat-essai-echelle.png : w {im.width}, h {im.height}, pied {im.width // 2}')
+    planche.save(SPRITES / 'mat-echelle.png', optimize=True)
+    print(f'mat-echelle.png : w {im.width}, h {im.height}, pied {im.width // 2}')
 
 
 def portrait(repos):
@@ -108,9 +108,9 @@ def portrait(repos):
     xs = np.nonzero(al[haut : haut + 14].any(0))[0]
     cx = (xs.min() + xs.max()) // 2
     Image.fromarray(repos).crop((cx - 17, haut - 2, cx + 17, haut + 32)).resize((44, 44), Image.NEAREST).save(
-        RACINE / 'public' / 'portraits' / 'mat-essai.png', optimize=True
+        RACINE / 'public' / 'portraits' / 'mat.png', optimize=True
     )
-    print('portraits/mat-essai.png : 44 x 44')  # le cadrage de la tête, agrandi au format des autres portraits
+    print('portraits/mat.png : 44 x 44')  # le cadrage de la tête, agrandi au format des autres portraits
 
 
 def intro(repos):
@@ -121,17 +121,17 @@ def intro(repos):
     k = 110 / im.height
     im = im.resize((round(im.width * k), 110), Image.NEAREST)
     planche.alpha_composite(im, (3 * 128 + 64 - im.width // 2, 128 - im.height))
-    planche.save(SPRITES / 'intro-heros-essai.png', optimize=True)
-    print('intro-heros-essai.png')
+    planche.save(SPRITES / 'intro-heros.png', optimize=True)
+    print('intro-heros.png')
 
 
 def main():
     repos = regrille('repos.jpg')
     reference(repos)
     saut = regrille('saut.jpg')
-    image_seule(saut, 'mat-essai-saut', saut.shape[1] // 2)
+    image_seule(saut, 'mat-saut', saut.shape[1] // 2)
     mur = regrille('mur.jpg')  # il regarde la paroi, à droite
-    image_seule(mur, 'mat-essai-mur', mur.shape[1] - round(BORD_MUR * DENSITE))
+    image_seule(mur, 'mat-mur', mur.shape[1] - round(BORD_MUR * DENSITE))
     echelle_deux_temps(regrille('echelle.jpg'))
     portrait(repos)
     intro(repos)
