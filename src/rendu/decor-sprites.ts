@@ -73,7 +73,8 @@ export type Sprite =
   | 'souche'
   | 'lavande'
   | 'dolmen'
-  | 'figuier';
+  | 'figuier'
+  | 'panneauTotoPizz';
 export const SPRITES: ReadonlySet<string> = new Set<Sprite>([
   'vacheCasque',
   'lampadaire',
@@ -142,6 +143,7 @@ export const SPRITES: ReadonlySet<string> = new Set<Sprite>([
   'lavande',
   'dolmen',
   'figuier',
+  'panneauTotoPizz',
 ]);
 
 /** Les accessoires dessinés par une planche fournie (apparence tirée au sort selon `v`, tournée d'un côté ou de l'autre). */
@@ -190,6 +192,8 @@ export function dessineSprite(
   voile: string,
 ): boolean {
   if (quoi === 'lampadaire') return dessineDecorFeuille(ctx, 'lampadaire', 0, voile);
+  // un panneau publicitaire (voir decor-panneaux.ts) : jamais retourné ni voilé, son enseigne doit se lire
+  if (quoi === 'panneauTotoPizz') return dessineDecorFeuille(ctx, quoi, 0);
   // les panneaux ne sont jamais retournés : on doit pouvoir lire ce qui est écrit dessus
   if (quoi === 'panneauFleche' || quoi === 'panneauNeige' || quoi === 'panneauLounge')
     return dessineDecorFeuille(ctx, 'panneau', v % 4, voile);

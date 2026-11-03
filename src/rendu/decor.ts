@@ -22,6 +22,7 @@ import {
 import { dessineSprite, SPRITES, type Sprite } from './decor-sprites';
 import type { NomTheme } from './themes';
 import { SEMIS } from './decor-semis';
+import { poseDesPanneaux, reglagePanneaux } from './decor-panneaux';
 
 export interface Pose {
   tx: number;
@@ -84,15 +85,27 @@ export function semeDecor(
         dedans: carte.aFond(tx, ty - 1),
       };
     });
-  if (fixe && !semerAussi) return fixes;
-  const semis = SEMIS[theme];
-  const poses: Pose[] = [...fixes];
-  // chaque rangée garde son propre espacement : des accessoires sur le sol, sur les passerelles, sur les toits
-  const libreDepuis = new Map<number, number>();
-  let derniereVoiture = -ECART_VOITURES;
   // les cases déjà prises par un accessoire : deux accessoires ne se cachent jamais l'un l'autre
   const prises = new Set<number>();
   const cle = (x: number, y: number) => y * 4096 + x;
+  // le décor placé à la main garde sa place : rien ne se sème par-dessus
+  for (const f of fixes) for (const [x, y] of emprise(f.tx, f.ty)) prises.add(cle(x, y));
+  // les panneaux publicitaires, sur les toits plats des bâtiments (leur propre tirage : le reste du décor ne change pas)
+  const panneaux = reglagePanneaux.actifs
+    ? poseDesPanneaux(
+        carte,
+        theme,
+        graine,
+        (x, y) => !prises.has(cle(x, y)),
+        (x, y) => prises.add(cle(x, y)),
+      )
+    : [];
+  if (fixe && !semerAussi) return [...fixes, ...panneaux];
+  const semis = SEMIS[theme];
+  const poses: Pose[] = [...fixes, ...panneaux];
+  // chaque rangée garde son propre espacement : des accessoires sur le sol, sur les passerelles, sur les toits
+  const libreDepuis = new Map<number, number>();
+  let derniereVoiture = -ECART_VOITURES;
   // un accessoire d'intérieur est dessiné par-dessus les tuiles (caisses cassables, échelles) : son emprise doit être libre
   const place = (tx: number, ty: number, dedans: boolean): boolean => {
     const cases = emprise(tx, ty);
@@ -105,8 +118,6 @@ export function semeDecor(
     if (libre) for (const [x, y] of cases) prises.add(cle(x, y));
     return libre;
   };
-  // le décor placé à la main garde sa place : rien ne se sème par-dessus
-  for (const f of fixes) for (const [x, y] of emprise(f.tx, f.ty)) prises.add(cle(x, y));
   // le premier arrière-plan : les grands accessoires du monde (les stands du FISE), en file sur le sol principal, à tour de
   // rôle, partout où ils tiennent : loin des échelles, et rien d'autre ne se pose sur leur largeur
   const solNiveau = solPrincipal(carte);

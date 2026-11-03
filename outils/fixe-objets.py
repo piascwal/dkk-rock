@@ -8,6 +8,7 @@ Le sprite est remis sur sa grille de pixels (prepare_instrument.py), recadré su
 largeur voulue en jeu (6 pixels de planche par pixel du jeu).
 """
 import pathlib
+import re
 import subprocess
 import sys
 
@@ -20,19 +21,22 @@ from prepare_instrument import natif_et_case
 RACINE = pathlib.Path(__file__).resolve().parent.parent
 DENSITE = 6
 # les héros dont les images de dos sur l'échelle sont fournies (planches du décor « <héros>-echelle », à la densité des héros : 6)
-ECHELLES = ('tom', 'mat', 'jbt', 'jbm', 'jbg')
+ECHELLES = ('tom', 'jbt', 'jbm', 'jbg')  # Mat n'y est plus : voir CONSERVEES
 # et celles du saut (en l'air), une image par héros, de profil
 SAUTS = tuple(f'{h}-saut' for h in ECHELLES)
 # et celles du mur (accroché à une paroi), fournies héros après héros : Mat, JBG, Tom, JBT et JBM pour l'instant ; à 12 pixels de planche par pixel du jeu
 # (le double : le jeu les réduit de moitié, au lieu de garder une image déjà lissée et floue)
-MURS = ('mat-mur', 'jbg-mur', 'tom-mur', 'jbt-mur', 'jbm-mur')
+MURS = ('jbg-mur', 'tom-mur', 'jbt-mur', 'jbm-mur')
 # où, de part et d'autre du centre du héros, finit l'image du mur côté paroi (pixels du jeu) : le bout des doigts et du pied touche la
 # paroi, quelle que soit la largeur de l'image (le manteau de JBG déborde loin derrière lui)
 BORD_MUR = 4.2
 # des planches plus fines que 6 pixels par pixel du jeu, et réduites avec lissage (au lieu d'un agrandissement entier, qui donne des
 # pixels inégaux quand l'écran n'est pas un multiple de la planche) : le DJ, très détaillé, plus grand que le reste
 DENSITES = {'dj': 8, 'robot': 8, 'borne': 8, 'pneus': 8, 'baril': 8, 'fougere': 8, 'menhir': 8, **{f'{h}-echelle': 6 for h in ECHELLES}, **{n: 6 for n in SAUTS}, **{n: 12 for n in MURS}}
-LISSES = {'barriere', 'archeFise', 'portiqueBreak', 'portiqueFlat', 'portiqueDance', 'juryBreak', 'foodDuke', 'foodRougail', 'foodCroque', 'foodGlace', 'pissotiere', 'toilettes', 'platane', 'platane2', 'tablePique', 'tableSkate', 'tableBmx', 'tableFamille', 'dj', 'voiture', 'rocker', 'robot', 'borne', 'pneus', 'baril', 'fougere', 'menhir', *(f'{h}-echelle' for h in ECHELLES), *SAUTS, *MURS}
+LISSES = {'barriere', 'archeFise', 'portiqueBreak', 'portiqueFlat', 'portiqueDance', 'juryBreak', 'foodDuke', 'foodRougail', 'foodCroque', 'foodGlace', 'pissotiere', 'toilettes', 'platane', 'platane2', 'tablePique', 'tableSkate', 'tableBmx', 'tableFamille', 'dj', 'voiture', 'rocker', 'robot', 'borne', 'pneus', 'baril', 'fougere', 'menhir', 'panneauTotoPizz', *(f'{h}-echelle' for h in ECHELLES), *SAUTS, *MURS}
+# les planches du décor de Mat (saut, mur, échelle) sortent de outils/prepare-mat.py, avec des densités à lui (voir README) : ce script
+# ne les refait pas, il reprend telles quelles leurs lignes de feuilles-objets.ts
+CONSERVEES = ('mat-saut', 'mat-mur', 'mat-echelle')
 # celles de ces planches qu'on réduit à 256 couleurs (le DJ, les voitures) ; les rockers en ont trop : douze personnages différents sur une planche
 QUANTIFIEES = {'dj', 'voiture'}
 # objet : (fichiers sources, un par état (une ligne de la planche chacun), genre dans jeu/vue.ts, largeur en jeu en pixels)
@@ -140,8 +144,6 @@ OBJETS = {
     # Tom de dos sur une échelle : deux images qui alternent (montée comme descente) ; même densité que les planches des héros (6),
     # largeur choisie pour que sa taille égale celle de Tom debout (118 px de planche de la tête aux pieds)
     'tom-echelle': ([f'heros/tom-echelle-{k}-base.png' for k in (1, 2)], None, 14.5),
-    # Mat de dos sur une échelle (même principe) : largeur calée sur sa taille debout (120 px de planche), un peu plus que pile
-    'mat-echelle': ([f'heros/mat-echelle-{k}-base.png' for k in (1, 2)], None, 11.6),
     # les trois autres héros, même principe ; largeurs calées sur leur taille debout (la tête aux pieds), un peu plus que pile
     'jbt-echelle': ([f'heros/jbt-echelle-{k}-base.png' for k in (1, 2)], None, 13.4),
     'jbm-echelle': ([f'heros/jbm-echelle-{k}-base.png' for k in (1, 2)], None, 9.9),
@@ -149,13 +151,11 @@ OBJETS = {
     # le saut : l'instrument est dans l'image ; l'échelle des images est la même pour tous (tête d'environ 75 px dans l'image
     # d'origine, 27 px de planche chez le héros debout, soit 0,37 px de planche par pixel d'image)
     'tom-saut': (['heros/tom-saut-base.png'], None, 20.2),
-    'mat-saut': (['heros/mat-saut-base.png'], None, 17.9),
     'jbt-saut': (['heros/jbt-saut-base.png'], None, 16.8),
     'jbm-saut': (['heros/jbm-saut-base.png'], None, 14.4),
     'jbg-saut': (['heros/jbg-saut-base.png'], None, 16.0),
     # le mur : accroché à une paroi, de profil face à elle (tourné vers la droite : le jeu le retourne pour l'autre paroi) ; même échelle
     # que le saut (tête de 27 px de planche), soit 0,77 px de planche par pixel de l'image à sa grille
-    'mat-mur': (['heros/mat-mur-base.png'], None, 8.3),
     # Tom : 0,123 pixel du jeu par pixel de l'image à sa grille, comme son saut (164 px de large pour 20,2 en jeu) ; l'image fournie
     # regardait à gauche : la source est son image retournée (miroir exact), comme celles des autres
     'tom-mur': (['heros/tom-mur-base.png'], None, 11.8),
@@ -166,6 +166,9 @@ OBJETS = {
     'jbt-mur': (['heros/jbt-mur-base.png'], None, 12.5),
     # JBM : même silhouette haute et étroite, 12 de large (il est un peu plus petit que JBT) ; l'image regarde à droite
     'jbm-mur': (['heros/jbm-mur-base.png'], None, 12),
+    # les panneaux publicitaires des toits (voir src/rendu/decor-panneaux.ts) : 80 px de large en jeu (cinq tuiles), lissés pour que
+    # l'enseigne reste lisible ; chacun vient de outils/prepare-panneau.py
+    'panneauTotoPizz': (['decor/panneaux/toto-pizz-base.png'], None, 80),
     # la fougère (garage, alpages, plage)
     'fougere': (['decor/fougere-base.png'], None, 14),
     # le menhir des forêts et de l'île (arc breton) : une pierre levée, de l'artiste ; le dolmen, lui, est dessiné en code
@@ -344,6 +347,11 @@ def main():
         (lignes if genre else decors).append(
             f"  {cle}: {{ fichier: '{nom}.png', w: {cw}, h: {ch}, images: [{ligne}], rythme: 1, densite: {dens}, pied: {pied} }},"
         )
+    ancien = (RACINE / 'src' / 'rendu' / 'feuilles-objets.ts').read_text()
+    for nom in CONSERVEES:
+        m = re.search(rf"  '{nom}': \{{.*?\}},\n", ancien, re.S)
+        if m:
+            decors.append(m.group(0).rstrip('\n'))
     (RACINE / 'src' / 'rendu' / 'feuilles-objets.ts').write_text(
         "// Fichier généré par outils/fixe-objets.py : ne pas modifier à la main.\n"
         "import { G, type Genre } from '../jeu/vue';\n"

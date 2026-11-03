@@ -99,6 +99,14 @@ se barre dans le fil ; les boutons des menus s'enfoncent et rebondissent.
   s'envolent (`rendu/debris-decor.ts`, notes en plus pour les enceintes) ; les bonus (armes, médiators, cœurs) sont enfermés dans
   une boîte de verre qui ondule et brille (`rendu/bulle-bonus.ts`) ; dans les mondes sombres (ville, club), un liseré lumineux
   détache les personnages du fond (`Theme.lueur`, cyan pour les héros, rose pour les autres) ; des enceintes dans chaque monde.
+- **Panneaux publicitaires** (`rendu/decor-panneaux.ts`, à l'essai : seulement avec `?essai`) : de grandes enseignes (planches
+  fournies) posées au hasard, toujours aux mêmes endroits pour une même carte, sur le dessus plat des bâtiments qu'on gravit : une
+  dalle de béton, de brique, de métal ou de tuiles d'au moins sept tuiles, au ciel libre sur six tuiles, dont un bout au moins
+  tombe dans le vide (pas une rue, pas une colline), loin des échelles, à vingt-six tuiles au moins d'un autre panneau. Chaque
+  panneau a ses **catégories** (`PANNEAUX`) et chaque monde les siennes (`CATEGORIES_THEME`) : il ne se pose que dans un monde
+  qui en partage une (un monde peut en avoir plusieurs, « urbain » et « neige » pour Ottawa). Un nouveau panneau :
+  `python3 outils/prepare-panneau.py image.jpg nom` (fond magenta retiré), une ligne dans `OBJETS` de `outils/fixe-objets.py`,
+  une dans `PANNEAUX` et son nom dans `Sprite` / `SPRITES` (`decor-sprites.ts`) et `ACCESSOIRES_PANNEAUX`.
 - **Armes à ramasser** : lecteur minidisc (disque à ondes), pile alcaline (rafale), flipper (le
   dauphin rebondit en le disant, puis explose), frisbee (guidé vers les ennemis), machine à donuts (explosifs), boîtier de CD « L5 » (trois boîtiers en éventail, un plaisir coupable),
   **chauffage soufflant** (compagnon) ; l'icône de l'arme remplace « TIR » sur le bouton ; **médiators d'or** : un spécial de plus (3 au plus ; ils ne soignent pas).
