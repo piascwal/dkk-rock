@@ -11,14 +11,24 @@ import { FEUILLES_DECOR } from './feuilles-objets';
  */
 export const essaiMat = { actif: false };
 
+/** Pixels de planche par pixel du jeu : 5,2 au lieu de 6, soit un Mat d'un septième plus grand (il paraissait plus petit que les autres). */
+const DENSITE = 5.2;
+
 /** Branche le nouveau Mat (au démarrage, avant le chargement des planches). */
 export function activeMatEssai(): void {
   essaiMat.actif = true;
-  const heros = { ...FEUILLES_HEROS[G.MAT]!, fichier: 'mat-essai-instrument.png', w: 127, h: 120, pied: 68 };
+  const heros = {
+    ...FEUILLES_HEROS[G.MAT]!,
+    fichier: 'mat-essai-instrument.png',
+    w: 127,
+    h: 120,
+    pied: 68,
+    densite: DENSITE,
+  };
   FEUILLES_HEROS[G.MAT] = heros;
   FEUILLES[G.MAT] = heros;
   const decor = (cle: string, fichier: string, w: number, h: number, pied: number, images = [1]) => {
-    FEUILLES_DECOR[cle] = { fichier, w, h, pied, images, rythme: 1, densite: 6 };
+    FEUILLES_DECOR[cle] = { fichier, w, h, pied, images, rythme: 1, densite: DENSITE };
   };
   decor('mat-saut', 'mat-essai-saut.png', 92, 97, 46);
   decor('mat-mur', 'mat-essai-mur.png', 61, 112, 36);
