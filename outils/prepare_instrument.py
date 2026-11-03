@@ -18,6 +18,7 @@ SPECS = {
     'jbt': ('jbt-instrument-base.png', 10.0, 2.5),
     'mat': ('mat-instrument-base.png', 11.0, 2.75),
     'jbg': ('jbg-instrument-base.png', 5.0, 1.25),
+    'mat-essai': ('mat-essai-instrument-base.png', 1.0, 2.0),  # déjà sur sa grille (outils/prepare-mat-essai.py)
 }
 
 
