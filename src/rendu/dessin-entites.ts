@@ -1,3 +1,4 @@
+import { coupee } from './chrono';
 import { DUREE_MECHE } from '../entites/baril';
 import { TUILE } from '../config';
 import { dessineSibylle } from './sibylle';
@@ -152,7 +153,7 @@ export function dessineEntite(
   if (lueur && estPersonnage(v.g) && !aTerre) {
     ctx.shadowColor = heros ? lueur.heros : lueur.ennemis;
     // un flou coûte cher (surtout sur téléphone) : court pour les ennemis, nombreux à l'écran
-    ctx.shadowBlur = heros ? 10 : 3;
+    ctx.shadowBlur = coupee('halos') ? 0 : heros ? 10 : 3;
   }
   ctx.translate(x, y);
   if (v.g === G.VAN_REACTEUR && v.e === 4) ctx.rotate(CABRE); // il décolle, nez en l'air

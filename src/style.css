@@ -1725,8 +1725,11 @@ h2 {
     monospace;
   color: #7cfc7c;
   background: rgba(0, 0, 0, 0.6);
-  pointer-events: none;
-  white-space: nowrap;
+  /* un toucher coupe une partie du dessin (voir ui/essai.ts) */
+  pointer-events: auto;
+  cursor: pointer;
+  white-space: pre;
+  text-align: center;
 }
 
 #mesures-essai.mauvais {

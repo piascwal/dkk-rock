@@ -3,6 +3,8 @@
  * aux joueurs, depuis le menu « Niveaux refaits » (la version d'avant et la version refaite de chacun, voir menus-refontes.ts).
  * Seulement avec `?essai` dans l'adresse (rien n'est retenu : sans lui, le jeu est celui de tout le monde). Un bandeau le rappelle.
  */
+import { chrono, COUPABLES, type Partie } from '../rendu/chrono';
+
 const ANCIENNE_CLE = 'dkk-rock.essai'; // un temps, l'appareil retenait le mode essai : on l'oublie
 
 /** Vrai si l'adresse demande le mode essai (`?essai`, ou `?essai=1`). */
@@ -24,15 +26,38 @@ export function afficheBandeauEssai(): void {
   document.body.append(b);
 }
 
+/** Le nom de chaque partie du dessin, tel qu'il s'affiche. */
+const NOMS: Record<Partie, string> = {
+  fond: 'fond',
+  tuiles: 'tuiles',
+  decor: 'décor',
+  personnages: 'persos',
+  halos: 'halos',
+  effets: 'effets',
+  simulation: 'simu',
+};
+
+const ms = (v: number): string => v.toFixed(1).replace('.', ',');
+
 /**
- * La mesure de fluidité du mode essai, en haut de l'écran : les images par seconde, la plus longue image de la dernière
- * seconde, le nombre d'à-coups (images de plus de 50 ms) des dix dernières secondes, et la finesse d'affichage (`finesse()`,
- * « 3× »). Mesurée sur les images de l'écran (requestAnimationFrame) : un blocage du jeu ou du navigateur s'y voit.
+ * La mesure de fluidité du mode essai, en haut de l'écran. Première ligne : les images par seconde, la plus longue image de la
+ * dernière demi-seconde, le nombre d'à-coups (images de plus de 50 ms) des dix dernières secondes, et la finesse d'affichage
+ * (`finesse()`, « 3× »). Deuxième ligne : le temps moyen du processeur, par image, pour chaque partie du dessin (et pour la
+ * simulation, par pas). Troisième : la partie coupée ; un toucher sur le compteur passe à la suivante (voir rendu/chrono.ts).
  */
 export function afficheMesuresEssai(finesse: () => string): void {
+  chrono.actif = true;
   const m = document.createElement('div');
   m.id = 'mesures-essai';
   document.body.append(m);
+  const coupe = () => {
+    const i = chrono.coupee ? COUPABLES.indexOf(chrono.coupee) : -1;
+    chrono.coupee = COUPABLES[i + 1] ?? null;
+  };
+  m.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    coupe();
+  });
   let avant = performance.now();
   let affiche = avant;
   let images = 0;
@@ -48,8 +73,19 @@ export function afficheMesuresEssai(finesse: () => string): void {
     while (acoups.length && acoups[0]! < t - 10000) acoups.shift();
     if (t - affiche >= 500) {
       const ips = Math.round((images * 1000) / (t - affiche));
-      m.textContent = `${ips} i/s · pire ${Math.round(pire)} ms · ${acoups.length} à-coups/10 s · ${finesse()}`;
+      const n = Math.max(1, chrono.images);
+      const parties = (['fond', 'tuiles', 'decor', 'personnages', 'effets'] as const)
+        .map((p) => `${NOMS[p]} ${ms(chrono.temps[p] / n)}`)
+        .join(' · ');
+      const simu = `${NOMS.simulation} ${ms(chrono.temps.simulation / Math.max(1, chrono.pas))}`;
+      const coupee = chrono.coupee ? `coupé : ${NOMS[chrono.coupee]}` : 'rien de coupé';
+      m.textContent =
+        `${ips} i/s · pire ${Math.round(pire)} ms · ${acoups.length} à-coups/10 s · ${finesse()}\n` +
+        `ms : ${parties} · ${simu}\n` +
+        `${coupee} (toucher pour couper)`;
       m.classList.toggle('mauvais', pire > 50);
+      for (const k of Object.keys(chrono.temps) as Partie[]) chrono.temps[k] = 0;
+      chrono.images = chrono.pas = 0;
       affiche = t;
       images = 0;
       pire = 0;

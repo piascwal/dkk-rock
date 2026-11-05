@@ -1,6 +1,7 @@
 import { TUILE } from '../config';
 import { Aleatoire } from '../moteur/maths';
-import type { Carte } from '../monde/carte';
+import { Carte } from '../monde/carte';
+import { NIVEAUX, niveauLu } from '../niveaux';
 import { T } from '../monde/tuiles';
 import type { DecorFixe } from '../niveaux/format';
 import { ACCESSOIRES, type NomAccessoire } from './decor-objets';
@@ -175,6 +176,20 @@ export function semeDecor(
       break;
     }
   return poses;
+}
+
+/** Le décor d'un niveau, semé sur sa carte d'origine (avant toute destruction), et rangé par tuile (pour ses débris). */
+export function decorDuNiveau(niveau: number): { poses: Pose[]; parTuile: Map<number, Pose[]> } {
+  const lu = niveauLu(niveau);
+  const def = NIVEAUX[niveau]!;
+  const carte = new Carte(lu.largeur, lu.hauteur, lu.tuiles, lu.fond);
+  const poses = semeDecor(carte, def.theme, 11 + niveau, def.decor, def.semis);
+  const parTuile = new Map<number, Pose[]>();
+  for (const o of poses) {
+    const cle = o.ty * 100000 + o.tx;
+    parTuile.set(cle, [...(parTuile.get(cle) ?? []), o]);
+  }
+  return { poses, parTuile };
 }
 
 /**

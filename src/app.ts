@@ -24,6 +24,7 @@ import { Recrue } from './ui/recrue';
 import { prepareInstallation } from './ui/installation';
 import { Bulles, Histoire } from './ui/dialogues';
 import { Hud } from './ui/hud';
+import { simulation } from './rendu/chrono';
 import { controleurDeVersion, ecouteLaFenetre, joueEvenements, nomsDesJoueurs } from './ui/app-aides';
 import { Menus, type Actions } from './ui/menus';
 import { pleinEcran } from './ui/plein-ecran';
@@ -295,7 +296,8 @@ export class App implements Actions {
         this.reste += dt;
         while (this.reste >= PAS_MS) {
           this.reste -= PAS_MS;
-          this.pas(this.partie, bits);
+          const partie = this.partie;
+          simulation(() => this.pas(partie, bits));
         }
       }
       this.affiche(this.partie.vue(), this.partie.carte, 0);

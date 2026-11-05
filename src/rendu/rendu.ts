@@ -1,3 +1,4 @@
+import { coupee, note, top } from './chrono';
 import { cadence } from './cadence';
 import { particulesDesEvenements } from './evenements-particules';
 import { DENSITE_MAX, DENSITE_MIN, HAUTEUR_CARTE, HAUTEUR_VUE, TUILE } from '../config';
@@ -9,7 +10,7 @@ import { AtlasTuiles } from './atlas-tuiles';
 import { Camera } from './camera';
 import { dessineCarteMonde } from './carte-monde';
 import { dessineEntite } from './dessin-entites';
-import { dessineDecor, semeDecor, type CoucheDecor } from './decor';
+import { decorDuNiveau, dessineDecor, semeDecor, type CoucheDecor } from './decor';
 import { dessineTuiles, dessineTyroliennes } from './dessin-tuiles';
 import { Prechauffage } from './prechauffage';
 import { Emojis } from './emojis';
@@ -265,32 +266,23 @@ export class Rendu {
     // en traversée, le ferry avance : le fond défile en plus de la caméra
     const decalage = Math.max(0, vue.traversee) * VITESSE_FERRY;
     this.fond.largeurNiveau = niveauLu(vue.niveau).largeur * TUILE;
-    this.fond.dessine(
-      ctx,
-      camX,
-      camY,
-      this.largeur,
-      (niveauLu(vue.niveau).depart.ty + 1) * TUILE,
-      this.tick,
-      decalage,
-    );
+    top();
+    if (!coupee('fond'))
+      this.fond.dessine(
+        ctx,
+        camX,
+        camY,
+        this.largeur,
+        (niveauLu(vue.niveau).depart.ty + 1) * TUILE,
+        this.tick,
+        decalage,
+      );
+    note('fond');
     // le décor est semé à partir de la carte d'origine (avant destruction) : au chargement de chaque carte
     if (this.carteDecor !== carte) {
       this.carteDecor = carte;
-      const lu = niveauLu(vue.niveau);
-      this.decor = semeDecor(
-        new Carte(lu.largeur, lu.hauteur, lu.tuiles, lu.fond),
-        NIVEAUX[vue.niveau]!.theme,
-        11 + vue.niveau,
-        NIVEAUX[vue.niveau]!.decor,
-        NIVEAUX[vue.niveau]!.semis,
-      );
+      ({ poses: this.decor, parTuile: this.decorParTuile } = decorDuNiveau(vue.niveau));
       this.braises.regle(this.decor);
-      this.decorParTuile = new Map();
-      for (const o of this.decor) {
-        const cle = o.ty * 100000 + o.tx;
-        this.decorParTuile.set(cle, [...(this.decorParTuile.get(cle) ?? []), o]);
-      }
     }
     // sur le ferry : les quais d'abord ; puis tout ce qui est à bord tangue, et la mer passe devant (voir navire.ts)
     const navire = this.navire;
@@ -298,6 +290,7 @@ export class Rendu {
     ctx.save();
     if (navire) ctx.translate(0, navire.tangage(vue.navire, this.tick));
     const decore = (couche: CoucheDecor) =>
+      !coupee('decor') &&
       dessineDecor(
         ctx,
         this.decor,
@@ -310,22 +303,27 @@ export class Rendu {
         this.theme.lointain,
       );
     decore('fond');
-    dessineTuiles(ctx, carte, this.atlas, camX, camY, this.largeur, this.tick);
+    note('decor');
+    if (!coupee('tuiles')) dessineTuiles(ctx, carte, this.atlas, camX, camY, this.largeur, this.tick);
     navire?.navire(ctx, camX, camY, vue.navire, this.tick);
+    note('tuiles');
     decore('interieur');
+    note('decor');
     // les projecteurs du club éclairent les murs, sous les personnages (et la nuit tombe sur la plage)
     this.fond.lumieres(ctx, camX, this.largeur, this.tick);
     dessineTyroliennes(ctx, niveauLu(vue.niveau).tyroliennes, carte, camX, camY);
     this.particules.meteo(this.theme.meteo, camX, camY, this.largeur);
     this.particules.maj(carte);
+    note('effets');
 
     // les objets derrière, puis les personnages, puis les tirs
     const tri = (v: EntiteVue) => (estUnTir(v.g) ? 2 : !estPersonnage(v.g) || v.e === ANIM.TERRASSE ? 0 : 1);
     this.restes.dessine(ctx, this.restes.maj(vue), camX, camY, this.largeur);
     // les barils empilés : du plus bas au plus haut, le pied de celui du dessus recouvre le dessus de celui qu'il porte
     const barils = vue.entites.filter((v) => v.g === G.BARIL).sort((a, b) => b.y - a.y);
-    for (const v of barils) dessineEntite(ctx, v, camX, camY, this.atlas, this.theme.lueur);
-    for (const passe of [0, 1, 2])
+    if (!coupee('personnages'))
+      for (const v of barils) dessineEntite(ctx, v, camX, camY, this.atlas, this.theme.lueur);
+    for (const passe of coupee('personnages') ? [] : [0, 1, 2])
       for (const v of vue.entites)
         if (v.g !== G.BARIL && tri(v) === passe)
           dessineEntite(ctx, v, camX, camY, this.atlas, this.theme.lueur);
@@ -340,17 +338,21 @@ export class Rendu {
       flammeReacteur(ctx, TUYERE.x, TUYERE.y, 1, this.tick);
       ctx.restore();
     }
+    note('personnages');
     decore('devant');
-    this.particules.dessine(ctx, camX, camY);
+    note('decor');
+    if (!coupee('effets')) this.particules.dessine(ctx, camX, camY);
     ctx.restore();
     navire?.mer(ctx, camX, camY, this.largeur, vue.navire, this.tick);
     // les braises sont un petit plus : on les coupe dès que l'appareil peine (mode éco, ou trop peu d'images par seconde)
-    if (this.braisesPermises()) {
+    if (this.braisesPermises() && !coupee('effets')) {
       this.braises.emetDepuis(carte, camX, this.largeur);
       this.braises.maj();
       this.braises.dessine(ctx, camX, camY);
     }
-    this.premierPlan.dessine(ctx, camX, camY, this.largeur, this.tick);
+    note('effets');
+    if (!coupee('fond')) this.premierPlan.dessine(ctx, camX, camY, this.largeur, this.tick);
+    note('fond');
     dessineBullesCages(ctx, vue, siegeLocal, camX, camY, this.largeur, this.tick);
     this.traits.maj(vue, this.decor, carte, { emojis: this.emojis });
     this.emojis.accompagne(vue.entites);
@@ -358,5 +360,6 @@ export class Rendu {
     this.emojis.dessine(ctx, camX, camY);
     dessineArene(ctx, vue, siegeLocal, camX, camY, this.largeur);
     dessineIndicateurs(ctx, vue, siegeLocal, camX, camY, this.largeur, this.tick);
+    note('effets');
   }
 }
