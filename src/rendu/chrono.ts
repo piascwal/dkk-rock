@@ -4,10 +4,19 @@
  * dessin d'un canvas est d'abord noté par le processeur, puis peint par la carte graphique plus tard, hors de ces mesures.
  */
 
-export type Partie = 'fond' | 'tuiles' | 'decor' | 'personnages' | 'halos' | 'effets' | 'simulation';
+export type Partie =
+  'fond' | 'tuiles' | 'decor' | 'personnages' | 'halos' | 'effets' | 'simulation' | 'optimisations';
 
 /** Les parties qu'on peut couper, dans l'ordre où un toucher sur le compteur les fait défiler. */
-export const COUPABLES: readonly Partie[] = ['fond', 'tuiles', 'decor', 'personnages', 'halos', 'effets'];
+export const COUPABLES: readonly Partie[] = [
+  'fond',
+  'tuiles',
+  'decor',
+  'personnages',
+  'halos',
+  'effets',
+  'optimisations',
+];
 
 export const chrono = {
   /** mesurer (seulement en mode essai : sinon, rien ne coûte) */
@@ -15,10 +24,16 @@ export const chrono = {
   /** la partie coupée (pas dessinée), ou aucune */
   coupee: null as Partie | null,
   /** le temps cumulé de chaque partie (ms), et le nombre d'images dessinées et de pas de la simulation, depuis la dernière lecture */
-  temps: { fond: 0, tuiles: 0, decor: 0, personnages: 0, halos: 0, effets: 0, simulation: 0 } as Record<
-    Partie,
-    number
-  >,
+  temps: {
+    fond: 0,
+    tuiles: 0,
+    decor: 0,
+    personnages: 0,
+    halos: 0,
+    effets: 0,
+    simulation: 0,
+    optimisations: 0,
+  } as Record<Partie, number>,
   images: 0,
   pas: 0,
 };
@@ -39,6 +54,12 @@ export function note(p: Partie): void {
   chrono.temps[p] += t - depart;
   depart = t;
 }
+
+/**
+ * Les optimisations à l'essai (le dessin des tuiles mémorisé, les nuages d'explosion en images toutes faites) : seulement en mode
+ * essai, et pas quand on les coupe au compteur (pour comparer). Pour tous les joueurs : renvoyer toujours vrai.
+ */
+export const optimise = (): boolean => chrono.actif && chrono.coupee !== 'optimisations';
 
 /** La partie `p` est coupée : on ne la dessine pas. */
 export const coupee = (p: Partie): boolean => chrono.coupee === p;

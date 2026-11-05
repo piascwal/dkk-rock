@@ -1,4 +1,4 @@
-import { disque } from './formes-pixels';
+import { disquePeint } from './formes-pixels';
 
 /** Les paliers de couleur d'un nuage d'explosion, [cœur, liseré] : feu vif, braise, cendre. */
 const FEU_VIF = ['#fff3b0', '#ffb347'];
@@ -34,18 +34,14 @@ export function dessineNuages(
       return { x: Math.round(p.x) - camX, y: Math.round(p.y) - camY, r, t, coeur, bord };
     })
     .filter((n) => n.r >= 1);
-  for (const n of nuages) {
-    ctx.fillStyle = n.bord;
-    disque(ctx, n.x, n.y, n.r + 1);
-  }
-  for (const n of nuages) {
-    ctx.fillStyle = n.coeur;
-    disque(ctx, n.x, n.y, n.r);
-  }
+  if (!nuages.length) return;
+  const d = Math.round(ctx.getTransform().a) || 1;
+  for (const n of nuages) disquePeint(ctx, n.x, n.y, n.r + 1, n.bord, d);
+  for (const n of nuages) disquePeint(ctx, n.x, n.y, n.r, n.coeur, d);
   for (const n of nuages) {
     if (n.t <= 0.35) continue;
     // un reflet plus clair en haut à gauche
-    ctx.fillStyle = n.t > 0.6 ? '#fff3b0' : '#ff9b2f';
-    disque(ctx, n.x - Math.round(n.r * 0.3), n.y - Math.round(n.r * 0.3), n.r * 0.4);
+    const reflet = n.t > 0.6 ? '#fff3b0' : '#ff9b2f';
+    disquePeint(ctx, n.x - Math.round(n.r * 0.3), n.y - Math.round(n.r * 0.3), n.r * 0.4, reflet, d);
   }
 }

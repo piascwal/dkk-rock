@@ -5,6 +5,8 @@ import type { Carte } from '../monde/carte';
 import { T, TUILES_LEGERES } from '../monde/tuiles';
 import type { AtlasTuiles } from './atlas-tuiles';
 import { bordIrregulier, cotesHD, paroiHD, pitonEnBois, tuileHD } from './tuiles-hd';
+import { optimise } from './chrono';
+import { RecettesTuiles } from './recettes-tuiles';
 import { dessineVegetation } from './vegetation';
 import { aUnCoin, COTE, coinsDeParoi, cotesLibres, cotesParoi, DEBORD } from './bords-tuiles';
 
@@ -24,70 +26,103 @@ export function dessineTuiles(
   const ty1 = Math.min(carte.hauteur - 1, Math.floor((camY + HAUTEUR_VUE) / TUILE));
 
   const finesse = Math.hypot(ctx.getTransform().a, ctx.getTransform().b);
+  // à l'essai : le dessin de chaque case est mémorisé, et rejoué tant que ni elle ni ses voisines n'ont changé
+  const memoire = optimise() ? recettes.prepare(carte, atlas, finesse) : null;
   for (let ty = ty0; ty <= ty1; ty++) {
     for (let tx = tx0; tx <= tx1; tx++) {
-      const t = carte.get(tx, ty);
       const x = tx * TUILE - camX;
       const y = ty * TUILE - camY;
-      const plein = t !== T.VIDE && !TUILES_LEGERES.has(t);
-      // l'eau n'a ni herbe ni bords arrondis : elle épouse ce qui l'entoure
-      const cotes =
-        t === T.VIDE || t === T.EAU ? 0 : cotesHD(carte, t, tx, ty, cotesLibres(carte, t, tx, ty));
-      // la paroi de fond, aux coins extérieurs arrondis ; derrière un coin arrondi d'une tuile pleine, elle remplit
-      // les angles où elle continue (sinon on verrait le ciel par ces angles)
-      // une tuile peinte en haute définition (voir tuiles-hd.ts) : ses coins arrondis sont plus grands (4 pixels)
-      const hd =
-        t === T.VIDE
-          ? null
-          : tuileHD(t, cotes, tx, ty, atlas.theme, t === T.PITON && pitonEnBois(carte, tx, ty));
-      if (fondDerriere(carte, t, tx, ty) && (!plein || aUnCoin(cotes))) {
-        const cp = cotesParoi(carte, tx, ty);
-        const fond = paroiHD(atlas.theme, cp, tx, ty);
-        if (fond) dessineFin(ctx, fond, x, y, TUILE, TUILE, finesse);
-        else ctx.drawImage(atlas.paroiHabillee(cp), x, y);
-      } else if (plein && aUnCoin(cotes)) {
-        const fond = hd ? paroiHD(atlas.theme, 0, tx, ty) : null;
-        for (const [dx, dy] of coinsDeParoi(carte, tx, ty, cotes)) {
-          // une tuile HD a des coins plus grands (4 pixels) : la paroi les remplit d'autant
-          const [cx, cy] = [dx ? TUILE - 4 : 0, dy ? TUILE - 4 : 0];
-          if (fond) ctx.drawImage(fond, cx * 4, cy * 4, 16, 16, x + cx, y + cy, 4, 4);
-          else if (hd) ctx.drawImage(atlas.paroi, cx, cy, 4, 4, x + cx, y + cy, 4, 4);
-          else ctx.drawImage(atlas.paroi, dx, dy, 3, 3, x + dx, y + dy, 3, 3);
-        }
-      }
-      if (hd && cotes && bordIrregulier(t)) paroiDerriereLeBord(ctx, carte, atlas, tx, ty, x, y, cotes);
-      if (t === T.VIDE) continue;
-      // bords à l'air libre : coins arrondis, ombrage, dessus herbeux (voir bords-tuiles.ts)
-      const habillee = !hd && cotes ? atlas.habillee(t, tx, ty, cotes) : null;
-      if (hd) {
-        const h = hd.debord ? DEBORD : 0;
-        dessineFin(ctx, hd.toile, x, y - h, TUILE, TUILE + h, finesse);
-      } else if (habillee) ctx.drawImage(habillee, x, y - DEBORD);
-      else {
-        const toile = atlas.toile(t, tx, ty);
-        // un sprite fourni (96 px) sur un affichage moins fin : lissé, sinon des pixels sautent au hasard
-        if (toile instanceof HTMLImageElement) ctx.imageSmoothingEnabled = finesse < 6;
-        if (toile && (t === T.TONNEAU_WOG || t === T.TONNEAU_OR)) {
-          // les tonneaux WOG débordent de leur case, vers le haut : l'inscription doit se lire (la collision reste d'une tuile)
-          const cote = Math.round(TUILE * GROSSEUR_TONNEAU);
-          ctx.drawImage(toile, x - Math.round((cote - TUILE) / 2), y - (cote - TUILE), cote, cote);
-          if (t === T.TONNEAU_OR)
-            refletOr(ctx, x - (cote - TUILE) / 2, y - (cote - TUILE), cote, tick + tx * 37);
-        } else if (toile) ctx.drawImage(toile, x, y, TUILE, TUILE);
-        ctx.imageSmoothingEnabled = false;
-      }
-      // la surface de l'eau, à l'air libre : une ligne claire qui ondule
-      if (t === T.EAU && carte.get(tx, ty - 1) !== T.EAU) {
-        ctx.fillStyle = 'rgba(200, 240, 250, 0.8)';
-        for (let i = 0; i < TUILE; i += 4)
-          ctx.fillRect(x + i, y + ((tick / 12 + tx + i / 4) % 2 < 1 ? 0 : 1), 3, 1);
-      }
-      const usure = carte.usure(tx, ty);
-      if (usure < 0.7) fissures(ctx, x, y, usure, tx, ty);
+      if (memoire) memoire.joue(ctx, tx, ty, x, y);
+      else dessineCaseFixe(ctx, carte, atlas, tx, ty, x, y, finesse);
+      dessineCaseVivante(ctx, carte, tx, ty, x, y, tick);
     }
   }
   dessineVegetation(ctx, carte, camX, camY, largeur, atlas.theme.decor, tick);
 }
+
+/** Le dessin d'une case qui ne bouge pas (sa paroi de fond, sa tuile et son habillage), en (x, y) : il se mémorise. */
+function dessineCaseFixe(
+  ctx: CanvasRenderingContext2D,
+  carte: Carte,
+  atlas: AtlasTuiles,
+  tx: number,
+  ty: number,
+  x: number,
+  y: number,
+  finesse: number,
+): void {
+  const t = carte.get(tx, ty);
+  const plein = t !== T.VIDE && !TUILES_LEGERES.has(t);
+  // l'eau n'a ni herbe ni bords arrondis : elle épouse ce qui l'entoure
+  const cotes = t === T.VIDE || t === T.EAU ? 0 : cotesHD(carte, t, tx, ty, cotesLibres(carte, t, tx, ty));
+  // la paroi de fond, aux coins extérieurs arrondis ; derrière un coin arrondi d'une tuile pleine, elle remplit
+  // les angles où elle continue (sinon on verrait le ciel par ces angles)
+  // une tuile peinte en haute définition (voir tuiles-hd.ts) : ses coins arrondis sont plus grands (4 pixels)
+  const hd =
+    t === T.VIDE ? null : tuileHD(t, cotes, tx, ty, atlas.theme, t === T.PITON && pitonEnBois(carte, tx, ty));
+  if (fondDerriere(carte, t, tx, ty) && (!plein || aUnCoin(cotes))) {
+    const cp = cotesParoi(carte, tx, ty);
+    const fond = paroiHD(atlas.theme, cp, tx, ty);
+    if (fond) dessineFin(ctx, fond, x, y, TUILE, TUILE, finesse);
+    else ctx.drawImage(atlas.paroiHabillee(cp), x, y);
+  } else if (plein && aUnCoin(cotes)) {
+    const fond = hd ? paroiHD(atlas.theme, 0, tx, ty) : null;
+    for (const [dx, dy] of coinsDeParoi(carte, tx, ty, cotes)) {
+      // une tuile HD a des coins plus grands (4 pixels) : la paroi les remplit d'autant
+      const [cx, cy] = [dx ? TUILE - 4 : 0, dy ? TUILE - 4 : 0];
+      if (fond) ctx.drawImage(fond, cx * 4, cy * 4, 16, 16, x + cx, y + cy, 4, 4);
+      else if (hd) ctx.drawImage(atlas.paroi, cx, cy, 4, 4, x + cx, y + cy, 4, 4);
+      else ctx.drawImage(atlas.paroi, dx, dy, 3, 3, x + dx, y + dy, 3, 3);
+    }
+  }
+  if (hd && cotes && bordIrregulier(t)) paroiDerriereLeBord(ctx, carte, atlas, tx, ty, x, y, cotes);
+  if (t === T.VIDE) return;
+  // bords à l'air libre : coins arrondis, ombrage, dessus herbeux (voir bords-tuiles.ts)
+  const habillee = !hd && cotes ? atlas.habillee(t, tx, ty, cotes) : null;
+  if (hd) {
+    const h = hd.debord ? DEBORD : 0;
+    dessineFin(ctx, hd.toile, x, y - h, TUILE, TUILE + h, finesse);
+  } else if (habillee) ctx.drawImage(habillee, x, y - DEBORD);
+  else {
+    const toile = atlas.toile(t, tx, ty);
+    // un sprite fourni (96 px) sur un affichage moins fin : lissé, sinon des pixels sautent au hasard
+    if (toile instanceof HTMLImageElement) ctx.imageSmoothingEnabled = finesse < 6;
+    if (toile && (t === T.TONNEAU_WOG || t === T.TONNEAU_OR)) {
+      // les tonneaux WOG débordent de leur case, vers le haut : l'inscription doit se lire (la collision reste d'une tuile)
+      const cote = Math.round(TUILE * GROSSEUR_TONNEAU);
+      ctx.drawImage(toile, x - Math.round((cote - TUILE) / 2), y - (cote - TUILE), cote, cote);
+    } else if (toile) ctx.drawImage(toile, x, y, TUILE, TUILE);
+    ctx.imageSmoothingEnabled = false;
+  }
+}
+
+/** Ce qui bouge sur une case, dessiné à chaque image : la surface de l'eau, le reflet du tonneau d'or, les fissures. */
+function dessineCaseVivante(
+  ctx: CanvasRenderingContext2D,
+  carte: Carte,
+  tx: number,
+  ty: number,
+  x: number,
+  y: number,
+  tick: number,
+): void {
+  const t = carte.get(tx, ty);
+  if (t === T.VIDE) return;
+  if (t === T.TONNEAU_OR) {
+    const cote = Math.round(TUILE * GROSSEUR_TONNEAU);
+    refletOr(ctx, x - (cote - TUILE) / 2, y - (cote - TUILE), cote, tick + tx * 37);
+  }
+  // la surface de l'eau, à l'air libre : une ligne claire qui ondule
+  if (t === T.EAU && carte.get(tx, ty - 1) !== T.EAU) {
+    ctx.fillStyle = 'rgba(200, 240, 250, 0.8)';
+    for (let i = 0; i < TUILE; i += 4)
+      ctx.fillRect(x + i, y + ((tick / 12 + tx + i / 4) % 2 < 1 ? 0 : 1), 3, 1);
+  }
+  const usure = carte.usure(tx, ty);
+  if (usure < 0.7) fissures(ctx, x, y, usure, tx, ty);
+}
+
+const recettes = new RecettesTuiles(dessineCaseFixe);
 
 /** Peint d'avance (sans rien dessiner) les toiles dont la case (tx, ty) aura besoin : sa tuile, sa paroi de fond. */
 export function prepareCase(carte: Carte, atlas: AtlasTuiles, tx: number, ty: number): void {

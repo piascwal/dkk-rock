@@ -38,6 +38,12 @@ export class Carte {
   readonly pv: Float32Array;
   /** 1 là où le niveau d'origine avait de la matière : on y dessine une paroi de fond une fois détruite */
   readonly fond: Uint8Array;
+  /**
+   * Le numéro du dernier changement de chaque case (0 : jamais changée) : le dessin mémorise celui des tuiles et ne le refait
+   * que si la case ou une voisine a changé depuis (voir rendu/recettes-tuiles.ts).
+   */
+  readonly versions: Uint32Array;
+  private changements = 0;
   modifications: Modification[] = [];
   /**
    * Les objets pleins qui ne sont pas des tuiles (les barils explosifs) : les corps qui se déplacent (`deplace`) s'y heurtent et
@@ -55,6 +61,7 @@ export class Carte {
     this.tuiles = new Uint8Array(largeur * hauteur);
     this.pv = new Float32Array(largeur * hauteur);
     this.fond = new Uint8Array(largeur * hauteur);
+    this.versions = new Uint32Array(largeur * hauteur);
     if (tuiles) {
       for (let i = 0; i < this.tuiles.length; i++) {
         const t = tuiles[i] ?? 0;
@@ -100,6 +107,7 @@ export class Carte {
     if (avant === t) return;
     this.tuiles[i] = t;
     this.pv[i] = PROPRIETES[t].pv;
+    this.versions[i] = ++this.changements;
     this.modifications.push({ x: tx, y: ty, t, avant });
   }
 

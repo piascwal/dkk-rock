@@ -1,8 +1,9 @@
 import { HAUTEUR_VUE } from '../config';
 import type { Carte } from '../monde/carte';
-import { anneau, disque, note } from './formes-pixels';
+import { anneau, disquePeint, note } from './formes-pixels';
 import { dessineNuages } from './nuages';
 import { ecritCentre } from './police';
+import { CalqueJeu, type Couche } from './calque-jeu';
 
 type Sorte = 'carre' | 'note' | 'fumee' | 'poussiere' | 'eclat' | 'texte' | 'flocon' | 'luciole' | 'onde';
 
@@ -248,12 +249,31 @@ export class Particules {
       p.x = nx;
       p.y = ny;
     }
-    this.liste = this.liste.filter((p) => p.vie > 0);
+    // on garde les vivantes sur place (sans fabriquer une nouvelle liste à chaque image)
+    let k = 0;
+    for (const p of this.liste) if (p.vie > 0) this.liste[k++] = p;
+    this.liste.length = k;
   }
 
+  private readonly calque = new CalqueJeu();
+
+  /** Dessine les particules ; à l'essai, d'abord sur un calque à la taille du jeu (voir calque-jeu.ts). */
   dessine(ctx: CanvasRenderingContext2D, camX: number, camY: number): void {
-    dessineNuages(ctx, this.liste, camX, camY);
+    const trace = (c: CanvasRenderingContext2D, x: number, y: number, quoi: Couche) =>
+      this.trace(c, x, y, quoi);
+    if (!this.calque.dessine(ctx, camX, camY, this.liste, trace)) this.trace(ctx, camX, camY, 'tout');
+  }
+
+  private trace(
+    ctx: CanvasRenderingContext2D,
+    camX: number,
+    camY: number,
+    quoi: 'tout' | 'sansTexte' | 'texte',
+  ): void {
+    if (quoi !== 'texte') dessineNuages(ctx, this.liste, camX, camY);
+    const d = Math.round(ctx.getTransform().a) || 1;
     for (const p of this.liste) {
+      if (quoi !== 'tout' && (p.sorte === 'texte') !== (quoi === 'texte')) continue;
       const x = Math.round(p.x) - camX;
       const y = Math.round(p.y) - camY;
       const t = p.vie / p.vieMax;
@@ -264,21 +284,14 @@ export class Particules {
           // même principe, sans transparence : de la poussière qui pâlit puis rétrécit
           const r = p.taille * (0.7 + (1 - t) * 0.9) * (t < 0.3 ? t / 0.3 : 1);
           if (r < 1) break;
-          ctx.fillStyle = p.couleur;
-          disque(ctx, x, y, r);
-          if (r > 2.5) {
-            ctx.fillStyle = 'rgba(255,255,255,0.35)';
-            disque(ctx, x - 1, y - 1, r * 0.5);
-          }
+          disquePeint(ctx, x, y, r, p.couleur, d);
+          if (r > 2.5) disquePeint(ctx, x - 1, y - 1, r * 0.5, 'rgba(255,255,255,0.35)', d);
           break;
         }
         case 'onde': {
           // l'onde de choc : un éclair blanc plein les premières images, puis un anneau d'un pixel qui s'élargit par à-coups
           const r = Math.round((p.taille * (1 - t * 0.7)) / 3) * 3;
-          if (t > 0.7) {
-            ctx.fillStyle = '#ffffff';
-            disque(ctx, x, y, p.taille * 0.45 * (1.3 - t));
-          }
+          if (t > 0.7) disquePeint(ctx, x, y, p.taille * 0.45 * (1.3 - t), '#ffffff', d);
           ctx.fillStyle = t > 0.4 ? p.couleur : '#ff9b2f';
           if (t > 0.15) anneau(ctx, x, y, r);
           break;

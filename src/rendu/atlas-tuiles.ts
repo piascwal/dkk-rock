@@ -213,6 +213,13 @@ const IMAGES_TUILES: Partial<Record<number, string>> = {
   [T.CAISSON_ROSE]: 'tuile-caisson-rose.png',
 };
 const imagesTuiles = new Map<number, HTMLImageElement>();
+/** Change à chaque image de tuile chargée : ce qui a mémorisé le dessin des tuiles le refait (voir recettes-tuiles.ts). */
+export const etatImagesTuiles = { generation: 0 };
+
+const charge = (t: number, img: HTMLImageElement): void => {
+  imagesTuiles.set(t, img);
+  etatImagesTuiles.generation++;
+};
 
 export function chargeTuiles(base: string, version: string): void {
   for (const [t, fichier] of Object.entries(IMAGES_TUILES)) {
@@ -220,8 +227,8 @@ export function chargeTuiles(base: string, version: string): void {
     // décodée avant de servir : pas de décodage au premier dessin, en pleine partie
     img.onload = () =>
       void img.decode().then(
-        () => imagesTuiles.set(Number(t), img),
-        () => imagesTuiles.set(Number(t), img),
+        () => charge(Number(t), img),
+        () => charge(Number(t), img),
       );
     img.src = `${base}sprites/${fichier}?v=${version}`;
   }
