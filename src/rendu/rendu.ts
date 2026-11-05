@@ -252,6 +252,8 @@ export class Rendu {
       return;
     }
     this.prepareNiveau(vue.niveau);
+    // le test « tout » du compteur d'essai : rien n'est dessiné (on voit si l'appareil ralentit même sans dessin)
+    if (coupee('tout')) return ctx.clearRect(0, 0, this.largeur, HAUTEUR_VUE);
     const moi = vue.joueurs[siegeLocal];
     const suivi = moi && moi.present && !moi.mort ? moi : vue.joueurs.find((j) => j.present && !j.mort);
     if (suivi) this.camera.suit(suivi.x, suivi.y, this.largeur, carte.largeur * TUILE, carte.hauteur * TUILE);

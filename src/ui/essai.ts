@@ -36,6 +36,7 @@ const NOMS: Record<Partie, string> = {
   effets: 'effets',
   simulation: 'simu',
   optimisations: 'optimisations',
+  tout: 'tout le dessin',
 };
 
 const ms = (v: number): string => v.toFixed(1).replace('.', ',');

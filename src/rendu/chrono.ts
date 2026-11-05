@@ -5,7 +5,7 @@
  */
 
 export type Partie =
-  'fond' | 'tuiles' | 'decor' | 'personnages' | 'halos' | 'effets' | 'simulation' | 'optimisations';
+  'fond' | 'tuiles' | 'decor' | 'personnages' | 'halos' | 'effets' | 'simulation' | 'optimisations' | 'tout';
 
 /** Les parties qu'on peut couper, dans l'ordre où un toucher sur le compteur les fait défiler. */
 export const COUPABLES: readonly Partie[] = [
@@ -16,6 +16,7 @@ export const COUPABLES: readonly Partie[] = [
   'halos',
   'effets',
   'optimisations',
+  'tout',
 ];
 
 export const chrono = {
