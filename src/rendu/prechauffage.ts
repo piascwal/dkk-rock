@@ -3,6 +3,8 @@ import type { EtatVue } from '../jeu/vue';
 import type { Carte } from '../monde/carte';
 import type { AtlasTuiles } from './atlas-tuiles';
 import { prepareCase } from './dessin-tuiles';
+import { zoneAGarder } from './blocs-tuiles';
+import { niveauLu } from '../niveaux';
 
 /**
  * Le préchauffage d'un niveau : ses tuiles (chaque variante, ses bords, sa paroi de fond) sont peintes d'avance, colonne par
@@ -35,6 +37,10 @@ export class Prechauffage {
     const heros = vue.joueurs[siege] ?? vue.joueurs.find((j) => j.present);
     this.commence(carte, atlas, Math.floor((heros?.x ?? 0) / TUILE) - 20);
     this.avance(vue.phase === 'jeu' ? 1 : 10);
+    // la zone du dernier drapeau passé reste peinte : on y réapparaît après une mort (voir blocs-tuiles.ts)
+    [zoneAGarder.x, zoneAGarder.y] = [-1, -1];
+    for (const d of niveauLu(vue.niveau).drapeaux)
+      if (heros && d.x <= heros.x && d.x > zoneAGarder.x) [zoneAGarder.x, zoneAGarder.y] = [d.x, d.y];
     const maintenant = performance.now();
     this.fluides = this.fini && maintenant - this.avant < 25 ? this.fluides + 1 : 0;
     this.avant = maintenant;

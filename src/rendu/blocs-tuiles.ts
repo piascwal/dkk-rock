@@ -11,7 +11,13 @@ import type { Carte } from '../monde/carte';
 const LARGEUR = 16;
 const HAUTEUR = 10;
 /** Au plus tant de blocs gardés (les plus anciens s'en vont) : la mémoire reste raisonnable. */
-const MAX_BLOCS = 10;
+const MAX_BLOCS = 16;
+
+/**
+ * La zone à garder prête (pixels du monde, coin haut gauche) : autour du dernier drapeau passé, là où l'on réapparaît après une
+ * mort ; ses blocs restent peints (voir prechauffage.ts, qui la tient à jour).
+ */
+export const zoneAGarder: { x: number; y: number } = { x: -1, y: -1 };
 
 /** Dessine la partie fixe d'une case dans `ctx`, en (x, y) (pixels du jeu). */
 export type PeintreCase = (
@@ -95,6 +101,23 @@ export class BlocsTuiles {
       [bx0, by1 + 1],
       [bx0, by0 - 1],
     ];
+    // puis la zone du dernier drapeau : tous ses blocs gardés, peints petit à petit s'il en manque
+    if (zoneAGarder.x >= 0) {
+      const [gx0, gy0] = [
+        Math.floor((zoneAGarder.x - largeur / 2) / (LARGEUR * TUILE)),
+        Math.floor((zoneAGarder.y - hauteur / 2) / (HAUTEUR * TUILE)),
+      ];
+      const [gx1, gy1] = [
+        Math.floor((zoneAGarder.x + largeur / 2) / (LARGEUR * TUILE)),
+        Math.floor((zoneAGarder.y + hauteur / 2) / (HAUTEUR * TUILE)),
+      ];
+      for (let by = Math.max(0, gy0); by <= gy1 && by * HAUTEUR < carte.hauteur; by++)
+        for (let bx = Math.max(0, gx0); bx <= gx1 && bx * LARGEUR < carte.largeur; bx++) {
+          const b = this.blocs.get(by * 65536 + bx);
+          if (b) b.vu = this.image;
+          else voisins.push([bx, by]);
+        }
+    }
     for (const [bx, by] of voisins) {
       if (bx < 0 || by < 0 || bx * LARGEUR >= carte.largeur || by * HAUTEUR >= carte.hauteur) continue;
       const deja = this.blocs.get(by * 65536 + bx);
@@ -149,11 +172,13 @@ export class BlocsTuiles {
       this.peinsZone(bloc, tx0, ty0, tx0, ty0 + bloc.rangees, tx0 + LARGEUR - 1, ty0 + fin - 1, peins);
       bloc.rangees = fin;
     } else if (version !== bloc.version) {
-      // seules les cases qui ont changé (et leurs voisines) sont repeintes
+      // seules les cases qui ont changé (et leurs voisines) sont repeintes, d'un seul coup : une explosion en casse des dizaines
+      let [x0, y0, x1, y1] = [Infinity, Infinity, -Infinity, -Infinity];
       for (let ty = ty0 - 1; ty <= ty0 + HAUTEUR; ty++)
         for (let tx = tx0 - 1; tx <= tx0 + LARGEUR; tx++)
           if (this.version(tx, ty, tx, ty) > bloc.version)
-            this.peinsZone(bloc, tx0, ty0, tx - 1, ty - 1, tx + 1, ty + 1, peins);
+            [x0, y0, x1, y1] = [Math.min(x0, tx), Math.min(y0, ty), Math.max(x1, tx), Math.max(y1, ty)];
+      if (x1 >= x0) this.peinsZone(bloc, tx0, ty0, x0 - 1, y0 - 1, x1 + 1, y1 + 1, peins);
       bloc.version = version;
     }
     return bloc;

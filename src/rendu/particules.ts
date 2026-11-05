@@ -33,9 +33,17 @@ export class Particules {
 
   /** Une particule de plus (public : les effets propres au décor, debris-decor.ts, s'en servent). */
   ajoute(p: Omit<Particule, 'vieMax'>): void {
-    if (this.liste.length >= MAX) this.liste.shift();
-    this.liste.push({ ...p, vieMax: p.vie });
+    // une particule usée resservira (une explosion en fait des dizaines : autant d'objets en moins à ramasser pour le navigateur)
+    const q = Object.assign(this.reserve.pop() ?? ({} as Particule), p);
+    q.vieMax = p.vie;
+    // la liste pleine : la nouvelle prend la place d'une ancienne, à tour de rôle (sans décaler les 700 autres)
+    if (this.liste.length < MAX) this.liste.push(q);
+    else this.liste[this.remplace++ % MAX] = q;
   }
+
+  /** Les particules usées, prêtes à resservir ; où remplacer dans la liste pleine. */
+  private reserve: Particule[] = [];
+  private remplace = 0;
 
   debris(x: number, y: number, couleur: string, n = 6): void {
     for (let i = 0; i < n; i++)
@@ -251,7 +259,9 @@ export class Particules {
     }
     // on garde les vivantes sur place (sans fabriquer une nouvelle liste à chaque image)
     let k = 0;
-    for (const p of this.liste) if (p.vie > 0) this.liste[k++] = p;
+    for (const p of this.liste)
+      if (p.vie > 0) this.liste[k++] = p;
+      else if (this.reserve.length < MAX) this.reserve.push(p);
     this.liste.length = k;
   }
 
