@@ -32,7 +32,7 @@ const NOMS: Record<Partie, string> = {
   tuiles: 'tuiles',
   decor: 'décor',
   personnages: 'persos',
-  halos: 'halos',
+  halos: 'halos et flashs',
   effets: 'effets',
   simulation: 'simu',
   optimisations: 'optimisations',
@@ -65,6 +65,9 @@ export function afficheMesuresEssai(finesse: () => string): void {
   let pire = 0;
   const acoups: number[] = [];
   const image = (t: number) => {
+    // le jeu dessine juste avant (son rappel passe d'abord, à chaque image) : depuis le début de l'image `t`, tout ce qu'il a fait
+    chrono.calcul += performance.now() - t;
+    chrono.cadres++;
     const ecart = t - avant;
     avant = t;
     images++;
@@ -82,11 +85,12 @@ export function afficheMesuresEssai(finesse: () => string): void {
       const coupee = chrono.coupee ? `coupé : ${NOMS[chrono.coupee]}` : 'rien de coupé';
       m.textContent =
         `${ips} i/s · pire ${Math.round(pire)} ms · ${acoups.length} à-coups/10 s · ${finesse()}\n` +
+        `calcul ${ms(chrono.calcul / Math.max(1, chrono.cadres))} ms par image, sur ${ms(1000 / Math.max(1, ips))} ms\n` +
         `ms : ${parties} · ${simu}\n` +
         `${coupee} (toucher pour couper)`;
       m.classList.toggle('mauvais', pire > 50);
       for (const k of Object.keys(chrono.temps) as Partie[]) chrono.temps[k] = 0;
-      chrono.images = chrono.pas = 0;
+      chrono.images = chrono.pas = chrono.cadres = chrono.calcul = 0;
       affiche = t;
       images = 0;
       pire = 0;

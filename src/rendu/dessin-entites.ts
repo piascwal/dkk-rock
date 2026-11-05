@@ -183,7 +183,8 @@ export function dessineEntite(
   const pb = blanc ? (x0: number, y0: number, w: number, h: number) => p(x0, y0, w, h, '#ffffff') : p;
   // un ennemi touché passe au blanc, sprite compris : la planche est éclaircie et désaturée le temps du coup
   // (une planche seulement : un dessin en code passe au blanc de lui-même, et un filtre coûte cher)
-  const flashe = blanc && FEUILLES[v.g] !== undefined && 'filter' in ctx;
+  // (coupé avec les halos au compteur du mode essai : un filtre est lent sur iPhone)
+  const flashe = blanc && FEUILLES[v.g] !== undefined && 'filter' in ctx && !coupee('halos');
   if (flashe) ctx.filter = 'grayscale(1) brightness(3)';
 
   // sprites à apparences : l'identifiant choisit l'apparence ; héros : phase d'animation ; autres : compteur

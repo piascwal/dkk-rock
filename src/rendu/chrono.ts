@@ -36,6 +36,9 @@ export const chrono = {
   } as Record<Partie, number>,
   images: 0,
   pas: 0,
+  /** le temps de calcul des images de l'écran (les pas, le dessin, l'interface : voir ui/essai.ts), et leur nombre */
+  calcul: 0,
+  cadres: 0,
 };
 
 let depart = 0;
