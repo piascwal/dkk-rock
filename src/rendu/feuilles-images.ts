@@ -9,6 +9,7 @@ import { chargeReve } from './reve-jbt';
 import { chargeAvion } from './avion-appareil';
 import { chargeSibylle } from './sibylle';
 import type { Genre } from '../jeu/vue';
+import { optimise } from './chrono';
 
 const images = new Map<Genre, HTMLImageElement>();
 const imagesDecor = new Map<string, HTMLImageElement>();
@@ -160,6 +161,29 @@ export function dessineFeuille(
   return true;
 }
 
+/** Les lignes déjà découpées de chaque planche (à l'essai : voir ligneDecoupee). */
+const lignes = new WeakMap<HTMLImageElement, (ImageBitmap | null)[]>();
+
+/**
+ * La ligne `rangee` (hauteur `h`) de la planche, découpée dans sa propre petite image (à l'essai, voir chrono.ts : optimise) :
+ * la carte graphique ne garde alors que les animations à l'écran, pas toute la planche (5 à 6 Mo par héros, une dizaine pour
+ * certaines) ; quand l'ensemble dépasse sa réserve, Chrome sur Android rechargeait les images à chaque image. La découpe se fait
+ * en arrière-plan : en attendant, on dessine depuis la planche entière.
+ */
+function ligneDecoupee(img: CanvasImageSource, rangee: number, h: number): ImageBitmap | null {
+  if (!optimise() || !(img instanceof HTMLImageElement) || typeof createImageBitmap !== 'function')
+    return null;
+  let decoupe = lignes.get(img);
+  if (!decoupe) lignes.set(img, (decoupe = []));
+  if (decoupe[rangee] !== undefined) return decoupe[rangee];
+  decoupe[rangee] = null;
+  createImageBitmap(img, 0, rangee * h, img.naturalWidth, h).then(
+    (b) => (decoupe[rangee] = b),
+    () => undefined,
+  );
+  return null;
+}
+
 /** Une case de la planche, pieds au point courant. */
 function dessineCase(
   ctx: CanvasRenderingContext2D,
@@ -176,10 +200,12 @@ function dessineCase(
   const { a, b } = ctx.getTransform();
   ctx.imageSmoothingEnabled = Math.hypot(a, b) < d;
   ctx.imageSmoothingQuality = 'high';
+  const rangee = rangeeDeLaPlanche(f, ligne);
+  const decoupee = ligneDecoupee(img, rangee, f.h);
   ctx.drawImage(
-    img,
+    decoupee ?? img,
     col * f.w,
-    rangeeDeLaPlanche(f, ligne) * f.h,
+    decoupee ? 0 : rangee * f.h,
     f.w,
     f.h,
     arrondi(-(f.pied ?? f.w / 2) * k),
