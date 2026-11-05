@@ -16,7 +16,7 @@ const ENTREE = 1.1;
 const ARRET = 1.8;
 const DEPART = 0.95;
 /** Le van n'attend jamais plus que ça (secondes) que le niveau soit prêt. */
-const ATTENTE_MAX = 8;
+const ATTENTE_MAX = 5;
 
 const sortieDouce = (x: number) => 1 - (1 - Math.min(1, Math.max(0, x))) ** 3;
 const accelere = (x: number) => Math.min(1, Math.max(0, x)) ** 2;

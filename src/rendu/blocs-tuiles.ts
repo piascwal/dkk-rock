@@ -2,7 +2,7 @@ import { TUILE } from '../config';
 import type { Carte } from '../monde/carte';
 
 /**
- * Les tuiles peintes par grands blocs (à l'essai, voir chrono.ts : optimise) : chaque bloc de LARGEUR × HAUTEUR tuiles est peint
+ * Les tuiles peintes par grands blocs (voir chrono.ts : optimise) : chaque bloc de LARGEUR × HAUTEUR tuiles est peint
  * une fois dans sa propre toile, à la finesse de l'affichage, puis posé d'un seul coup à l'écran. La carte graphique reçoit
  * quelques grandes images par image au lieu de centaines de petites (Chrome sur Android s'en sortait mal). Une tuile qui change
  * (cassée, voir Carte.versions) fait repeindre son coin du bloc, pas tout le bloc. Ce qui bouge sur une tuile (l'eau, les

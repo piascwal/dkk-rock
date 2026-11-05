@@ -17,7 +17,7 @@ export function disque(ctx: CanvasRenderingContext2D, x: number, y: number, r: n
 const disques = new Map<string, Map<number, HTMLCanvasElement>>();
 
 /**
- * Un disque de couleur `couleur` (le même que `disque`) : à l'essai (voir chrono.ts : optimise), peint une fois pour toutes dans
+ * Un disque de couleur `couleur` (le même que `disque`) (voir chrono.ts : optimise), peint une fois pour toutes dans
  * une petite image à la finesse `d` de l'affichage, puis recopié d'un seul ordre de dessin au lieu de deux par rangée ; une
  * explosion en dessine des dizaines par image.
  */

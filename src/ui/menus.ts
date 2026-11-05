@@ -23,7 +23,6 @@ import { ecranCarte } from './carte-choix';
 import { aUnClavier, contenuTouches } from './touches-ui';
 import { animeTitre } from './titre-anime';
 import { transitionVan } from './transition-van';
-import { chrono } from '../rendu/chrono';
 import { etatNiveau } from '../rendu/prechauffage';
 import { compteSibylles } from '../jeu/sibylles';
 import { ecranRefontes } from './menus-refontes';
@@ -140,8 +139,8 @@ export class Menus {
           NIVEAUX[n]!.envol === true,
           s.qualite === 'eco',
           () => this.lanceNiveau(n, s.enCours?.niveau === n ? { ...s.enCours, drapeau: -1 } : null),
-          // à l'essai : le van attend que le niveau soit prêt dessous (voir prechauffage.ts)
-          () => !chrono.actif || etatNiveau.pret,
+          // le van attend que le niveau soit prêt dessous (voir prechauffage.ts)
+          () => etatNiveau.pret,
         ),
       () => this.titre(),
     );

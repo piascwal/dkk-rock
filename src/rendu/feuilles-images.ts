@@ -161,11 +161,11 @@ export function dessineFeuille(
   return true;
 }
 
-/** Les lignes déjà découpées de chaque planche (à l'essai : voir ligneDecoupee). */
+/** Les lignes déjà découpées de chaque planche (voir ligneDecoupee). */
 const lignes = new WeakMap<HTMLImageElement, (ImageBitmap | null)[]>();
 
 /**
- * La ligne `rangee` (hauteur `h`) de la planche, découpée dans sa propre petite image (à l'essai, voir chrono.ts : optimise) :
+ * La ligne `rangee` (hauteur `h`) de la planche, découpée dans sa propre petite image (voir chrono.ts : optimise) :
  * la carte graphique ne garde alors que les animations à l'écran, pas toute la planche (5 à 6 Mo par héros, une dizaine pour
  * certaines) ; quand l'ensemble dépasse sa réserve, Chrome sur Android rechargeait les images à chaque image. La découpe se fait
  * en arrière-plan : en attendant, on dessine depuis la planche entière.

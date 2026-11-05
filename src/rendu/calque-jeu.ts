@@ -12,7 +12,7 @@ interface Point {
 }
 
 /**
- * Le calque des particules à la taille du jeu (un pixel de toile par pixel du jeu), à l'essai (voir chrono.ts : optimise) : les
+ * Le calque des particules à la taille du jeu (un pixel de toile par pixel du jeu) (voir chrono.ts : optimise) : les
  * particules s'y dessinent, puis la boîte qui les contient est posée d'un coup à l'écran, agrandie sans lissage. Même image (tout
  * ce qu'elles dessinent tombe sur des pixels entiers du jeu), mais la carte graphique peint jusqu'à 36 fois moins de pixels : les
  * nuages d'explosion se recouvrent beaucoup. Les textes (+1 VIE...) se dessinent ensuite, directement.
@@ -20,7 +20,7 @@ interface Point {
 export class CalqueJeu {
   private toile: HTMLCanvasElement | null = null;
 
-  /** Faux si le calque ne sert pas (hors essai, affichage à un pixel par pixel du jeu) : on dessine alors comme avant. */
+  /** Faux si le calque ne sert pas (optimisations coupées, affichage à un pixel par pixel du jeu) : on dessine alors comme avant. */
   dessine(
     ctx: CanvasRenderingContext2D,
     camX: number,

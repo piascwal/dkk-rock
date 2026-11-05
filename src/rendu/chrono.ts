@@ -60,10 +60,10 @@ export function note(p: Partie): void {
 }
 
 /**
- * Les optimisations à l'essai (le dessin des tuiles mémorisé, les nuages d'explosion en images toutes faites) : seulement en mode
- * essai, et pas quand on les coupe au compteur (pour comparer). Pour tous les joueurs : renvoyer toujours vrai.
+ * Les optimisations du dessin (les tuiles par grands blocs, les planches ligne par ligne, les particules sur un calque à la taille
+ * du jeu) : pour tous les joueurs ; seul le compteur du mode essai peut les couper (« optimisations »), pour comparer.
  */
-export const optimise = (): boolean => chrono.actif && chrono.coupee !== 'optimisations';
+export const optimise = (): boolean => chrono.coupee !== 'optimisations';
 
 /** La partie `p` est coupée : on ne la dessine pas. */
 export const coupee = (p: Partie): boolean => chrono.coupee === p;

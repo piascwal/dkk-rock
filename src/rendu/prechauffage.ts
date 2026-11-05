@@ -14,11 +14,11 @@ import { niveauLu } from '../niveaux';
  */
 /**
  * Le niveau est-il prêt à se montrer ? Tout est préchauffé, et le jeu dessiné dessous (sous le drap du van) tourne sans à-coup
- * depuis un moment : les blocs de tuiles, les images des personnages sont prêts. Le van attend ce signal pour repartir (à
- * l'essai, voir transition-van.ts).
+ * depuis un moment : les blocs de tuiles, les images des personnages sont prêts. Le van attend ce signal pour repartir (voir
+ * transition-van.ts).
  */
 export const etatNiveau = { pret: false };
-/** Tant d'images fluides d'affilée (moins de 25 ms chacune), une fois tout préchauffé. */
+/** Tant d'images fluides d'affilée (moins de 34 ms chacune : 30 i/s au moins, même sur un appareil lent), une fois tout préchauffé. */
 const IMAGES_FLUIDES = 20;
 
 export class Prechauffage {
@@ -42,7 +42,7 @@ export class Prechauffage {
     for (const d of niveauLu(vue.niveau).drapeaux)
       if (heros && d.x <= heros.x && d.x > zoneAGarder.x) [zoneAGarder.x, zoneAGarder.y] = [d.x, d.y];
     const maintenant = performance.now();
-    this.fluides = this.fini && maintenant - this.avant < 25 ? this.fluides + 1 : 0;
+    this.fluides = this.fini && maintenant - this.avant < 34 ? this.fluides + 1 : 0;
     this.avant = maintenant;
     etatNiveau.pret = this.fluides >= IMAGES_FLUIDES;
   }

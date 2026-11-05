@@ -27,9 +27,9 @@ export function dessineTuiles(
   const ty1 = Math.min(carte.hauteur - 1, Math.floor((camY + HAUTEUR_VUE) / TUILE));
 
   const finesse = Math.hypot(ctx.getTransform().a, ctx.getTransform().b);
-  // à l'essai : le dessin de chaque case est mémorisé, et rejoué tant que ni elle ni ses voisines n'ont changé
+  // le dessin de chaque case est mémorisé, et rejoué tant que ni elle ni ses voisines n'ont changé
   const memoire = optimise() ? recettes.prepare(carte, atlas, finesse) : null;
-  // à l'essai : les parties fixes, par grands blocs déjà peints (voir blocs-tuiles.ts), puis ce qui bouge par-dessus
+  // les parties fixes, par grands blocs déjà peints (voir blocs-tuiles.ts), puis ce qui bouge par-dessus
   if (memoire)
     blocs
       .prepare(carte, atlas, etatImagesTuiles.generation, finesse)

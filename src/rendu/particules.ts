@@ -267,7 +267,7 @@ export class Particules {
 
   private readonly calque = new CalqueJeu();
 
-  /** Dessine les particules ; à l'essai, d'abord sur un calque à la taille du jeu (voir calque-jeu.ts). */
+  /** Dessine les particules, d'abord sur un calque à la taille du jeu (voir calque-jeu.ts). */
   dessine(ctx: CanvasRenderingContext2D, camX: number, camY: number): void {
     const trace = (c: CanvasRenderingContext2D, x: number, y: number, quoi: Couche) =>
       this.trace(c, x, y, quoi);

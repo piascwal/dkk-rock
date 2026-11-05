@@ -49,7 +49,8 @@ dessous. Elle ne lit que la vue (la barre de vie du boss qui apparaît) : les cl
 en altitude) tire, d'un seul bloc rigide, un grand drap sombre et, dessus, une banderole au nom du niveau. Il entre par la gauche en
 ralentissant et s'arrête : le drap couvre l'écran et le nom se lit pendant près de 2 s, le niveau se lance dessous ; puis le van
 repart en trombe avec le drap et la banderole, dont le bord arrière découvre le niveau de gauche à droite (3,9 s en tout ; un
-toucher saute l'arrêt ; rien en affichage économe).
+toucher saute l'arrêt ; rien en affichage économe). À l'arrêt, le van attend que le niveau soit prêt dessous (tout
+préchauffé, puis une vingtaine d'images fluides d'affilée, au plus 5 s) : trois carrés jaunes clignotent sous la banderole.
 
 **Les retours de jeu** : un quart de cœur perdu fait trembler le cœur et en fait sortir un éclat, un cœur vidé éclate, un cœur
 regagné gonfle avec un éclat doré (`ui/hud-effets.ts`) ; le cœur d'un tonneau WOG jaillit et rebondit deux fois ; un reflet
@@ -397,6 +398,14 @@ src/
   ui/                menus, HUD, dialogues, portraits (HTML)
   app.ts             relie le tout : boucle à pas fixe, solo, hôte ou invité
 ```
+
+**Fluidité du dessin** (mesurée sur un S21 Ultra, Chrome : de 15-20 à ~60 i/s) : la carte graphique saturait à recevoir des
+centaines de petites images par image. Les tuiles se peignent par grands blocs de 16 × 10 (`rendu/blocs-tuiles.ts`, chaque case
+d'après son dessin mémorisé, `rendu/recettes-tuiles.ts`), préparés d'avance autour de la caméra et du dernier drapeau, repeints
+par coin quand une tuile casse (`Carte.versions`) ; les planches se découpent ligne par ligne (`feuilles-images.ts`) ; les
+particules se dessinent sur un calque à la taille du jeu (`rendu/calque-jeu.ts`) et resservent. En mode essai, le compteur en
+haut de l'écran (`ui/essai.ts`, `rendu/chrono.ts`) détaille le temps de chaque partie du dessin et, au toucher, en coupe une
+(dont « optimisations », pour comparer).
 
 Trois règles : la **simulation** ne touche pas au DOM (elle tourne dans les tests) ; le **rendu**
 ne lit que la **vue** (`EtatVue`), comme un client distant ; tout ce qui vient du **réseau** est
