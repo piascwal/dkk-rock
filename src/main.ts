@@ -8,14 +8,12 @@ import { installeAntiZoom } from './entrees/anti-zoom';
 import { installeCurseurVoile } from './ui/curseur-voile';
 import { choisitVersions } from './niveaux';
 import { afficheBandeauEssai, afficheMesuresEssai, modeEssai } from './ui/essai';
-import { activePanneaux } from './rendu/decor-panneaux';
 
 /** Point d'entrée : DKK : Rock Never Dies. */
 // le mode essai d'abord : les niveaux refaits remplacent les originaux avant que rien ne soit lu
 choisitVersions(modeEssai());
 if (modeEssai()) {
   afficheBandeauEssai();
-  activePanneaux(); // les panneaux publicitaires des toits, à l'essai
 }
 const app = new App();
 app.demarre();

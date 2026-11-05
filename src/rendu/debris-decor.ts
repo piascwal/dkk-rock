@@ -1,5 +1,6 @@
 import { TUILE } from '../config';
 import type { Pose } from './decor';
+import { NOMS_PANNEAUX } from './decor-panneaux';
 import type { Particules } from './particules';
 
 /** Les couleurs des morceaux d'un accessoire de décor qui se brise, et sa hauteur (d'où ils jaillissent). */
@@ -46,7 +47,9 @@ const MATIERES: Partial<Record<string, { couleurs: string[]; haut: number }>> = 
   panneauLounge: { couleurs: [...BOIS, '#7cfc7c'], haut: 20 },
   afficheRose: { couleurs: ['#3a1a4a', '#ff4fd8', '#ffffff'], haut: 20 },
   afficheBleue: { couleurs: ['#102a4a', '#3fe0ff', '#ffffff'], haut: 20 },
-  panneauTotoPizz: { couleurs: [...METAL, '#c8322a', '#f2e2b0', '#ffd23f'], haut: 60 },
+  ...Object.fromEntries(
+    NOMS_PANNEAUX.map((n) => [n, { couleurs: [...METAL, '#c8322a', '#f2e2b0', '#ffd23f'], haut: 60 }]),
+  ),
   vacheCasque: { couleurs: ['#f4f4f4', '#222', '#c98b6a', '#ffd23f'], haut: 22 },
 };
 

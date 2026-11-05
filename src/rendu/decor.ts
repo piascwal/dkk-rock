@@ -23,7 +23,7 @@ import {
 import { dessineSprite, SPRITES, type Sprite } from './decor-sprites';
 import type { NomTheme } from './themes';
 import { SEMIS } from './decor-semis';
-import { poseDesPanneaux, reglagePanneaux } from './decor-panneaux';
+import { poseDesPanneaux } from './decor-panneaux';
 
 export interface Pose {
   tx: number;
@@ -92,15 +92,12 @@ export function semeDecor(
   // le décor placé à la main garde sa place : rien ne se sème par-dessus
   for (const f of fixes) for (const [x, y] of emprise(f.tx, f.ty)) prises.add(cle(x, y));
   // les panneaux publicitaires, sur les toits plats des bâtiments (leur propre tirage : le reste du décor ne change pas)
-  const panneaux = reglagePanneaux.actifs
-    ? poseDesPanneaux(
-        carte,
-        theme,
-        graine,
-        (x, y) => !prises.has(cle(x, y)),
-        (x, y) => prises.add(cle(x, y)),
-      )
-    : [];
+  const panneaux = poseDesPanneaux(
+    carte,
+    graine,
+    (x, y) => !prises.has(cle(x, y)),
+    (x, y) => prises.add(cle(x, y)),
+  );
   if (fixe && !semerAussi) return [...fixes, ...panneaux];
   const semis = SEMIS[theme];
   const poses: Pose[] = [...fixes, ...panneaux];

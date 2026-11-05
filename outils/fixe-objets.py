@@ -33,10 +33,13 @@ BORD_MUR = 4.2
 # des planches plus fines que 6 pixels par pixel du jeu, et réduites avec lissage (au lieu d'un agrandissement entier, qui donne des
 # pixels inégaux quand l'écran n'est pas un multiple de la planche) : le DJ, très détaillé, plus grand que le reste
 DENSITES = {'dj': 8, 'robot': 8, 'borne': 8, 'pneus': 8, 'baril': 8, 'fougere': 8, 'menhir': 8, **{f'{h}-echelle': 6 for h in ECHELLES}, **{n: 6 for n in SAUTS}, **{n: 12 for n in MURS}}
-LISSES = {'barriere', 'archeFise', 'portiqueBreak', 'portiqueFlat', 'portiqueDance', 'juryBreak', 'foodDuke', 'foodRougail', 'foodCroque', 'foodGlace', 'pissotiere', 'toilettes', 'platane', 'platane2', 'tablePique', 'tableSkate', 'tableBmx', 'tableFamille', 'dj', 'voiture', 'rocker', 'robot', 'borne', 'pneus', 'baril', 'fougere', 'menhir', 'panneauTotoPizz', *(f'{h}-echelle' for h in ECHELLES), *SAUTS, *MURS}
+LISSES = {'barriere', 'archeFise', 'portiqueBreak', 'portiqueFlat', 'portiqueDance', 'juryBreak', 'foodDuke', 'foodRougail', 'foodCroque', 'foodGlace', 'pissotiere', 'toilettes', 'platane', 'platane2', 'tablePique', 'tableSkate', 'tableBmx', 'tableFamille', 'dj', 'voiture', 'rocker', 'robot', 'borne', 'pneus', 'baril', 'fougere', 'menhir', 'panneauTotoPizz', 'panneauPiles', 'panneauGouttes', 'panneauRadio', 'panneauVermiVie', 'panneauVermiSavent', *(f'{h}-echelle' for h in ECHELLES), *SAUTS, *MURS}
 # les planches du décor de Mat (saut, mur, échelle) sortent de outils/prepare-mat.py, avec des densités à lui (voir README) : ce script
 # ne les refait pas, il reprend telles quelles leurs lignes de feuilles-objets.ts
 CONSERVEES = ('mat-saut', 'mat-mur', 'mat-echelle')
+# les planches des panneaux publicitaires : leurs lignes vont dans leur propre fichier (feuilles-panneaux.ts), pour que
+# feuilles-objets.ts reste sous la limite des 300 lignes
+PANNEAUX = {'panneauTotoPizz', 'panneauPiles', 'panneauGouttes', 'panneauRadio', 'panneauVermiVie', 'panneauVermiSavent'}
 # celles de ces planches qu'on réduit à 256 couleurs (le DJ, les voitures) ; les rockers en ont trop : douze personnages différents sur une planche
 QUANTIFIEES = {'dj', 'voiture'}
 # objet : (fichiers sources, un par état (une ligne de la planche chacun), genre dans jeu/vue.ts, largeur en jeu en pixels)
@@ -166,9 +169,14 @@ OBJETS = {
     'jbt-mur': (['heros/jbt-mur-base.png'], None, 12.5),
     # JBM : même silhouette haute et étroite, 12 de large (il est un peu plus petit que JBT) ; l'image regarde à droite
     'jbm-mur': (['heros/jbm-mur-base.png'], None, 12),
-    # les panneaux publicitaires des toits (voir src/rendu/decor-panneaux.ts) : 80 px de large en jeu (cinq tuiles), lissés pour que
+    # les panneaux publicitaires des toits (voir src/rendu/decor-panneaux.ts) : de 64 à 128 px de large en jeu, lissés pour que
     # l'enseigne reste lisible ; chacun vient de outils/prepare-panneau.py
     'panneauTotoPizz': (['decor/panneaux/toto-pizz-base.png'], None, 80),
+    'panneauPiles': (['decor/panneaux/piles-alca-lune-base.png'], None, 128),
+    'panneauGouttes': (['decor/panneaux/gouttes-jbg-tom-base.png'], None, 112),
+    'panneauRadio': (['decor/panneaux/radio-fm-base.png'], None, 64),
+    'panneauVermiVie': (['decor/panneaux/vermi-vie-base.png'], None, 80),
+    'panneauVermiSavent': (['decor/panneaux/vermi-savent-base.png'], None, 80),
     # la fougère (garage, alpages, plage)
     'fougere': (['decor/fougere-base.png'], None, 14),
     # le menhir des forêts et de l'île (arc breton) : une pierre levée, de l'artiste ; le dolmen, lui, est dessiné en code
@@ -279,7 +287,7 @@ def cadre_commun(chemins):
 
 
 def main():
-    lignes, decors = [], []
+    lignes, decors, panneaux = [], [], []
     for nom, (sources, genre, largeur, *commun) in OBJETS.items():
         if commun:
             etats = cadre_commun([RACINE / 'assets-sources' / s for s in sources])
@@ -344,7 +352,7 @@ def main():
         ligne = ', '.join(['1'] * len(images))
         pied = cw - round(BORD_MUR * dens) if nom in MURS else cw // 2
         cle = f'[G.{genre}]' if genre else f"'{nom}'"
-        (lignes if genre else decors).append(
+        (lignes if genre else panneaux if nom in PANNEAUX else decors).append(
             f"  {cle}: {{ fichier: '{nom}.png', w: {cw}, h: {ch}, images: [{ligne}], rythme: 1, densite: {dens}, pied: {pied} }},"
         )
     ancien = (RACINE / 'src' / 'rendu' / 'feuilles-objets.ts').read_text()
@@ -352,13 +360,20 @@ def main():
         m = re.search(rf"  '{nom}': \{{.*?\}},\n", ancien, re.S)
         if m:
             decors.append(m.group(0).rstrip('\n'))
+    (RACINE / 'src' / 'rendu' / 'feuilles-panneaux.ts').write_text(
+        "// Fichier généré par outils/fixe-objets.py : ne pas modifier à la main.\n"
+        "import type { Feuille } from './feuilles';\n\n"
+        "/** Les planches des panneaux publicitaires des toits (voir decor-panneaux.ts). */\n"
+        "export const FEUILLES_PANNEAUX: Record<string, Feuille> = {\n" + '\n'.join(panneaux) + '\n};\n'
+    )
     (RACINE / 'src' / 'rendu' / 'feuilles-objets.ts').write_text(
         "// Fichier généré par outils/fixe-objets.py : ne pas modifier à la main.\n"
         "import { G, type Genre } from '../jeu/vue';\n"
-        "import type { Feuille } from './feuilles';\n\n"
+        "import type { Feuille } from './feuilles';\n"
+        "import { FEUILLES_PANNEAUX } from './feuilles-panneaux';\n\n"
         "export const FEUILLES_OBJETS: Partial<Record<Genre, Feuille>> = {\n" + '\n'.join(lignes) + '\n};\n\n'
         "/** Les planches du décor, sans genre : une ligne par apparence. */\n"
-        "export const FEUILLES_DECOR: Record<string, Feuille> = {\n" + '\n'.join(decors) + '\n};\n'
+        "export const FEUILLES_DECOR: Record<string, Feuille> = {\n" + '\n'.join(decors) + '\n  ...FEUILLES_PANNEAUX,\n};\n'
     )
 
 
@@ -373,3 +388,4 @@ def formate(chemin):
 if __name__ == '__main__':
     main()
     formate(RACINE / 'src' / 'rendu' / 'feuilles-objets.ts')
+    formate(RACINE / 'src' / 'rendu' / 'feuilles-panneaux.ts')

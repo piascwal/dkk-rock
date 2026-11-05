@@ -1,6 +1,7 @@
 // Fichier généré par outils/fixe-objets.py : ne pas modifier à la main.
 import { G, type Genre } from '../jeu/vue';
 import type { Feuille } from './feuilles';
+import { FEUILLES_PANNEAUX } from './feuilles-panneaux';
 
 export const FEUILLES_OBJETS: Partial<Record<Genre, Feuille>> = {
   [G.VAN]: { fichier: 'van.png', w: 336, h: 199, images: [1], rythme: 1, densite: 6, pied: 168 },
@@ -264,15 +265,6 @@ export const FEUILLES_DECOR: Record<string, Feuille> = {
   'jbg-mur': { fichier: 'jbg-mur.png', w: 202, h: 243, images: [1], rythme: 1, densite: 12, pied: 152 },
   'jbt-mur': { fichier: 'jbt-mur.png', w: 150, h: 267, images: [1], rythme: 1, densite: 12, pied: 100 },
   'jbm-mur': { fichier: 'jbm-mur.png', w: 173, h: 248, images: [1], rythme: 1, densite: 12, pied: 113 },
-  panneauTotoPizz: {
-    fichier: 'panneauTotoPizz.png',
-    w: 480,
-    h: 542,
-    images: [1],
-    rythme: 1,
-    densite: 6,
-    pied: 240,
-  },
   fougere: { fichier: 'fougere.png', w: 112, h: 107, images: [1], rythme: 1, densite: 8, pied: 56 },
   menhir: { fichier: 'menhir.png', w: 112, h: 214, images: [1], rythme: 1, densite: 8, pied: 56 },
   poubelle: { fichier: 'poubelle.png', w: 66, h: 96, images: [1, 1], rythme: 1, densite: 6, pied: 33 },
@@ -297,4 +289,5 @@ export const FEUILLES_DECOR: Record<string, Feuille> = {
     densite: 6,
     pied: 78,
   },
+  ...FEUILLES_PANNEAUX,
 };

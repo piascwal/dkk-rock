@@ -1,0 +1,60 @@
+// Fichier généré par outils/fixe-objets.py : ne pas modifier à la main.
+import type { Feuille } from './feuilles';
+
+/** Les planches des panneaux publicitaires des toits (voir decor-panneaux.ts). */
+export const FEUILLES_PANNEAUX: Record<string, Feuille> = {
+  panneauTotoPizz: {
+    fichier: 'panneauTotoPizz.png',
+    w: 480,
+    h: 542,
+    images: [1],
+    rythme: 1,
+    densite: 6,
+    pied: 240,
+  },
+  panneauPiles: {
+    fichier: 'panneauPiles.png',
+    w: 768,
+    h: 358,
+    images: [1],
+    rythme: 1,
+    densite: 6,
+    pied: 384,
+  },
+  panneauGouttes: {
+    fichier: 'panneauGouttes.png',
+    w: 672,
+    h: 342,
+    images: [1],
+    rythme: 1,
+    densite: 6,
+    pied: 336,
+  },
+  panneauRadio: {
+    fichier: 'panneauRadio.png',
+    w: 384,
+    h: 618,
+    images: [1],
+    rythme: 1,
+    densite: 6,
+    pied: 192,
+  },
+  panneauVermiVie: {
+    fichier: 'panneauVermiVie.png',
+    w: 480,
+    h: 592,
+    images: [1],
+    rythme: 1,
+    densite: 6,
+    pied: 240,
+  },
+  panneauVermiSavent: {
+    fichier: 'panneauVermiSavent.png',
+    w: 480,
+    h: 592,
+    images: [1],
+    rythme: 1,
+    densite: 6,
+    pied: 240,
+  },
+};

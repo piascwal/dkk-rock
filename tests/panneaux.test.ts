@@ -1,19 +1,10 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { Carte } from '../src/monde/carte';
-import { NIVEAUX, niveauLu } from '../src/niveaux';
 import { T, type Tuile } from '../src/monde/tuiles';
 import { semeDecor } from '../src/rendu/decor';
-import {
-  CATEGORIES_THEME,
-  PANNEAUX,
-  reglagePanneaux,
-  panneauxDuTheme,
-  poseDesPanneaux,
-  tuilesDuPanneau,
-} from '../src/rendu/decor-panneaux';
 import { ACCESSOIRES } from '../src/rendu/decor-objets';
+import { NOMS_PANNEAUX, PANNEAUX, poseDesPanneaux, tuilesDuPanneau } from '../src/rendu/decor-panneaux';
 import { SPRITES } from '../src/rendu/decor-sprites';
-import { THEMES } from '../src/rendu/themes';
 
 /** Une carte vide de `l` × `h` tuiles, avec le décor de la fonction `fait` (un bâtiment de béton, par exemple). */
 function carte(l: number, h: number, fait: (c: Carte) => void): Carte {
@@ -27,50 +18,34 @@ const batiment = (c: Carte, x0: number, x1: number, toit: number, matiere: Tuile
   for (let x = x0; x <= x1; x++) for (let y = toit; y < c.hauteur; y++) c.pose(x, y, matiere);
 };
 
-// les panneaux ne sont posés qu'en mode essai : on le branche le temps de ces tests
-beforeAll(() => {
-  reglagePanneaux.actifs = true;
-});
-afterAll(() => {
-  reglagePanneaux.actifs = false;
-});
-
 const libre = () => true;
 const rien = () => {};
-const panneaux = (c: Carte, theme: 'ville' | 'neige' = 'ville', graine = 1) =>
-  poseDesPanneaux(c, theme, graine, libre, rien);
+const panneaux = (c: Carte, graine = 1) => poseDesPanneaux(c, graine, libre, rien);
 
-describe('les catégories des panneaux', () => {
-  it('chaque monde a ses catégories, et chaque panneau est planté dans l’urbain', () => {
-    for (const nom of Object.keys(THEMES)) expect(CATEGORIES_THEME, nom).toHaveProperty(nom);
-    expect(PANNEAUX.find((p) => p.nom === 'panneauTotoPizz')?.categories).toContain('urbain');
+/** Une rue de bâtiments de `n` toits de 30 tuiles, espacés de 10 : de quoi poser plusieurs panneaux. */
+const rue = (n = 8) =>
+  carte(40 * n + 20, 60, (c) => {
+    for (let k = 0; k < n; k++) batiment(c, 10 + k * 40, 39 + k * 40, 40);
   });
 
-  it('le panneau de pizza va dans les mondes urbains, jamais dans ceux de neige ou de campagne', () => {
-    for (const urbain of ['ville', 'newyork', 'club', 'limerick'] as const)
-      expect(
-        panneauxDuTheme(urbain).map((p) => p.nom),
-        urbain,
-      ).toContain('panneauTotoPizz');
-    for (const autre of ['neige', 'montagne', 'foret', 'stc', 'plage'] as const)
-      expect(panneauxDuTheme(autre), autre).toHaveLength(0);
-  });
-
-  it('un monde à plusieurs catégories reçoit les panneaux de chacune', () => {
-    // Ottawa est à la fois urbain et neigeux : il reçoit les panneaux « urbain » et ceux de « neige »
-    expect(CATEGORIES_THEME.ottawa).toEqual(expect.arrayContaining(['urbain', 'neige']));
-    expect(panneauxDuTheme('ottawa').map((p) => p.nom)).toContain('panneauTotoPizz');
-  });
-
-  it('chaque panneau est un accessoire, dessiné par sa planche', () => {
-    for (const p of PANNEAUX) {
-      expect(p.nom in ACCESSOIRES, p.nom).toBe(true);
-      expect(SPRITES.has(p.nom), p.nom).toBe(true);
+describe('les panneaux', () => {
+  it('chaque panneau est un accessoire, dessiné par sa planche, sur une largeur impaire de tuiles', () => {
+    for (const nom of NOMS_PANNEAUX) {
+      expect(nom in ACCESSOIRES, nom).toBe(true);
+      expect(SPRITES.has(nom), nom).toBe(true);
+      expect(tuilesDuPanneau(nom).largeur % 2, `${nom} : largeur impaire`).toBe(1);
+      expect(tuilesDuPanneau(nom).hauteur, nom).toBeGreaterThan(2);
     }
   });
 
-  it('le panneau de pizza tient sur cinq tuiles de large', () => {
-    expect(tuilesDuPanneau('panneauTotoPizz').largeur).toBe(5);
+  it('les deux « Vermi-fin » vont ensemble : la suite de « Ma vie a changé » est « Pour ceux qui ne le savent pas »', () => {
+    expect(PANNEAUX.find((p) => p.nom === 'panneauVermiVie')?.suite).toBe('panneauVermiSavent');
+    expect(PANNEAUX.some((p) => p.nom === 'panneauVermiSavent')).toBe(false); // jamais tiré seul
+  });
+
+  it('il y a de quoi choisir : au moins cinq panneaux, aucun lié à un type de niveau', () => {
+    expect(PANNEAUX.length).toBeGreaterThanOrEqual(5);
+    expect(PANNEAUX.every((p) => !('categories' in p))).toBe(true);
   });
 });
 
@@ -85,145 +60,146 @@ describe('la pose des panneaux sur les toits', () => {
   it('pose des panneaux sur les toits plats, et seulement dessus', () => {
     let vus = 0;
     for (let graine = 1; graine <= 40; graine++) {
-      for (const p of panneaux(immeuble(), 'ville', graine)) {
+      for (const p of panneaux(immeuble(), graine)) {
         vus++;
         expect(p.ty).toBe(40);
-        expect(p.quoi).toBe('panneauTotoPizz');
+        expect(NOMS_PANNEAUX).toContain(p.quoi);
         expect((p.tx >= 22 && p.tx <= 47) || (p.tx >= 72 && p.tx <= 97), `tx ${p.tx}`).toBe(true);
       }
     }
     expect(vus).toBeGreaterThan(10);
   });
 
-  it('ne pose rien dans un monde sans panneau pour lui', () => {
-    for (let graine = 1; graine <= 20; graine++)
-      expect(panneaux(immeuble(), 'neige', graine)).toHaveLength(0);
-  });
-
   it('ne pose rien sur le sol d’une plaine qui continue (pas de bord de toit)', () => {
     const plaine = carte(120, 60, (c) => batiment(c, 0, 119, 40));
-    for (let graine = 1; graine <= 20; graine++) expect(panneaux(plaine, 'ville', graine)).toHaveLength(0);
+    for (let graine = 1; graine <= 20; graine++) expect(panneaux(plaine, graine)).toHaveLength(0);
   });
 
   it('ne pose rien sur la terre d’une colline : seul un toit (béton, brique, tuiles, métal) en porte', () => {
     const colline = carte(120, 60, (c) => batiment(c, 20, 49, 40, T.TERRE));
-    for (let graine = 1; graine <= 20; graine++) expect(panneaux(colline, 'ville', graine)).toHaveLength(0);
+    for (let graine = 1; graine <= 20; graine++) expect(panneaux(colline, graine)).toHaveLength(0);
   });
 
-  it('un toit trop étroit n’en reçoit pas, et le panneau garde une marge de chaque côté', () => {
-    const etroit = carte(120, 60, (c) => batiment(c, 20, 25, 40)); // 6 tuiles : le panneau en fait 5, plus deux marges
-    for (let graine = 1; graine <= 20; graine++) expect(panneaux(etroit, 'ville', graine)).toHaveLength(0);
+  it('un toit trop étroit n’en reçoit pas', () => {
+    const etroit = carte(120, 60, (c) => batiment(c, 20, 25, 40)); // 6 tuiles : un panneau en demande cinq, plus deux marges
+    for (let graine = 1; graine <= 20; graine++) expect(panneaux(etroit, graine)).toHaveLength(0);
+  });
+
+  it('un panneau garde une marge sur chaque bord de toit', () => {
     for (let graine = 1; graine <= 40; graine++)
-      for (const p of panneaux(immeuble(), 'ville', graine)) {
-        const gauche = p.tx - 2;
-        expect(gauche === 20 || gauche === 70 || gauche > 20, 'pas à plat sur le bord').toBe(true);
-        expect(gauche >= 21 || (gauche >= 71 && gauche <= 94), `gauche ${gauche}`).toBe(true);
+      for (const p of panneaux(immeuble(), graine)) {
+        const { largeur } = tuilesDuPanneau(p.quoi);
+        const gauche = p.tx - (largeur - 1) / 2;
+        const droite = gauche + largeur - 1;
+        const dans = (x0: number, x1: number) => gauche >= x0 + 1 && droite <= x1 - 1;
+        expect(dans(20, 49) || dans(70, 99), `panneau ${p.quoi} sur ${gauche}-${droite}`).toBe(true);
       }
   });
 
   it('ne pose pas un panneau dont le ciel est bouché (un plafond, un mur de fond)', () => {
     const couvert = carte(120, 60, (c) => {
       batiment(c, 20, 49, 40);
-      for (let x = 20; x <= 49; x++) c.pose(x, 35, T.BETON); // une dalle trois tuiles au-dessus : pas la place
+      for (let x = 20; x <= 49; x++) c.pose(x, 38, T.BETON); // une dalle deux tuiles au-dessus : aucun panneau n'y tient
     });
-    for (let graine = 1; graine <= 20; graine++) expect(panneaux(couvert, 'ville', graine)).toHaveLength(0);
+    for (let graine = 1; graine <= 20; graine++) expect(panneaux(couvert, graine)).toHaveLength(0);
   });
 
   it('évite une échelle qui monte sur le toit', () => {
     const avecEchelle = carte(120, 60, (c) => {
       batiment(c, 20, 59, 40);
-      for (let y = 36; y < 40; y++) c.pose(40, y, T.ECHELLE);
+      for (let y = 30; y < 40; y++) c.pose(40, y, T.ECHELLE);
     });
     for (let graine = 1; graine <= 60; graine++)
-      for (const p of panneaux(avecEchelle, 'ville', graine))
-        expect(Math.abs(p.tx - 40), `panneau trop près de l’échelle (tx ${p.tx})`).toBeGreaterThan(3);
+      for (const p of panneaux(avecEchelle, graine)) {
+        const { largeur } = tuilesDuPanneau(p.quoi);
+        expect(Math.abs(p.tx - 40), `panneau trop près de l’échelle (tx ${p.tx})`).toBeGreaterThan(
+          (largeur - 1) / 2 + 1,
+        );
+      }
   });
 
-  it('deux panneaux d’un niveau sont toujours espacés', () => {
-    const long = carte(400, 60, (c) => {
-      for (let k = 0; k < 6; k++) batiment(c, 10 + k * 60, 55 + k * 60, 40);
-    });
+  it('espace les panneaux d’un niveau (sauf un panneau et sa suite)', () => {
     for (let graine = 1; graine <= 20; graine++) {
-      const xs = panneaux(long, 'ville', graine).map((p) => p.tx);
-      for (let i = 1; i < xs.length; i++) expect(xs[i]! - xs[i - 1]!).toBeGreaterThanOrEqual(26);
+      const liste = panneaux(rue(), graine);
+      for (let i = 1; i < liste.length; i++) {
+        const [a, b] = [liste[i - 1]!, liste[i]!];
+        if (PANNEAUX.some((p) => p.nom === a.quoi && p.suite === b.quoi)) continue;
+        expect(b.tx - a.tx).toBeGreaterThanOrEqual(26);
+      }
     }
   });
 
   it('est stable : la même carte, la même graine, les mêmes panneaux', () => {
-    expect(panneaux(immeuble(), 'ville', 7)).toEqual(panneaux(immeuble(), 'ville', 7));
+    expect(panneaux(rue(), 7)).toEqual(panneaux(rue(), 7));
   });
 
-  it('réserve les cases du panneau : ce qu’on sème ensuite ne le recouvre pas', () => {
-    const prises = new Set<string>();
-    const poses = poseDesPanneaux(
-      immeuble(),
-      'ville',
-      3,
-      (x, y) => !prises.has(`${x},${y}`),
-      (x, y) => prises.add(`${x},${y}`),
-    );
-    expect(poses.length).toBeGreaterThan(0);
-    const { largeur, hauteur } = tuilesDuPanneau('panneauTotoPizz');
-    expect(prises.size).toBe(poses.length * largeur * hauteur);
+  it('ne recouvre jamais un autre panneau : leurs cases sont réservées une seule fois', () => {
+    for (let graine = 1; graine <= 20; graine++) {
+      const prises = new Set<string>();
+      const poses = poseDesPanneaux(
+        rue(),
+        graine,
+        (x, y) => !prises.has(`${x},${y}`),
+        (x, y) => {
+          expect(prises.has(`${x},${y}`), `case ${x},${y} prise deux fois`).toBe(false);
+          prises.add(`${x},${y}`);
+        },
+      );
+      const cases = poses.reduce(
+        (n, p) => n + tuilesDuPanneau(p.quoi).largeur * tuilesDuPanneau(p.quoi).hauteur,
+        0,
+      );
+      expect(prises.size).toBe(cases);
+    }
   });
 
-  it('un panneau n’est posé sur aucun niveau dont le monde ne le veut pas, et le semis garde sa forme', () => {
-    const c = immeuble();
-    const poses = semeDecor(c, 'ville', 5);
-    const toits = poses.filter((p) => p.quoi === 'panneauTotoPizz');
-    expect(toits.length).toBeGreaterThan(0);
-    for (const t of toits)
-      expect(c.solide(t.tx, t.ty) && !c.solide(t.tx, t.ty - 1), 'posé sur un toit').toBe(true);
-    expect(semeDecor(immeuble(), 'neige', 5).some((p) => p.quoi === 'panneauTotoPizz')).toBe(false);
-  });
-});
-
-describe('les panneaux dans les vrais niveaux', () => {
-  const semis = (i: number) => {
-    const lu = niveauLu(i);
-    const c = new Carte(lu.largeur, lu.hauteur, lu.tuiles, lu.fond);
-    return { c, poses: semeDecor(c, NIVEAUX[i]!.theme, 11 + i, NIVEAUX[i]!.decor, NIVEAUX[i]!.semis) };
-  };
-  const urbains = NIVEAUX.flatMap((n, i) => (n.miniJeu || n.arene ? [] : [[n.id, i] as const]));
-
-  it.each(urbains)(
-    '%s : un panneau est sur un toit, jamais devant une échelle ni sur un autre accessoire',
-    (_id, i) => {
-      const { c, poses } = semis(i);
-      const { largeur, hauteur } = tuilesDuPanneau('panneauTotoPizz');
-      const pris = new Set<string>();
-      for (const p of poses.filter((q) => q.quoi !== 'panneauTotoPizz'))
-        for (let dx = -1; dx <= 1; dx++)
-          for (let dy = 1; dy <= 3; dy++) pris.add(`${p.tx + dx},${p.ty - dy}`);
-      for (const p of poses.filter((q) => q.quoi === 'panneauTotoPizz')) {
-        // le dessus d'une dalle (un piton compte : il se traverse) et rien de plein au-dessus
-        expect(c.props(p.tx, p.ty).solide, `toit en ${p.tx},${p.ty}`).toBe(true);
-        expect(c.solide(p.tx, p.ty - 1), `ciel en ${p.tx},${p.ty}`).toBe(false);
-        for (let x = p.tx - (largeur - 1) / 2 - 1; x <= p.tx + (largeur - 1) / 2 + 1; x++)
-          for (let y = p.ty - hauteur - 1; y < p.ty; y++) {
-            expect(c.props(x, y).echelle, `échelle en ${x},${y}`).toBe(false);
-            if (Math.abs(x - p.tx) <= (largeur - 1) / 2 && y >= p.ty - hauteur)
-              expect(pris.has(`${x},${y}`), `accessoire sous le panneau en ${x},${y}`).toBe(false);
-          }
-      }
-    },
-  );
-
-  it('les niveaux de la ville et de New York ont des panneaux, ceux de neige, de plage et de campagne n’en ont pas', () => {
-    const n = (id: string) =>
-      semis(NIVEAUX.findIndex((x) => x.id === id)).poses.filter((p) => p.quoi === 'panneauTotoPizz').length;
-    expect(n('ville')).toBeGreaterThan(0);
-    expect(n('newyork')).toBeGreaterThan(0);
-    for (const id of ['cimes', 'alpages', 'plage', 'stc', 'foret', 'tuves']) expect(n(id), id).toBe(0);
+  it('chacun passe une fois avant que l’un se répète', () => {
+    let longueurs = 0;
+    for (let graine = 1; graine <= 30; graine++) {
+      const noms = panneaux(rue(10), graine)
+        .map((p) => p.quoi as string)
+        .filter((n) => n !== 'panneauVermiSavent');
+      const premiers = noms.slice(0, PANNEAUX.length);
+      expect(new Set(premiers).size, `${premiers}`).toBe(premiers.length);
+      longueurs += noms.length;
+    }
+    expect(longueurs).toBeGreaterThan(60);
   });
 
-  it('sans le réglage d’essai, aucun panneau n’est posé nulle part', () => {
-    reglagePanneaux.actifs = false;
-    try {
-      for (const [, i] of urbains)
-        expect(semis(i).poses.some((p) => p.quoi === 'panneauTotoPizz')).toBe(false);
-    } finally {
-      reglagePanneaux.actifs = true;
+  it('un panneau et sa suite : toujours ensemble, la suite à droite, près du premier', () => {
+    let paires = 0;
+    for (let graine = 1; graine <= 60; graine++) {
+      const liste = panneaux(rue(), graine);
+      const vie = liste.filter((p) => p.quoi === 'panneauVermiVie');
+      const savent = liste.filter((p) => p.quoi === 'panneauVermiSavent');
+      expect(savent.length, `graine ${graine}`).toBe(vie.length);
+      vie.forEach((a, i) => {
+        const b = savent[i]!;
+        expect(b.tx).toBeGreaterThan(a.tx);
+        expect(b.tx - a.tx).toBeLessThanOrEqual(40);
+        paires++;
+      });
+    }
+    expect(paires).toBeGreaterThan(5);
+  });
+
+  it('une suite sans place n’est pas posée seule : le premier non plus', () => {
+    // un seul toit, assez large pour un panneau mais pas pour deux : « Ma vie a changé » ne peut pas être suivi
+    const seul = carte(80, 60, (c) => batiment(c, 20, 30, 40));
+    for (let graine = 1; graine <= 80; graine++) {
+      const liste = poseDesPanneaux(seul, graine, libre, rien);
+      expect(liste.filter((p) => p.quoi === 'panneauVermiVie')).toHaveLength(0);
+      expect(liste.filter((p) => p.quoi === 'panneauVermiSavent')).toHaveLength(0);
+    }
+  });
+
+  it('le semis du décor les pose sur les toits, dans tous les mondes', () => {
+    for (const theme of ['ville', 'neige', 'foret', 'port'] as const) {
+      const c = rue();
+      const toits = semeDecor(c, theme, 5).filter((p) => NOMS_PANNEAUX.includes(p.quoi));
+      expect(toits.length, theme).toBeGreaterThan(0);
+      for (const t of toits)
+        expect(c.solide(t.tx, t.ty) && !c.solide(t.tx, t.ty - 1), 'posé sur un toit').toBe(true);
     }
   });
 });
