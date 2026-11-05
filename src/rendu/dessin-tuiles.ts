@@ -3,9 +3,10 @@ import { bruit } from '../moteur/maths';
 import type { Tyrolienne } from '../jeu/contexte';
 import type { Carte } from '../monde/carte';
 import { T, TUILES_LEGERES } from '../monde/tuiles';
-import type { AtlasTuiles } from './atlas-tuiles';
+import { etatImagesTuiles, type AtlasTuiles } from './atlas-tuiles';
 import { bordIrregulier, cotesHD, paroiHD, pitonEnBois, tuileHD } from './tuiles-hd';
 import { optimise } from './chrono';
+import { BlocsTuiles } from './blocs-tuiles';
 import { RecettesTuiles } from './recettes-tuiles';
 import { dessineVegetation } from './vegetation';
 import { aUnCoin, COTE, coinsDeParoi, cotesLibres, cotesParoi, DEBORD } from './bords-tuiles';
@@ -28,12 +29,16 @@ export function dessineTuiles(
   const finesse = Math.hypot(ctx.getTransform().a, ctx.getTransform().b);
   // à l'essai : le dessin de chaque case est mémorisé, et rejoué tant que ni elle ni ses voisines n'ont changé
   const memoire = optimise() ? recettes.prepare(carte, atlas, finesse) : null;
+  // à l'essai : les parties fixes, par grands blocs déjà peints (voir blocs-tuiles.ts), puis ce qui bouge par-dessus
+  if (memoire)
+    blocs
+      .prepare(carte, atlas, etatImagesTuiles.generation, finesse)
+      .dessine(ctx, camX, camY, largeur, HAUTEUR_VUE, (c, tx, ty, x, y) => memoire.joue(c, tx, ty, x, y));
   for (let ty = ty0; ty <= ty1; ty++) {
     for (let tx = tx0; tx <= tx1; tx++) {
       const x = tx * TUILE - camX;
       const y = ty * TUILE - camY;
-      if (memoire) memoire.joue(ctx, tx, ty, x, y);
-      else dessineCaseFixe(ctx, carte, atlas, tx, ty, x, y, finesse);
+      if (!memoire) dessineCaseFixe(ctx, carte, atlas, tx, ty, x, y, finesse);
       dessineCaseVivante(ctx, carte, tx, ty, x, y, tick);
     }
   }
@@ -123,6 +128,7 @@ function dessineCaseVivante(
 }
 
 const recettes = new RecettesTuiles(dessineCaseFixe);
+const blocs = new BlocsTuiles();
 
 /** Peint d'avance (sans rien dessiner) les toiles dont la case (tx, ty) aura besoin : sa tuile, sa paroi de fond. */
 export function prepareCase(carte: Carte, atlas: AtlasTuiles, tx: number, ty: number): void {
