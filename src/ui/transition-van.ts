@@ -15,6 +15,8 @@ import { dessineFeuille } from '../rendu/feuilles-images';
 const ENTREE = 1.1;
 const ARRET = 1.8;
 const DEPART = 0.95;
+/** Le van n'attend jamais plus que ça (secondes) que le niveau soit prêt. */
+const ATTENTE_MAX = 8;
 
 const sortieDouce = (x: number) => 1 - (1 - Math.min(1, Math.max(0, x))) ** 3;
 const accelere = (x: number) => Math.min(1, Math.max(0, x)) ** 2;
@@ -24,6 +26,8 @@ export function transitionVan(
   envol: boolean,
   sansAnimation: boolean,
   ensuite: () => void,
+  /** le niveau, lancé dessous, est prêt à se montrer : le van attend ce signal pour repartir (au plus ATTENTE_MAX) */
+  pret: () => boolean = () => true,
 ): void {
   if (sansAnimation || matchMedia('(prefers-reduced-motion: reduce)').matches) return ensuite();
   const toile = document.createElement('canvas');
@@ -57,8 +61,20 @@ export function transitionVan(
   const police = getComputedStyle(document.documentElement).getPropertyValue('--titre') || 'monospace';
   const genre = envol ? G.VAN_REACTEUR : G.VAN;
 
+  let attente = 0;
+  let parti = false;
   const image = () => {
-    const t = (performance.now() - debut) / 1000;
+    let t = (performance.now() - debut) / 1000;
+    // à l'arrêt, tant que le niveau n'est pas prêt : le van attend (un petit chargement s'affiche sous la banderole)
+    let attend = false;
+    if (!parti && t >= ENTREE + ARRET) {
+      attente = t - (ENTREE + ARRET);
+      if (pret() || attente >= ATTENTE_MAX) {
+        parti = true;
+        debut = performance.now() - (ENTREE + ARRET) * 1000;
+      } else attend = true;
+      t = ENTREE + ARRET;
+    }
     if (t >= ENTREE + ARRET + DEPART) {
       lanceLeNiveau();
       window.removeEventListener('keydown', touche, true);
@@ -114,6 +130,14 @@ export function transitionVan(
       titre,
       taille,
     );
+    if (attend)
+      chargement(
+        ctx,
+        droiteBanderole - largeurBanderole / 2,
+        yBanderole + taille * 2.8,
+        taille * 0.35,
+        attente,
+      );
     ctx.save();
     ctx.translate(xVan, sol);
     ctx.scale(k, k);
@@ -123,6 +147,19 @@ export function transitionVan(
     requestAnimationFrame(image);
   };
   requestAnimationFrame(image);
+}
+
+/** Le petit chargement, centré en (x, y) : trois carrés qui s'allument tour à tour. */
+function chargement(ctx: CanvasRenderingContext2D, x: number, y: number, cote: number, t: number): void {
+  for (let i = 0; i < 3; i++) {
+    ctx.fillStyle = Math.floor(t * 4) % 3 === i ? '#ffd23f' : 'rgba(255, 210, 63, 0.3)';
+    ctx.fillRect(
+      Math.round(x + (i - 1.5) * cote * 2 + cote / 2),
+      Math.round(y),
+      Math.round(cote),
+      Math.round(cote),
+    );
+  }
 }
 
 /** Le drap sombre, de `gauche` à `droite` : son bord arrière (à gauche) porte la bande du logo. */

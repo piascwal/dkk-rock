@@ -29,7 +29,12 @@ interface Bloc {
   version: number;
   /** la dernière image où il a servi */
   vu: number;
+  /** combien de ses rangées sont peintes (il se peint petit à petit quand on le prépare d'avance) */
+  rangees: number;
 }
+
+/** Quand un bloc se prépare d'avance (avant d'être à l'écran) : tant de rangées par image, pour ne pas faire d'à-coup. */
+const RANGEES_PAR_IMAGE = 2;
 
 export class BlocsTuiles {
   private blocs = new Map<number, Bloc>();
@@ -71,7 +76,7 @@ export class BlocsTuiles {
     ];
     for (let by = Math.max(0, by0); by <= by1 && by * HAUTEUR < carte.hauteur; by++)
       for (let bx = Math.max(0, bx0); bx <= bx1 && bx * LARGEUR < carte.largeur; bx++) {
-        const bloc = this.bloc(bx, by, peins);
+        const bloc = this.bloc(bx, by, peins, HAUTEUR);
         bloc.vu = this.image;
         ctx.drawImage(
           bloc.toile,
@@ -81,7 +86,36 @@ export class BlocsTuiles {
           HAUTEUR * TUILE,
         );
       }
+    // les blocs voisins (devant, derrière, dessus, dessous) se préparent d'avance, un à la fois, petit à petit
+    const voisins: [number, number][] = [
+      [bx1 + 1, by0],
+      [bx0 - 1, by0],
+      [bx1 + 1, by1],
+      [bx0 - 1, by1],
+      [bx0, by1 + 1],
+      [bx0, by0 - 1],
+    ];
+    for (const [bx, by] of voisins) {
+      if (bx < 0 || by < 0 || bx * LARGEUR >= carte.largeur || by * HAUTEUR >= carte.hauteur) continue;
+      const deja = this.blocs.get(by * 65536 + bx);
+      if (deja && deja.rangees >= HAUTEUR) continue;
+      this.bloc(bx, by, peins, RANGEES_PAR_IMAGE).vu = this.image;
+      break;
+    }
     this.oublie();
+  }
+
+  /** Vrai si les blocs autour de (x, y) (pixels du monde) sont tous peints : le niveau peut se montrer sans à-coup. */
+  prets(x: number, y: number, largeur: number, hauteur: number): boolean {
+    const [bx0, by0] = [Math.floor(x / (LARGEUR * TUILE)), Math.floor(y / (HAUTEUR * TUILE))];
+    const [bx1, by1] = [
+      Math.floor((x + largeur) / (LARGEUR * TUILE)),
+      Math.floor((y + hauteur) / (HAUTEUR * TUILE)),
+    ];
+    for (let by = Math.max(0, by0); by <= by1; by++)
+      for (let bx = Math.max(0, bx0); bx <= bx1; bx++)
+        if ((this.blocs.get(by * 65536 + bx)?.rangees ?? 0) < HAUTEUR) return false;
+    return true;
   }
 
   /** Le dernier changement de la carte sur les cases de [x0, x1] × [y0, y1]. */
@@ -94,7 +128,8 @@ export class BlocsTuiles {
     return v;
   }
 
-  private bloc(bx: number, by: number, peins: PeintreCase): Bloc {
+  /** Le bloc (bx, by), avec au moins `rangees` rangées de plus de peintes (toutes, s'il est à l'écran). */
+  private bloc(bx: number, by: number, peins: PeintreCase, rangees: number): Bloc {
     const cle = by * 65536 + bx;
     const [tx0, ty0] = [bx * LARGEUR, by * HAUTEUR];
     // une case dépend de ses voisines (ses bords), et déborde un peu sur elles : deux tuiles de marge
@@ -105,9 +140,14 @@ export class BlocsTuiles {
       toile.width = LARGEUR * TUILE * this.finesse;
       toile.height = HAUTEUR * TUILE * this.finesse;
       const c = toile.getContext('2d')!;
-      bloc = { toile, ctx: c, version, vu: this.image };
-      this.peinsZone(bloc, tx0, ty0, tx0, ty0, tx0 + LARGEUR - 1, ty0 + HAUTEUR - 1, peins);
+      bloc = { toile, ctx: c, version, vu: this.image, rangees: 0 };
       this.blocs.set(cle, bloc);
+    }
+    if (bloc.rangees < HAUTEUR) {
+      // les rangées qui restent à peindre (une rangée de plus déborde un peu sur celle d'au-dessus : on la peint avec)
+      const fin = Math.min(HAUTEUR, bloc.rangees + rangees);
+      this.peinsZone(bloc, tx0, ty0, tx0, ty0 + bloc.rangees, tx0 + LARGEUR - 1, ty0 + fin - 1, peins);
+      bloc.rangees = fin;
     } else if (version !== bloc.version) {
       // seules les cases qui ont changé (et leurs voisines) sont repeintes
       for (let ty = ty0 - 1; ty <= ty0 + HAUTEUR; ty++)

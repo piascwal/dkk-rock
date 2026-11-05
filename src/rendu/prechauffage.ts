@@ -10,7 +10,19 @@ import { prepareCase } from './dessin-tuiles';
  * peindre pour la première fois quand la caméra découvre un endroit : pas d'à-coup. Chaque image y passe un peu de temps (plus
  * avant que le jeu ne démarre, très peu ensuite).
  */
+/**
+ * Le niveau est-il prêt à se montrer ? Tout est préchauffé, et le jeu dessiné dessous (sous le drap du van) tourne sans à-coup
+ * depuis un moment : les blocs de tuiles, les images des personnages sont prêts. Le van attend ce signal pour repartir (à
+ * l'essai, voir transition-van.ts).
+ */
+export const etatNiveau = { pret: false };
+/** Tant d'images fluides d'affilée (moins de 25 ms chacune), une fois tout préchauffé. */
+const IMAGES_FLUIDES = 20;
+
 export class Prechauffage {
+  private fluides = 0;
+  private avant = 0;
+
   private carte: Carte | null = null;
   private atlas: AtlasTuiles | null = null;
   /** la première colonne peinte (un peu avant la caméra : on reprend peut-être à un drapeau), et combien le sont */
@@ -23,12 +35,18 @@ export class Prechauffage {
     const heros = vue.joueurs[siege] ?? vue.joueurs.find((j) => j.present);
     this.commence(carte, atlas, Math.floor((heros?.x ?? 0) / TUILE) - 20);
     this.avance(vue.phase === 'jeu' ? 1 : 10);
+    const maintenant = performance.now();
+    this.fluides = this.fini && maintenant - this.avant < 25 ? this.fluides + 1 : 0;
+    this.avant = maintenant;
+    etatNiveau.pret = this.fluides >= IMAGES_FLUIDES;
   }
 
   /** Un nouveau niveau : on repart de la colonne `depuis` (celle de la caméra), vers la droite, puis le début du niveau. */
   commence(carte: Carte, atlas: AtlasTuiles, depuis: number): void {
     if (carte === this.carte && atlas === this.atlas) return;
     [this.carte, this.atlas, this.faites] = [carte, atlas, 0];
+    this.fluides = 0;
+    etatNiveau.pret = false;
     this.debut = Math.max(0, Math.min(carte.largeur - 1, depuis - 4));
   }
 

@@ -23,6 +23,8 @@ import { ecranCarte } from './carte-choix';
 import { aUnClavier, contenuTouches } from './touches-ui';
 import { animeTitre } from './titre-anime';
 import { transitionVan } from './transition-van';
+import { chrono } from '../rendu/chrono';
+import { etatNiveau } from '../rendu/prechauffage';
 import { compteSibylles } from '../jeu/sibylles';
 import { ecranRefontes } from './menus-refontes';
 import type { DefNiveau } from '../niveaux/format';
@@ -133,8 +135,13 @@ export class Menus {
       // depuis le menu, on repart du début du niveau (les vies et le score restent) ; le dernier drapeau sert à la pause
       // le van traverse l'écran avec le nom du niveau, puis le niveau se lance dessous (transition-van.ts)
       (n) =>
-        transitionVan(NIVEAUX[n]!.titre, NIVEAUX[n]!.envol === true, s.qualite === 'eco', () =>
-          this.lanceNiveau(n, s.enCours?.niveau === n ? { ...s.enCours, drapeau: -1 } : null),
+        transitionVan(
+          NIVEAUX[n]!.titre,
+          NIVEAUX[n]!.envol === true,
+          s.qualite === 'eco',
+          () => this.lanceNiveau(n, s.enCours?.niveau === n ? { ...s.enCours, drapeau: -1 } : null),
+          // à l'essai : le van attend que le niveau soit prêt dessous (voir prechauffage.ts)
+          () => !chrono.actif || etatNiveau.pret,
         ),
       () => this.titre(),
     );
