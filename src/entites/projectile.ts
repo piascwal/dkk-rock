@@ -42,7 +42,9 @@ export class Projectile implements EntiteSimulee {
     if (this.def.tourne) {
       if (!this.colle) this.angle += this.vx < 0 ? -0.32 : 0.32;
       // le clignotement s'accélère à mesure que l'explosion approche : une période de 26 ticks au début, 4 à la fin
-      this.phase += 1 / (4 + 22 * Math.max(0, 1 - this.age / this.def.duree));
+      // le premier tiers de sa vie, elle ne clignote pas (on voit sa forme et son logo) ; ensuite le clignotement s'accélère : 28 ticks par éclat, puis 6
+      const avance = Math.max(0, (this.age / this.def.duree - 0.35) / 0.65);
+      if (avance > 0) this.phase += 1 / (6 + 22 * (1 - avance));
     }
     if (!this.colle) {
       this.vy = Math.min(CHUTE_MAX, this.vy + GRAVITE * this.def.gravite);
@@ -172,7 +174,7 @@ export class Projectile implements EntiteSimulee {
       x: this.x,
       y: this.y + this.def.taille / 2,
       gauche: this.vx < 0,
-      clignote: this.def.tourne ? this.phase % 1 < 0.5 : !!this.def.explosion && reste < 40 && reste % 8 < 4,
+      clignote: this.def.tourne ? this.phase % 1 > 0.7 : !!this.def.explosion && reste < 40 && reste % 8 < 4,
       e: this.colle ? 1 : 0,
       // un tir qui tourne : son angle (un tour = 256)
       f: this.def.tourne ? Math.round((this.angle / (2 * Math.PI)) * 256) & 255 : this.age & 255,
