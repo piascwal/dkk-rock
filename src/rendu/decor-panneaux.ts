@@ -63,6 +63,10 @@ export const ACCESSOIRES_PANNEAUX = {
  * ne bouchent pas le ciel ; le panneau se dresse derrière eux.
  */
 const TOITS: readonly number[] = [T.BETON, T.BRIQUE, T.TOIT, T.METAL, T.PITON];
+/** Les matières d'un sol de plaine : une longue ligne droite et plate en porte aussi, même sans bord. */
+const SOLS: readonly number[] = [...TOITS, T.TERRE, T.NEIGE, T.SABLE, T.ROCHE, T.PIERRE, T.PARC];
+/** La longueur (tuiles) à partir de laquelle une ligne plate, même sans bord de toit, reçoit des panneaux. */
+const LONGUE = 40;
 /** La chance qu'un toit assez large reçoive un panneau, et l'écart minimal (en tuiles) entre deux panneaux (sans leur suite). */
 const CHANCE = 0.65;
 const ECART = 26;
@@ -79,9 +83,9 @@ export function tuilesDuPanneau(nom: string): { largeur: number; hauteur: number
   return { largeur: largeur % 2 ? largeur : largeur + 1, hauteur: Math.ceil(f.h / (f.densite ?? 1) / TUILE) };
 }
 
-/** Le dessus d'un bâtiment en (tx, ty) : une matière de toit, le ciel au-dessus, un massif dessous (pas une passerelle). */
+/** Le dessus plat en (tx, ty) : une matière de sol, le ciel au-dessus, un massif dessous (pas une passerelle). */
 function estToit(carte: Carte, tx: number, ty: number): boolean {
-  if (!TOITS.includes(carte.get(tx, ty))) return false;
+  if (!SOLS.includes(carte.get(tx, ty))) return false;
   return (
     !carte.solide(tx, ty - 1) &&
     !carte.aFond(tx, ty - 1) &&
@@ -179,7 +183,10 @@ export function poseDesPanneaux(
       }
       const x0 = tx;
       while (tx < carte.largeur - 1 && estToit(carte, tx, ty)) tx++;
-      if (borde(carte, x0 - 1, ty) || borde(carte, tx, ty)) toits.push({ x0, x1: tx - 1, ty });
+      const toitNet = [...Array(tx - x0).keys()].every((k) => TOITS.includes(carte.get(x0 + k, ty)));
+      // un toit (bord dans le vide) ; ou une longue ligne plate, quelle que soit la matière
+      if ((toitNet && (borde(carte, x0 - 1, ty) || borde(carte, tx, ty))) || tx - x0 >= LONGUE)
+        toits.push({ x0, x1: tx - 1, ty });
     }
   toits.sort((a, b) => a.x0 - b.x0 || a.ty - b.ty);
   // chacun passe une fois avant que l'un se répète

@@ -104,7 +104,7 @@ se barre dans le fil ; les boutons des menus s'enfoncent et rebondissent.
   Alca-Lune, les gouttes JBG & Tom, Radio FM, et les deux « Vermi-fin ») posées au hasard, toujours aux mêmes endroits pour une
   même carte, sur le dessus plat des bâtiments qu'on gravit, dans tous les niveaux qui en ont : une dalle de béton, de brique, de
   métal ou de tuiles assez large pour le panneau (plus une tuile de marge), au ciel libre sur sa hauteur, dont un bout au moins
-  tombe dans le vide (pas une rue, pas une colline), loin des échelles, à vingt-six tuiles au moins d'un autre panneau. Chacun
+  tombe dans le vide (pas une colline), ou une longue ligne droite et plate (quarante tuiles et plus, sol de terre, neige, sable… compris), loin des échelles, à vingt-six tuiles au moins d'un autre panneau. Chacun
   passe une fois avant que l'un se répète. Deux panneaux vont ensemble (`Panneau.suite`) : « Ma vie a changé depuis que j'ai... »
   et « Pour ceux qui ne le savent pas... » se posent à quarante tuiles au plus l'un de l'autre, le second à droite du premier, ou
   aucun des deux. Un nouveau panneau : `python3 outils/prepare-panneau.py image.jpg nom` (fond magenta retiré), une ligne dans

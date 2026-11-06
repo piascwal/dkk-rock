@@ -70,13 +70,23 @@ describe('la pose des panneaux sur les toits', () => {
     expect(vus).toBeGreaterThan(10);
   });
 
-  it('ne pose rien sur le sol d’une plaine qui continue (pas de bord de toit)', () => {
-    const plaine = carte(120, 60, (c) => batiment(c, 0, 119, 40));
-    for (let graine = 1; graine <= 20; graine++) expect(panneaux(plaine, graine)).toHaveLength(0);
+  it('pose des panneaux sur une longue ligne droite et plate, même de terre, sans bord de toit', () => {
+    let vus = 0;
+    for (const matiere of [T.BETON, T.TERRE, T.NEIGE]) {
+      const plaine = carte(160, 60, (c) => batiment(c, 0, 159, 40, matiere));
+      for (let graine = 1; graine <= 20; graine++)
+        for (const p of panneaux(plaine, graine)) {
+          vus++;
+          expect(p.ty).toBe(40);
+        }
+    }
+    expect(vus).toBeGreaterThan(10);
   });
 
-  it('ne pose rien sur la terre d’une colline : seul un toit (béton, brique, tuiles, métal) en porte', () => {
-    const colline = carte(120, 60, (c) => batiment(c, 20, 49, 40, T.TERRE));
+  it('ne pose rien sur une plaine courte ni sur la terre d’une colline : un sol court n’est pas un toit', () => {
+    const courte = carte(120, 60, (c) => batiment(c, 0, 119, 40)); // 118 tuiles : assez longue
+    expect([1, 2, 3, 4, 5].some((g) => panneaux(courte, g).length > 0)).toBe(true);
+    const colline = carte(120, 60, (c) => batiment(c, 20, 49, 40, T.TERRE)); // 30 tuiles seulement
     for (let graine = 1; graine <= 20; graine++) expect(panneaux(colline, graine)).toHaveLength(0);
   });
 

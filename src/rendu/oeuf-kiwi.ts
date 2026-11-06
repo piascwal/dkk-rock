@@ -1,13 +1,13 @@
 import { VERSION } from '../version';
 
 /**
- * L'œuf que lance Fadatchi (le kiwi) : l'image fournie, en 256 couleurs (sprites/oeuf.png, 9 Ko). Dessinée réduite à sa taille
- * en jeu : le grain se voit ainsi. Tant qu'elle n'est pas chargée, le dessin en code de repli sert (voir dessins-tirs.ts).
+ * L'œuf que lance Fadatchi (le kiwi) : l'image fournie, en 256 couleurs (sprites/oeuf.png, 9 Ko). Recadrée sur l'œuf et accentuée (les
+ * poils, ce qui le distingue, ressortent), à peu près à sa taille en jeu. Tant qu'elle n'est pas chargée, le dessin en code de repli sert (voir dessins-tirs.ts).
  */
 
 /** La taille de l'œuf en pixels du jeu, centré sur sa position. */
-const LARGEUR = 24;
-const HAUTEUR = 30;
+const LARGEUR = 20;
+const HAUTEUR = 25;
 
 let image: HTMLImageElement | null = null;
 
@@ -24,6 +24,7 @@ export function chargeOeuf(base: string): void {
 export function dessineOeuf(ctx: CanvasRenderingContext2D): boolean {
   if (!image) return false;
   ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(image, -LARGEUR / 2, -HAUTEUR / 2, LARGEUR, HAUTEUR);
   ctx.imageSmoothingEnabled = false;
   return true;
