@@ -82,10 +82,11 @@ export const FEUILLES: Partial<Record<Genre, Feuille>> = {
   // Fadatchi, fabriqué par outils/anime-kiwi.py : debout 8 images (il respire), court 4, saut 1, coup de bec 4
   [G.KIWI]: {
     fichier: 'fadatchi.png',
-    w: 41,
-    h: 23,
+    w: 123,
+    h: 68,
     images: [8, 4, 1, 0, 0, 0, 0, 0, 0, 0, 4],
     rythme: 5,
+    densite: 3,
     echelle: 0.5,
   },
   // le chauffage soufflant, fabriqué par outils/fixe-chauffage.py : debout 1 image, court 4 (écrasé), saut 1 (étiré), souffle 2 (secoué)
