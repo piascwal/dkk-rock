@@ -28,6 +28,7 @@ SRC = RACINE / 'assets-sources' / 'heros' / 'mat-source'
 SPRITES = RACINE / 'public' / 'sprites'
 CASE = 9.75  # la taille d'une case de pixel art dans les images fournies
 CONTOUR = (28, 22, 30)
+HAUTEUR_INTRO = 121  # la hauteur de Mat dans l'intro (128 × 128 par héros), comme les autres silhouettes
 CARRE = 120  # le carré de la référence (anime-instrument.py la veut carrée)
 DENSITE = 6  # pixels de planche par pixel du jeu
 BORD_MUR = 4.2  # contre la paroi : le pied à cette distance (pixels du jeu) du bord de l'image côté paroi (voir fixe-objets.py)
@@ -101,16 +102,17 @@ def echelle_deux_temps(nat):
 
 
 def portrait(repos):
-    """Le portrait des dialogues (44 × 44, comme les autres) : la tête et les épaules de Mat debout."""
+    """Le portrait des dialogues (44 × 44, comme les autres) : la tête et les épaules de Mat debout, à sa taille d'origine (une
+    fenêtre plus serrée coupait ses épaules, plus larges qu'elle : les autres portraits montrent leurs épaules)."""
     al = repos[..., 3] > 0
     haut = np.nonzero(al.any(1))[0].min()
     # le milieu de la tête : les cheveux, les 14 premières rangées (plus bas, la tête de la basse dépasse à droite)
     xs = np.nonzero(al[haut : haut + 14].any(0))[0]
     cx = (xs.min() + xs.max()) // 2
-    Image.fromarray(repos).crop((cx - 17, haut - 2, cx + 17, haut + 32)).resize((44, 44), Image.NEAREST).save(
+    Image.fromarray(repos).crop((cx - 22, haut - 1, cx + 22, haut + 43)).save(
         RACINE / 'public' / 'portraits' / 'mat.png', optimize=True
     )
-    print('portraits/mat.png : 44 x 44')  # le cadrage de la tête, agrandi au format des autres portraits
+    print('portraits/mat.png : 44 x 44')
 
 
 def intro(repos):
@@ -118,8 +120,10 @@ def intro(repos):
     planche = Image.open(SPRITES / 'intro-heros.png').convert('RGBA')
     planche.paste((0, 0, 0, 0), (3 * 128, 0, 4 * 128, 128))
     im = Image.fromarray(repos)
-    k = 110 / im.height
-    im = im.resize((round(im.width * k), 110), Image.NEAREST)
+    # la même hauteur que les quatre autres silhouettes (118 à 123 pixels, la moyenne ici) : il ne doit pas paraître plus petit
+    haut = HAUTEUR_INTRO
+    k = haut / im.height
+    im = im.resize((round(im.width * k), haut), Image.NEAREST)
     planche.alpha_composite(im, (3 * 128 + 64 - im.width // 2, 128 - im.height))
     planche.save(SPRITES / 'intro-heros.png', optimize=True)
     print('intro-heros.png')
