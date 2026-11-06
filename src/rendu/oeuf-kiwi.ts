@@ -6,8 +6,8 @@ import { VERSION } from '../version';
  */
 
 /** La taille de l'œuf en pixels du jeu, centré sur sa position. */
-const LARGEUR = 20;
-const HAUTEUR = 25;
+const LARGEUR = 16;
+const HAUTEUR = 20;
 
 let image: HTMLImageElement | null = null;
 
@@ -21,8 +21,10 @@ export function chargeOeuf(base: string): void {
 }
 
 /** Dessine l'œuf à l'origine du repère courant ; faux si l'image n'est pas encore chargée. */
-export function dessineOeuf(ctx: CanvasRenderingContext2D): boolean {
+/** `x` : sa position dans le monde ; il roule sans glisser : il tourne d'un tour de plus tous les 2π rayons parcourus. */
+export function dessineOeuf(ctx: CanvasRenderingContext2D, x = 0): boolean {
   if (!image) return false;
+  ctx.rotate(x / (LARGEUR / 2));
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(image, -LARGEUR / 2, -HAUTEUR / 2, LARGEUR, HAUTEUR);

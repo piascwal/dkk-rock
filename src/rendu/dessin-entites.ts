@@ -222,7 +222,7 @@ export function dessineEntite(
     // l'arme à ramasser : le chauffage lui-même, en petit, au milieu de sa boîte
   } else if (heros) dessineHeros(p, v.g, v.e, v.f, ctx);
   else if (v.g === G.KIWI) dessineKiwi(p, v.e, v.f);
-  else if (v.g === G.P_OEUF && dessineOeuf(ctx)) {
+  else if (v.g === G.P_OEUF && dessineOeuf(ctx, v.x)) {
     // l'œuf de Fadatchi : son image fournie (voir oeuf-kiwi.ts)
   } else if (estTir) DESSINS_TIRS[v.g]?.(pb, v.f, v.e);
   else if (DESSINS_ENNEMIS[v.g] || DESSINS_BOSS[v.g]) {
