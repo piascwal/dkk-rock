@@ -3,6 +3,9 @@ import type { Pose } from './decor';
 import { NOMS_PANNEAUX } from './decor-panneaux';
 import type { Particules } from './particules';
 
+/** Au-delà de ce nombre de particules vivantes, le nuage de poussière d'un décor brisé n'est pas ajouté. */
+const POUSSIERE_MAX = 350;
+
 /** Les couleurs des morceaux d'un accessoire de décor qui se brise, et sa hauteur (d'où ils jaillissent). */
 const BOIS = ['#8a5a2b', '#6b4520', '#b88347', '#d9a066'];
 const FEUILLES = ['#3f8f3a', '#2f6f2e', '#62b346', '#ffd23f'];
@@ -76,6 +79,20 @@ export function debrisDeDecor(particules: Particules, o: Pose): void {
       gravite: 0.2,
     });
   }
+  // un petit nuage de poussière au pied : deux disques seulement, et rien quand l'écran est déjà plein de particules
+  if (particules.nombre < POUSSIERE_MAX)
+    for (let i = 0; i < 2; i++)
+      particules.ajoute({
+        sorte: 'poussiere',
+        x: x + (i - 0.5) * 6,
+        y: y - 1,
+        vx: (i - 0.5) * 0.6,
+        vy: -0.25 - Math.random() * 0.2,
+        vie: 22 + Math.random() * 10,
+        taille: 3 + Math.random() * 2,
+        couleur: i ? '#d9d4c7' : '#a7a29a',
+        gravite: 0,
+      });
   // une enceinte brisée laisse échapper quelques notes
   if (o.quoi.startsWith('enceinte'))
     for (let i = 0; i < 3; i++)

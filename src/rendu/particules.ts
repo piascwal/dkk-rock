@@ -31,6 +31,11 @@ const CONFETTIS = ['#ff4fd8', '#ffd23f', '#3fa7f2', '#7cfc7c', '#ff6b35', '#ffff
 export class Particules {
   private liste: Particule[] = [];
 
+  /** Combien de particules vivent en ce moment (les effets facultatifs se retiennent quand il y en a beaucoup). */
+  get nombre(): number {
+    return this.liste.length;
+  }
+
   /** Une particule de plus (public : les effets propres au décor, debris-decor.ts, s'en servent). */
   ajoute(p: Omit<Particule, 'vieMax'>): void {
     // une particule usée resservira (une explosion en fait des dizaines : autant d'objets en moins à ramasser pour le navigateur)
