@@ -17,6 +17,7 @@ import { FEUILLES_DECOR } from './feuilles-objets';
 import { dessineHeros, dessineInstrument, dessineKiwi } from './dessins-heros';
 import { DESSINS_OBJETS, iconeArme } from './dessins-objets';
 import { DEMI_TAILLE, DESSINS_TIRS } from './dessins-tirs';
+import { dessineOeuf } from './oeuf-kiwi';
 import { pinceau, type Pinceau } from './pinceau';
 import { ecritCentre } from './police';
 import { dessineRockerConverti } from './rockers-convertis';
@@ -221,7 +222,9 @@ export function dessineEntite(
     // l'arme à ramasser : le chauffage lui-même, en petit, au milieu de sa boîte
   } else if (heros) dessineHeros(p, v.g, v.e, v.f, ctx);
   else if (v.g === G.KIWI) dessineKiwi(p, v.e, v.f);
-  else if (estTir) DESSINS_TIRS[v.g]?.(pb, v.f, v.e);
+  else if (v.g === G.P_OEUF && dessineOeuf(ctx)) {
+    // l'œuf de Fadatchi : son image fournie (voir oeuf-kiwi.ts)
+  } else if (estTir) DESSINS_TIRS[v.g]?.(pb, v.f, v.e);
   else if (DESSINS_ENNEMIS[v.g] || DESSINS_BOSS[v.g]) {
     // dessinés en code : mis en image une fois, puis repris du cache (voir dessins-en-cache.ts)
     const dessin = (DESSINS_ENNEMIS[v.g] ?? DESSINS_BOSS[v.g])!;

@@ -8,6 +8,7 @@ import { chargePlongeon } from './plongeon-tom';
 import { chargeReve } from './reve-jbt';
 import { chargeAvion } from './avion-appareil';
 import { chargeSibylle } from './sibylle';
+import { chargeOeuf } from './oeuf-kiwi';
 import type { Genre } from '../jeu/vue';
 import { optimise } from './chrono';
 
@@ -58,6 +59,7 @@ export function chargeFeuilles(base: string): void {
     chargeReve(base);
     chargeAvion(base);
     chargeSibylle(base);
+    chargeOeuf(base);
     for (const [genre, f] of Object.entries(FEUILLES))
       if (!ESSENTIELLES.includes(Number(genre) as Genre))
         chargeImage(`${base}sprites/${f.fichier}`, (img) => images.set(Number(genre) as Genre, img));
