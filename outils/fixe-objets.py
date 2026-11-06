@@ -40,8 +40,8 @@ CONSERVEES = ('mat-saut', 'mat-mur', 'mat-echelle')
 # les planches des panneaux publicitaires : leurs lignes vont dans leur propre fichier (feuilles-panneaux.ts), pour que
 # feuilles-objets.ts reste sous la limite des 300 lignes
 PANNEAUX = {'panneauTotoPizz', 'panneauPiles', 'panneauGouttes', 'panneauRadio', 'panneauVermiVie', 'panneauVermiSavent'}
-# celles de ces planches qu'on réduit à 256 couleurs (le DJ, les voitures) ; les rockers en ont trop : douze personnages différents sur une planche
-QUANTIFIEES = {'dj', 'voiture'}
+# celles de ces planches qu'on réduit à 256 couleurs (le DJ, les voitures, les panneaux : cinq fois moins lourds, même image) ; les rockers en ont trop : douze personnages différents sur une planche
+QUANTIFIEES = {'dj', 'voiture', *PANNEAUX}
 # objet : (fichiers sources, un par état (une ligne de la planche chacun), genre dans jeu/vue.ts, largeur en jeu en pixels)
 OBJETS = {
     'van': (['van-base.png'], 'VAN', 56),
