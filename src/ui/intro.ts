@@ -251,16 +251,8 @@ export class Intro {
     const ligne = court ? 1 : 0;
     const col = Math.floor(t * (court ? 12 : 6)) % (f.images[ligne] ?? 1);
     const saut = !court && Math.floor(t * 3) % 3 === 0 ? -6 : 0;
-    this.ctx.drawImage(
-      img,
-      col * f.w,
-      ligne * f.h,
-      f.w,
-      f.h,
-      x - f.w,
-      236 - f.h * 2 + saut,
-      f.w * 2,
-      f.h * 2,
-    );
+    // la planche est en pleine définition (densité 3) : on l'affiche à la taille d'avant
+    const [w, h] = [(f.w * 2) / (f.densite ?? 1), (f.h * 2) / (f.densite ?? 1)];
+    this.ctx.drawImage(img, col * f.w, ligne * f.h, f.w, f.h, x - w / 2, 236 - h + saut, w, h);
   }
 }
