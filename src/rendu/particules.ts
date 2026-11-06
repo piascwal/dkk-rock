@@ -286,7 +286,7 @@ export class Particules {
     if (quoi !== 'texte') dessineNuages(ctx, this.liste, camX, camY);
     const d = Math.round(ctx.getTransform().a) || 1;
     for (const p of this.liste) {
-      if (quoi !== 'tout' && (p.sorte === 'texte') !== (quoi === 'texte')) continue;
+      if (quoi !== 'tout' && (p.sorte === 'texte' || p.sorte === 'logo') !== (quoi === 'texte')) continue;
       const x = Math.round(p.x) - camX;
       const y = Math.round(p.y) - camY;
       const t = p.vie / p.vieMax;
@@ -310,7 +310,7 @@ export class Particules {
           break;
         }
         case 'logo':
-          dessineLogoOM(ctx, x, y, p.taille, t);
+          dessineLogoOM(ctx, p, camX, camY, t);
           break;
         case 'note':
           // elle clignote avant de disparaître (pas de transparence)

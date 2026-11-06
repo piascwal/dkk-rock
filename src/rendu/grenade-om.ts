@@ -3,7 +3,7 @@ import type { Particules } from './particules';
 
 /**
  * La grenade de l'OM que lance Tom (essai : voir entites/options-essai.ts) et le logo dont elle explose en morceaux. Deux petites
- * images en pleine définition (grenade-om.png : 60 × 84, logo-om.png : 32 × 40, une cinquantaine de couleurs, 3 Ko en tout).
+ * images en pleine définition (grenade-om.png : 60 × 84, logo-om.png : 64 × 80, une cinquantaine de couleurs, 3 Ko en tout).
  */
 
 /** Sa taille en jeu (pixels du jeu) : la planche est à la densité 8. */
@@ -37,44 +37,51 @@ export function chargeGrenadeOM(base: string): void {
   l.src = `${base}sprites/logo-om.png?v=${VERSION}`;
 }
 
-/** La grenade explose : des logos s'envolent dans tous les sens (une dizaine, et moins quand l'écran est déjà plein). */
+/** La grenade explose : des logos s'envolent dans tous les sens, de tailles et de vitesses variées (une dizaine, et moins quand l'écran est déjà plein). */
 export function logosDeGrenade(p: Particules, x: number, y: number): void {
   const n = p.liste.length < 400 ? 12 : 4;
   for (let i = 0; i < n; i++) {
-    const a = (i / n) * Math.PI * 2 + Math.random() * 0.5;
-    const v = 1.5 + Math.random() * 2.2;
+    const a = Math.random() * Math.PI * 2;
+    const v = 0.6 + Math.random() * 3.4;
     p.ajoute({
       sorte: 'logo',
-      x,
-      y,
+      x: x + (Math.random() - 0.5) * 8,
+      y: y + (Math.random() - 0.5) * 8,
       vx: Math.cos(a) * v,
-      vy: Math.sin(a) * v - 1.5,
-      vie: 40 + Math.random() * 30,
-      taille: 5 + Math.floor(Math.random() * 3),
+      vy: Math.sin(a) * v - 1 - Math.random() * 2,
+      vie: 35 + Math.random() * 45,
+      taille: 6 + Math.random() * 5,
       couleur: '#1f5fd0',
-      gravite: 0.18,
+      gravite: 0.12 + Math.random() * 0.1,
     });
   }
 }
 
-/** Un morceau de l'écusson : l'image du logo (un carré bleu tant qu'elle n'est pas chargée), qui rétrécit à la fin (`t` : sa vie restante, de 1 à 0). */
+/**
+ * Un morceau de l'écusson : le logo, tourné selon son sens de vol, dessiné à la finesse de l'écran (et non sur le calque des
+ * particules, trop grossier pour son détail) ; il rétrécit à la fin (`t` : sa vie restante, de 1 à 0). Un carré bleu sert de repli.
+ */
 export function dessineLogoOM(
   ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  taille: number,
+  p: { x: number; y: number; vx: number; vie: number; taille: number },
+  camX: number,
+  camY: number,
   t: number,
 ): void {
-  const k = Math.round(taille * Math.min(1, t * 3));
+  const k = p.taille * Math.min(1, t * 3);
   if (k < 1) return;
+  ctx.save();
+  ctx.translate(p.x - camX, p.y - camY);
   if (logo) {
+    ctx.rotate(p.vie * 0.18 * (p.vx < 0 ? -1 : 1));
     ctx.imageSmoothingEnabled = true;
-    ctx.drawImage(logo, x - k / 2, y - k / 2, k * 0.8, k);
-    ctx.imageSmoothingEnabled = false;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(logo, (-k * 0.8) / 2, -k / 2, k * 0.8, k);
   } else {
     ctx.fillStyle = '#1f5fd0';
-    ctx.fillRect(x, y, k / 2, k / 2);
+    ctx.fillRect(-k / 4, -k / 4, k / 2, k / 2);
   }
+  ctx.restore();
 }
 
 /**

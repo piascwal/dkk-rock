@@ -54,7 +54,7 @@ export class Projectile implements EntiteSimulee {
     }
     if (this.y > ctx.carte.hauteur * TUILE + 80) this.fini = true;
     const prox = this.def.proximite;
-    if (prox && !this.fini) {
+    if (prox && !this.fini && this.age >= (this.def.amorce ?? 0)) {
       const proche = ctx
         .cibles(this.camp === 'heros' ? 'ennemis' : 'heros')
         .some(

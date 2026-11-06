@@ -39,7 +39,7 @@ export class CalqueJeu {
     // la boîte qui contient les particules (une marge pour les nuages qui enflent) : seule elle est posée à l'écran
     let [x0, y0, x1, y1] = [l, h, 0, 0];
     for (const p of liste) {
-      if (p.sorte === 'texte') continue;
+      if (p.sorte === 'texte' || p.sorte === 'logo') continue; // dessinés à part, à la finesse de l'écran
       const e = p.taille * 1.6 + 8;
       const [x, y] = [Math.round(p.x) - ox, Math.round(p.y) - oy];
       [x0, y0, x1, y1] = [Math.min(x0, x - e), Math.min(y0, y - e), Math.max(x1, x + e), Math.max(y1, y + e)];

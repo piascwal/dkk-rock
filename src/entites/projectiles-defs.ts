@@ -40,6 +40,8 @@ export interface DefProjectile {
   laisse?: DefProjectile;
   /** tourne sur lui-même en vol (son angle reste celui de son atterrissage) et clignote de plus en plus vite avant d'exploser */
   tourne?: boolean;
+  /** la proximité d'un ennemi ne le fait exploser qu'après ce nombre de ticks (le temps de voir la grenade clignoter) */
+  amorce?: number;
 }
 
 export const P = (d: DefProjectile): DefProjectile => d;
@@ -131,6 +133,7 @@ export const GRENADE_OM = P({
   taille: 8,
   colle: true,
   tourne: true,
+  amorce: 45,
   explosion: { rayon: RAYON_GRENADE_OM, degats: 8 },
   proximite: 26,
 });
