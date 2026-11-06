@@ -26,23 +26,38 @@ export const DEMI_TAILLE: Partial<Record<number, number>> = {
 const tourne = (f: number, n: number) => Math.floor(f / 3) % n;
 
 /**
- * L'œuf de Fadatchi (le kiwi lance ses œufs) : une petite image pixel art, réduite de la planche fournie (10 × 12 pixels, quatre
- * couleurs ; a = clair, b = pâle, e = le corps, d = le contour pointillé). Dessinée en code, sans fichier à charger.
+ * L'œuf de Fadatchi (le kiwi lance ses œufs) : une petite image pixel art réduite de la planche fournie (16 × 20 pixels, six
+ * couleurs, le grain conservé). Dessinée en code, sans fichier à charger. `.` : transparent.
  */
-const OEUF_PALETTE: Record<string, string> = { a: '#fefefa', b: '#faf3da', d: '#9d8d6c', e: '#e7d6a9' };
+const OEUF_PALETTE: Record<string, string> = {
+  a: '#62462a',
+  b: '#fcf7e6',
+  c: '#ebd9ac',
+  d: '#c4b997',
+  e: '#a19272',
+  f: '#88724e',
+};
 const OEUF_GRILLE = [
-  '....dd....',
-  '..bbddee..',
-  '.eaaabbed.',
-  '.baaabbed.',
-  '.aaaabbedd',
-  'ebaaabbedd',
-  'dbbbbbbedd',
-  'ebbbbbbedd',
-  '.eebbeeedd',
-  '.deeeeedd.',
-  '..dddddd..',
-  '...dddd...',
+  '.......aa.......',
+  '.....daafaa.....',
+  '...abcdffdcce...',
+  '...bbbbbcbccde..',
+  '..cbbbbbbbbcce..',
+  '..bbbbbbbbbccef.',
+  '.dbbbbbbbbbbcee.',
+  '.bbbbbbbbbbbcee.',
+  '.bbbbbbbbbbbcdef',
+  'ebbbbbbbbbbcccee',
+  'ebbbbbbbbbbcccee',
+  'fbbbbbbbbbbccdee',
+  'ecbbbbbbbbccceee',
+  '.cccbbbbbcccceef',
+  '.ecccbccccccdee.',
+  '.fccccccccceeee.',
+  '..ecccccccdeee..',
+  '...eedddeeeee...',
+  '....feeeeeef....',
+  '......aaaf......',
 ];
 
 /** Dessine une grille de couleurs (un caractère par pixel, `.` : transparent) dont le coin haut gauche est en (x, y). */
@@ -175,7 +190,7 @@ export const DESSINS_TIRS: Partial<Record<number, Dessin>> = {
     p(-1, -r, 3, r * 2, '#ffd23f');
     p(2, -r + 2, 1, r * 2 - 4, '#fff3b0');
   },
-  [G.P_OEUF]: (p) => dessineGrille(p, OEUF_GRILLE, -5, -6),
+  [G.P_OEUF]: (p) => dessineGrille(p, OEUF_GRILLE, -8, -10),
   [G.P_NOTE]: (p) => {
     p(-2, 0, 3, 2, '#ff4fd8');
     p(0, -4, 1, 4, '#ff4fd8');
