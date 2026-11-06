@@ -6,6 +6,7 @@ import './style.css';
 import { App } from './app';
 import { installeAntiZoom } from './entrees/anti-zoom';
 import { installeCurseurVoile } from './ui/curseur-voile';
+import { essaiSim } from './entites/options-essai';
 import { choisitVersions } from './niveaux';
 import { afficheBandeauEssai, afficheMesuresEssai, modeEssai } from './ui/essai';
 
@@ -13,6 +14,7 @@ import { afficheBandeauEssai, afficheMesuresEssai, modeEssai } from './ui/essai'
 // le mode essai d'abord : les niveaux refaits remplacent les originaux avant que rien ne soit lu
 choisitVersions(modeEssai());
 if (modeEssai()) {
+  essaiSim.grenadeOM = true;
   afficheBandeauEssai();
 }
 const app = new App();

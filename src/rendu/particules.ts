@@ -3,9 +3,11 @@ import type { Carte } from '../monde/carte';
 import { anneau, disquePeint, note } from './formes-pixels';
 import { dessineNuages } from './nuages';
 import { ecritCentre } from './police';
+import { dessineLogoOM } from './grenade-om';
 import { CalqueJeu, type Couche } from './calque-jeu';
 
-type Sorte = 'carre' | 'note' | 'fumee' | 'poussiere' | 'eclat' | 'texte' | 'flocon' | 'luciole' | 'onde';
+type Sorte =
+  'carre' | 'note' | 'fumee' | 'poussiere' | 'eclat' | 'texte' | 'flocon' | 'luciole' | 'onde' | 'logo';
 
 interface Particule {
   sorte: Sorte;
@@ -29,12 +31,8 @@ const CONFETTIS = ['#ff4fd8', '#ffd23f', '#3fa7f2', '#7cfc7c', '#ff6b35', '#ffff
  * fabrique à partir des évènements de la partie (débris, explosions, textes).
  */
 export class Particules {
-  private liste: Particule[] = [];
-
-  /** Combien de particules vivent en ce moment (les effets facultatifs se retiennent quand il y en a beaucoup). */
-  get nombre(): number {
-    return this.liste.length;
-  }
+  /** les particules vivantes (public : les effets facultatifs se retiennent quand il y en a beaucoup) */
+  readonly liste: Particule[] = [];
 
   /** Une particule de plus (public : les effets propres au décor, debris-decor.ts, s'en servent). */
   ajoute(p: Omit<Particule, 'vieMax'>): void {
@@ -311,6 +309,9 @@ export class Particules {
           if (t > 0.15) anneau(ctx, x, y, r);
           break;
         }
+        case 'logo':
+          dessineLogoOM(ctx, x, y, p.taille, t);
+          break;
         case 'note':
           // elle clignote avant de disparaître (pas de transparence)
           if (t > 0.3 || p.vie % 4 < 2) note(ctx, x - 2, y - 3, p.couleur);

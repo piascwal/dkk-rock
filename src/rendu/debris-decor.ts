@@ -80,7 +80,7 @@ export function debrisDeDecor(particules: Particules, o: Pose): void {
     });
   }
   // un petit nuage de poussière au pied : deux disques seulement, et rien quand l'écran est déjà plein de particules
-  if (particules.nombre < POUSSIERE_MAX)
+  if (particules.liste.length < POUSSIERE_MAX)
     for (let i = 0; i < 2; i++)
       particules.ajoute({
         sorte: 'poussiere',

@@ -1,3 +1,4 @@
+import { RAYON_GRENADE_OM } from './options-essai';
 import { G, type Genre } from '../jeu/vue';
 
 /** Ce qu'est un tir : tout est décrit ici, le comportement commun est dans projectile.ts. */
@@ -37,6 +38,8 @@ export interface DefProjectile {
   guide?: number;
   /** se transforme en un autre tir en fin de course (la cornemuse laisse un nuage) */
   laisse?: DefProjectile;
+  /** tourne sur lui-même en vol (son angle reste celui de son atterrissage) et clignote de plus en plus vite avant d'exploser */
+  tourne?: boolean;
 }
 
 export const P = (d: DefProjectile): DefProjectile => d;
@@ -115,6 +118,20 @@ export const LARSEN = P({
   taille: 6,
   colle: true,
   explosion: { rayon: 56, degats: 8 },
+  proximite: 26,
+});
+/** Essai : la grenade de l'OM de Tom (même fonctionnement que le larsen : elle se colle, mais explose plus tôt). */
+export const GRENADE_OM = P({
+  genre: G.P_LARSEN,
+  vitesse: 4,
+  gravite: 1,
+  degats: 0,
+  degatsTuile: 0,
+  duree: 150,
+  taille: 8,
+  colle: true,
+  tourne: true,
+  explosion: { rayon: RAYON_GRENADE_OM, degats: 8 },
   proximite: 26,
 });
 export const SOLO = P({

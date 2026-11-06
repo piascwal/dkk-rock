@@ -10,6 +10,9 @@ export class Projectile implements EntiteSimulee {
   age = 0;
   private rebonds: number;
   private colle = false;
+  /** pour un tir qui tourne : son angle (radians), figé à l'atterrissage, et l'avancée de son clignotement */
+  private angle = 0;
+  private phase = 0;
   private readonly touches = new Map<number, number>();
   /** en battle royale : le héros qui l'a lancé (son identifiant) ; ses tirs blessent les autres héros, jamais lui */
   tireur: number | null = null;
@@ -36,6 +39,11 @@ export class Projectile implements EntiteSimulee {
   maj(ctx: Contexte): void {
     if (++this.age >= this.def.duree) return this.termine(ctx);
     if (this.def.guide) this.guide(ctx);
+    if (this.def.tourne) {
+      if (!this.colle) this.angle += this.vx < 0 ? -0.32 : 0.32;
+      // le clignotement s'accélère à mesure que l'explosion approche : une période de 26 ticks au début, 4 à la fin
+      this.phase += 1 / (4 + 22 * Math.max(0, 1 - this.age / this.def.duree));
+    }
     if (!this.colle) {
       this.vy = Math.min(CHUTE_MAX, this.vy + GRAVITE * this.def.gravite);
       const pas = Math.max(1, Math.ceil(Math.max(Math.abs(this.vx), Math.abs(this.vy)) / 5));
@@ -164,9 +172,10 @@ export class Projectile implements EntiteSimulee {
       x: this.x,
       y: this.y + this.def.taille / 2,
       gauche: this.vx < 0,
-      clignote: !!this.def.explosion && reste < 40 && reste % 8 < 4,
+      clignote: this.def.tourne ? this.phase % 1 < 0.5 : !!this.def.explosion && reste < 40 && reste % 8 < 4,
       e: this.colle ? 1 : 0,
-      f: this.age & 255,
+      // un tir qui tourne : son angle (un tour = 256)
+      f: this.def.tourne ? Math.round((this.angle / (2 * Math.PI)) * 256) & 255 : this.age & 255,
     };
   }
 }

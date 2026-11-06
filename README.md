@@ -12,13 +12,13 @@ sur téléphone** (ou au clavier, ou à la manette), **seul ou jusqu'à 4**.
       parents de JBT, à Saint-Cézaire, pour débrancher **DJ Boucle**, qui hypnotise le monde avec un beat qui ne s'arrête
       jamais.
 
-| Héros   | Instrument        | Arme de base                        | Spécial                               |
-| ------- | ----------------- | ----------------------------------- | ------------------------------------- |
-| **JBT** | batterie          | baguettes lancées à la chaîne       | grosse caisse qui roule et explose    |
-| **JBM** | chant             | cri qui traverse les rangs          | contre-ut qui pulvérise tout autour   |
-| **JBG** | guitare solo      | power chords rapides                | solo interminable                     |
-| **Mat** | basse             | ondes lourdes qui creusent la roche | slap : piqué qui fait trembler le sol |
-| **Tom** | guitare rythmique | rythmique en éventail               | larsen qui se colle et explose        |
+| Héros   | Instrument        | Arme de base                        | Spécial                                                        |
+| ------- | ----------------- | ----------------------------------- | -------------------------------------------------------------- |
+| **JBT** | batterie          | baguettes lancées à la chaîne       | grosse caisse qui roule et explose                             |
+| **JBM** | chant             | cri qui traverse les rangs          | contre-ut qui pulvérise tout autour                            |
+| **JBG** | guitare solo      | power chords rapides                | solo interminable                                              |
+| **Mat** | basse             | ondes lourdes qui creusent la roche | slap : piqué qui fait trembler le sol                          |
+| **Tom** | guitare rythmique | rythmique en éventail               | larsen qui se colle et explose (en essai : la grenade de l'OM) |
 
 Ils sont aidés par **Fadatchi**, le kiwi du groupe (« espèce totalement disparue », selon JBM, qui
 n'a jamais vérifié) : il picore les ennemis et pond des œufs explosifs.

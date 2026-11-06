@@ -4,7 +4,17 @@ import { G, type Genre } from '../jeu/vue';
 import type { Qui } from '../niveaux/format';
 import { tire, type DefArme, type Tireur } from './armes';
 import { Projectile } from './projectile';
-import { BAGUETTE, GROSSE_CAISSE, LARSEN, ONDE_BASSE, ONDE_CRI, POWER_CHORD, RIFF } from './projectiles-defs';
+import { essaiSim } from './options-essai';
+import {
+  BAGUETTE,
+  GRENADE_OM,
+  GROSSE_CAISSE,
+  LARSEN,
+  ONDE_BASSE,
+  ONDE_CRI,
+  POWER_CHORD,
+  RIFF,
+} from './projectiles-defs';
 
 /** Ce qu'un coup spécial peut modifier chez le héros qui le lance. */
 export interface EtatSpecial {
@@ -137,7 +147,10 @@ export const HEROS: DefHeros[] = [
     }),
     special: {
       nom: 'Larsen',
-      lance: (ctx, t) => ctx.ajoute(new Projectile(ctx, LARSEN, 'heros', t.x, t.y, t.dir * 4, -3)),
+      lance: (ctx, t) =>
+        ctx.ajoute(
+          new Projectile(ctx, essaiSim.grenadeOM ? GRENADE_OM : LARSEN, 'heros', t.x, t.y, t.dir * 4, -3),
+        ),
     },
     rejoint: [
       "C'est Tom. L'AUTRE guitariste. Non, pas JBG. Tom.",
