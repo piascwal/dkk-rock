@@ -93,6 +93,8 @@ export class Kiwi implements EntiteSimulee {
     let meilleure: Cible | null = null;
     let dMin = 90;
     for (const e of ctx.cibles('ennemis')) {
+      // un ennemi déjà converti (couché ou transformé en rocker, pas encore effacé) n'est plus une proie
+      if (!e.vivant() || e.surEchelle) continue;
       const d = Math.hypot(e.x - c.x, e.y - c.y);
       if (d < dMin) {
         dMin = d;
