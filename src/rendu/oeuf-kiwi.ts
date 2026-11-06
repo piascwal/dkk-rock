@@ -6,8 +6,8 @@ import { VERSION } from '../version';
  */
 
 /** La taille de l'œuf en pixels du jeu, centré sur sa position. */
-const LARGEUR = 16;
-const HAUTEUR = 20;
+const LARGEUR = 9;
+const HAUTEUR = 11;
 
 let image: HTMLImageElement | null = null;
 
