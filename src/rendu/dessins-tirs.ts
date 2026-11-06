@@ -25,6 +25,45 @@ export const DEMI_TAILLE: Partial<Record<number, number>> = {
 
 const tourne = (f: number, n: number) => Math.floor(f / 3) % n;
 
+/**
+ * L'œuf de Fadatchi (le kiwi lance ses œufs) : une petite image pixel art, réduite de la planche fournie (10 × 12 pixels, quatre
+ * couleurs ; a = clair, b = pâle, e = le corps, d = le contour pointillé). Dessinée en code, sans fichier à charger.
+ */
+const OEUF_PALETTE: Record<string, string> = { a: '#fefefa', b: '#faf3da', d: '#9d8d6c', e: '#e7d6a9' };
+const OEUF_GRILLE = [
+  '....dd....',
+  '..bbddee..',
+  '.eaaabbed.',
+  '.baaabbed.',
+  '.aaaabbedd',
+  'ebaaabbedd',
+  'dbbbbbbedd',
+  'ebbbbbbedd',
+  '.eebbeeedd',
+  '.deeeeedd.',
+  '..dddddd..',
+  '...dddd...',
+];
+
+/** Dessine une grille de couleurs (un caractère par pixel, `.` : transparent) dont le coin haut gauche est en (x, y). */
+function dessineGrille(
+  p: (x: number, y: number, w: number, h: number, c: string) => void,
+  grille: string[],
+  x: number,
+  y: number,
+): void {
+  grille.forEach((ligne, j) => {
+    let i = 0;
+    while (i < ligne.length) {
+      const c = ligne[i]!;
+      let k = i;
+      while (k < ligne.length && ligne[k] === c) k++;
+      if (c !== '.') p(x + i, y + j, k - i, 1, OEUF_PALETTE[c]!);
+      i = k;
+    }
+  });
+}
+
 export const DESSINS_TIRS: Partial<Record<number, Dessin>> = {
   ...DESSINS_TIRS_ARMES,
   // la figue du Viet Cong glaireux : violette, sa queue verte, et le lait blanc qui en goutte
@@ -136,11 +175,7 @@ export const DESSINS_TIRS: Partial<Record<number, Dessin>> = {
     p(-1, -r, 3, r * 2, '#ffd23f');
     p(2, -r + 2, 1, r * 2 - 4, '#fff3b0');
   },
-  [G.P_OEUF]: (p) => {
-    p(-3, -3, 6, 6, '#f7f1dc');
-    p(-2, -4, 4, 1, '#f7f1dc');
-    p(1, -2, 1, 1, '#ffffff');
-  },
+  [G.P_OEUF]: (p) => dessineGrille(p, OEUF_GRILLE, -5, -6),
   [G.P_NOTE]: (p) => {
     p(-2, 0, 3, 2, '#ff4fd8');
     p(0, -4, 1, 4, '#ff4fd8');
