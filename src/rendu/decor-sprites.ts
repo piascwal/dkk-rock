@@ -80,7 +80,9 @@ export type Sprite =
   | 'panneauGouttes'
   | 'panneauRadio'
   | 'panneauVermiVie'
-  | 'panneauVermiSavent';
+  | 'panneauVermiSavent'
+  | 'panneauGrenaprot'
+  | 'panneauFlipper';
 export const SPRITES: ReadonlySet<string> = new Set<Sprite>([
   'vacheCasque',
   'lampadaire',
@@ -155,6 +157,8 @@ export const SPRITES: ReadonlySet<string> = new Set<Sprite>([
   'panneauRadio',
   'panneauVermiVie',
   'panneauVermiSavent',
+  'panneauGrenaprot',
+  'panneauFlipper',
 ]);
 
 /** Les accessoires dessinés par une planche fournie (apparence tirée au sort selon `v`, tournée d'un côté ou de l'autre). */

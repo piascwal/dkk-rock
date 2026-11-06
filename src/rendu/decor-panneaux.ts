@@ -30,6 +30,8 @@ export const PANNEAUX: readonly Panneau[] = [
   { nom: 'panneauGouttes' },
   { nom: 'panneauRadio' },
   { nom: 'panneauVermiVie', suite: 'panneauVermiSavent' },
+  { nom: 'panneauGrenaprot' },
+  { nom: 'panneauFlipper' },
 ];
 
 /** Tous les accessoires panneaux, les suites comprises. */
@@ -51,6 +53,8 @@ export const ACCESSOIRES_PANNEAUX = {
   panneauRadio: cadre,
   panneauVermiVie: cadre,
   panneauVermiSavent: cadre,
+  panneauGrenaprot: cadre,
+  panneauFlipper: cadre,
 };
 
 /**

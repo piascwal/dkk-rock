@@ -57,4 +57,22 @@ export const FEUILLES_PANNEAUX: Record<string, Feuille> = {
     densite: 6,
     pied: 240,
   },
+  panneauGrenaprot: {
+    fichier: 'panneauGrenaprot.png',
+    w: 576,
+    h: 638,
+    images: [1],
+    rythme: 1,
+    densite: 6,
+    pied: 288,
+  },
+  panneauFlipper: {
+    fichier: 'panneauFlipper.png',
+    w: 768,
+    h: 551,
+    images: [1],
+    rythme: 1,
+    densite: 6,
+    pied: 384,
+  },
 };

@@ -39,7 +39,7 @@ LISSES = {'barriere', 'archeFise', 'portiqueBreak', 'portiqueFlat', 'portiqueDan
 CONSERVEES = ('mat-saut', 'mat-mur', 'mat-echelle')
 # les planches des panneaux publicitaires : leurs lignes vont dans leur propre fichier (feuilles-panneaux.ts), pour que
 # feuilles-objets.ts reste sous la limite des 300 lignes
-PANNEAUX = {'panneauTotoPizz', 'panneauPiles', 'panneauGouttes', 'panneauRadio', 'panneauVermiVie', 'panneauVermiSavent'}
+PANNEAUX = {'panneauTotoPizz', 'panneauPiles', 'panneauGouttes', 'panneauRadio', 'panneauVermiVie', 'panneauVermiSavent', 'panneauGrenaprot', 'panneauFlipper'}
 # celles de ces planches qu'on réduit à 256 couleurs (le DJ, les voitures, les panneaux : cinq fois moins lourds, même image) ; les rockers en ont trop : douze personnages différents sur une planche
 QUANTIFIEES = {'dj', 'voiture', *PANNEAUX}
 # objet : (fichiers sources, un par état (une ligne de la planche chacun), genre dans jeu/vue.ts, largeur en jeu en pixels)
@@ -177,6 +177,8 @@ OBJETS = {
     'panneauRadio': (['decor/panneaux/radio-fm-base.png'], None, 64),
     'panneauVermiVie': (['decor/panneaux/vermi-vie-base.png'], None, 80),
     'panneauVermiSavent': (['decor/panneaux/vermi-savent-base.png'], None, 80),
+    'panneauGrenaprot': (['decor/panneaux/grenaprot-base.png'], None, 96),
+    'panneauFlipper': (['decor/panneaux/flipper-dauphin-base.png'], None, 128),
     # la fougère (garage, alpages, plage)
     'fougere': (['decor/fougere-base.png'], None, 14),
     # le menhir des forêts et de l'île (arc breton) : une pierre levée, de l'artiste ; le dolmen, lui, est dessiné en code
