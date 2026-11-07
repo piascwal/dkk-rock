@@ -68,8 +68,20 @@ export function afficheBandeauEssai(): void {
   nom.textContent = 'ESSAI';
   const mesures = document.createElement('button');
   const copier = document.createElement('button');
+  const couper = document.createElement('button');
   mesures.textContent = 'Mesures';
   copier.textContent = 'Copier';
+  // couper une partie du dessin, pour voir ce qu'elle coûte : un bouton à part (le compteur, en haut, ne capte plus de toucher :
+  // on le touchait par mégarde en jouant, et la mesure se faisait sans les optimisations)
+  const libelle = () => (couper.textContent = `Couper : ${chrono.coupee ? NOMS[chrono.coupee] : 'rien'}`);
+  libelle();
+  couper.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    const i = chrono.coupee ? COUPABLES.indexOf(chrono.coupee) : -1;
+    chrono.coupee = COUPABLES[i + 1] ?? null;
+    libelle();
+    couper.classList.toggle('actif', chrono.coupee !== null);
+  });
   mesures.addEventListener('pointerdown', (e) => {
     e.stopPropagation();
     const cachees = !document.body.classList.toggle('mesures-cachees');
@@ -86,7 +98,7 @@ export function afficheBandeauEssai(): void {
     if (!navigator.clipboard) prompt('Rapport à copier :', texte);
   });
   if (lit(CLE_MESURES) === 'cachees') document.body.classList.add('mesures-cachees');
-  b.append(nom, mesures, copier);
+  b.append(nom, mesures, copier, couper);
   document.body.append(b);
 }
 
@@ -105,22 +117,14 @@ function rapport(): string {
  * La mesure de fluidité du mode essai, en haut de l'écran. Première ligne : les images par seconde, la plus longue image de la
  * dernière demi-seconde, le nombre d'à-coups (images de plus de 50 ms) des dix dernières secondes, et la finesse d'affichage
  * (`finesse()`, « 3× »). Deuxième ligne : le temps de calcul par image. Troisième : le temps moyen et le pire de chaque partie du
- * dessin (et de la simulation, par pas), les tuiles cassées et les particules. Quatrième : la partie coupée ; un toucher sur le
- * compteur passe à la suivante (voir rendu/chrono.ts).
+ * dessin (et de la simulation, par pas), les tuiles cassées et les particules. Quatrième, s'il y en a une : la partie coupée (le bouton
+ * « Couper » du bandeau passe à la suivante, voir rendu/chrono.ts).
  */
 export function afficheMesuresEssai(finesse: () => string): void {
   chrono.actif = true;
   const m = document.createElement('div');
   m.id = 'mesures-essai';
   document.body.append(m);
-  const coupe = () => {
-    const i = chrono.coupee ? COUPABLES.indexOf(chrono.coupee) : -1;
-    chrono.coupee = COUPABLES[i + 1] ?? null;
-  };
-  m.addEventListener('pointerdown', (e) => {
-    e.stopPropagation();
-    coupe();
-  });
   let avant = performance.now();
   let affiche = avant;
   let images = 0;
@@ -147,9 +151,9 @@ export function afficheMesuresEssai(finesse: () => string): void {
       const l1 = `${ips} i/s · pire ${Math.round(pire)} ms · ${acoups.length} à-coups/10 s · ${finesse()}`;
       const l2 = `calcul ${ms(chrono.calcul / Math.max(1, chrono.cadres))} ms par image, sur ${ms(1000 / Math.max(1, ips))} ms`;
       const l3 = `ms moy/max : ${parties} · ${chrono.tuiles} tuiles cassées · ${chrono.particules} particules`;
-      m.textContent = `${l1}\n${l2}\n${l3}\n${coupee} (toucher pour couper)`;
+      m.textContent = `${l1}\n${l2}\n${l3}${chrono.coupee ? `\n${coupee.toUpperCase()}` : ''}`;
       m.classList.toggle('mauvais', pire > 50);
-      historique.push(`${ms((t - debut) / 1000)} s · ${l1} · ${l2} · ${l3}`);
+      historique.push(`${ms((t - debut) / 1000)} s · ${l1} · ${l2} · ${l3} · ${coupee}`);
       if (historique.length > 60) historique.shift();
       for (const k of Object.keys(chrono.temps) as Partie[]) chrono.temps[k] = chrono.pics[k] = 0;
       chrono.images = chrono.pas = chrono.cadres = chrono.calcul = chrono.tuiles = chrono.particules = 0;

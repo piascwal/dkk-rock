@@ -1724,6 +1724,11 @@ h2 {
 }
 
 /* les mesures masquées (bouton « Mesures » du bandeau) : elles continuent d'être relevées pour « Copier » */
+#bandeau-essai button.actif {
+  color: #1a1a1a;
+  background: #ff5a5a;
+}
+
 body.mesures-cachees #mesures-essai {
   display: none;
 }
@@ -1741,9 +1746,8 @@ body.mesures-cachees #mesures-essai {
     monospace;
   color: #7cfc7c;
   background: rgba(0, 0, 0, 0.6);
-  /* un toucher coupe une partie du dessin (voir ui/essai.ts) */
-  pointer-events: auto;
-  cursor: pointer;
+  /* il ne capte aucun toucher : les boutons du jeu restent accessibles dessous (couper : bouton du bandeau) */
+  pointer-events: none;
   white-space: pre;
   text-align: center;
 }
