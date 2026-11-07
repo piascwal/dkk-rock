@@ -1,7 +1,6 @@
 import type { Synthe } from '../audio/synthe';
 import { G } from '../jeu/vue';
 import { FEUILLES } from '../rendu/feuilles';
-import { essaiJbm } from '../rendu/essai-jbm';
 import { imageDe, progresEssentielles } from '../rendu/feuilles-images';
 import { ecritCentre } from '../rendu/police';
 import { VERSION } from '../version';
@@ -54,7 +53,7 @@ export class Intro {
     this.passer.hidden = true;
     this.passer.addEventListener('click', () => this.termine());
     toile.after(this.passer);
-    this.bases.src = `${import.meta.env.BASE_URL}sprites/${essaiJbm.actif ? 'intro-heros-essai' : 'intro-heros'}.png?v=${VERSION}`;
+    this.bases.src = `${import.meta.env.BASE_URL}sprites/intro-heros.png?v=${VERSION}`;
   }
 
   lance(): void {
@@ -189,7 +188,7 @@ export class Intro {
       const img = imageDe(g);
       if (t > INSTRUMENTS && f && img) {
         const col = Math.floor(t * 6) % 4; // ils bougent en rythme
-        // une planche plus fine que les autres (le JBM à l'essai, densité 8,1) est ramenée à leur taille (densité 6)
+        // une planche plus fine que les autres (JBM, densité 8,1) est ramenée à leur taille (densité 6)
         const k = Math.min(1, 6 / (f.densite ?? 6));
         const [w, h, pied] = [f.w * k, f.h * k, (f.pied ?? f.w / 2) * k];
         c.drawImage(img, col * f.w, 0, f.w, f.h, x - pied, y - h, w, h);

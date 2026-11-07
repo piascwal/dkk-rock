@@ -19,8 +19,7 @@ import { DESSINS_OBJETS, iconeArme } from './dessins-objets';
 import { DEMI_TAILLE, DESSINS_TIRS } from './dessins-tirs';
 import { dessineOeuf } from './oeuf-kiwi';
 import { dessineGrenadeOM } from './grenade-om';
-import { imageEnLair } from './essai-jbm';
-import { essaiSim } from '../entites/options-essai';
+import { imageEnLair } from './en-lair';
 import { pinceau, type Pinceau } from './pinceau';
 import { ecritCentre } from './police';
 import { dessineRockerConverti } from './rockers-convertis';
@@ -232,8 +231,8 @@ export function dessineEntite(
   else if (v.g === G.KIWI) dessineKiwi(p, v.e, v.f);
   else if (v.g === G.P_OEUF && dessineOeuf(ctx, v.x)) {
     // l'œuf de Fadatchi : son image fournie (voir oeuf-kiwi.ts)
-  } else if (v.g === G.P_LARSEN && essaiSim.grenadeOM && dessineGrenade(ctx, v)) {
-    // essai : la grenade de l'OM de Tom, qui tourne et clignote (voir grenade-om.ts)
+  } else if (v.g === G.P_LARSEN && dessineGrenade(ctx, v)) {
+    // la grenade de l'OM de Tom, qui tourne et clignote (voir grenade-om.ts)
   } else if (estTir) DESSINS_TIRS[v.g]?.(pb, v.f, v.e);
   else if (DESSINS_ENNEMIS[v.g] || DESSINS_BOSS[v.g]) {
     // dessinés en code : mis en image une fois, puis repris du cache (voir dessins-en-cache.ts)

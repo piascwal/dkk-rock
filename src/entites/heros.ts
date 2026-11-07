@@ -4,12 +4,10 @@ import { G, type Genre } from '../jeu/vue';
 import type { Qui } from '../niveaux/format';
 import { tire, type DefArme, type Tireur } from './armes';
 import { Projectile } from './projectile';
-import { essaiSim } from './options-essai';
 import {
   BAGUETTE,
   GRENADE_OM,
   GROSSE_CAISSE,
-  LARSEN,
   ONDE_BASSE,
   ONDE_CRI,
   POWER_CHORD,
@@ -141,16 +139,14 @@ export const HEROS: DefHeros[] = [
     instrument: 'Guitare rythmique',
     genre: G.TOM,
     couleur: '#2ec4b6',
-    description: 'Une rythmique en éventail, idéale de près. Spécial : un larsen qui se colle et explose.',
+    description:
+      'Une rythmique en éventail, idéale de près. Spécial : la grenade de l’OM, qui se colle et explose.',
     arme: instrument('Rythmique', 15, 'riff', (ctx, t) => {
       for (const vy of [-0.8, 0, 0.8]) tire(ctx, t, RIFF, vy + ctx.rng.entre(-0.2, 0.2));
     }),
     special: {
-      nom: 'Larsen',
-      lance: (ctx, t) =>
-        ctx.ajoute(
-          new Projectile(ctx, essaiSim.grenadeOM ? GRENADE_OM : LARSEN, 'heros', t.x, t.y, t.dir * 4, -3),
-        ),
+      nom: "Grenade de l'OM",
+      lance: (ctx, t) => ctx.ajoute(new Projectile(ctx, GRENADE_OM, 'heros', t.x, t.y, t.dir * 4, -3)),
     },
     rejoint: [
       "C'est Tom. L'AUTRE guitariste. Non, pas JBG. Tom.",

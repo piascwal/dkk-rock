@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Planche d'un héros avec son instrument, à partir du sprite de référence qui le tient (assets-sources/heros/).
 
-Usage : python3 outils/anime-instrument.py [tom|jbm|mat|jbt|jbg ...]     (Pillow et numpy requis)
+Usage : python3 outils/anime-instrument.py [tom|mat|jbt|jbg ...] (JBM : outils/prepare-jbm.py)     (Pillow et numpy requis)
 Sortie : public/sprites/<nom>-instrument.png + aperçu ; la méta (taille, lignes, pied) est affichée.
 
 Le sprite est remis sur sa grille (prepare_instrument.py). L'instrument et les bras qui le tiennent forment une
@@ -161,7 +161,8 @@ def fabrique(nom):
     print(nom, json.dumps(meta))
 
 
-GENRES = {'jbt': 'JBT', 'jbm': 'JBM', 'jbg': 'JBG', 'mat': 'MAT', 'tom': 'TOM'}
+# JBM n'est plus fabriqué ici : ses planches viennent de ses bandes d'animation (outils/prepare-jbm.py, src/rendu/feuilles-jbm.ts)
+GENRES = {'jbt': 'JBT', 'jbg': 'JBG', 'mat': 'MAT', 'tom': 'TOM'}
 # pixels de planche par pixel du jeu, quand le héros n'est pas à 6 (un Mat plus grand : son image est plus petite)
 DENSITE_HEROS = {'mat': 5.6}
 
@@ -189,6 +190,8 @@ def ecrit_ts():
 
 
 if __name__ == '__main__':
-    for n in sys.argv[1:] or list(HEROS):
+    for n in sys.argv[1:] or [h for h in HEROS if h in GENRES]:
+        if n not in GENRES:
+            sys.exit(f'{n} : ses planches viennent de outils/prepare-{n}.py')
         fabrique(n)
     ecrit_ts()

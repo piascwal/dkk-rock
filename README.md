@@ -12,13 +12,13 @@ sur téléphone** (ou au clavier, ou à la manette), **seul ou jusqu'à 4**.
       parents de JBT, à Saint-Cézaire, pour débrancher **DJ Boucle**, qui hypnotise le monde avec un beat qui ne s'arrête
       jamais.
 
-| Héros   | Instrument        | Arme de base                        | Spécial                                                        |
-| ------- | ----------------- | ----------------------------------- | -------------------------------------------------------------- |
-| **JBT** | batterie          | baguettes lancées à la chaîne       | grosse caisse qui roule et explose                             |
-| **JBM** | chant             | cri qui traverse les rangs          | contre-ut qui pulvérise tout autour                            |
-| **JBG** | guitare solo      | power chords rapides                | solo interminable                                              |
-| **Mat** | basse             | ondes lourdes qui creusent la roche | slap : piqué qui fait trembler le sol                          |
-| **Tom** | guitare rythmique | rythmique en éventail               | larsen qui se colle et explose (en essai : la grenade de l'OM) |
+| Héros   | Instrument        | Arme de base                        | Spécial                                                                  |
+| ------- | ----------------- | ----------------------------------- | ------------------------------------------------------------------------ |
+| **JBT** | batterie          | baguettes lancées à la chaîne       | grosse caisse qui roule et explose                                       |
+| **JBM** | chant             | cri qui traverse les rangs          | contre-ut qui pulvérise tout autour                                      |
+| **JBG** | guitare solo      | power chords rapides                | solo interminable                                                        |
+| **Mat** | basse             | ondes lourdes qui creusent la roche | slap : piqué qui fait trembler le sol                                    |
+| **Tom** | guitare rythmique | rythmique en éventail               | la grenade de l'OM : elle tourne, se colle, clignote et explose en logos |
 
 Ils sont aidés par **Fadatchi**, le kiwi du groupe (« espèce totalement disparue », selon JBM, qui
 n'a jamais vérifié) : il picore les ennemis et pond des œufs explosifs.
@@ -442,6 +442,10 @@ validé.
   compteur de fluidité) et « Copier » (le rapport des 30 dernières secondes, moyennes et pires images de chaque partie du
   dessin, tuiles cassées, particules, à coller tel quel) : le menu « Niveaux refaits » propose chaque niveau refait dans sa version d'avant et dans sa version
   refaite, sans rien sauvegarder.
+  JBM est fait à partir de ses bandes d'animation (`assets-sources/heros/jbm-source/`, 4 poses chacune) : `outils/prepare-jbm.py`
+  (repos, course en foulée et passage alternés, saut, échelle et tyrolienne en deux temps, mur, à terre, portrait, intro), déclaré
+  dans `src/rendu/feuilles-jbm.ts` (densité 8,1 : la même taille en jeu). Un héros qui a son image `<nom>-tyrolienne` s'en sert sur
+  le câble.
   Mat est fait à partir de ses images (`assets-sources/heros/mat-source/`) : `outils/prepare-mat.py` (saut, mur, échelle de dos
   et son miroir, portrait, intro), puis `outils/anime-instrument.py mat` (la planche du héros : marche et visée, la basse et les
   bras pivotant ensemble). Sa taille par situation est dans `DENSITE_HEROS` (`outils/anime-instrument.py`) et dans

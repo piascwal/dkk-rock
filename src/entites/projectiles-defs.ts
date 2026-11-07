@@ -1,4 +1,3 @@
-import { RAYON_GRENADE_OM } from './options-essai';
 import { G, type Genre } from '../jeu/vue';
 
 /** Ce qu'est un tir : tout est décrit ici, le comportement commun est dans projectile.ts. */
@@ -110,19 +109,11 @@ export const GROSSE_CAISSE = P({
   explosion: { rayon: 44, degats: 8 },
   proximite: 14,
 });
-export const LARSEN = P({
-  genre: G.P_LARSEN,
-  vitesse: 4,
-  gravite: 1,
-  degats: 0,
-  degatsTuile: 0,
-  duree: 240,
-  taille: 6,
-  colle: true,
-  explosion: { rayon: 56, degats: 8 },
-  proximite: 26,
-});
-/** Essai : la grenade de l'OM de Tom (même fonctionnement que le larsen : elle se colle, mais explose plus tôt). */
+/**
+ * La grenade de l'OM, le spécial de Tom : elle tourne en vol, se colle (inclinée comme elle est arrivée), clignote de plus en plus
+ * vite et explose (en logos de l'OM, voir rendu/grenade-om.ts), ou plus tôt si un ennemi passe tout près.
+ */
+export const RAYON_GRENADE_OM = 58;
 export const GRENADE_OM = P({
   genre: G.P_LARSEN,
   vitesse: 4,

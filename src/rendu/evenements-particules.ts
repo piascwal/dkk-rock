@@ -1,4 +1,4 @@
-import { essaiSim, RAYON_GRENADE_OM } from '../entites/options-essai';
+import { RAYON_GRENADE_OM } from '../entites/projectiles-defs';
 import { chrono } from './chrono';
 import { TUILE } from '../config';
 import type { Evenement } from '../jeu/vue';
@@ -65,8 +65,8 @@ function traite(
       break;
     case 'explo':
       p.explosion(e.x, e.y, e.r);
-      // la grenade de l'OM (essai) : en plus, une pluie de logos
-      if (essaiSim.grenadeOM && e.r === RAYON_GRENADE_OM) logosDeGrenade(p, e.x, e.y);
+      // la grenade de l'OM : en plus, une pluie de logos
+      if (e.r === RAYON_GRENADE_OM) logosDeGrenade(p, e.x, e.y);
       break;
     case 'impact':
       p.impact(e.x, e.y, e.c);

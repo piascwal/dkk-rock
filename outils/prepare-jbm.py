@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""JBM, à l'essai : ses bandes d'animation fournies (4 poses chacune, fond magenta) → les planches du jeu.
+"""JBM : ses bandes d'animation fournies (4 poses chacune, fond magenta) → les planches du jeu.
 
-Usage : python3 outils/prepare-jbm-essai.py        (Pillow, numpy et scipy requis)
+Usage : python3 outils/prepare-jbm.py        (Pillow, numpy et scipy requis)
 
-Entrées : assets-sources/heros/jbm-essai/ : repos.jpg, course.jpg, saut.jpg, echelle.jpg (de dos), mur.jpg (de profil, la paroi
+Entrées : assets-sources/heros/jbm-source/ : repos.jpg, course.jpg, saut.jpg, echelle.jpg (de dos), mur.jpg (de profil, la paroi
           à droite), tyrolienne.jpg ; chacune une bande de 4 cases de même taille.
-Sorties : public/sprites/jbm-essai.png (la planche du héros : repos 4, course 4, saut 1, mort 1), jbm-essai-saut.png,
-          jbm-essai-mur.png, jbm-essai-echelle.png (2 temps), jbm-essai-tyrolienne.png (2 temps), public/portraits/jbm-essai.png,
-          public/sprites/intro-heros-essai.png (la silhouette de JBM remplacée). Les tailles s'affichent : à reporter dans
-          src/rendu/essai-jbm.ts.
+Sorties : public/sprites/jbm-instrument.png (la planche du héros : repos 4, course 4, saut 1, mort 1), jbm-saut.png,
+          jbm-mur.png, jbm-echelle.png (2 temps), jbm-tyrolienne.png (2 temps), public/portraits/jbm.png,
+          public/sprites/intro-heros.png (la silhouette de JBM remplacée). Les tailles s'affichent : à reporter dans
+          src/rendu/feuilles-jbm.ts.
 
 Les images d'une IA n'ont pas de vraie grille de pixels (elle varie de 2,6 à 3,3 pixels d'une image à l'autre) : chaque case est
 réduite d'un tiers (moyenne de chaque bloc de 3 × 3, le grain de l'image), le fond retiré, le liseré violet passé au contour
@@ -16,6 +16,7 @@ sombre, puis la palette réduite (une centaine de couleurs : le poids baisse, le
 
 Poses écartées (incohérentes) : tyrolienne 1 et 4 (trois bras : deux poings au câble et une main au micro ; la 4 est debout),
 échelle 1 (pas de micro) et 4 (deux micros). Saut : seule la pose du sommet sert (le jeu n'a qu'une image en l'air).
+Course : les poses 1, 3 et 4 sont presque la même foulée (un pas qui glisse) : la course alterne foulée et passage (1, 2, 3, 2).
 """
 import pathlib
 
@@ -24,7 +25,7 @@ from PIL import Image
 from scipy import ndimage
 
 RACINE = pathlib.Path(__file__).resolve().parent.parent
-SRC = RACINE / 'assets-sources' / 'heros' / 'jbm-essai'
+SRC = RACINE / 'assets-sources' / 'heros' / 'jbm-source'
 SPRITES = RACINE / 'public' / 'sprites'
 CONTOUR = (28, 22, 30)
 REDUCTION = 3
@@ -92,8 +93,8 @@ def planche(lignes, w, h, ancre):
 ancre_de = milieu_torse
 
 
-def enregistre(p, nom, dossier=SPRITES):
-    q = p.quantize(COULEURS, method=Image.FASTOCTREE, dither=Image.NONE)
+def enregistre(p, nom, dossier=SPRITES, couleurs=COULEURS):
+    q = p.quantize(couleurs, method=Image.FASTOCTREE, dither=Image.NONE)
     q.save(dossier / f'{nom}.png', optimize=True)
     print(f'{nom}.png : {p.width} x {p.height}, {(dossier / f"{nom}.png").stat().st_size // 1024} Ko')
 
@@ -101,6 +102,7 @@ def enregistre(p, nom, dossier=SPRITES):
 def main():
     global ancre_de
     repos, course, saut = cases('repos.jpg'), cases('course.jpg'), cases('saut.jpg')
+    course = [course[0], course[1], course[2], course[1]]  # foulée, passage, foulée, passage
     echelle, mur, tyro = cases('echelle.jpg'), cases('mur.jpg'), cases('tyrolienne.jpg')
     debout = repos[0].height
     densite = 6 * debout / HAUTEUR_ANCIEN
@@ -115,18 +117,18 @@ def main():
     # planche compacte : les lignes vides (échelle, tyrolienne, mur : images à part) ne sont pas dans le fichier
     lignes = [repos, course, [saut[2]], [mort]]
     p = planche(lignes, w, h, pied)
-    enregistre(p, 'jbm-essai')
+    enregistre(p, 'jbm-instrument')
     print(f'  héros : w {w}, h {h}, pied {pied}, images [4, 4, 1, 0, 0, 0, 1], compacte')
     # les images à part (une pose par ligne)
     for nom, poses in (('saut', [saut[2]]), ('echelle', [echelle[1], echelle[2]]), ('tyrolienne', [tyro[1], tyro[2]])):
         w2, h2 = max(im.width for im in poses) + 4, max(im.height for im in poses)
         ancre_de = (lambda im: im.width / 2) if nom != 'saut' else milieu_torse
-        enregistre(planche([[im] for im in poses], w2, h2, w2 / 2), f'jbm-essai-{nom}')
+        enregistre(planche([[im] for im in poses], w2, h2, w2 / 2), f'jbm-{nom}')
         print(f'  {nom} : w {w2}, h {h2}, pied {w2 // 2}, images {[1] * len(poses)}')
     # contre la paroi (à droite) : le bord droit de la silhouette touche le bord de l'image
     m = mur[0]
     ancre_de = lambda im: im.width
-    enregistre(planche([[m]], m.width, m.height, m.width), 'jbm-essai-mur')
+    enregistre(planche([[m]], m.width, m.height, m.width), 'jbm-mur')
     print(f'  mur : w {m.width}, h {m.height}, pied {round(m.width - BORD_MUR * densite)}')
     portrait(repos[0])
     intro(repos[0])
@@ -140,7 +142,7 @@ def portrait(im):
     cx = (xs.min() + xs.max()) // 2
     cote = round(44 * im.height / HAUTEUR_ANCIEN)
     crop = im.crop((cx - cote // 2, haut - 1, cx + cote // 2, haut - 1 + cote)).resize((44, 44), Image.LANCZOS)
-    enregistre(crop, 'jbm-essai', RACINE / 'public' / 'portraits')
+    enregistre(crop, 'jbm', RACINE / 'public' / 'portraits')
 
 
 def intro(im):
@@ -150,7 +152,7 @@ def intro(im):
     k = 121 / im.height
     j = im.resize((round(im.width * k), 121), Image.LANCZOS)
     planche_.alpha_composite(j, (128 + 64 - j.width // 2, 128 - j.height))
-    enregistre(planche_, 'intro-heros-essai')
+    enregistre(planche_, 'intro-heros', couleurs=256)  # les cinq silhouettes : la palette entière
 
 
 if __name__ == '__main__':

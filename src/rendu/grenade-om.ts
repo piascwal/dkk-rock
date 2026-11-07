@@ -2,7 +2,7 @@ import { VERSION } from '../version';
 import type { Particules } from './particules';
 
 /**
- * La grenade de l'OM que lance Tom (essai : voir entites/options-essai.ts) et le logo dont elle explose en morceaux. Deux petites
+ * La grenade de l'OM que lance Tom et le logo dont elle explose en morceaux. Deux petites
  * images en pleine définition (grenade-om.png : 60 × 84, logo-om.png : 64 × 80, une cinquantaine de couleurs, 3 Ko en tout).
  */
 

@@ -69,7 +69,7 @@ export function dessineCase(c: CanvasRenderingContext2D, w: number, i: number, u
   const img = imageDe(p.g);
   if (f && img) {
     const col = Math.floor(t * 6) % (f.images[0] ?? 1);
-    // ×2, ramené à la taille des autres pour une planche plus fine (le JBM à l'essai, densité 8,1)
+    // ×2, ramené à la taille des autres pour une planche plus fine (JBM, densité 8,1)
     const zoom = 2 * Math.min(1, 6 / (f.densite ?? 6));
     const bas = H + 30; // les pieds sortent du cadre : c'est un gros plan
     c.drawImage(

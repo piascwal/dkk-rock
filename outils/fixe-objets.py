@@ -21,12 +21,12 @@ from prepare_instrument import natif_et_case
 RACINE = pathlib.Path(__file__).resolve().parent.parent
 DENSITE = 6
 # les héros dont les images de dos sur l'échelle sont fournies (planches du décor « <héros>-echelle », à la densité des héros : 6)
-ECHELLES = ('tom', 'jbt', 'jbm', 'jbg')  # Mat n'y est plus : voir CONSERVEES
+ECHELLES = ('tom', 'jbt', 'jbg')  # ni Mat (voir CONSERVEES) ni JBM (outils/prepare-jbm.py, src/rendu/feuilles-jbm.ts)
 # et celles du saut (en l'air), une image par héros, de profil
 SAUTS = tuple(f'{h}-saut' for h in ECHELLES)
 # et celles du mur (accroché à une paroi), fournies héros après héros : Mat, JBG, Tom, JBT et JBM pour l'instant ; à 12 pixels de planche par pixel du jeu
 # (le double : le jeu les réduit de moitié, au lieu de garder une image déjà lissée et floue)
-MURS = ('jbg-mur', 'tom-mur', 'jbt-mur', 'jbm-mur')
+MURS = ('jbg-mur', 'tom-mur', 'jbt-mur')
 # où, de part et d'autre du centre du héros, finit l'image du mur côté paroi (pixels du jeu) : le bout des doigts et du pied touche la
 # paroi, quelle que soit la largeur de l'image (le manteau de JBG déborde loin derrière lui)
 BORD_MUR = 4.2
@@ -149,13 +149,11 @@ OBJETS = {
     'tom-echelle': ([f'heros/tom-echelle-{k}-base.png' for k in (1, 2)], None, 14.5),
     # les trois autres héros, même principe ; largeurs calées sur leur taille debout (la tête aux pieds), un peu plus que pile
     'jbt-echelle': ([f'heros/jbt-echelle-{k}-base.png' for k in (1, 2)], None, 13.4),
-    'jbm-echelle': ([f'heros/jbm-echelle-{k}-base.png' for k in (1, 2)], None, 9.9),
     'jbg-echelle': ([f'heros/jbg-echelle-{k}-base.png' for k in (1, 2)], None, 10.8),
     # le saut : l'instrument est dans l'image ; l'échelle des images est la même pour tous (tête d'environ 75 px dans l'image
     # d'origine, 27 px de planche chez le héros debout, soit 0,37 px de planche par pixel d'image)
     'tom-saut': (['heros/tom-saut-base.png'], None, 20.2),
     'jbt-saut': (['heros/jbt-saut-base.png'], None, 16.8),
-    'jbm-saut': (['heros/jbm-saut-base.png'], None, 14.4),
     'jbg-saut': (['heros/jbg-saut-base.png'], None, 16.0),
     # le mur : accroché à une paroi, de profil face à elle (tourné vers la droite : le jeu le retourne pour l'autre paroi) ; même échelle
     # que le saut (tête de 27 px de planche), soit 0,77 px de planche par pixel de l'image à sa grille
@@ -168,7 +166,6 @@ OBJETS = {
     # au mur ; l'image regarde à droite, comme Mat et JBG
     'jbt-mur': (['heros/jbt-mur-base.png'], None, 12.5),
     # JBM : même silhouette haute et étroite, 12 de large (il est un peu plus petit que JBT) ; l'image regarde à droite
-    'jbm-mur': (['heros/jbm-mur-base.png'], None, 12),
     # les panneaux publicitaires des toits (voir src/rendu/decor-panneaux.ts) : de 64 à 128 px de large en jeu, lissés pour que
     # l'enseigne reste lisible ; chacun vient de outils/prepare-panneau.py
     'panneauTotoPizz': (['decor/panneaux/toto-pizz-base.png'], None, 80),
@@ -372,10 +369,11 @@ def main():
         "// Fichier généré par outils/fixe-objets.py : ne pas modifier à la main.\n"
         "import { G, type Genre } from '../jeu/vue';\n"
         "import type { Feuille } from './feuilles';\n"
-        "import { FEUILLES_PANNEAUX } from './feuilles-panneaux';\n\n"
+        "import { FEUILLES_PANNEAUX } from './feuilles-panneaux';\n"
+        "import { DECOR_JBM } from './feuilles-jbm';\n\n"
         "export const FEUILLES_OBJETS: Partial<Record<Genre, Feuille>> = {\n" + '\n'.join(lignes) + '\n};\n\n'
         "/** Les planches du décor, sans genre : une ligne par apparence. */\n"
-        "export const FEUILLES_DECOR: Record<string, Feuille> = {\n" + '\n'.join(decors) + '\n  ...FEUILLES_PANNEAUX,\n};\n'
+        "export const FEUILLES_DECOR: Record<string, Feuille> = {\n" + '\n'.join(decors) + '\n  ...FEUILLES_PANNEAUX,\n  ...DECOR_JBM,\n};\n'
     )
 
 
