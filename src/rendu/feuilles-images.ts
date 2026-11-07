@@ -12,6 +12,7 @@ import { chargeOeuf } from './oeuf-kiwi';
 import { chargeGrenadeOM } from './grenade-om';
 import type { Genre } from '../jeu/vue';
 import { optimise } from './chrono';
+import { ligneBlanche, ligneHalo, MARGE_HALO } from './planches-cuites';
 
 const images = new Map<Genre, HTMLImageElement>();
 const imagesDecor = new Map<string, HTMLImageElement>();
@@ -189,28 +190,17 @@ function ligneDecoupee(img: CanvasImageSource, rangee: number, h: number): Image
   return null;
 }
 
-/** Les lignes passées au blanc (un ennemi touché), faites une fois chacune. */
-const blanches = new WeakMap<object, Map<number, HTMLCanvasElement>>();
-
 /**
- * La ligne `rangee` de la planche en silhouette blanche : un ennemi touché flashe en blanc. Faite une fois (un filtre à chaque
- * image, pour chaque ennemi touché d'une explosion, épuisait la carte graphique des téléphones).
+ * Prépare d'avance la silhouette blanche d'un ennemi (la ligne « étourdi » s'il en a une, sinon le repos et la marche) : sa
+ * première fabrication, en pleine explosion, coûtait une image. Faux si sa planche n'est pas encore chargée.
  */
-function ligneBlanche(img: CanvasImageSource, rangee: number, h: number): HTMLCanvasElement {
-  let parImage = blanches.get(img);
-  if (!parImage) blanches.set(img, (parImage = new Map()));
-  const deja = parImage.get(rangee);
-  if (deja) return deja;
-  const l = img instanceof HTMLImageElement ? img.naturalWidth : (img as HTMLCanvasElement).width;
-  const toile = document.createElement('canvas');
-  [toile.width, toile.height] = [l, h];
-  const c = toile.getContext('2d')!;
-  c.drawImage(img, 0, rangee * h, l, h, 0, 0, l, h);
-  c.globalCompositeOperation = 'source-atop';
-  c.fillStyle = 'rgba(255,255,255,0.85)';
-  c.fillRect(0, 0, l, h);
-  parImage.set(rangee, toile);
-  return toile;
+export function prechauffeBlanc(genre: Genre): boolean {
+  const f = FEUILLES[genre];
+  const img = images.get(genre);
+  if (!f || !img) return false;
+  const lignes = (f.images[ANIM.ETOURDI] ?? 0) > 0 ? [ANIM.ETOURDI] : [ANIM.DEBOUT, ANIM.COURT];
+  for (const l of lignes) if ((f.images[l] ?? 0) > 0) ligneBlanche(img, rangeeDeLaPlanche(f, l), f.h);
+  return true;
 }
 
 /** Une case de la planche, pieds au point courant. */
@@ -231,6 +221,28 @@ function dessineCase(
   ctx.imageSmoothingEnabled = Math.hypot(a, b) < d;
   ctx.imageSmoothingQuality = 'high';
   const rangee = rangeeDeLaPlanche(f, ligne);
+  // un halo demandé (la lueur des mondes sombres) : la ligne avec son halo, faite une fois (voir planches-cuites.ts)
+  if (ctx.shadowBlur > 0 && optimise() && !blanc) {
+    const echelleEcran = Math.hypot(a, b) || 1;
+    const flou = Math.round((ctx.shadowBlur * d) / echelleEcran);
+    const toile = ligneHalo(img, rangee, f.w, f.h, ctx.shadowColor, flou);
+    const [m, flouAvant] = [MARGE_HALO, ctx.shadowBlur];
+    ctx.shadowBlur = 0;
+    ctx.drawImage(
+      toile,
+      col * (f.w + 2 * m),
+      0,
+      f.w + 2 * m,
+      f.h + 2 * m,
+      arrondi(-((f.pied ?? f.w / 2) + m) * k),
+      arrondi(-(f.h + m) * k),
+      (f.w + 2 * m) * k,
+      (f.h + 2 * m) * k,
+    );
+    ctx.shadowBlur = flouAvant;
+    ctx.imageSmoothingEnabled = false;
+    return;
+  }
   const decoupee = blanc ? ligneBlanche(img, rangee, f.h) : ligneDecoupee(img, rangee, f.h);
   ctx.drawImage(
     decoupee ?? img,

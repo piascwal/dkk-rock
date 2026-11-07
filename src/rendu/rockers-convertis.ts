@@ -35,6 +35,9 @@ function rockerCuit(n: number): HTMLCanvasElement | null {
   return toile;
 }
 
+/** Prépare d'avance le rocker `n` avec son halo (voir prechauffage.ts) ; faux si la planche n'est pas encore chargée. */
+export const prechauffeRocker = (n: number): boolean => rockerCuit(n % NB_ROCKERS) !== null;
+
 /**
  * L'ennemi qu'on vient de convertir : à sa place, un rocker tiré au sort (toujours le même pour un ennemi donné) qui reste
  * là, debout. Assez transparent, avec un léger halo doré : on comprend qu'il a changé de camp, sans le prendre pour un ennemi

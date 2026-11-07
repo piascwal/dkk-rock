@@ -5,6 +5,10 @@ import type { AtlasTuiles } from './atlas-tuiles';
 import { prepareCase } from './dessin-tuiles';
 import { zoneAGarder } from './blocs-tuiles';
 import { niveauLu } from '../niveaux';
+import { estPersonnage } from '../jeu/vue';
+import { herosDuGenre } from '../entites/heros';
+import { prechauffeBlanc } from './feuilles-images';
+import { prechauffeRocker } from './rockers-convertis';
 
 /**
  * Le préchauffage d'un niveau : ses tuiles (chaque variante, ses bords, sa paroi de fond) sont peintes d'avance, colonne par
@@ -37,6 +41,7 @@ export class Prechauffage {
     const heros = vue.joueurs[siege] ?? vue.joueurs.find((j) => j.present);
     this.commence(carte, atlas, Math.floor((heros?.x ?? 0) / TUILE) - 20);
     this.avance(vue.phase === 'jeu' ? 1 : 10);
+    this.effets(vue);
     // la zone du dernier drapeau passé reste peinte : on y réapparaît après une mort (voir blocs-tuiles.ts)
     [zoneAGarder.x, zoneAGarder.y] = [-1, -1];
     for (const d of niveauLu(vue.niveau).drapeaux)
@@ -45,6 +50,26 @@ export class Prechauffage {
     this.fluides = this.fini && maintenant - this.avant < 34 ? this.fluides + 1 : 0;
     this.avant = maintenant;
     etatNiveau.pret = this.fluides >= IMAGES_FLUIDES;
+  }
+
+  /** Les ennemis déjà prêts en blanc, et les rockers déjà cuits avec leur halo (voir planches-cuites.ts). */
+  private readonly blancs = new Set<number>();
+  private rockers = 0;
+
+  /**
+   * Un effet préparé par image, au plus : la silhouette blanche des ennemis présents (le flash d'un coup), puis les rockers et
+   * leur halo (la conversion) ; sans cela, leur première fabrication tombait en pleine explosion.
+   */
+  private effets(vue: EtatVue): void {
+    if (this.rockers < 12) {
+      if (prechauffeRocker(this.rockers)) this.rockers++;
+      return;
+    }
+    for (const v of vue.entites) {
+      if (this.blancs.has(v.g) || !estPersonnage(v.g) || herosDuGenre(v.g)) continue;
+      if (prechauffeBlanc(v.g)) this.blancs.add(v.g);
+      return;
+    }
   }
 
   /** Un nouveau niveau : on repart de la colonne `depuis` (celle de la caméra), vers la droite, puis le début du niveau. */
