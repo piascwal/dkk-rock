@@ -189,7 +189,10 @@ export class Intro {
       const img = imageDe(g);
       if (t > INSTRUMENTS && f && img) {
         const col = Math.floor(t * 6) % 4; // ils bougent en rythme
-        c.drawImage(img, col * f.w, 0, f.w, f.h, x - (f.pied ?? f.w / 2), y - f.h, f.w, f.h);
+        // une planche plus fine que les autres (le JBM à l'essai, densité 8,1) est ramenée à leur taille (densité 6)
+        const k = Math.min(1, 6 / (f.densite ?? 6));
+        const [w, h, pied] = [f.w * k, f.h * k, (f.pied ?? f.w / 2) * k];
+        c.drawImage(img, col * f.w, 0, f.w, f.h, x - pied, y - h, w, h);
       } else if (this.bases.complete && this.bases.naturalWidth)
         c.drawImage(this.bases, i * 128, 0, 128, 128, x - 64, y - 128, 128, 128);
       ecritCentre(c, NOMS[i]!, x, Math.max(y, 214) + 8, COULEURS[i]!, 2);
