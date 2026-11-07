@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Les tyroliennes de JBG, Tom et JBT : leurs bandes de 4 poses fournies (fond magenta) → public/sprites/<héros>-tyrolienne.png.
+"""Les tyroliennes de JBG, Tom, JBT et Mat : leurs bandes de 4 poses fournies (fond magenta) → public/sprites/<héros>-tyrolienne.png.
 
 Usage : python3 outils/prepare-tyroliennes.py        (Pillow, numpy et scipy requis ; même traitement que outils/prepare-jbm.py)
 
 Entrées : assets-sources/heros/<héros>-source/tyrolienne.jpg. Chaque héros garde deux poses qui se balancent, les deux mains au
 câble ; les autres sont écartées : JBG 1 (presque la 3) et 4 (une main au câble, l'autre à la sangle), Tom 1 et 2 (une seule main
-au câble), JBT 1 (debout, pieds au sol) et 4 (une main au câble). La densité met chaque héros à l'échelle de sa planche de jeu
+au câble), JBT 1 (debout, pieds au sol) et 4 (une main au câble), Mat 3 (le visage déformé) et 4 (presque la 1) ; Mat tient le câble
+d'une main, sa basse de l'autre, dans toutes ses poses. La densité met chaque héros à l'échelle de sa planche de jeu
 (la taille de sa tête) : à reporter, avec les tailles affichées, dans src/rendu/feuilles-tyroliennes.ts.
 """
 import importlib.util
@@ -17,7 +18,7 @@ pj = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(pj)
 
 # héros : (les poses gardées, de 0 à 3 ; pixels de planche par pixel du jeu)
-HEROS = {'jbg': ((1, 2), 6.8), 'tom': ((2, 3), 6), 'jbt': ((2, 1), 7.2)}
+HEROS = {'jbg': ((1, 2), 6.8), 'tom': ((2, 3), 6), 'jbt': ((2, 1), 7.2), 'mat': ((0, 1), 7.5)}
 
 
 def main():

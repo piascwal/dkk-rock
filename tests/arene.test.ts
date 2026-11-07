@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { HEROS } from '../src/entites/heros';
 import { HEROS_HAUTEUR, PV_HEROS, TUILE } from '../src/config';
 import { departEn, placeDepart, retireDepart } from '../src/editeur/departs';
@@ -15,6 +15,11 @@ import { valideDef } from '../src/niveaux/mes-niveaux';
 import { decodeEtat, encodeEtat } from '../src/reseau/protocole';
 
 const TOUR = NIVEAUX.findIndex((d) => d.id === 'arene-tour-de-mixage');
+// une graine fixe pour chaque partie (elle tire la sienne de l'heure) : selon le tirage, une manche de l'IA dure de 1 à plus de
+// 5 minutes ; les tests ne dépendent plus de l'heure à laquelle ils tournent
+beforeEach(() => void vi.spyOn(Date, 'now').mockReturnValue(7919));
+afterEach(() => void vi.restoreAllMocks());
+
 const ARENES_DU_JEU = NIVEAUX.flatMap((d, i) => (d.arene ? [[d.id, i] as const] : []));
 
 /** Un battle royale à `n` joueurs ; `enLigne` : il commence au salon. */
@@ -128,7 +133,7 @@ describe('le battle royale', () => {
       const p = new Partie({ niveau: i, drapeau: -1, vies: 0, score: 0 });
       for (let s = 0; s < 4; s++) p.ajouteJoueur(s, s);
       p.ouvreArene({}, false, [0, 1, 2, 3]);
-      for (let t = 0; t < 60 * 240 && p.arene!.etape !== 'fin'; t++) pas(p, 1);
+      for (let t = 0; t < 60 * 600 && p.arene!.etape !== 'fin'; t++) pas(p, 1);
       expect(p.arene!.etape, NIVEAUX[i]!.id).toBe('fin');
     }
   }, 120_000);
