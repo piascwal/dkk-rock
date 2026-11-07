@@ -1,7 +1,7 @@
 import { TUILE } from '../config';
 import type { Joueur } from '../entites/joueur';
 import { parcoursAcces } from '../niveaux/accessibilite';
-import { chainesDeTyroliennes } from '../niveaux/tyroliennes';
+import { poteauProche } from './arene-ia-poteaux';
 import { C } from './commandes';
 import type { Cible } from './contexte';
 import type { Partie } from './partie';
@@ -12,8 +12,10 @@ import type { Partie } from './partie';
  * la carte telle qu'elle est maintenant : marcher, sauter, grimper aux échelles, prendre les tyroliennes) ; il tire quand il
  * est à hauteur, et creuse quand il est coincé. Il n'a que les commandes d'un joueur.
  *
- * Trois niveaux : facile (il voit moins loin, met du temps à réagir, tire par petites rafales et rate souvent son tir), moyen,
- * difficile (il réagit tout de suite et ne lâche pas la gâchette).
+ * Trois niveaux : facile (il voit moins loin, réagit un peu plus lentement, tire par rafales avec des pauses), moyen, difficile
+ * (il réagit tout de suite et ne lâche pas la gâchette). Collé à son adversaire, il recule pour avoir la place de tirer (un tir
+ * part devant le héros : à bout touchant, il passait au-delà) ; sur une tyrolienne, il ne fait pas demi-tour vers lui (deux
+ * joueurs face à face sur un câble s'y bloquaient) et lâche le câble s'il est trop près ou n'avance plus.
  */
 
 export type NiveauIA = 'facile' | 'moyen' | 'difficile';
@@ -34,7 +36,7 @@ interface Profil {
 }
 
 const PROFILS: Record<NiveauIA, Profil> = {
-  facile: { portee: 110, reaction: [45, 80], rafale: 20, pause: 70, tir: 0.35, recalcul: 45, special: false },
+  facile: { portee: 140, reaction: [25, 45], rafale: 30, pause: 45, tir: 0.55, recalcul: 40, special: true },
   moyen: { portee: 150, reaction: [20, 40], rafale: 35, pause: 40, tir: 0.6, recalcul: 30, special: true },
   difficile: { portee: 190, reaction: [0, 8], rafale: 1, pause: 0, tir: 0.9, recalcul: 20, special: true },
 };
@@ -66,6 +68,9 @@ interface Memoire {
   bilan: number;
   errance: number;
   but: [number, number];
+  /** reculer d'un adversaire trop proche pour le toucher : ticks restants, et le sens */
+  recul: number;
+  sensRecul: number;
 }
 
 /** tous les tant de pas, on regarde si l'on a bougé ; sinon, on erre ailleurs ce temps-là */
@@ -132,6 +137,8 @@ export class IAArene {
           bilan: 0,
           errance: 0,
           but: [j.cx, j.cy],
+          recul: 0,
+          sensRecul: 1,
         };
         this.memoires.set(s, m);
       }
@@ -217,9 +224,15 @@ export class IAArene {
         veutSauter = true;
       }
     } else if (j.surTyrolienne) {
-      // sur une tyrolienne : on file dans le sens choisi, et on lâche au-dessus de la cible
+      // sur une tyrolienne : on file dans le sens choisi, et on lâche au-dessus de la cible ; on saute du câble si un adversaire
+      // y est collé ou si l'on n'avance plus (deux joueurs face à face sur un câble s'y bloquaient)
       bits = (bits & ~(C.GAUCHE | C.DROITE)) | (m.sensTyro > 0 ? C.DROITE : C.GAUCHE);
       if (cible && cible.y > c.y + 24 && Math.abs(cible.x + cible.w / 2 - j.cx) < 24) bits |= C.BAS;
+      const colle = cible && Math.abs(cible.x + cible.w / 2 - j.cx) < 14 && Math.abs(cible.y - c.y) < 16;
+      if ((colle || m.immobile > 30) && m.relache === 0) {
+        bits |= C.SAUT;
+        m.relache = 20;
+      }
       veutSauter = false;
     } else if (ey < pieds) {
       if (echelle && ex === tx) bits |= C.HAUT;
@@ -250,8 +263,19 @@ export class IAArene {
     else if (m.reaction > 0) m.reaction--;
     m.rafale = (m.rafale + 1) % (pr.rafale + pr.pause);
     const gachette = enVue && m.reaction === 0 && m.rafale < pr.rafale && p.rng.entre(0, 1) < pr.tir;
+    // collé à l'adversaire, à son étage : on recule un moment pour avoir la place de tirer (pas sur un câble ni une échelle)
+    if (enVue && aHauteur && Math.abs(dx) < 12 && m.recul === 0 && !j.surTyrolienne && !j.surEchelle) {
+      m.recul = 10 + p.rng.entier(0, 8);
+      m.sensRecul = dx > 0 ? -1 : dx < 0 ? 1 : p.rng.entre(0, 1) < 0.5 ? -1 : 1;
+    }
+    if (m.recul > 0) {
+      m.recul--;
+      return (bits & ~(C.GAUCHE | C.DROITE | C.TIR)) | (m.sensRecul > 0 ? C.DROITE : C.GAUCHE);
+    }
     if (enVue) {
-      if (aHauteur) bits = (bits & ~(C.GAUCHE | C.DROITE)) | (dx > 0 ? C.DROITE : C.GAUCHE);
+      // à hauteur, on se tourne vers lui (sauf suspendu à un câble : on y garde son sens)
+      if (aHauteur && !j.surTyrolienne)
+        bits = (bits & ~(C.GAUCHE | C.DROITE)) | (dx > 0 ? C.DROITE : C.GAUCHE);
       else bits |= dy < 0 ? C.HAUT : c.auSol ? 0 : C.BAS;
       if (gachette) bits |= C.TIR;
       if (pr.special && m.reaction === 0 && Math.abs(dx) < 70 && Math.abs(dy) < 30 && m.special-- <= 0) {
@@ -304,21 +328,4 @@ export class IAArene {
     }
     return meilleure;
   }
-}
-
-/**
- * Le poteau de tyrolienne d'où part le pas (la même règle que le parcours : à 3 colonnes près, de 0 à 3 rangées au-dessus des
- * pieds), en cases ; parmi eux, celui qui mène le plus vers l'arrivée `versX`.
- */
-function poteauProche(p: Partie, tx: number, pieds: number, versX: number): [number, number] | null {
-  let meilleur: [number, number] | null = null;
-  let score = Infinity;
-  for (const poteaux of chainesDeTyroliennes(p.tyroliennes))
-    for (const q of poteaux) {
-      const [px, py] = [Math.floor(q.x / TUILE), Math.floor(q.y / TUILE)];
-      if (Math.abs(px - tx) > 3 || pieds - py < 0 || pieds - py > 3) continue;
-      const loin = Math.min(...poteaux.map((o) => Math.abs(Math.floor(o.x / TUILE) - versX)));
-      if (loin < score) [score, meilleur] = [loin, [px, py]];
-    }
-  return meilleur;
 }

@@ -317,8 +317,10 @@ jouer le même héros : un repère de couleur au-dessus de chacun dit qui est qu
 Les joueurs de l'ordinateur suivent le chemin que trouve le parcours d'accessibilité vers l'adversaire le plus proche (sur la
 carte telle qu'elle est : sauts, échelles, tyroliennes qu'ils vont attraper sous leur poteau), tirent à hauteur, creusent quand
 ils sont coincés, et partent errer ailleurs s'ils tournent en rond. Leur niveau règle leur portée, leur temps de réaction et
-leurs rafales : facile (110 px, près d'une seconde pour réagir, des rafales courtes et ratées), moyen (le niveau par défaut),
-difficile (190 px, aucune hésitation).
+leurs rafales : facile (140 px, un demi-seconde pour réagir, des rafales avec des pauses, un coup spécial de temps en temps),
+moyen (le niveau par défaut), difficile (190 px, aucune hésitation). Collés à un adversaire, ils reculent pour avoir la place de
+tirer (un tir part devant le héros) ; sur une tyrolienne, ils gardent leur sens et sautent du câble si un adversaire y est
+collé ou s'ils n'avancent plus (deux joueurs face à face sur un câble s'y bloquaient).
 
 La taille conseillée vient de la surface où l'on peut se tenir (le même calcul que « le niveau est atteignable ») : environ 30
 cases par joueur au plus, 110 au moins, de 2 à 8. Le code : `src/jeu/arene.ts` (les règles), `src/jeu/arene-ia.ts` (l'IA),
