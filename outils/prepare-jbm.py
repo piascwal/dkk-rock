@@ -34,22 +34,24 @@ BORD_MUR = 4.2  # contre la paroi : le pied à cette distance (pixels du jeu) du
 COULEURS = 112
 
 
-def cases(nom):
-    """Les 4 poses d'une bande, chacune réduite et détourée (RGBA, recadrée)."""
+def cases(nom, n=4, reduction=REDUCTION):
+    """Les `n` poses d'une bande (4, ou 1 pour une image seule), chacune réduite (`reduction` : la taille d'un bloc) et
+    détourée (RGBA, recadrée)."""
     a = np.array(Image.open(SRC / nom).convert('RGB')).astype(float)
     r, g, b = a[..., 0], a[..., 1], a[..., 2]
     fond = (r > 140) & (b > 120) & (g < 130) & ((r + b) / 2 - g > 90)
-    etiquettes, n = ndimage.label(~fond)
-    tailles = ndimage.sum(np.ones_like(etiquettes), etiquettes, range(1, n + 1))
+    etiquettes, nb = ndimage.label(~fond)
+    tailles = ndimage.sum(np.ones_like(etiquettes), etiquettes, range(1, nb + 1))
     plein = np.isin(etiquettes, 1 + np.nonzero(tailles > 400)[0])
     plein = ndimage.binary_fill_holes(plein) & plein | ndimage.binary_opening(plein, iterations=1)
-    l = a.shape[1] // 4
+    l = a.shape[1] // n
+    R = reduction
     sortie = []
-    for k in range(4):
+    for k in range(n):
         c, m = a[:, k * l : (k + 1) * l], plein[:, k * l : (k + 1) * l].astype(float)
-        h, w = (c.shape[0] // REDUCTION) * REDUCTION, (c.shape[1] // REDUCTION) * REDUCTION
+        h, w = (c.shape[0] // R) * R, (c.shape[1] // R) * R
         c, m = c[:h, :w], m[:h, :w]
-        bloc = lambda x: x.reshape(h // REDUCTION, REDUCTION, w // REDUCTION, REDUCTION, *x.shape[2:]).mean((1, 3))
+        bloc = lambda x: x.reshape(h // R, R, w // R, R, *x.shape[2:]).mean((1, 3))
         poids = bloc(m)
         couleur = bloc(c * m[..., None]) / np.maximum(poids, 1e-6)[..., None]
         im = np.zeros(poids.shape + (4,), np.uint8)
@@ -61,11 +63,11 @@ def cases(nom):
         rr, gg, bb = (im[..., i].astype(int) for i in range(3))
         violet = (rr - gg > 30) & (bb - gg > 30)
         im[(bord | violet) & op & violet, :3] = CONTOUR
-        # les miettes isolées
+        # les miettes isolées (moins de 40 pixels : des points parasites au-dessus des têtes)
         et, n2 = ndimage.label(op)
         if n2 > 1:
             t = ndimage.sum(np.ones_like(et), et, range(1, n2 + 1))
-            im[~np.isin(et, 1 + np.nonzero(t >= 12)[0])] = 0
+            im[~np.isin(et, 1 + np.nonzero(t >= 40)[0])] = 0
         pil = Image.fromarray(im)
         sortie.append(pil.crop(pil.getbbox()))
     return sortie

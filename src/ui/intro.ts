@@ -1,6 +1,7 @@
 import type { Synthe } from '../audio/synthe';
 import { G } from '../jeu/vue';
 import { FEUILLES } from '../rendu/feuilles';
+import { essaiJbt } from '../rendu/essai-jbt';
 import { imageDe, progresEssentielles } from '../rendu/feuilles-images';
 import { ecritCentre } from '../rendu/police';
 import { VERSION } from '../version';
@@ -53,7 +54,7 @@ export class Intro {
     this.passer.hidden = true;
     this.passer.addEventListener('click', () => this.termine());
     toile.after(this.passer);
-    this.bases.src = `${import.meta.env.BASE_URL}sprites/intro-heros.png?v=${VERSION}`;
+    this.bases.src = `${import.meta.env.BASE_URL}sprites/${essaiJbt.actif ? 'intro-heros-essai' : 'intro-heros'}.png?v=${VERSION}`;
   }
 
   lance(): void {
