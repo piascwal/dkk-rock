@@ -26,7 +26,7 @@ def main():
         poses = [pj.cases('tyrolienne.jpg')[i] for i in gardees]
         w, h = max(im.width for im in poses) + 4, max(im.height for im in poses)
         pj.ancre_de = lambda im: im.width / 2
-        pj.enregistre(pj.planche([[im] for im in poses], w, h, w / 2), f'{nom}-tyrolienne')
+        pj.enregistre(pj.planche([[im] for im in poses], w, h, w / 2, en_haut=True), f'{nom}-tyrolienne')
         print(f'  {nom} : w {w}, h {h}, pied {w // 2}, densité {densite}')
 
 

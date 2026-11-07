@@ -79,14 +79,15 @@ def milieu_torse(im):
     return (xs.min() + xs.max()) / 2
 
 
-def planche(lignes, w, h, ancre):
-    """Une planche : une ligne par liste de poses, chaque pose pieds en bas, son ancre (fonction de l'image) en `ancre`."""
+def planche(lignes, w, h, ancre, en_haut=False):
+    """Une planche : une ligne par liste de poses, chaque pose pieds en bas (ou, `en_haut`, calée en haut : les poings d'une
+    tyrolienne tiennent tous le câble), son ancre (fonction de l'image) en `ancre`."""
     n = max(len(l) for l in lignes)
     p = Image.new('RGBA', (w * n, h * len(lignes)), (0, 0, 0, 0))
     for j, poses in enumerate(lignes):
         for i, im in enumerate(poses):
             x = round(ancre - ancre_de(im))
-            p.alpha_composite(im, (i * w + max(0, min(w - im.width, x)), j * h + h - im.height))
+            p.alpha_composite(im, (i * w + max(0, min(w - im.width, x)), j * h + (0 if en_haut else h - im.height)))
     return p
 
 
@@ -123,7 +124,7 @@ def main():
     for nom, poses in (('saut', [saut[2]]), ('echelle', [echelle[1], echelle[2]]), ('tyrolienne', [tyro[1], tyro[2]])):
         w2, h2 = max(im.width for im in poses) + 4, max(im.height for im in poses)
         ancre_de = (lambda im: im.width / 2) if nom != 'saut' else milieu_torse
-        enregistre(planche([[im] for im in poses], w2, h2, w2 / 2), f'jbm-{nom}')
+        enregistre(planche([[im] for im in poses], w2, h2, w2 / 2, nom == 'tyrolienne'), f'jbm-{nom}')
         print(f'  {nom} : w {w2}, h {h2}, pied {w2 // 2}, images {[1] * len(poses)}')
     # contre la paroi (à droite) : le bord droit de la silhouette touche le bord de l'image
     m = mur[0]
