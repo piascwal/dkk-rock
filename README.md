@@ -39,6 +39,11 @@ mer, puis le festival, sa foule, ses lasers, ses stroboscopes et sa grande scèn
 trois projecteurs aux couleurs du logo balaient la scène (un héros pris dans un faisceau sort de l'ombre), la rampe de LED bat la
 mesure, et de temps en temps un passant traverse : Fadatchi, un yéti, un goéland ou le van. Sur un téléphone debout, les héros
 se rangent plus petits le long du bas. En affichage économe, ou si le système demande moins d'animations : une image fixe.
+En mode essai, l'écran titre passe **en scène** (`ui/titre-scene.ts`, chorégraphie dans `ui/titre-choregraphie.ts`) : les cinq
+héros, deux fois plus grands, jouent entre eux par scènes qui s'enchaînent au hasard (le solo sous le projecteur, le saute-mouton,
+les ricochets d'un bord de l'écran à l'autre, les « tapes » en l'air avec étincelles), entrecoupées d'un temps où tous sautent au
+rythme ; en l'air, l'image de saut de chacun, comme en jeu. Un public en ombres chinoises lève les bras en bas de l'écran, avec
+des flashs d'appareils photo.
 
 **L'entrée des boss** (`ui/entree-boss.ts`) : quand le Yéti Alpha, le Champion du FISE ou DJ Boucle se réveille, un éclair blanc,
 l'écran tremble, et un bandeau en travers de l'écran le présente en grand avec son nom en lettres qui tremblent et son titre

@@ -1,7 +1,8 @@
 import { BPM } from '../config';
 import { ANIM, G, type Genre } from '../jeu/vue';
 import { FEUILLES } from '../rendu/feuilles';
-import { dessineFeuille } from '../rendu/feuilles-images';
+import { dessineDecorFeuille, dessineFeuille } from '../rendu/feuilles-images';
+import { FEUILLES_DECOR } from '../rendu/feuilles-objets';
 
 /**
  * L'écran titre vivant, derrière le logo et les boutons (une toile sous le menu, qui ne prend aucun clic) :
@@ -110,7 +111,7 @@ export function animeTitre(ecran: HTMLElement, qualite: () => Qualite): void {
 }
 
 /** Les trois faisceaux, qui balancent lentement ; renvoie où chacun touche le sol (pour éclairer les héros). */
-function projecteurs(ctx: CanvasRenderingContext2D, W: number, H: number, t: number): number[] {
+export function projecteurs(ctx: CanvasRenderingContext2D, W: number, H: number, t: number): number[] {
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
   const touches = FAISCEAUX.map((couleur, i) => {
@@ -136,7 +137,7 @@ function projecteurs(ctx: CanvasRenderingContext2D, W: number, H: number, t: num
 }
 
 /** Le bord de la scène : une rampe de LED aux couleurs de la bande du logo, qui s'allume sur chaque temps. */
-function rampe(ctx: CanvasRenderingContext2D, W: number, sol: number, temps: number): void {
+export function rampe(ctx: CanvasRenderingContext2D, W: number, sol: number, temps: number): void {
   ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
   ctx.fillRect(0, sol, W, 400);
   const couleurs = ['#c4172c', '#0b6e4f', '#1b3a8a', '#ffd23f'];
@@ -172,7 +173,7 @@ function placeDesHeros(ecran: HTMLElement, W: number, H: number): { x: number; k
 }
 
 /** Un sprite pieds en (x, y), à l'échelle `k`, assombri de `ombre` (0 : en pleine lumière ; 1 : une silhouette noire). */
-function silhouette(
+export function silhouette(
   ctx: CanvasRenderingContext2D,
   tampon: CanvasRenderingContext2D | null,
   genre: Genre,
@@ -184,8 +185,11 @@ function silhouette(
   ombre: number,
   alpha = 1,
   e: number = ANIM.DEBOUT,
+  /** une image à part à dessiner à la place de la planche (le saut d'un héros : `<nom>-saut`), si elle existe */
+  image?: string,
 ): boolean {
-  const f = FEUILLES[genre];
+  const aPart = image ? FEUILLES_DECOR[image] : undefined;
+  const f = aPart ?? FEUILLES[genre];
   if (!f || !tampon) return false;
   // le sprite sur un tampon à sa taille, assombri là où il est opaque, puis posé sur la scène
   const echelle = (k * (f.echelle ?? 1)) / (f.densite ?? 1);
@@ -198,7 +202,10 @@ function silhouette(
   tampon.translate(w / 2, h - 2);
   if (versLaGauche) tampon.scale(-1, 1);
   tampon.scale(k, k);
-  if (!dessineFeuille(tampon, genre, e, compteur, false)) return false;
+  const dessine = aPart
+    ? dessineDecorFeuille(tampon, image!, 0) || dessineFeuille(tampon, genre, e, compteur, false)
+    : dessineFeuille(tampon, genre, e, compteur, false);
+  if (!dessine) return false;
   if (ombre > 0) {
     tampon.setTransform(1, 0, 0, 1, 0, 0);
     tampon.globalCompositeOperation = 'source-atop';
