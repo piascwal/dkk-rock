@@ -1,14 +1,17 @@
 import { VERSION } from '../version';
 
 /**
- * La grosse caisse « DKK » que lance le nouveau JBT (essai) : elle roule en tournant sur elle-même (un tour de plus à chaque
- * périmètre parcouru) et passe au blanc quand elle va exploser. Une image (grosse-caisse.png, 96 × 88, 3 Ko), d'après la
+ * La grosse caisse « DKK » que lance le nouveau JBT (essai) : elle roule en tournant sur elle-même (lentement : un tour à chaque
+ * quatre périmètres parcourus, environ une seconde) et passe au blanc quand elle va exploser. Une image (grosse-caisse.png, 96 × 88, 3 Ko), d'après la
  * grosse caisse fournie (assets-sources/heros/jbt-essai/).
  */
 
 /** Sa taille en jeu (pixels du jeu) : un peu plus grosse que la boîte de collision du tir (12 pixels). */
 const LARGEUR = 16;
 const HAUTEUR = 14.7;
+
+/** La rotation est quatre fois plus lente que le roulement réel : à vitesse réelle, le logo et la forme ne se lisaient pas (un tour en 0,25 s). */
+const RAYON_APPARENT = (HAUTEUR / 2) * 4;
 
 let image: HTMLImageElement | null = null;
 let blanche: HTMLCanvasElement | null = null;
@@ -43,7 +46,7 @@ export function dessineGrosseCaisse(
   const img = blanc ? blanche : image;
   if (!img) return false;
   ctx.translate(0, demi - HAUTEUR / 2);
-  ctx.rotate(x / (HAUTEUR / 2));
+  ctx.rotate(x / RAYON_APPARENT);
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(img, -LARGEUR / 2, -HAUTEUR / 2, LARGEUR, HAUTEUR);
