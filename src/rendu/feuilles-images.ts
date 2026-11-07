@@ -10,6 +10,7 @@ import { chargeAvion } from './avion-appareil';
 import { chargeSibylle } from './sibylle';
 import { chargeOeuf } from './oeuf-kiwi';
 import { chargeGrenadeOM } from './grenade-om';
+import { chargeGrosseCaisse } from './grosse-caisse';
 import type { Genre } from '../jeu/vue';
 import { optimise } from './chrono';
 import { ligneBlanche, ligneHalo, MARGE_HALO } from './planches-cuites';
@@ -63,6 +64,7 @@ export function chargeFeuilles(base: string): void {
     chargeSibylle(base);
     chargeOeuf(base);
     chargeGrenadeOM(base);
+    chargeGrosseCaisse(base);
     for (const [genre, f] of Object.entries(FEUILLES))
       if (!ESSENTIELLES.includes(Number(genre) as Genre))
         chargeImage(`${base}sprites/${f.fichier}`, (img) => images.set(Number(genre) as Genre, img));

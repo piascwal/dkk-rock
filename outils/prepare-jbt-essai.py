@@ -33,7 +33,7 @@ def seule(nom):
 def main():
     repos, course = pj.cases('repos.jpg'), pj.cases('course.jpg')
     saut, mur, echelle, tyro = seule('saut'), seule('mur'), seule('echelle'), seule('tyrolienne')
-    densite = 6 * repos[0].height / HAUTEUR_ANCIEN
+    densite = 7.6  # un peu plus grand que l'ancien (6 × 161 / 118 = 8,2 l'aurait mis à la même taille) : il se voit mieux
     print(f'JBT debout : {repos[0].height} pixels, densité {densite:.2f}')
     mort = repos[0].rotate(90, expand=True)
     corps = [*repos, *course, saut]

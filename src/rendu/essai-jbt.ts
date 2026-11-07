@@ -11,8 +11,12 @@ import { FEUILLES_DECOR } from './feuilles-objets';
  */
 export const essaiJbt = { actif: false };
 
-/** 161 pixels pour JBT debout (l'ancien en faisait 118, à la densité 6) : la même taille en jeu. */
-const DENSITE = 8.19;
+/**
+ * 161 pixels pour JBT debout (l'ancien en faisait 118, à la densité 6) : 7,6 le fait un peu plus grand que les autres (comme
+ * Mat), sa silhouette fine se voit mieux. JBM aussi, en essai (7,5 au lieu de 8,1).
+ */
+const DENSITE = 7.6;
+const DENSITE_JBM = 7.5;
 
 const decor = (nom: string, w: number, h: number, pied: number, images = [1]): Feuille => ({
   fichier: `jbt-essai-${nom}.png`,
@@ -41,7 +45,15 @@ export function activeJbtEssai(): void {
   FEUILLES_HEROS[G.JBT] = heros;
   FEUILLES[G.JBT] = heros;
   FEUILLES_DECOR['jbt-saut'] = decor('saut', 146, 154, 73);
-  FEUILLES_DECOR['jbt-mur'] = decor('mur', 105, 147, 71);
+  FEUILLES_DECOR['jbt-mur'] = decor('mur', 105, 147, 73);
   FEUILLES_DECOR['jbt-echelle'] = decor('echelle', 84, 160, 42, [1, 1]);
   FEUILLES_DECOR['jbt-tyrolienne'] = decor('tyrolienne', 85, 158, 53);
+  // JBM aussi, un peu plus grand : sa planche et ses images à part
+  const jbm = { ...FEUILLES[G.JBM]!, densite: DENSITE_JBM };
+  FEUILLES[G.JBM] = jbm;
+  FEUILLES_HEROS[G.JBM] = jbm;
+  for (const nom of ['jbm-saut', 'jbm-mur', 'jbm-echelle', 'jbm-tyrolienne'])
+    FEUILLES_DECOR[nom] = { ...FEUILLES_DECOR[nom]!, densite: DENSITE_JBM };
+  // contre la paroi : le pied à 4,2 pixels du jeu du bord, à la nouvelle densité
+  FEUILLES_DECOR['jbm-mur']!.pied = 58;
 }

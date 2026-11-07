@@ -19,6 +19,8 @@ import { DESSINS_OBJETS, iconeArme } from './dessins-objets';
 import { DEMI_TAILLE, DESSINS_TIRS } from './dessins-tirs';
 import { dessineOeuf } from './oeuf-kiwi';
 import { dessineGrenadeOM } from './grenade-om';
+import { dessineGrosseCaisse } from './grosse-caisse';
+import { essaiJbt } from './essai-jbt';
 import { imageEnLair } from './en-lair';
 import { pinceau, type Pinceau } from './pinceau';
 import { ecritCentre } from './police';
@@ -121,6 +123,12 @@ function dessineChauffageBonus(ctx: CanvasRenderingContext2D): boolean {
 function dessineGrenade(ctx: CanvasRenderingContext2D, v: EntiteVue): boolean {
   if (v.gauche) ctx.scale(-1, 1);
   return dessineGrenadeOM(ctx, v.f, v.clignote);
+}
+
+/** La grosse caisse : jamais retournée (le logo se lit), elle roule selon sa position. */
+function dessineCaisse(ctx: CanvasRenderingContext2D, v: EntiteVue): boolean {
+  if (v.gauche) ctx.scale(-1, 1);
+  return dessineGrosseCaisse(ctx, v.x, v.clignote, DEMI_TAILLE[v.g] ?? 2);
 }
 
 /** Dessine une entité de la vue, en coordonnées d'écran. */
@@ -232,6 +240,8 @@ export function dessineEntite(
   else if (v.g === G.KIWI) dessineKiwi(p, v.e, v.f);
   else if (v.g === G.P_OEUF && dessineOeuf(ctx, v.x)) {
     // l'œuf de Fadatchi : son image fournie (voir oeuf-kiwi.ts)
+  } else if (v.g === G.P_GROSSE_CAISSE && essaiJbt.actif && dessineCaisse(ctx, v)) {
+    // essai : la grosse caisse « DKK » du nouveau JBT, qui roule (voir grosse-caisse.ts)
   } else if (v.g === G.P_LARSEN && dessineGrenade(ctx, v)) {
     // la grenade de l'OM de Tom, qui tourne et clignote (voir grenade-om.ts)
   } else if (estTir) DESSINS_TIRS[v.g]?.(pb, v.f, v.e);
