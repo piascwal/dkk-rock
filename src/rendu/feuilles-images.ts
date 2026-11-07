@@ -150,6 +150,7 @@ export function dessineFeuille(
   tire: boolean,
   visee = 0,
   apparence = 0,
+  blanc = false,
 ): boolean {
   const f = FEUILLES[genre];
   const img = images.get(genre);
@@ -161,7 +162,7 @@ export function dessineFeuille(
     ligne = f.visees + visee - 1;
     col = e === ANIM.COURT ? colonneDuCycle(f, f.images[ligne] ?? 1, compteur) : 0;
   }
-  dessineCase(ctx, img, f, col, ligne);
+  dessineCase(ctx, img, f, col, ligne, blanc);
   return true;
 }
 
@@ -188,6 +189,30 @@ function ligneDecoupee(img: CanvasImageSource, rangee: number, h: number): Image
   return null;
 }
 
+/** Les lignes passées au blanc (un ennemi touché), faites une fois chacune. */
+const blanches = new WeakMap<object, Map<number, HTMLCanvasElement>>();
+
+/**
+ * La ligne `rangee` de la planche en silhouette blanche : un ennemi touché flashe en blanc. Faite une fois (un filtre à chaque
+ * image, pour chaque ennemi touché d'une explosion, épuisait la carte graphique des téléphones).
+ */
+function ligneBlanche(img: CanvasImageSource, rangee: number, h: number): HTMLCanvasElement {
+  let parImage = blanches.get(img);
+  if (!parImage) blanches.set(img, (parImage = new Map()));
+  const deja = parImage.get(rangee);
+  if (deja) return deja;
+  const l = img instanceof HTMLImageElement ? img.naturalWidth : (img as HTMLCanvasElement).width;
+  const toile = document.createElement('canvas');
+  [toile.width, toile.height] = [l, h];
+  const c = toile.getContext('2d')!;
+  c.drawImage(img, 0, rangee * h, l, h, 0, 0, l, h);
+  c.globalCompositeOperation = 'source-atop';
+  c.fillStyle = 'rgba(255,255,255,0.85)';
+  c.fillRect(0, 0, l, h);
+  parImage.set(rangee, toile);
+  return toile;
+}
+
 /** Une case de la planche, pieds au point courant. */
 function dessineCase(
   ctx: CanvasRenderingContext2D,
@@ -195,6 +220,7 @@ function dessineCase(
   f: Feuille,
   col: number,
   ligne: number,
+  blanc = false,
 ): void {
   const d = f.densite ?? 1;
   const k = (f.echelle ?? 1) / d;
@@ -205,7 +231,7 @@ function dessineCase(
   ctx.imageSmoothingEnabled = Math.hypot(a, b) < d;
   ctx.imageSmoothingQuality = 'high';
   const rangee = rangeeDeLaPlanche(f, ligne);
-  const decoupee = ligneDecoupee(img, rangee, f.h);
+  const decoupee = blanc ? ligneBlanche(img, rangee, f.h) : ligneDecoupee(img, rangee, f.h);
   ctx.drawImage(
     decoupee ?? img,
     col * f.w,

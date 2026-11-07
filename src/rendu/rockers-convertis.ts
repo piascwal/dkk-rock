@@ -1,5 +1,6 @@
 import { ANIM, GENRES_CONVERTIS, VOLANTS, type EtatVue } from '../jeu/vue';
 import { dessineDecorFeuille } from './feuilles-images';
+import { FEUILLES_DECOR } from './feuilles-objets';
 
 /** Les rockers de la planche (outils/fixe-objets.py) : un ennemi vaincu n'est pas tué, il est converti au rock. */
 const NB_ROCKERS = 12;
@@ -10,16 +11,52 @@ const MAX_RESTES = 300;
 /** Les ennemis qui deviennent des rockers (un drone, lui, tombe en morceaux). */
 const GENRES_ROCKERS = new Set(GENRES_CONVERTIS.filter((g) => !VOLANTS.has(g)));
 
+/** Le halo doré (pixels de la planche) autour de chaque rocker, et la marge qu'il lui faut. */
+const HALO = 5;
+const MARGE = 8;
+/** Chaque rocker avec son halo, peint une fois : un flou à chaque image, pour des dizaines de rockers, épuisait la carte graphique. */
+const cuits = new Map<number, HTMLCanvasElement>();
+
+function rockerCuit(n: number): HTMLCanvasElement | null {
+  const deja = cuits.get(n);
+  if (deja) return deja;
+  const f = FEUILLES_DECOR.rocker;
+  if (!f) return null;
+  const d = f.densite ?? 1;
+  const toile = document.createElement('canvas');
+  [toile.width, toile.height] = [f.w + 2 * MARGE, f.h + 2 * MARGE];
+  const c = toile.getContext('2d')!;
+  // à la finesse de la planche, pieds au bas de la marge ; le flou se compte en pixels de la toile (comme à l'écran en 6×)
+  c.setTransform(d, 0, 0, d, MARGE + (f.pied ?? f.w / 2), MARGE + f.h);
+  c.shadowColor = 'rgba(255,214,90,0.85)';
+  c.shadowBlur = HALO;
+  if (!dessineDecorFeuille(c, 'rocker', n)) return null;
+  cuits.set(n, toile);
+  return toile;
+}
+
 /**
  * L'ennemi qu'on vient de convertir : à sa place, un rocker tiré au sort (toujours le même pour un ennemi donné) qui reste
  * là, debout. Assez transparent, avec un léger halo doré : on comprend qu'il a changé de camp, sans le prendre pour un ennemi
  * encore debout. Dessiné pieds en (0, 0) ; false si la planche n'est pas encore chargée (l'ennemi couché sert alors de repli).
  */
 export function dessineRockerConverti(ctx: CanvasRenderingContext2D, id: number): boolean {
+  const toile = rockerCuit(id % NB_ROCKERS);
+  const f = FEUILLES_DECOR.rocker;
+  if (!toile || !f) return false;
+  const d = f.densite ?? 1;
   ctx.globalAlpha = 0.8;
-  ctx.shadowColor = 'rgba(255,214,90,0.85)';
-  ctx.shadowBlur = 5;
-  return dessineDecorFeuille(ctx, 'rocker', id % NB_ROCKERS);
+  const lisse = ctx.imageSmoothingEnabled;
+  ctx.imageSmoothingEnabled = ctx.getTransform().a < d;
+  ctx.drawImage(
+    toile,
+    -(MARGE + (f.pied ?? f.w / 2)) / d,
+    -(MARGE + f.h) / d,
+    toile.width / d,
+    toile.height / d,
+  );
+  ctx.imageSmoothingEnabled = lisse;
+  return true;
 }
 
 interface Reste {

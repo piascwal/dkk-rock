@@ -191,11 +191,9 @@ export function dessineEntite(
   const p = pinceau(ctx);
   const blanc = v.clignote && !heros && !estTir;
   const pb = blanc ? (x0: number, y0: number, w: number, h: number) => p(x0, y0, w, h, '#ffffff') : p;
-  // un ennemi touché passe au blanc, sprite compris : la planche est éclaircie et désaturée le temps du coup
-  // (une planche seulement : un dessin en code passe au blanc de lui-même, et un filtre coûte cher)
-  // (coupé avec les halos au compteur du mode essai : un filtre est lent sur iPhone)
-  const flashe = blanc && FEUILLES[v.g] !== undefined && 'filter' in ctx && !coupee('halos');
-  if (flashe) ctx.filter = 'grayscale(1) brightness(3)';
+  // un ennemi touché passe au blanc, sprite compris : sa ligne de planche en silhouette blanche, faite une fois (un dessin en code
+  // passe au blanc de lui-même) ; coupé avec les halos au compteur du mode essai
+  const flashe = blanc && FEUILLES[v.g] !== undefined && !coupee('halos');
 
   // sprites à apparences : l'identifiant choisit l'apparence ; héros : phase d'animation ; autres : compteur
   const compteur = aTerre ? 0 : FEUILLES[v.g]?.variantes ? v.id : heros ? v.f & 15 : v.f;
@@ -221,6 +219,7 @@ export function dessineEntite(
       heros !== undefined && (v.f & 128) !== 0,
       heros ? (v.f >> 4) & 7 : 0,
       apparence,
+      flashe,
     )
   ) {
     // une planche fournie remplace le dessin en code ; l'instrument d'un héros se pose par-dessus
@@ -254,7 +253,6 @@ export function dessineEntite(
       if (v.g === G.ARME) iconeArme(p, v.f, 0);
     }
   }
-  if (flashe) ctx.filter = 'none';
   if (salto) {
     ctx.translate(0, -10);
     ctx.rotate(-salto);
