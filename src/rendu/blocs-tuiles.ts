@@ -41,6 +41,11 @@ interface Bloc {
 
 /** Quand un bloc se prépare d'avance (avant d'être à l'écran) : tant de rangées par image, pour ne pas faire d'à-coup. */
 const RANGEES_PAR_IMAGE = 2;
+/**
+ * Une grosse explosion casse des tuiles dans plusieurs blocs à la fois : au plus tant de blocs à l'écran se repeignent par image,
+ * les autres l'image suivante (une tuile cassée reste visible 1/60 s de plus, sous la fumée de l'explosion).
+ */
+const REPEINTS_PAR_IMAGE = 2;
 
 export class BlocsTuiles {
   private blocs = new Map<number, Bloc>();
@@ -49,6 +54,8 @@ export class BlocsTuiles {
   private generation = -1;
   private finesse = 0;
   private image = 0;
+  /** les blocs repeints (tuiles cassées) dans l'image en cours */
+  private repeints = 0;
 
   /** Repart de zéro si la carte, ce qui fait l'apparence des tuiles (`cle` : l'atlas, `generation` : les images chargées) ou la finesse change. */
   prepare(carte: Carte, cle: unknown, generation: number, finesse: number): this {
@@ -75,6 +82,7 @@ export class BlocsTuiles {
   ): void {
     const carte = this.carte!;
     this.image++;
+    this.repeints = 0;
     const [bx0, by0] = [Math.floor(camX / (LARGEUR * TUILE)), Math.floor(camY / (HAUTEUR * TUILE))];
     const [bx1, by1] = [
       Math.floor((camX + largeur) / (LARGEUR * TUILE)),
@@ -171,7 +179,8 @@ export class BlocsTuiles {
       const fin = Math.min(HAUTEUR, bloc.rangees + rangees);
       this.peinsZone(bloc, tx0, ty0, tx0, ty0 + bloc.rangees, tx0 + LARGEUR - 1, ty0 + fin - 1, peins);
       bloc.rangees = fin;
-    } else if (version !== bloc.version) {
+    } else if (version !== bloc.version && this.repeints < REPEINTS_PAR_IMAGE) {
+      this.repeints++;
       // seules les cases qui ont changé (et leurs voisines) sont repeintes, d'un seul coup : une explosion en casse des dizaines
       let [x0, y0, x1, y1] = [Infinity, Infinity, -Infinity, -Infinity];
       for (let ty = ty0 - 1; ty <= ty0 + HAUTEUR; ty++)
