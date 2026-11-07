@@ -1,3 +1,4 @@
+import { essaiJbm } from '../rendu/essai-jbm';
 import { ANIM, G } from '../jeu/vue';
 import { VERSION } from '../version';
 import type { Qui } from '../niveaux/format';
@@ -83,7 +84,9 @@ const IMAGES: Partial<Record<Qui, string>> = {
 
 export function portrait(qui: Qui): string {
   const fichier = IMAGES[qui];
-  if (fichier) return `${import.meta.env.BASE_URL}portraits/${fichier}.png?v=${VERSION}`;
+  // le nouveau JBM, à l'essai : son portrait
+  const nom = qui === 'JBM' && essaiJbm.actif ? 'jbm-essai' : fichier;
+  if (nom) return `${import.meta.env.BASE_URL}portraits/${nom}.png?v=${VERSION}`;
   let url = cache.get(qui);
   if (url) return url;
   const [w, h, dessin] = DESSINS[qui as Exclude<Qui, 'YETI'>];

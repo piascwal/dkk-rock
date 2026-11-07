@@ -19,6 +19,7 @@ import { DESSINS_OBJETS, iconeArme } from './dessins-objets';
 import { DEMI_TAILLE, DESSINS_TIRS } from './dessins-tirs';
 import { dessineOeuf } from './oeuf-kiwi';
 import { dessineGrenadeOM } from './grenade-om';
+import { imageEnLair } from './essai-jbm';
 import { essaiSim } from '../entites/options-essai';
 import { pinceau, type Pinceau } from './pinceau';
 import { ecritCentre } from './police';
@@ -204,8 +205,8 @@ export function dessineEntite(
   const imagesEchelle = v.e === ANIM.ECHELLE ? IMAGES_ECHELLE[v.g] : undefined;
   // en l'air, et sur une tyrolienne (pour l'instant, la même image que le saut)
   const enLair = v.e === ANIM.SAUT || v.e === ANIM.TYROLIENNE;
-  const imageSaut = enLair && heros !== undefined ? `${NOMS_HEROS[v.g]}-saut` : undefined;
-  if (imageSaut && dessineDecorFeuille(ctx, imageSaut, 0)) {
+  const [imageSaut, ligneSaut] = enLair && heros ? imageEnLair(NOMS_HEROS[v.g]!, v.e) : ['', 0];
+  if (imageSaut && dessineDecorFeuille(ctx, imageSaut, ligneSaut)) {
     // en l'air : une image par héros, avec son instrument
   } else if (v.e === ANIM.MUR && heros !== undefined && imageMur(ctx, `${NOMS_HEROS[v.g]}-mur`, v.g)) {
     // accroché à une paroi : une image par héros, de profil face à elle (les héros qui n'en ont pas encore gardent leur planche)
