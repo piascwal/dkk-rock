@@ -4,6 +4,7 @@ import { anneau, disquePeint, note } from './formes-pixels';
 import { dessineNuages } from './nuages';
 import { ecritCentre } from './police';
 import { dessineLogoOM } from './grenade-om';
+import { chrono } from './chrono';
 import { CalqueJeu, type Couche } from './calque-jeu';
 
 type Sorte =
@@ -274,6 +275,7 @@ export class Particules {
   dessine(ctx: CanvasRenderingContext2D, camX: number, camY: number): void {
     const trace = (c: CanvasRenderingContext2D, x: number, y: number, quoi: Couche) =>
       this.trace(c, x, y, quoi);
+    if (chrono.actif) chrono.particules = Math.max(chrono.particules, this.liste.length);
     if (!this.calque.dessine(ctx, camX, camY, this.liste, trace)) this.trace(ctx, camX, camY, 'tout');
   }
 

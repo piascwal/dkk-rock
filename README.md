@@ -437,8 +437,10 @@ validé.
   aucun creux sans issue), `outils/niveaux/massifs.py` ; puis `python3 outils/pose-barils.py ../refontes/21-marseille`), et se
   déclare dans `src/niveaux/refontes.ts`. Elle garde l'`id` et la place du niveau : les sauvegardes ne bougent pas. Les joueurs
   ne l'ont qu'une fois son `id` ajouté à `REFONTES_PUBLIEES` (augmenter alors `VERSION_PROTOCOLE`) ; avant, on l'essaie en
-  ouvrant le jeu avec `?essai` à la fin de l'adresse (rien n'est retenu : sans lui, c'est le jeu de tout le monde ; un
-  bandeau le rappelle) : le menu « Niveaux refaits » propose chaque niveau refait dans sa version d'avant et dans sa version
+  allumant **Options → Mode essai** (l'appareil s'en souvient, le jeu redémarre ; `?essai` dans l'adresse marche aussi,
+  `?essai=0` l'éteint ; éteint, rien n'est mesuré ni changé). Un bandeau le rappelle, avec « Mesures » (afficher ou masquer le
+  compteur de fluidité) et « Copier » (le rapport des 30 dernières secondes, moyennes et pires images de chaque partie du
+  dessin, tuiles cassées, particules, à coller tel quel) : le menu « Niveaux refaits » propose chaque niveau refait dans sa version d'avant et dans sa version
   refaite, sans rien sauvegarder.
   Mat est fait à partir de ses images (`assets-sources/heros/mat-source/`) : `outils/prepare-mat.py` (saut, mur, échelle de dos
   et son miroir, portrait, intro), puis `outils/anime-instrument.py mat` (la planche du héros : marche et visée, la basse et les

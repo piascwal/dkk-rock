@@ -1,29 +1,44 @@
 /**
- * Le mode essai : les niveaux refaits encore en essai (voir niveaux/refontes.ts) se jouent sur cet appareil avant d'être publiés
- * aux joueurs, depuis le menu « Niveaux refaits » (la version d'avant et la version refaite de chacun, voir menus-refontes.ts).
- * Seulement avec `?essai` dans l'adresse (rien n'est retenu : sans lui, le jeu est celui de tout le monde). Un bandeau le rappelle.
+ * Le mode essai : les niveaux refaits, les héros et les coups encore en essai se jouent sur cet appareil avant d'être publiés aux
+ * joueurs. Il s'allume dans Options (« Mode essai », l'appareil s'en souvient ; le jeu redémarre), ou avec `?essai` dans
+ * l'adresse (`?essai=0` l'éteint). Un bandeau le rappelle, avec deux boutons : afficher ou masquer les mesures, et les copier.
+ * Éteint, il ne coûte rien : rien n'est mesuré.
  */
 import { chrono, COUPABLES, type Partie } from '../rendu/chrono';
+import { COMMIT, VERSION } from '../version';
 
-const ANCIENNE_CLE = 'dkk-rock.essai'; // un temps, l'appareil retenait le mode essai : on l'oublie
+const CLE = 'dkk-rock.mode-essai';
+const CLE_MESURES = 'dkk-rock.mesures-essai';
 
-/** Vrai si l'adresse demande le mode essai (`?essai`, ou `?essai=1`). */
-export function modeEssai(): boolean {
+const lit = (cle: string): string | null => {
   try {
-    localStorage.removeItem(ANCIENNE_CLE);
+    return localStorage.getItem(cle);
   } catch {
-    // stockage indisponible : rien à oublier
+    return null; // stockage indisponible : rien de retenu
   }
+};
+const ecrit = (cle: string, valeur: string | null): void => {
+  try {
+    if (valeur === null) localStorage.removeItem(cle);
+    else localStorage.setItem(cle, valeur);
+  } catch {
+    // stockage indisponible : le choix ne durera que cette fois
+  }
+};
+
+/** Vrai en mode essai : l'adresse le demande (`?essai`), ou l'appareil s'en souvient (Options). */
+export function modeEssai(): boolean {
   const demande = new URLSearchParams(location.search).get('essai');
-  return demande !== null && demande !== '0';
+  if (demande === '0') return false;
+  return demande !== null || lit(CLE) === '1';
 }
 
-/** Le bandeau du mode essai, en bas à gauche de l'écran ; il ne capte aucun toucher. */
-export function afficheBandeauEssai(): void {
-  const b = document.createElement('div');
-  b.id = 'bandeau-essai';
-  b.textContent = 'ESSAI : niveaux refaits';
-  document.body.append(b);
+/** Allume ou éteint le mode essai (Options) : l'appareil s'en souvient, et le jeu redémarre pour le prendre en compte. */
+export function changeModeEssai(actif: boolean): void {
+  ecrit(CLE, actif ? '1' : null);
+  const url = new URL(location.href);
+  url.searchParams.delete('essai');
+  location.replace(url.toString());
 }
 
 /** Le nom de chaque partie du dessin, tel qu'il s'affiche. */
@@ -38,14 +53,60 @@ const NOMS: Record<Partie, string> = {
   optimisations: 'optimisations',
   tout: 'tout le dessin',
 };
+const PARTIES = ['fond', 'tuiles', 'decor', 'personnages', 'effets', 'simulation'] as const;
 
 const ms = (v: number): string => v.toFixed(1).replace('.', ',');
+
+/** Les relevés des 30 dernières secondes (un par demi-seconde) : le bouton « Copier » les donne, pics compris. */
+const historique: string[] = [];
+
+/** Le bandeau du mode essai, en bas à gauche : son nom, puis « Mesures » (les afficher ou non) et « Copier » (le rapport). */
+export function afficheBandeauEssai(): void {
+  const b = document.createElement('div');
+  b.id = 'bandeau-essai';
+  const nom = document.createElement('span');
+  nom.textContent = 'ESSAI';
+  const mesures = document.createElement('button');
+  const copier = document.createElement('button');
+  mesures.textContent = 'Mesures';
+  copier.textContent = 'Copier';
+  mesures.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    const cachees = !document.body.classList.toggle('mesures-cachees');
+    ecrit(CLE_MESURES, cachees ? null : 'cachees');
+  });
+  copier.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    const texte = rapport();
+    const fini = () => {
+      copier.textContent = 'Copié !';
+      setTimeout(() => (copier.textContent = 'Copier'), 1500);
+    };
+    navigator.clipboard?.writeText(texte).then(fini, () => prompt('Rapport à copier :', texte));
+    if (!navigator.clipboard) prompt('Rapport à copier :', texte);
+  });
+  if (lit(CLE_MESURES) === 'cachees') document.body.classList.add('mesures-cachees');
+  b.append(nom, mesures, copier);
+  document.body.append(b);
+}
+
+/** Le rapport à coller : l'appareil, la version, puis les relevés des 30 dernières secondes, du plus ancien au plus récent. */
+function rapport(): string {
+  const ecran = `${screen.width}×${screen.height} à ${devicePixelRatio}`;
+  return [
+    `DKK essai · v${VERSION}${COMMIT ? ` ${COMMIT}` : ''} · ${navigator.userAgent}`,
+    `écran ${ecran} · coupé : ${chrono.coupee ? NOMS[chrono.coupee] : 'rien'}`,
+    'relevés par demi-seconde (moy = moyenne par image, max = la pire image) :',
+    ...historique,
+  ].join('\n');
+}
 
 /**
  * La mesure de fluidité du mode essai, en haut de l'écran. Première ligne : les images par seconde, la plus longue image de la
  * dernière demi-seconde, le nombre d'à-coups (images de plus de 50 ms) des dix dernières secondes, et la finesse d'affichage
- * (`finesse()`, « 3× »). Deuxième ligne : le temps moyen du processeur, par image, pour chaque partie du dessin (et pour la
- * simulation, par pas). Troisième : la partie coupée ; un toucher sur le compteur passe à la suivante (voir rendu/chrono.ts).
+ * (`finesse()`, « 3× »). Deuxième ligne : le temps de calcul par image. Troisième : le temps moyen et le pire de chaque partie du
+ * dessin (et de la simulation, par pas), les tuiles cassées et les particules. Quatrième : la partie coupée ; un toucher sur le
+ * compteur passe à la suivante (voir rendu/chrono.ts).
  */
 export function afficheMesuresEssai(finesse: () => string): void {
   chrono.actif = true;
@@ -65,6 +126,7 @@ export function afficheMesuresEssai(finesse: () => string): void {
   let images = 0;
   let pire = 0;
   const acoups: number[] = [];
+  const debut = avant;
   const image = (t: number) => {
     // le jeu dessine juste avant (son rappel passe d'abord, à chaque image) : depuis le début de l'image `t`, tout ce qu'il a fait
     chrono.calcul += performance.now() - t;
@@ -79,19 +141,18 @@ export function afficheMesuresEssai(finesse: () => string): void {
     if (t - affiche >= 500) {
       const ips = Math.round((images * 1000) / (t - affiche));
       const n = Math.max(1, chrono.images);
-      const parties = (['fond', 'tuiles', 'decor', 'personnages', 'effets'] as const)
-        .map((p) => `${NOMS[p]} ${ms(chrono.temps[p] / n)}`)
-        .join(' · ');
-      const simu = `${NOMS.simulation} ${ms(chrono.temps.simulation / Math.max(1, chrono.pas))}`;
+      const moy = (p: Partie) => chrono.temps[p] / (p === 'simulation' ? Math.max(1, chrono.pas) : n);
+      const parties = PARTIES.map((p) => `${NOMS[p]} ${ms(moy(p))}/${ms(chrono.pics[p])}`).join(' · ');
       const coupee = chrono.coupee ? `coupé : ${NOMS[chrono.coupee]}` : 'rien de coupé';
-      m.textContent =
-        `${ips} i/s · pire ${Math.round(pire)} ms · ${acoups.length} à-coups/10 s · ${finesse()}\n` +
-        `calcul ${ms(chrono.calcul / Math.max(1, chrono.cadres))} ms par image, sur ${ms(1000 / Math.max(1, ips))} ms\n` +
-        `ms : ${parties} · ${simu}\n` +
-        `${coupee} (toucher pour couper)`;
+      const l1 = `${ips} i/s · pire ${Math.round(pire)} ms · ${acoups.length} à-coups/10 s · ${finesse()}`;
+      const l2 = `calcul ${ms(chrono.calcul / Math.max(1, chrono.cadres))} ms par image, sur ${ms(1000 / Math.max(1, ips))} ms`;
+      const l3 = `ms moy/max : ${parties} · ${chrono.tuiles} tuiles cassées · ${chrono.particules} particules`;
+      m.textContent = `${l1}\n${l2}\n${l3}\n${coupee} (toucher pour couper)`;
       m.classList.toggle('mauvais', pire > 50);
-      for (const k of Object.keys(chrono.temps) as Partie[]) chrono.temps[k] = 0;
-      chrono.images = chrono.pas = chrono.cadres = chrono.calcul = 0;
+      historique.push(`${ms((t - debut) / 1000)} s · ${l1} · ${l2} · ${l3}`);
+      if (historique.length > 60) historique.shift();
+      for (const k of Object.keys(chrono.temps) as Partie[]) chrono.temps[k] = chrono.pics[k] = 0;
+      chrono.images = chrono.pas = chrono.cadres = chrono.calcul = chrono.tuiles = chrono.particules = 0;
       affiche = t;
       images = 0;
       pire = 0;

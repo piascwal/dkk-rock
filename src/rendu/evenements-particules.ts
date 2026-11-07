@@ -1,4 +1,5 @@
 import { essaiSim, RAYON_GRENADE_OM } from '../entites/options-essai';
+import { chrono } from './chrono';
 import { TUILE } from '../config';
 import type { Evenement } from '../jeu/vue';
 import { proprietes } from '../monde/tuiles';
@@ -20,6 +21,7 @@ export function particulesDesEvenements(
     switch (e.k) {
       case 'tuile':
         if (e.t !== 0) break;
+        if (chrono.actif) chrono.tuiles++;
         p.debris((e.x + 0.5) * TUILE, (e.y + 0.5) * TUILE, proprietes(e.avant).debris, 7);
         // ce qui était posé sur cette tuile (décor) se brise aussi : des morceaux s'envolent
         for (const o of decorParTuile.get(e.y * 100000 + e.x) ?? []) debrisDeDecor(p, o);

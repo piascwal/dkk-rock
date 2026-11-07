@@ -1,3 +1,4 @@
+import { changeModeEssai, modeEssai } from './essai';
 import { codeDuLien, nettoiePseudo, type Annonce } from '@piascwal/lan-kit';
 import { HEROS } from '../entites/heros';
 import type { Progression, Sauvegarde } from '../jeu/sauvegarde';
@@ -272,6 +273,7 @@ export class Menus {
       ...(aUnClavier() ? [bouton('Touches du clavier', () => this.touches())] : []),
       efface,
       tests,
+      bouton(`Mode essai : ${modeEssai() ? 'oui' : 'non'}`, () => changeModeEssai(!modeEssai())),
       bouton('Retour', () => this.titre()),
     );
   }

@@ -40,7 +40,24 @@ export const chrono = {
   /** le temps de calcul des images de l'écran (les pas, le dessin, l'interface : voir ui/essai.ts), et leur nombre */
   calcul: 0,
   cadres: 0,
+  /** la plus longue image de chaque partie (ms) depuis la dernière lecture : les moyennes cachent les pics */
+  pics: {
+    fond: 0,
+    tuiles: 0,
+    decor: 0,
+    personnages: 0,
+    halos: 0,
+    effets: 0,
+    simulation: 0,
+    optimisations: 0,
+  } as Record<Partie, number>,
+  /** les tuiles cassées et le plus de particules vivantes depuis la dernière lecture */
+  tuiles: 0,
+  particules: 0,
 };
+
+/** Ce que chaque partie a pris dans l'image en cours (pour `pics`). */
+const courant: Partial<Record<Partie, number>> = {};
 
 let depart = 0;
 
@@ -48,6 +65,10 @@ let depart = 0;
 export function top(): void {
   if (!chrono.actif) return;
   chrono.images++;
+  for (const k of Object.keys(courant) as Partie[]) {
+    chrono.pics[k] = Math.max(chrono.pics[k], courant[k]!);
+    courant[k] = 0;
+  }
   depart = performance.now();
 }
 
@@ -56,6 +77,7 @@ export function note(p: Partie): void {
   if (!chrono.actif) return;
   const t = performance.now();
   chrono.temps[p] += t - depart;
+  courant[p] = (courant[p] ?? 0) + t - depart;
   depart = t;
 }
 
@@ -75,7 +97,9 @@ export function simulation<T>(f: () => T): T {
   try {
     return f();
   } finally {
-    chrono.temps.simulation += performance.now() - t;
+    const dt = performance.now() - t;
+    chrono.temps.simulation += dt;
+    chrono.pics.simulation = Math.max(chrono.pics.simulation, dt);
     chrono.pas++;
   }
 }
