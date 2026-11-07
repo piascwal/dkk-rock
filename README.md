@@ -444,8 +444,9 @@ validé.
   refaite, sans rien sauvegarder.
   JBM est fait à partir de ses bandes d'animation (`assets-sources/heros/jbm-source/`, 4 poses chacune) : `outils/prepare-jbm.py`
   (repos, course en foulée et passage alternés, saut, échelle et tyrolienne en deux temps, mur, à terre, portrait, intro), déclaré
-  dans `src/rendu/feuilles-jbm.ts` (densité 8,1 : la même taille en jeu). Un héros qui a son image `<nom>-tyrolienne` s'en sert sur
-  le câble.
+  dans `src/rendu/feuilles-jbm.ts` (densité 8,1 : la même taille en jeu). Sur une tyrolienne, un héros qui a son image
+  `<nom>-tyrolienne` (deux poses qui se balancent, poings au câble, le corps qui pend dessous) s'en sert : JBM, JBG, Tom et JBT
+  (`outils/prepare-tyroliennes.py`, `src/rendu/feuilles-tyroliennes.ts`) ; Mat garde l'image de son saut.
   Mat est fait à partir de ses images (`assets-sources/heros/mat-source/`) : `outils/prepare-mat.py` (saut, mur, échelle de dos
   et son miroir, portrait, intro), puis `outils/anime-instrument.py mat` (la planche du héros : marche et visée, la basse et les
   bras pivotant ensemble). Sa taille par situation est dans `DENSITE_HEROS` (`outils/anime-instrument.py`) et dans

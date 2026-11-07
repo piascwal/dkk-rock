@@ -3,6 +3,7 @@ import { G, type Genre } from '../jeu/vue';
 import type { Feuille } from './feuilles';
 import { FEUILLES_PANNEAUX } from './feuilles-panneaux';
 import { DECOR_JBM } from './feuilles-jbm';
+import { DECOR_TYROLIENNES } from './feuilles-tyroliennes';
 
 export const FEUILLES_OBJETS: Partial<Record<Genre, Feuille>> = {
   [G.VAN]: { fichier: 'van.png', w: 336, h: 199, images: [1], rythme: 1, densite: 6, pied: 168 },
@@ -281,4 +282,5 @@ export const FEUILLES_DECOR: Record<string, Feuille> = {
   },
   ...FEUILLES_PANNEAUX,
   ...DECOR_JBM,
+  ...DECOR_TYROLIENNES,
 };

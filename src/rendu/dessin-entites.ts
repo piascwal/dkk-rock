@@ -202,7 +202,8 @@ export function dessineEntite(
   const imagesEchelle = v.e === ANIM.ECHELLE ? IMAGES_ECHELLE[v.g] : undefined;
   // en l'air, et sur une tyrolienne (pour l'instant, la même image que le saut)
   const enLair = v.e === ANIM.SAUT || v.e === ANIM.TYROLIENNE;
-  const [imageSaut, ligneSaut] = enLair && heros ? imageEnLair(NOMS_HEROS[v.g]!, v.e) : ['', 0];
+  const [imageSaut, ligneSaut, pend] = enLair && heros ? imageEnLair(NOMS_HEROS[v.g]!, v.e) : ['', 0, 0];
+  if (pend) ctx.translate(0, pend);
   if (imageSaut && dessineDecorFeuille(ctx, imageSaut, ligneSaut)) {
     // en l'air : une image par héros, avec son instrument
   } else if (v.e === ANIM.MUR && heros !== undefined && imageMur(ctx, `${NOMS_HEROS[v.g]}-mur`, v.g)) {
