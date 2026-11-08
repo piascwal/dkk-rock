@@ -10,8 +10,8 @@ import { pas, sousLeDoigt, type Acteur, type Bloc, type Scene } from './titre-ph
  * le logo et la colonne des boutons sont des obstacles (titre-physique.ts) : ils les escaladent, montent dessus, grimpent aux
  * bords de l'écran et filent suspendus au haut de l'écran, au lieu de passer derrière. Au doigt (ou à la souris), on attrape un
  * héros : il s'accroche (son image de tyrolienne), on le traîne et on le lance, il rebondit partout. En bas, le public en
- * ombres chinoises, rétroéclairé par la scène. Deux toiles : le fond (projecteurs, rampe) sous la page, les héros et le public
- * par-dessus (sans prendre les clics : le doigt n'attrape que les héros). En affichage économe : une image fixe.
+ * ombres chinoises, rétroéclairé par la scène, devant les héros (sauf sur les boutons et le logo). Deux toiles : le fond (projecteurs,
+ * rampe) sous la page, les héros et le public par-dessus (sans prendre les clics : le doigt n'attrape que les héros). En affichage économe : une image fixe.
  */
 
 type Qualite = 'auto' | 'max' | 'eco';
@@ -176,8 +176,14 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
       ca.fillRect(e.x - 2, e.y - 2, 4, 4);
     }
     ca.globalAlpha = 1;
-    // le public sous la page (les boutons restent devant lui), les héros devant lui
-    lePublic(cf, W, H, temps, gens, flashs, horloge);
+    // le public devant les héros (on les voit depuis la salle), mais jamais sur les boutons ni le logo : découpés de son dessin
+    ca.save();
+    ca.beginPath();
+    ca.rect(0, 0, W, H);
+    for (const b of s.blocs) ca.rect(b.x0 - 2, b.y0 - 2, b.x1 - b.x0 + 4, b.y1 - b.y0 + 4);
+    ca.clip('evenodd');
+    lePublic(ca, W, H, temps, gens, flashs, horloge);
+    ca.restore();
   };
 
   const anime = (maintenant: number) => {
