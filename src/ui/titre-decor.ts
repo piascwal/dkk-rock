@@ -30,7 +30,7 @@ export function blocsDesEnceintes(W: number, sol: number, hh: number): Bloc[] {
   return piles(W, hh).map((p) => ({ x0: p.x - p.l / 2, y0: sol - p.h, x1: p.x + p.l / 2, y1: sol }));
 }
 
-/** Les deux piles, qui battent la mesure (les images du jeu : la membrane qui pulse). */
+/** Les deux piles, qui battent la mesure (la membrane de l'enceinte du bas gonfle à chaque demi-temps). */
 export function dessineEnceintes(
   ctx: CanvasRenderingContext2D,
   W: number,
@@ -39,14 +39,16 @@ export function dessineEnceintes(
   temps: number,
 ): void {
   const k = (hh / 20) * ECHELLE;
-  const coup = Math.floor(temps * 4);
+  const coup = Math.floor(temps * 2);
   for (const [i, p] of piles(W, hh).entries()) {
     ctx.save();
     ctx.translate(p.x, sol);
     ctx.scale(k * (i ? -1 : 1), k);
-    dessineFeuille(ctx, G.ENCEINTE, 0, coup, false);
+    // l'enceinte du bas bat la mesure : sa membrane rouge gonfle et dégonfle (ses deux premières images) ; le caisson du dessus
+    // garde sa matière (noir à gauche, bois à droite)
+    dessineFeuille(ctx, G.ENCEINTE, coup % 2, 0, false);
     ctx.translate(0, -H1);
-    dessineDecorFeuille(ctx, 'enceinte-34', coup % 2);
+    dessineDecorFeuille(ctx, 'enceinte-34', i);
     ctx.restore();
   }
 }
