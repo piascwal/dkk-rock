@@ -1,27 +1,11 @@
-import { BPM } from '../config';
-import type { Genre } from '../jeu/vue';
+import { saute, type Acteur, type Scene } from './titre-physique';
 
 /**
- * La chorégraphie de l'écran titre en scène (voir titre-scene.ts) : les acteurs, et les scènes qui se succèdent. Chaque scène
- * donne des buts aux acteurs (où courir, quand sauter) ; titre-scene.ts les fait courir, sauter (et sauter par-dessus un autre
- * qui leur barre la route), et dessine.
+ * Ce que font les héros de l'écran titre en scène (voir titre-scene.ts) quand on les laisse faire : chacun à son idée, à son
+ * rythme (jamais tous ensemble) : flâner, se retourner, sautiller, grimper au bord de l'écran puis filer suspendu au haut de
+ * l'écran, grimper au flanc du logo ou des boutons et monter dessus, sauter de là ; sauter par-dessus un autre qui barre la
+ * route ; se taper dans la main avec un voisin. Et de temps en temps, quelques secondes de folie où tous sautent partout.
  */
-
-/** Le nombre d'acteurs (les cinq DKK). */
-export const NB_ACTEURS = 5;
-
-export interface Acteur {
-  genre: Genre;
-  x: number;
-  /** hauteur au-dessus du sol (px) et vitesse verticale */
-  z: number;
-  vz: number;
-  dir: 1 | -1;
-  /** où il court (null : il est arrivé), et à quelle vitesse (en hauteurs de héros par seconde) */
-  tx: number | null;
-  vitesse: number;
-  accueil: number;
-}
 
 export interface Etincelle {
   x: number;
@@ -32,173 +16,120 @@ export interface Etincelle {
   couleur: string;
 }
 
-/** Ce que les scènes manipulent : la scène, les acteurs, et les mesures de l'écran (une hauteur de héros, sa largeur, le sol). */
-export interface Monde {
-  acteurs: Acteur[];
-  etincelles: Etincelle[];
-  W: number;
-  sol: number;
-  hh: number;
-  /** l'acteur sous le projecteur (-1 : personne) et le temps de la scène (s), et un état libre */
-  eclaire: number;
+export interface Choregraphie {
+  /** temps de la scène (s) ; la prochaine folie, et sa fin */
   t: number;
-  etat: Record<string, number>;
+  folie: number;
+  finFolie: number;
+  etincelles: Etincelle[];
 }
 
-export interface Scene {
-  duree: number;
-  debut(m: Monde): void;
-  maj(m: Monde, dt: number): void;
-}
-
-export const G_PESANTEUR = 30; // en hauteurs de héros par s²
 const COULEURS = ['#ffd23f', '#ff2e93', '#00c2d1', '#ffffff'];
+const hasard = (a: number, b: number) => a + Math.random() * (b - a);
 
-export const alea = (n: number): number => Math.floor(Math.random() * n);
-export const saute = (m: Monde, a: Acteur, hauteurs: number): void => {
-  if (a.z === 0) a.vz = Math.sqrt(2 * G_PESANTEUR * hauteurs) * m.hh;
-};
-const va = (a: Acteur, x: number, vitesse = 4): void => {
-  a.tx = x;
-  a.vitesse = vitesse;
-};
-const etincelles = (m: Monde, x: number, y: number, n = 10): void => {
+export const nouvelleChoregraphie = (): Choregraphie => ({
+  t: 0,
+  folie: hasard(14, 20),
+  finFolie: 0,
+  etincelles: [],
+});
+
+export function etincelles(c: Choregraphie, s: Scene, x: number, y: number, n = 10): void {
   for (let i = 0; i < n; i++) {
     const a = (i / n) * 2 * Math.PI;
-    m.etincelles.push({
+    const v = s.hh * hasard(1.2, 2);
+    c.etincelles.push({
       x,
       y,
-      vx: Math.cos(a) * m.hh * 1.6,
-      vy: Math.sin(a) * m.hh * 1.6 - m.hh,
-      t0: m.t,
+      vx: Math.cos(a) * v,
+      vy: Math.sin(a) * v - s.hh,
+      t0: c.t,
       couleur: COULEURS[i % 4]!,
     });
   }
-};
+}
 
-/** Tous reviennent à leur place d'accueil. */
-const rentre = (m: Monde): void => m.acteurs.forEach((a) => va(a, a.accueil, 3.5));
+/** Une nouvelle idée pour un acteur au repos. */
+function idee(c: Choregraphie, s: Scene, a: Acteur): void {
+  const r = Math.random();
+  a.grimpe = false;
+  a.minuteur = hasard(1.2, 3);
+  const auSol = Math.abs(a.y - s.sol) < 1;
+  if (r < 0.32) {
+    // flâner un peu plus loin (et sauter du bloc s'il y est : il marche jusqu'au bord et tombe)
+    a.tx = Math.max(s.hh * 0.2, Math.min(s.W - s.hh * 0.2, a.x + hasard(-2.5, 2.5) * s.hh));
+  } else if (r < 0.5) {
+    // grimper : au bord de l'écran le plus proche, ou au flanc d'un bloc (il y marche, le mur l'arrête, il grimpe)
+    a.grimpe = true;
+    a.plafond = hasard(1.2, 3);
+    a.tx = Math.random() < 0.5 ? (a.x < s.W / 2 ? 0 : s.W) : a.x + (Math.random() < 0.5 ? -1 : 1) * s.W;
+  } else if (r < 0.62 && auSol) {
+    // un grand saut vers le bloc le plus proche (le logo, souvent) : il atterrit dessus s'il y arrive
+    const b = s.blocs.reduce<(typeof s.blocs)[number] | null>(
+      (m, x) => (!m || Math.abs((x.x0 + x.x1) / 2 - a.x) < Math.abs((m.x0 + m.x1) / 2 - a.x) ? x : m),
+      null,
+    );
+    if (b && s.sol - b.y0 < s.hh * 2.4 && b.y0 > s.hh) {
+      const cible = Math.max(b.x0 + s.hh * 0.3, Math.min(b.x1 - s.hh * 0.3, a.x));
+      saute(s, a, (s.sol - b.y0) / s.hh + 0.35, (cible - a.x) * 1.4);
+    } else saute(s, a, 0.5);
+  } else if (r < 0.8) {
+    // sautiller sur place, en se retournant parfois
+    saute(s, a, hasard(0.2, 0.45));
+    if (Math.random() < 0.4) a.dir = a.dir > 0 ? -1 : 1;
+  } else {
+    // se retourner et regarder
+    a.dir = a.dir > 0 ? -1 : 1;
+  }
+}
 
-/** Le temps où tous jouent ensemble : ils sautent chacun leur tour, au rythme. */
-export const jam: Scene = {
-  duree: 4,
-  debut: (m) => {
-    rentre(m);
-    m.eclaire = -1;
-  },
-  maj: (m) => {
-    const temps = Math.floor(((m.t + 100) * BPM) / 60);
-    if (temps !== m.etat.temps) {
-      m.etat.temps = temps;
-      m.acteurs.forEach((a, i) => (temps + i) % 2 === 0 && a.tx === null && saute(m, a, 0.3));
+/** Les idées de chacun, les rencontres et les folies : un pas de temps `dt`. */
+export function joue(c: Choregraphie, s: Scene, acteurs: Acteur[], dt: number): void {
+  c.t += dt;
+  const fou = c.t >= c.folie && c.t < c.finFolie;
+  if (c.t >= c.folie && c.finFolie < c.folie) c.finFolie = c.t + 3.2;
+  if (c.t >= c.finFolie && c.finFolie > c.folie) [c.folie, c.finFolie] = [c.t + hasard(16, 24), 0];
+  for (const a of acteurs) {
+    if (a.etat !== 'sol') continue;
+    if (fou) {
+      // la folie : des sauts dans tous les sens, et ils ricochent sur les bords
+      if (a.tx === null || Math.random() < dt * 2) a.tx = Math.random() < 0.5 ? 0 : s.W;
+      saute(s, a, hasard(0.4, 1.1), (Math.random() < 0.5 ? -1 : 1) * s.hh * hasard(1.5, 3.5));
+      continue;
     }
-  },
-};
-
-/** Le solo : l'un s'avance et saute haut, sous le projecteur ; les autres le regardent et suivent le rythme. */
-const solo: Scene = {
-  duree: 7,
-  debut: (m) => {
-    m.eclaire = alea(NB_ACTEURS);
-    const a = m.acteurs[m.eclaire]!;
-    va(a, a.accueil < m.W / 2 ? a.accueil + m.hh * 1.6 : a.accueil - m.hh * 1.6, 3);
-    m.etat.saut = 0;
-  },
-  maj: (m, dt) => {
-    const a = m.acteurs[m.eclaire]!;
-    m.etat.saut = (m.etat.saut ?? 0) - dt;
-    if (m.etat.saut! <= 0 && a.tx === null) {
-      saute(m, a, 0.8);
-      m.etat.saut = 1;
+    // un autre sur le chemin, à son niveau : il lui saute par-dessus
+    if (a.tx !== null) {
+      const gene = acteurs.some(
+        (b) =>
+          b !== a &&
+          b.etat === 'sol' &&
+          Math.abs(b.y - a.y) < 2 &&
+          (b.x - a.x) * a.dir > 0 &&
+          (b.x - a.x) * a.dir < s.hh * 0.5,
+      );
+      if (gene) saute(s, a, 0.75, a.dir * s.hh * 2.6);
+      continue;
     }
-    m.acteurs.forEach((b, i) => i !== m.eclaire && b.z === 0 && Math.random() < dt * 1.2 && saute(m, b, 0.3));
-  },
-};
-
-/** Saute-mouton : deux se tiennent au milieu de la scène, un troisième court d'un bord à l'autre en leur sautant par-dessus. */
-const mouton: Scene = {
-  duree: 9,
-  debut: (m) => {
-    m.eclaire = -1;
-    const ordre = [0, 1, 2, 3, 4].sort(() => Math.random() - 0.5);
-    m.etat.coureur = ordre[0]!;
-    va(m.acteurs[ordre[1]!]!, m.W * 0.3, 5);
-    va(m.acteurs[ordre[2]!]!, m.W * 0.3 + m.hh * 1.3, 5);
-    va(m.acteurs[m.etat.coureur]!, m.W * 0.95, 5);
-  },
-  maj: (m) => {
-    const c = m.acteurs[m.etat.coureur!]!;
-    if (c.tx === null) va(c, c.x > m.W / 2 ? m.W * 0.05 : m.W * 0.95, 5.5);
-  },
-};
-
-/** Ricochets : chacun court d'un bord à l'autre de l'écran, saute en touchant le bord, repart ; ils se croisent en se sautant dessus. */
-const ricochet: Scene = {
-  duree: 9,
-  debut: (m) => {
-    m.eclaire = -1;
-    m.acteurs.forEach((a, i) => va(a, i % 2 ? m.W * 0.04 : m.W * 0.96, 3.2 + i * 0.5));
-  },
-  maj: (m) => {
-    m.acteurs.forEach((a) => {
-      if (a.tx !== null) return;
-      saute(m, a, 0.45);
-      etincelles(m, a.x, m.sol - m.hh * 0.6, 5);
-      va(a, a.x < m.W / 2 ? m.W * 0.96 : m.W * 0.04, 3.2 + alea(8) * 0.2);
-    });
-  },
-};
-
-/** On se tape dans la main : deux paires s'écartent, courent l'une vers l'autre et sautent ensemble, étincelles à l'impact ; les autres comptent les temps. */
-const tape: Scene = {
-  duree: 8,
-  debut: (m) => {
-    m.eclaire = -1;
-    m.etat.cycle = -1;
-  },
-  maj: (m) => {
-    const cycle = Math.floor(m.t / 2.6);
-    const c = m.t % 2.6;
-    // les paires : deux voisins de scène (pas un de chaque côté des boutons) ; les autres comptent les temps
-    const paires: [number, number][] = [];
-    for (let i = 0; i < NB_ACTEURS - 1; i++)
-      if (
-        !paires.some((p) => p.includes(i)) &&
-        Math.abs(m.acteurs[i + 1]!.accueil - m.acteurs[i]!.accueil) < m.hh * 1.2
-      )
-        paires.push([i, i + 1]);
-    if (cycle !== m.etat.cycle) {
-      // chaque paire s'écarte
-      m.etat.cycle = cycle;
-      m.etat.tape = 0;
-      paires.forEach(([i, j]) => {
-        va(m.acteurs[i]!, Math.max(m.hh * 0.5, m.acteurs[i]!.accueil - m.hh * 1.5), 4);
-        va(m.acteurs[j]!, Math.min(m.W - m.hh * 0.5, m.acteurs[j]!.accueil + m.hh * 1.5), 4);
-      });
+    a.minuteur -= dt;
+    // un voisin au repos tout près : on se tape dans la main, de temps en temps
+    const voisin = acteurs.find(
+      (b) =>
+        b !== a &&
+        b.etat === 'sol' &&
+        b.tx === null &&
+        Math.abs(b.y - a.y) < 2 &&
+        Math.abs(b.x - a.x) < s.hh * 0.9,
+    );
+    if (voisin && Math.random() < dt * 0.25) {
+      [a.dir, voisin.dir] = a.x < voisin.x ? [1, -1] : [-1, 1];
+      saute(s, a, 0.5, 0);
+      saute(s, voisin, 0.5, 0);
+      etincelles(c, s, (a.x + voisin.x) / 2, a.y - s.hh * 1.25, 12);
+      a.minuteur = voisin.minuteur = hasard(1, 2);
+      continue;
     }
-    if (c > 1) {
-      paires.forEach(([i, j]) => {
-        const [a, b] = [m.acteurs[i]!, m.acteurs[j]!];
-        const milieu = (a.accueil + b.accueil) / 2;
-        const proche = Math.abs(a.x - b.x) < m.hh * 0.9;
-        if (!proche && (a.tx === null || a.tx !== milieu - m.hh * 0.35)) {
-          va(a, milieu - m.hh * 0.35, 5);
-          va(b, milieu + m.hh * 0.35, 5);
-        }
-        if (proche && !(m.etat.tape! & (i + 1))) {
-          m.etat.tape = (m.etat.tape ?? 0) | (i + 1);
-          saute(m, a, 0.6);
-          saute(m, b, 0.6);
-          etincelles(m, milieu, m.sol - m.hh * 1.3, 12);
-          a.tx = b.tx = null;
-        }
-      });
-    }
-    if (Math.floor(m.t * 2) !== m.etat.beat) {
-      m.etat.beat = Math.floor(m.t * 2);
-      m.acteurs.forEach((a, i) => !paires.some((p) => p.includes(i)) && saute(m, a, 0.35));
-    }
-  },
-};
-
-export const SCENES: readonly Scene[] = [solo, mouton, ricochet, tape];
+    if (a.minuteur <= 0) idee(c, s, a);
+  }
+  c.etincelles = c.etincelles.filter((e) => c.t - e.t0 < 0.7);
+  for (const e of c.etincelles) [e.x, e.y, e.vy] = [e.x + e.vx * dt, e.y + e.vy * dt, e.vy + s.hh * 8 * dt];
+}

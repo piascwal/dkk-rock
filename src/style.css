@@ -212,7 +212,17 @@ body:has(#ecran:not(:empty)) .fil-elim {
     display: none;
   }
 
-  .titre-ouvert .ecran .logo {
+  .titre-ouvert .ecran /* l'écran titre en scène (mode essai, ui/titre-scene.ts) : les héros et le public par-dessus la page, sans prendre les clics */
+.titre-avant {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .logo {
     grid-column: 1;
     grid-row: 2;
     margin: 0;
