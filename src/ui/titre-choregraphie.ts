@@ -22,6 +22,11 @@ export interface Choregraphie {
   folie: number;
   finFolie: number;
   etincelles: Etincelle[];
+  /** la dernière idée lancée, et quand : deux héros ne font pas la même chose au même moment */
+  derniereIdee: number;
+  quand: number;
+  /** depuis combien de temps chacun est superposé à un autre (s) : ils peuvent se croiser, pas rester l'un sur l'autre */
+  colles: Map<Acteur, number>;
 }
 
 const COULEURS = ['#ffd23f', '#ff2e93', '#00c2d1', '#ffffff'];
@@ -32,6 +37,9 @@ export const nouvelleChoregraphie = (): Choregraphie => ({
   folie: hasard(14, 20),
   finFolie: 0,
   etincelles: [],
+  derniereIdee: -1,
+  quand: -9,
+  colles: new Map(),
 });
 
 export function etincelles(c: Choregraphie, s: Scene, x: number, y: number, n = 10): void {
@@ -51,7 +59,11 @@ export function etincelles(c: Choregraphie, s: Scene, x: number, y: number, n = 
 
 /** Une nouvelle idée pour un acteur au repos. */
 function idee(c: Choregraphie, s: Scene, a: Acteur): void {
-  const r = Math.random();
+  // la même idée qu'un autre il y a moins de deux secondes : il en prend une autre (on ne voit jamais deux héros faire pareil ensemble)
+  let r = Math.random();
+  const genre = (x: number) => (x < 0.3 ? 0 : x < 0.5 ? 1 : x < 0.6 ? 2 : x < 0.7 ? 3 : x < 0.86 ? 4 : 5);
+  if (genre(r) === c.derniereIdee && c.t - c.quand < 2) r = (r + 0.35 + Math.random() * 0.3) % 1;
+  [c.derniereIdee, c.quand] = [genre(r), c.t];
   a.grimpe = false;
   a.minuteur = hasard(1.2, 3);
   const auSol = Math.abs(a.y - s.sol) < 1;
@@ -102,9 +114,27 @@ export function joue(c: Choregraphie, s: Scene, acteurs: Acteur[], dt: number): 
   for (const a of acteurs) {
     if (a.etat !== 'sol') continue;
     if (fou) {
-      // la folie : des sauts dans tous les sens, et ils ricochent sur les bords
+      // la folie : des sauts dans tous les sens, chacun à son moment (pas tous ensemble), et ils ricochent sur les bords
       if (a.tx === null || Math.random() < dt * 2) a.tx = Math.random() < 0.5 ? 0 : s.W;
-      saute(s, a, hasard(0.4, 1.1), (Math.random() < 0.5 ? -1 : 1) * s.hh * hasard(1.5, 3.5));
+      if (Math.random() < dt * 4)
+        saute(s, a, hasard(0.4, 1.1), (Math.random() < 0.5 ? -1 : 1) * s.hh * hasard(1.5, 3.5));
+      continue;
+    }
+    // superposé à un autre au repos, au même niveau : ils peuvent se croiser, mais au bout d'un moment l'un des deux s'écarte
+    const colle = acteurs.find(
+      (b) => b !== a && b.etat === 'sol' && Math.abs(b.y - a.y) < 2 && Math.abs(b.x - a.x) < s.hh * 0.45,
+    );
+    const duree = colle ? (c.colles.get(a) ?? 0) + dt : 0;
+    c.colles.set(a, duree);
+    if (colle && duree > 1.2 && a.tx === null && a.objectif === null) {
+      const sens = a.x === colle.x ? (Math.random() < 0.5 ? 1 : -1) : a.x > colle.x ? 1 : -1;
+      a.tx = Math.max(
+        s.hh * 0.2,
+        Math.min(s.W - s.hh * 0.2, a.x + sens * s.hh * (0.6 + Math.random() * 0.4)),
+      );
+      a.grimpe = false;
+      // l'autre reste où il est : son compte repart de zéro
+      c.colles.set(colle, 0);
       continue;
     }
     // un autre sur le chemin, à son niveau : il lui saute par-dessus

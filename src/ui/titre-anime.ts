@@ -201,7 +201,11 @@ export function silhouette(
   tampon.setTransform(1, 0, 0, 1, 0, 0);
   tampon.globalCompositeOperation = 'source-over';
   tampon.clearRect(0, 0, c.width, c.height);
-  tampon.translate(w / 2, h - 2);
+  // l'origine du tampon : les pieds de l'image (pas forcément son milieu : contre une paroi, ils sont près du bord côté mur),
+  // sinon l'image déborderait du tampon et serait rognée (le dos d'un héros qui grimpe)
+  const pied = (f.pied ?? f.w / 2) * echelle;
+  const ox = (versLaGauche ? f.w * echelle - pied : pied) + 2;
+  tampon.translate(ox, h - 2);
   if (versLaGauche) tampon.scale(-1, 1);
   tampon.scale(k, k);
   const dessine = aPart
@@ -215,7 +219,7 @@ export function silhouette(
     tampon.fillRect(0, 0, w, h);
   }
   ctx.globalAlpha = alpha;
-  ctx.drawImage(c, 0, 0, w, h, Math.round(x - w / 2), Math.round(y - h + 2), w, h);
+  ctx.drawImage(c, 0, 0, w, h, Math.round(x - ox), Math.round(y - h + 2), w, h);
   ctx.globalAlpha = 1;
   return true;
 }
