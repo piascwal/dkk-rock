@@ -55,15 +55,25 @@ function idee(c: Choregraphie, s: Scene, a: Acteur): void {
   a.grimpe = false;
   a.minuteur = hasard(1.2, 3);
   const auSol = Math.abs(a.y - s.sol) < 1;
-  if (r < 0.32) {
+  if (r < 0.3) {
+    // passer de l'autre côté de la scène : en marchant (le logo, les boutons l'arrêtent : il les escalade, passe par-dessus ou
+    // marche dessus), ou par le bord de l'écran, puis suspendu tout le long du haut de l'écran
+    a.objectif = a.x < s.W / 2 ? s.W * hasard(0.72, 0.95) : s.W * hasard(0.05, 0.28);
+    a.grimpe = true;
+    a.plafond = s.W / (1.3 * s.hh);
+    a.minuteur = 14; // sa patience : s'il n'y arrive pas, il abandonne
+    a.tx = Math.random() < 0.4 ? (a.x < s.W / 2 ? 0 : s.W) : a.objectif;
+    return;
+  }
+  if (r < 0.5) {
     // flâner un peu plus loin (et sauter du bloc s'il y est : il marche jusqu'au bord et tombe)
     a.tx = Math.max(s.hh * 0.2, Math.min(s.W - s.hh * 0.2, a.x + hasard(-2.5, 2.5) * s.hh));
-  } else if (r < 0.5) {
+  } else if (r < 0.6) {
     // grimper : au bord de l'écran le plus proche, ou au flanc d'un bloc (il y marche, le mur l'arrête, il grimpe)
     a.grimpe = true;
     a.plafond = hasard(1.2, 3);
     a.tx = Math.random() < 0.5 ? (a.x < s.W / 2 ? 0 : s.W) : a.x + (Math.random() < 0.5 ? -1 : 1) * s.W;
-  } else if (r < 0.62 && auSol) {
+  } else if (r < 0.7 && auSol) {
     // un grand saut vers le bloc le plus proche (le logo, souvent) : il atterrit dessus s'il y arrive
     const b = s.blocs.reduce<(typeof s.blocs)[number] | null>(
       (m, x) => (!m || Math.abs((x.x0 + x.x1) / 2 - a.x) < Math.abs((m.x0 + m.x1) / 2 - a.x) ? x : m),
@@ -73,7 +83,7 @@ function idee(c: Choregraphie, s: Scene, a: Acteur): void {
       const cible = Math.max(b.x0 + s.hh * 0.3, Math.min(b.x1 - s.hh * 0.3, a.x));
       saute(s, a, (s.sol - b.y0) / s.hh + 0.35, (cible - a.x) * 1.4);
     } else saute(s, a, 0.5);
-  } else if (r < 0.8) {
+  } else if (r < 0.86) {
     // sautiller sur place, en se retournant parfois
     saute(s, a, hasard(0.2, 0.45));
     if (Math.random() < 0.4) a.dir = a.dir > 0 ? -1 : 1;
@@ -108,6 +118,14 @@ export function joue(c: Choregraphie, s: Scene, acteurs: Acteur[], dt: number): 
           (b.x - a.x) * a.dir < s.hh * 0.5,
       );
       if (gene) saute(s, a, 0.75, a.dir * s.hh * 2.6);
+      continue;
+    }
+    // en route vers l'autre côté : il reprend sa marche après chaque saut, chute ou escalade
+    if (a.objectif !== null) {
+      a.minuteur -= dt;
+      if (Math.abs(a.x - a.objectif) < s.hh * 0.5 || a.minuteur <= 0)
+        [a.objectif, a.minuteur] = [null, hasard(0.5, 2)];
+      else [a.tx, a.grimpe] = [a.objectif, true];
       continue;
     }
     a.minuteur -= dt;

@@ -38,6 +38,8 @@ export interface Acteur {
   lance: boolean;
   /** le temps qui lui reste suspendu au haut de l'écran (s), et celui avant sa prochaine idée (chorégraphie) */
   plafond: number;
+  /** l'autre côté de la scène où il veut aller (null : nulle part) : il y va en grimpant, par-dessus ou suspendu au haut de l'écran */
+  objectif: number | null;
   minuteur: number;
   /** la hauteur de son image de tyrolienne (px) : suspendu, les poings sont à cette hauteur au-dessus des pieds */
   ht: number;
@@ -130,7 +132,9 @@ export function pas(s: Scene, a: Acteur, dt: number): void {
       if (appui(s, a.x, a.y) === null) a.etat = 'air';
     } else if (a.y - a.ht <= 0) {
       // les mains au haut de l'écran : il s'y suspend et part de l'autre côté
-      [a.etat, a.y, a.dir] = ['plafond', a.ht, a.cote === 1 ? -1 : 1];
+      // au bord de l'écran, il repart vers la scène ; au flanc d'un bloc trop haut pour y tenir, il passe par-dessus
+      [a.etat, a.y] = ['plafond', a.ht];
+      a.dir = a.surBord ? (a.cote === 1 ? -1 : 1) : a.cote;
       a.plafond = a.plafond || 2;
     }
     return;
@@ -138,7 +142,10 @@ export function pas(s: Scene, a: Acteur, dt: number): void {
   if (a.etat === 'plafond') {
     a.plafond -= dt;
     const nx = a.x + a.dir * SUSPENDU * hh * dt;
-    if (a.plafond <= 0 || nx - d < 0 || nx + d > s.W || bloque(s, nx, a.y)) lache(a);
+    // suspendu, il passe devant le logo et les boutons (il est dessiné par-dessus) ; il lâche au bout de son temps, au bord de
+    // l'écran, ou une fois arrivé au-dessus de l'endroit où il voulait aller
+    const arrive = a.objectif !== null && (nx - a.objectif) * a.dir >= 0;
+    if (a.plafond <= 0 || nx - d < 0 || nx + d > s.W || arrive) lache(a);
     else a.x = nx;
     return;
   }

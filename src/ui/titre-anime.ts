@@ -187,6 +187,8 @@ export function silhouette(
   e: number = ANIM.DEBOUT,
   /** une image à part à dessiner à la place de la planche (le saut d'un héros : `<nom>-saut`), si elle existe */
   image?: string,
+  /** la ligne de cette image (ses temps : la tyrolienne en a deux, qui se balancent) */
+  ligneImage = 0,
 ): boolean {
   const aPart = image ? FEUILLES_DECOR[image] : undefined;
   const f = aPart ?? FEUILLES[genre];
@@ -203,7 +205,7 @@ export function silhouette(
   if (versLaGauche) tampon.scale(-1, 1);
   tampon.scale(k, k);
   const dessine = aPart
-    ? dessineDecorFeuille(tampon, image!, 0) || dessineFeuille(tampon, genre, e, compteur, false)
+    ? dessineDecorFeuille(tampon, image!, ligneImage) || dessineFeuille(tampon, genre, e, compteur, false)
     : dessineFeuille(tampon, genre, e, compteur, false);
   if (!dessine) return false;
   if (ombre > 0) {

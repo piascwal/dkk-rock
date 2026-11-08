@@ -3,6 +3,7 @@ import { ANIM, G, type Genre } from '../jeu/vue';
 import { FEUILLES_DECOR } from '../rendu/feuilles-objets';
 import { projecteurs, rampe, silhouette } from './titre-anime';
 import { joue, nouvelleChoregraphie } from './titre-choregraphie';
+import { blocsDesEnceintes, dessineEnceintes, lePublic, type Spectateur } from './titre-decor';
 import { pas, sousLeDoigt, type Acteur, type Bloc, type Scene } from './titre-physique';
 
 /**
@@ -66,18 +67,21 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
   const c = nouvelleChoregraphie();
   let acteurs: Acteur[] = [];
   let [dernier, horloge, image] = [performance.now(), 0, 0];
-  const gens = Array.from({ length: 34 }, () => ({
+  const gens: Spectateur[] = Array.from({ length: 34 }, () => ({
     phase: Math.random() * 6,
     taille: 0.8 + Math.random() * 0.45,
-    bras: Math.random() < 0.7,
+    geste: Math.random() < 0.3 ? 'rien' : Math.random() < 0.5 ? 'poing' : 'cornes',
   }));
   let flashs: { x: number; y: number; t0: number }[] = [];
+  let pageBlocs: Bloc[] = [];
   const doigt = { a: null as Acteur | null, x: 0, y: 0, vx: 0, vy: 0, t: 0 };
 
   const mesure = (W: number, H: number) => {
     [s.W, s.H, s.sol] = [W, H, H * 0.9];
-    s.hh = Math.max(56, Math.min(H * 0.3, W / 5, 190));
-    if (image++ % 20 === 0) s.blocs = blocs(ecran);
+    s.hh = Math.max(50, Math.min(H * 0.26, W / 5.5, 170));
+    // les obstacles : le logo et les boutons (relus de la page de temps en temps), et les enceintes aux deux bords de la scène
+    if (image++ % 20 === 0) pageBlocs = blocs(ecran);
+    s.blocs = [...pageBlocs, ...blocsDesEnceintes(W, s.sol, s.hh)];
     const k = s.hh / 20;
     const ht = (nom: string) => {
       const f = FEUILLES_DECOR[`${nom}-tyrolienne`];
@@ -99,6 +103,7 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
         grimpe: false,
         lance: false,
         plafond: 0,
+        objectif: null,
         minuteur: 0.5 + i * 0.7,
         ht: ht(nom),
         phase: Math.random() * 4,
@@ -151,9 +156,11 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
     const temps = (horloge * BPM) / 60;
     const faisceaux = projecteurs(cf, W, H, horloge);
     rampe(cf, W, s.sol, temps);
+    dessineEnceintes(cf, W, s.sol, s.hh, temps);
     const k = s.hh / 20;
     for (const a of acteurs) {
-      if (a === doigt.a) [a.x, a.y] = [doigt.x, doigt.y + a.ht * 0.92];
+      // tenu au doigt : il pend un peu sous le doigt (le doigt ne le cache pas)
+      if (a === doigt.a) [a.x, a.y] = [doigt.x, doigt.y + a.ht * 0.92 + s.hh * 0.3];
       const lumiere = faisceaux.reduce((v, fx) => Math.max(v, 1 - Math.abs(fx - a.x) / (W * 0.12)), 0);
       const ombre = 0.28 * (1 - Math.max(0, lumiere));
       const marche = a.etat === 'sol' && a.tx !== null;
@@ -168,7 +175,9 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
       const compteur = marche
         ? Math.floor((horloge + a.phase) * 40)
         : (Math.floor((temps + a.phase) * 2) % 4) * 3;
-      silhouette(ca, tampon, a.genre, a.x, a.y, k, gauche, compteur, ombre, 1, e, image_);
+      // suspendu ou tenu : la tyrolienne se balance (ses deux temps)
+      const balance = Math.floor((horloge + a.phase) * 2.6) % 2;
+      silhouette(ca, tampon, a.genre, a.x, a.y, k, gauche, compteur, ombre, 1, e, image_, balance);
     }
     for (const e of c.etincelles) {
       ca.globalAlpha = Math.max(0, 1 - (c.t - e.t0) / 0.7);
@@ -220,52 +229,4 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
     if (!fige) requestAnimationFrame(anime);
   };
   requestAnimationFrame(anime);
-}
-
-/**
- * Le public, en bas de l'écran : une lueur de scène derrière lui, et des silhouettes bien noires qui se balancent, bras levés
- * au rythme, avec des flashs d'appareils photo.
- */
-function lePublic(
-  ctx: CanvasRenderingContext2D,
-  W: number,
-  H: number,
-  temps: number,
-  gens: { phase: number; taille: number; bras: boolean }[],
-  flashs: { x: number; y: number; t0: number }[],
-  horloge: number,
-): void {
-  const r0 = Math.max(8, H * 0.042);
-  const haut = H - r0 * 3.6;
-  const lueur = ctx.createLinearGradient(0, haut - r0, 0, H);
-  lueur.addColorStop(0, 'rgba(255, 90, 170, 0)');
-  lueur.addColorStop(0.45, 'rgba(255, 120, 190, 0.32)');
-  lueur.addColorStop(1, 'rgba(255, 210, 63, 0.18)');
-  ctx.fillStyle = lueur;
-  ctx.fillRect(0, haut - r0, W, H - haut + r0);
-  const pas_ = W / gens.length;
-  ctx.fillStyle = '#05030a';
-  gens.forEach((g, i) => {
-    const r = r0 * g.taille;
-    const x = pas_ * (i + 0.5) + Math.sin(g.phase * 3) * pas_ * 0.25;
-    const saut = Math.max(0, Math.sin(temps * Math.PI * 2 + g.phase)) * r * 0.35;
-    const tete = H - r * 1.9 - saut;
-    ctx.beginPath();
-    ctx.arc(x, tete, r, 0, Math.PI * 2);
-    ctx.fill();
-    // les épaules
-    ctx.fillRect(x - r * 1.5, tete + r * 0.8, r * 3, H - tete);
-    if (g.bras) {
-      const leve = Math.sin(temps * Math.PI + g.phase * 2) > -0.2;
-      const h = leve ? r * 2.6 : r * 1.4;
-      ctx.fillRect(x + r * 1.05, tete + r * 0.9 - h, r * 0.5, h);
-      ctx.fillRect(x + r * 0.95, tete + r * 0.9 - h - r * 0.3, r * 0.7, r * 0.5);
-    }
-  });
-  for (const f of flashs) {
-    ctx.globalAlpha = Math.max(0, 1 - (horloge - f.t0) / 0.25);
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(f.x - 3, f.y - 3, 6, 6);
-  }
-  ctx.globalAlpha = 1;
 }

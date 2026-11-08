@@ -44,8 +44,11 @@ En mode essai, l'écran titre passe **en scène** (`ui/titre-scene.ts`) : les ci
 de temps en temps quelques secondes de folie où tous sautent partout). Le logo et la colonne des boutons sont des obstacles
 (`ui/titre-physique.ts`) : ils les escaladent (image de mur), montent sur le logo, grimpent aux bords de l'écran et filent
 suspendus au haut de l'écran (image de tyrolienne) ; en l'air, leur image de saut. Au doigt (ou à la souris), on attrape un
-héros (il s'accroche, image de tyrolienne), on le lance, il rebondit sur tout ; les boutons restent à eux. Un public en ombres
-chinoises, rétroéclairé, lève les bras derrière les boutons, avec des flashs d'appareils photo.
+héros (il s'accroche sous le doigt, sa tyrolienne se balance), on le lance, il rebondit sur tout ; les boutons restent à eux.
+Pour changer de côté, ils passent par le haut de l'écran (suspendus, devant le logo et les boutons), escaladent le menu ou
+marchent sur le logo. Deux piles d'enceintes du jeu, aux bords de la scène, battent la mesure (on y grimpe). Un public en ombres
+chinoises, rétroéclairé, au premier plan (jamais sur les boutons ni le logo), lève le poing ou fait les cornes du rock, avec
+des flashs d'appareils photo (`ui/titre-decor.ts`).
 
 **L'entrée des boss** (`ui/entree-boss.ts`) : quand le Yéti Alpha, le Champion du FISE ou DJ Boucle se réveille, un éclair blanc,
 l'écran tremble, et un bandeau en travers de l'écran le présente en grand avec son nom en lettres qui tremblent et son titre
