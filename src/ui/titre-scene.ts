@@ -190,7 +190,8 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
     }
     const fige = qualite() === 'eco' || calme();
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const [W, H] = [avant.clientWidth, avant.clientHeight];
+    // la taille de l'écran (bornée : une toile mal placée qui grandirait d'elle-même ne doit jamais emporter la page)
+    const [W, H] = [Math.min(avant.clientWidth, 4096), Math.min(avant.clientHeight, 4096)];
     for (const t of [fond, avant])
       if (t.width !== Math.round(W * dpr) || t.height !== Math.round(H * dpr))
         [t.width, t.height] = [Math.round(W * dpr), Math.round(H * dpr)];
