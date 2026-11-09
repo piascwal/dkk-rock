@@ -260,6 +260,8 @@ export const FEUILLES_DECOR: Record<string, Feuille> = {
   menhir: { fichier: 'menhir.png', w: 112, h: 214, images: [1], rythme: 1, densite: 8, pied: 56 },
   poubelle: { fichier: 'poubelle.png', w: 66, h: 96, images: [1, 1], rythme: 1, densite: 6, pied: 33 },
   tonneau: { fichier: 'tonneau.png', w: 78, h: 95, images: [1], rythme: 1, densite: 6, pied: 39 },
+  // les sacs de jute (image fournie, rognée à sa silhouette) : posés sur leur base
+  sacs: { fichier: 'sacs.png', w: 88, h: 85, images: [1], rythme: 1, densite: 3.5, pied: 44 },
   cloture: { fichier: 'cloture.png', w: 167, h: 108, images: [1, 1, 1], rythme: 1, densite: 6, pied: 83 },
   boite: { fichier: 'boite.png', w: 66, h: 124, images: [1, 1], rythme: 1, densite: 6, pied: 33 },
   palmier: { fichier: 'palmier.png', w: 234, h: 271, images: [1, 1, 1], rythme: 1, densite: 6, pied: 117 },

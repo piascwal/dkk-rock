@@ -18,7 +18,7 @@ const PIERRE = ['#6d6d78', '#8a8a96', '#4c4c58'];
 const MATIERES: Partial<Record<string, { couleurs: string[]; haut: number }>> = {
   caisseDeco: { couleurs: BOIS, haut: 22 },
   etagere: { couleurs: [...BOIS, '#c1121f', '#2a6fdb', '#ffd23f'], haut: 24 },
-  sacs: { couleurs: ['#c9b27a', '#a58d57', '#e3d2a0'], haut: 12 },
+  sacs: { couleurs: ['#b6986d', '#8a6c4a', '#4e3926', '#553d27'], haut: 12 },
   enceinte34: { couleurs: ['#1a1a1a', '#3a3a44', '#8a8a96', ...NEON.slice(0, 1)], haut: 30 },
   enceinteDeco: { couleurs: ['#1a1a1a', '#3a3a44', '#8a8a96', ...NEON.slice(0, 1)], haut: 30 },
   enceinteRose: { couleurs: ['#1a1a1a', '#3a3a44', '#8a8a96', ...NEON.slice(0, 1)], haut: 21 },

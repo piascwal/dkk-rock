@@ -19,6 +19,7 @@ export type Sprite =
   | 'palmier'
   | 'arbre'
   | 'tonneau'
+  | 'sacs'
   | 'panneauFleche'
   | 'panneauNeige'
   | 'panneauLounge'
@@ -95,6 +96,7 @@ export const SPRITES: ReadonlySet<string> = new Set<Sprite>([
   'palmier',
   'arbre',
   'tonneau',
+  'sacs',
   'panneauFleche',
   'panneauNeige',
   'panneauLounge',
@@ -233,6 +235,7 @@ export function dessineSprite(
   if (quoi === 'palmier') return dessineDecorFeuille(ctx, 'palmier', v % 3, voile);
   if (quoi === 'arbre') return dessineDecorFeuille(ctx, 'arbre', v % 2, voile);
   if (quoi === 'tonneau') return dessineDecorFeuille(ctx, 'tonneau', 0, voile);
+  if (quoi === 'sacs') return dessineDecorFeuille(ctx, 'sacs', 0, voile);
   // une voiture est un élément clé : jamais voilée, pour qu'on reconnaisse son modèle
   if (quoi === 'voiture') return dessineDecorFeuille(ctx, 'voiture', v % 5);
   // les petits pots : cactus, pousse, plante retombante ; la grosse jardinière se réserve aux plantes d'intérieur
