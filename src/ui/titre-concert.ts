@@ -69,11 +69,31 @@ function places(s: Scene): Record<string, number> {
 
 const surLogo = (a: Acteur, logo: Bloc) =>
   a.etat === 'sol' && Math.abs(a.y - logo.y0) < 2 && a.x > logo.x0 && a.x < logo.x1;
-/** Assez de hauteur sous le logo pour sauter le frapper par-dessous (sinon, JBG monte dessus et saute à pieds joints). */
-const dessousLibre = (s: Scene, logo: Bloc) => s.sol - logo.y1 > s.hh * 1.6;
+/** Assez de sol libre sous le logo pour sauter le frapper par-dessous (pas de menu juste dessous, comme sur iPad). */
+const dessousLibre = (s: Scene, logo: Bloc) =>
+  s.sol - logo.y1 > s.hh * 1.6 &&
+  !s.blocs.some(
+    (o) => o !== logo && o.x1 > logo.x0 && o.x0 < logo.x1 && o.y0 > logo.y1 - 1 && o.y0 < s.sol - s.hh * 0.5,
+  );
+/** Assez de place entre le logo et le haut de l'écran pour s'y tenir debout (sinon, on s'y suspend). */
+const dessusLibre = (logo: Bloc, s: Scene) => logo.y0 > s.hh;
 
-/** JBG au travail sur le logo : par-dessous (sa tête y cogne), ou dessus (il y grimpe, puis saute à pieds joints). */
+/**
+ * JBG au travail sur le logo, selon la place : par-dessous (sa tête y cogne) ; dessus (il y grimpe, puis saute à pieds joints) ;
+ * ou, quand le logo est trop haut sous le plafond pour s'y tenir (iPad), suspendu au haut de l'écran : il se balance au-dessus du
+ * logo, d'un bord à l'autre, et lui donne des coups de pied.
+ */
 function attaqueLogo(co: Concert, b: Batterie, s: Scene, a: Acteur, logo: Bloc): void {
+  if (a.etat === 'plafond') {
+    a.plafond = Math.max(a.plafond, 1);
+    if (a.x > logo.x1 + s.hh * 0.3) a.dir = -1;
+    else if (a.x < logo.x0 - s.hh * 0.3) a.dir = 1;
+    if (a.x > logo.x0 && a.x < logo.x1 && b.t >= (co.saut.get(a) ?? 0)) {
+      frappe(co, b, s, a.x, Math.max(logo.y0, Math.min(logo.y1, a.y)));
+      co.saut.set(a, b.t + hasard(0.45, 0.8));
+    }
+    return;
+  }
   if (a.etat !== 'sol' || b.t < (co.saut.get(a) ?? 0)) return;
   const milieu = (logo.x0 + logo.x1) / 2;
   a.grimpe = false;
@@ -91,6 +111,11 @@ function attaqueLogo(co: Concert, b: Batterie, s: Scene, a: Acteur, logo: Bloc):
     const monte = Math.max(s.hh * 0.5, a.y - logo.y1 - s.hh * 0.8);
     saute(s, a, monte / s.hh, (cible - a.x) / Math.sqrt((2 * monte) / (PESANTEUR * s.hh)));
     co.saut.set(a, b.t + hasard(0.5, 1.1));
+  } else if (!dessusLibre(logo, s)) {
+    // pas la place debout dessus : il grimpe au bord de l'écran (sur l'enceinte, puis le long du bord) et s'y suspend
+    a.tx ??= a.x < s.W / 2 ? 0 : s.W;
+    [a.grimpe, a.plafond] = [true, 8];
+    return;
   } else {
     // il prend son élan à côté du logo, saute contre son flanc, l'escalade et monte dessus (titre-physique.ts)
     const droite = (s.menu ? s.menu.x0 : s.W) - logo.x1 > s.hh * 0.9;
