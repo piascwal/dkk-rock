@@ -48,6 +48,15 @@ export function activeJbtEssai(): void {
   FEUILLES_DECOR['jbt-mur'] = decor('mur', 105, 147, 73);
   FEUILLES_DECOR['jbt-echelle'] = decor('echelle', 84, 160, 42, [1, 1]);
   FEUILLES_DECOR['jbt-tyrolienne'] = decor('tyrolienne', 85, 158, 53);
+  // la batterie de l'écran titre en scène (ui/titre-batterie.ts) : seule, JBT qui en joue, puis qui la casse ; une image par ligne
+  FEUILLES_DECOR['batterie'] = {
+    fichier: 'batterie.png',
+    w: 256,
+    h: 247,
+    pied: 128,
+    images: Array(9).fill(1),
+    rythme: 1,
+  };
   // JBM aussi, un peu plus grand : sa planche et ses images à part
   const jbm = { ...FEUILLES[G.JBM]!, densite: DENSITE_JBM };
   FEUILLES[G.JBM] = jbm;

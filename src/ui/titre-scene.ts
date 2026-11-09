@@ -2,6 +2,13 @@ import { BPM } from '../config';
 import { ANIM, G, type Genre } from '../jeu/vue';
 import { FEUILLES_DECOR } from '../rendu/feuilles-objets';
 import { projecteurs, rampe, silhouette } from './titre-anime';
+import {
+  dessineBatterie,
+  dessineEffetsBatterie,
+  joueBatterie,
+  nouvelleBatterie,
+  placeBatterie,
+} from './titre-batterie';
 import { joue, nouvelleChoregraphie } from './titre-choregraphie';
 import { blocsDesEnceintes, dessineEnceintes, lePublic, type Spectateur } from './titre-decor';
 import { pas, sousLeDoigt, type Acteur, type Bloc, type Scene } from './titre-physique';
@@ -65,6 +72,7 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
   if (!cf || !ca) return;
   const s: Scene = { W: 0, H: 0, sol: 0, hh: 0, blocs: [] };
   const c = nouvelleChoregraphie();
+  const batterie = nouvelleBatterie();
   let acteurs: Acteur[] = [];
   let [dernier, horloge, image] = [performance.now(), 0, 0];
   const gens: Spectateur[] = Array.from({ length: 34 }, () => ({
@@ -82,6 +90,7 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
     // les obstacles : le logo et les boutons (relus de la page de temps en temps), et les enceintes aux deux bords de la scène
     if (image++ % 20 === 0) pageBlocs = blocs(ecran);
     s.blocs = [...pageBlocs, ...blocsDesEnceintes(W, s.sol, s.hh)];
+    placeBatterie(batterie, s);
     const k = s.hh / 20;
     const ht = (nom: string) => {
       const f = FEUILLES_DECOR[`${nom}-tyrolienne`];
@@ -157,8 +166,10 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
     const faisceaux = projecteurs(cf, W, H, horloge);
     rampe(cf, W, s.sol, temps);
     dessineEnceintes(cf, W, s.sol, s.hh, temps);
+    dessineBatterie(ca, batterie, s);
     const k = s.hh / 20;
     for (const a of acteurs) {
+      if (a.etat === 'batterie') continue;
       // tenu au doigt : il pend un peu sous le doigt (le doigt ne le cache pas)
       if (a === doigt.a) [a.x, a.y] = [doigt.x, doigt.y + a.ht * 0.92 + s.hh * 0.3];
       const lumiere = faisceaux.reduce((v, fx) => Math.max(v, 1 - Math.abs(fx - a.x) / (W * 0.12)), 0);
@@ -179,6 +190,7 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
       const balance = Math.floor((horloge + a.phase) * 2.6) % 2;
       silhouette(ca, tampon, a.genre, a.x, a.y, k, gauche, compteur, ombre, 1, e, image_, balance);
     }
+    dessineEffetsBatterie(ca, batterie, s);
     for (const e of c.etincelles) {
       ca.globalAlpha = Math.max(0, 1 - (c.t - e.t0) / 0.7);
       ca.fillStyle = e.couleur;
@@ -222,6 +234,7 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
       if (Math.random() < dt * 3)
         flashs.push({ x: Math.random() * W, y: H * (0.9 + Math.random() * 0.06), t0: horloge });
       flashs = flashs.filter((f) => horloge - f.t0 < 0.25);
+      joueBatterie(batterie, s, acteurs, dt);
       joue(c, s, acteurs, dt);
     }
     for (const a of acteurs) pas(s, a, dt);

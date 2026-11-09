@@ -6,7 +6,8 @@ import type { Genre } from '../jeu/vue';
  * rebondissent quand on les lance du doigt. Tout se mesure en pixels de l'écran ; `hh` est la hauteur d'un héros.
  */
 
-export type Etat = 'sol' | 'air' | 'mur' | 'plafond' | 'tenu';
+/** `batterie` : JBT joue de la batterie (titre-batterie.ts) ; le héros n'est plus sur la scène. */
+export type Etat = 'sol' | 'air' | 'mur' | 'plafond' | 'tenu' | 'batterie';
 
 /** Un obstacle de la page (le logo, la colonne des boutons), en pixels de la toile. */
 export interface Bloc {
@@ -100,7 +101,7 @@ const lache = (a: Acteur): void => {
 export function pas(s: Scene, a: Acteur, dt: number): void {
   const d = demi(s);
   const hh = s.hh;
-  if (a.etat === 'tenu') return;
+  if (a.etat === 'tenu' || a.etat === 'batterie') return;
   // dans un bloc (posé là au départ, la page a bougé, ou lâché du doigt dedans) : il en sort par le côté le plus proche
   const dedans = a.etat === 'sol' || a.etat === 'air' ? bloque(s, a.x, a.y) : null;
   if (dedans) a.x = a.x - dedans.x0 < dedans.x1 - a.x ? dedans.x0 - d - 1 : dedans.x1 + d + 1;
@@ -188,6 +189,7 @@ export function pas(s: Scene, a: Acteur, dt: number): void {
 export function sousLeDoigt(s: Scene, acteurs: Acteur[], x: number, y: number): Acteur | null {
   for (let i = acteurs.length - 1; i >= 0; i--) {
     const a = acteurs[i]!;
+    if (a.etat === 'batterie') continue;
     const haut = a.etat === 'plafond' || a.etat === 'tenu' ? a.y - a.ht : a.y - s.hh;
     if (Math.abs(x - a.x) < s.hh * 0.35 && y > haut && y < a.y) return a;
   }
