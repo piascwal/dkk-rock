@@ -59,6 +59,16 @@ export function activeJbtEssai(): void {
     rythme: 1,
     densite: 5.45,
   };
+  // Tom qui casse sa guitare : brandie, écrasée, en morceaux (sa tête y est plus petite : densité 4,6 pour sa taille de jeu)
+  FEUILLES_DECOR['tom-guitare'] = {
+    fichier: 'tom-guitare.png',
+    w: 112,
+    h: 132,
+    pied: 59,
+    images: [1, 1, 1],
+    rythme: 1,
+    densite: 4.6,
+  };
   FEUILLES_DECOR['batterie'] = {
     fichier: 'batterie.png',
     w: 256,

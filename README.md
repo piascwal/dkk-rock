@@ -53,9 +53,11 @@ des flashs d'appareils photo (`ui/titre-decor.ts`). Une batterie sur son estrade
 (notes qui s'envolent, cymbales qui scintillent), s'emballe, puis pète un câble : la grosse caisse se fend, crève, il la soulève,
 arrache le charleston et le lance ; éclats et baguettes volent, un nuage de fumée, la batterie est comme neuve et JBT en ressort
 d'un bond. Ses images : `public/sprites/batterie.png` (`outils/prepare-batterie.py`, chargée seulement en mode essai). Pendant ce
-temps (`ui/titre-concert.ts`), les autres se rangent à gauche du menu : quand JBT casse tout, Mat lève sa basse, l'écrase et la
-casse (`mat-basse.png`, `outils/prepare-mat-basse.py`), Tom et JBG frappent le logo (par-dessous, ou montés dessus à pieds
-joints) qui se fissure et penche, JBM saute en l'air ; la fumée remet tout en état.
+temps (`ui/titre-concert.ts`), les autres se rangent à gauche du menu ; Mat et Tom montent sur une estrade qui sort du sol.
+Quand JBT casse tout, Mat lève sa basse, l'écrase et la casse, Tom brandit sa guitare, l'écrase et la laisse en morceaux
+(`mat-basse.png`, `tom-guitare.png`, `outils/prepare-casse.py`), JBG casse le logo morceau par morceau (`ui/titre-logo-casse.ts` :
+un masque CSS retire les cases une à une, elles volent en éclats), JBM saute en l'air ; la fumée remet tout en état, le logo
+revient d'un bloc. Le logo est un peu plus petit sur la scène.
 
 **L'entrée des boss** (`ui/entree-boss.ts`) : quand le Yéti Alpha, le Champion du FISE ou DJ Boucle se réveille, un éclair blanc,
 l'écran tremble, et un bandeau en travers de l'écran le présente en grand avec son nom en lettres qui tremblent et son titre

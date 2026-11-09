@@ -2,14 +2,9 @@ import { BPM } from '../config';
 import { ANIM, G, type Genre } from '../jeu/vue';
 import { FEUILLES_DECOR } from '../rendu/feuilles-objets';
 import { projecteurs, rampe, silhouette } from './titre-anime';
-import {
-  dessineBatterie,
-  dessineEffetsBatterie,
-  joueBatterie,
-  nouvelleBatterie,
-  placeBatterie,
-} from './titre-batterie';
+import { dessineBatterie, joueBatterie, nouvelleBatterie, placeBatterie } from './titre-batterie';
 import { joue, nouvelleChoregraphie } from './titre-choregraphie';
+import { dessineEclats } from './titre-eclats';
 import { dessineConcert, joueConcert, nouveauConcert } from './titre-concert';
 import { blocsDesEnceintes, dessineEnceintes, lePublic, type Spectateur } from './titre-decor';
 import { pas, sousLeDoigt, type Acteur, type Bloc, type Scene } from './titre-physique';
@@ -83,14 +78,14 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
     geste: Math.random() < 0.3 ? 'rien' : Math.random() < 0.5 ? 'poing' : 'cornes',
   }));
   let flashs: { x: number; y: number; t0: number }[] = [];
-  const doigt = { a: null as Acteur | null, x: 0, y: 0, vx: 0, vy: 0, t: 0 };
+  // `dy` : où sont ses pieds sous le doigt (d'abord là où on l'a pris, puis il glisse jusqu'à pendre sous le doigt)
+  const doigt = { a: null as Acteur | null, x: 0, y: 0, vx: 0, vy: 0, t: 0, dy: 0 };
 
   const mesure = (W: number, H: number) => {
     [s.W, s.H, s.sol] = [W, H, H * 0.9];
     s.hh = Math.max(50, Math.min(H * 0.26, W / 5.5, 170));
     // les obstacles : le logo et les boutons (relus de la page de temps en temps), et les enceintes aux deux bords de la scène
-    // (pas pendant que le logo est cassé : il penche, sa boîte grandirait et pousserait ceux qui sont dessus)
-    if (image++ % 20 === 0 && !concert.degats) Object.assign(s, blocs(ecran));
+    if (image++ % 20 === 0) Object.assign(s, blocs(ecran));
     s.blocs = [...[s.logo, s.menu].filter((b) => b !== null), ...blocsDesEnceintes(W, s.sol, s.hh)];
     placeBatterie(batterie, s);
     const k = s.hh / 20;
@@ -121,6 +116,7 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
         dirige: false,
         pose: null,
         poseLigne: 0,
+        hausse: 0,
       }));
     acteurs.forEach((a) => (a.ht = ht(a.nom)));
   };
@@ -136,8 +132,8 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
     if (!a) return;
     e.preventDefault();
     e.stopPropagation();
-    Object.assign(doigt, { a, x, y, vx: 0, vy: 0, t: performance.now() });
-    [a.etat, a.tx, a.lance] = ['tenu', null, false];
+    Object.assign(doigt, { a, x, y, vx: 0, vy: 0, t: performance.now(), dy: a.y - a.hausse - y });
+    [a.etat, a.tx, a.lance, a.y, a.hausse] = ['tenu', null, false, a.y - a.hausse, 0];
   };
   const bouge = (e: PointerEvent) => {
     if (!doigt.a) return;
@@ -161,7 +157,14 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
     window.addEventListener('click', bloqueClic, { capture: true, once: true });
     setTimeout(() => window.removeEventListener('click', bloqueClic, { capture: true }), 400);
   };
+  // au toucher, l'écran défile verticalement : un héros tiré vers le haut, le navigateur croirait à un défilement et lâcherait
+  // le doigt (pointercancel) ; tant qu'un héros est tenu, pas de défilement
+  const retient = (e: TouchEvent) => doigt.a && e.preventDefault();
   ecran.addEventListener('pointerdown', appuie, { capture: true });
+  ecran.addEventListener('touchstart', retient, { capture: true, passive: false });
+  ecran.addEventListener('touchmove', retient, { capture: true, passive: false });
+  // le logo un peu plus petit sur la scène (style.css)
+  document.body.classList.add('titre-en-scene');
   window.addEventListener('pointermove', bouge);
   window.addEventListener('pointerup', relache);
   window.addEventListener('pointercancel', relache);
@@ -172,14 +175,16 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
     rampe(cf, W, s.sol, temps);
     dessineEnceintes(cf, W, s.sol, s.hh, temps);
     dessineBatterie(ca, batterie, s);
-    dessineConcert(ca, concert, s);
+    dessineConcert(ca, batterie, s, acteurs);
     const k = s.hh / 20;
     for (const a of acteurs) {
       if (a.etat === 'batterie') continue;
       // tenu au doigt : il pend un peu sous le doigt (le doigt ne le cache pas)
       // (jamais sous la scène : attrapé au sol, il y reste tant que le doigt ne le soulève pas)
-      if (a === doigt.a)
-        [a.x, a.y] = [Math.max(0, Math.min(W, doigt.x)), Math.min(s.sol, doigt.y + a.ht * 0.92 + s.hh * 0.3)];
+      if (a === doigt.a) {
+        doigt.dy += (a.ht * 0.92 + s.hh * 0.3 - doigt.dy) * 0.06;
+        [a.x, a.y] = [Math.max(0, Math.min(W, doigt.x)), Math.min(s.sol, doigt.y + doigt.dy)];
+      }
       const lumiere = faisceaux.reduce((v, fx) => Math.max(v, 1 - Math.abs(fx - a.x) / (W * 0.12)), 0);
       const ombre = 0.28 * (1 - Math.max(0, lumiere));
       const marche = a.etat === 'sol' && a.tx !== null;
@@ -203,7 +208,7 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
         tampon,
         a.genre,
         a.x,
-        a.y,
+        a.y - a.hausse,
         k,
         gauche,
         compteur,
@@ -214,7 +219,7 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
         a.pose ? a.poseLigne : balance,
       );
     }
-    dessineEffetsBatterie(ca, batterie, s);
+    dessineEclats(ca, batterie, s);
     for (const e of c.etincelles) {
       ca.globalAlpha = Math.max(0, 1 - (c.t - e.t0) / 0.7);
       ca.fillStyle = e.couleur;
@@ -234,6 +239,9 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
   const anime = (maintenant: number) => {
     if (!avant.isConnected) {
       ecran.removeEventListener('pointerdown', appuie, { capture: true });
+      ecran.removeEventListener('touchstart', retient, { capture: true });
+      ecran.removeEventListener('touchmove', retient, { capture: true });
+      if (!document.querySelector('.titre-avant')) document.body.classList.remove('titre-en-scene');
       window.removeEventListener('pointermove', bouge);
       window.removeEventListener('pointerup', relache);
       window.removeEventListener('pointercancel', relache);

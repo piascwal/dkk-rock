@@ -288,6 +288,11 @@ body:has(#ecran:not(:empty)) .fil-elim {
   box-shadow: 0 0 0 4px #000;
 }
 
+/* l'écran titre en scène (mode essai) : le logo un peu plus petit, la place aux héros */
+.titre-en-scene .logo {
+  font-size: clamp(2.6rem, 13vh, 6rem);
+}
+
 .slogan {
   font-family: var(--titre);
   color: var(--jaune);

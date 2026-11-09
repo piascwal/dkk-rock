@@ -50,6 +50,8 @@ export interface Acteur {
   dirige: boolean;
   pose: string | null;
   poseLigne: number;
+  /** monté sur une estrade (titre-concert.ts) : dessiné de tant de pixels plus haut */
+  hausse: number;
 }
 
 export interface Scene {
@@ -198,8 +200,9 @@ export function sousLeDoigt(s: Scene, acteurs: Acteur[], x: number, y: number): 
   for (let i = acteurs.length - 1; i >= 0; i--) {
     const a = acteurs[i]!;
     if (a.etat === 'batterie') continue;
-    const haut = a.etat === 'plafond' || a.etat === 'tenu' ? a.y - a.ht : a.y - s.hh;
-    if (Math.abs(x - a.x) < s.hh * 0.35 && y > haut && y < a.y) return a;
+    const pieds = a.y - a.hausse;
+    const haut = a.etat === 'plafond' || a.etat === 'tenu' ? pieds - a.ht : pieds - s.hh;
+    if (Math.abs(x - a.x) < s.hh * 0.35 && y > haut && y < pieds) return a;
   }
   return null;
 }
