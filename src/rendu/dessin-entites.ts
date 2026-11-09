@@ -22,6 +22,7 @@ import { dessineGrenadeOM } from './grenade-om';
 import { dessineGrosseCaisse } from './grosse-caisse';
 import { essaiJbt } from './essai-jbt';
 import { imageEnLair } from './en-lair';
+import { dessineMurPlie, pliEnJeu } from './mur-anime';
 import { pinceau, type Pinceau } from './pinceau';
 import { ecritCentre } from './police';
 import { dessineRockerConverti } from './rockers-convertis';
@@ -58,16 +59,19 @@ const COLLE_AU_MUR = 1.5;
 const PENCHE_MUR: Partial<Record<number, { angle: number; x: number; y: number }>> = {
   [G.JBG]: { angle: 0.12, x: 4.2, y: -8 },
 };
-function imageMur(ctx: CanvasRenderingContext2D, nom: string, genre: number): boolean {
+function imageMur(ctx: CanvasRenderingContext2D, nom: string, v: EntiteVue): boolean {
   ctx.save();
   ctx.translate(COLLE_AU_MUR, 0);
-  const p = PENCHE_MUR[genre];
+  const p = PENCHE_MUR[v.g];
   if (p) {
     ctx.translate(p.x, p.y);
     ctx.rotate(p.angle);
     ctx.translate(-p.x, -p.y);
   }
-  const dessine = dessineDecorFeuille(ctx, nom, 0);
+  // à l'essai : l'image vit (mur-anime.ts)
+  const dessine = essaiJbt.actif
+    ? dessineMurPlie(ctx, nom, pliEnJeu(v.id, v.y))
+    : dessineDecorFeuille(ctx, nom, 0);
   ctx.restore();
   return dessine;
 }
@@ -214,7 +218,7 @@ export function dessineEntite(
   if (pend) ctx.translate(0, pend);
   if (imageSaut && dessineDecorFeuille(ctx, imageSaut, ligneSaut)) {
     // en l'air : une image par héros, avec son instrument
-  } else if (v.e === ANIM.MUR && heros !== undefined && imageMur(ctx, `${NOMS_HEROS[v.g]}-mur`, v.g)) {
+  } else if (v.e === ANIM.MUR && heros !== undefined && imageMur(ctx, `${NOMS_HEROS[v.g]}-mur`, v)) {
     // accroché à une paroi : une image par héros, de profil face à elle (les héros qui n'en ont pas encore gardent leur planche)
   } else if (imagesEchelle && dessineDecorFeuille(ctx, imagesEchelle, (compteur >> 2) & 1)) {
     // de dos sur une échelle : deux images qui alternent, à la montée comme à la descente (la phase ne bouge qu'avec le joystick)

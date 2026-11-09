@@ -103,6 +103,36 @@ export function dessineDecorFeuille(
   return true;
 }
 
+/**
+ * Une image du décor déformée en hauteur (l'escalade animée, mur-anime.ts) : coupée à `coupe` (fraction de la hauteur, depuis le
+ * haut), le haut descend de `haut` pixels du jeu, les pieds remontent de `-bas` ; le bas de l'image se tasse entre les deux.
+ */
+export function dessineDecorEtire(
+  ctx: CanvasRenderingContext2D,
+  nom: string,
+  ligne: number,
+  haut: number,
+  bas: number,
+  coupe: number,
+): boolean {
+  const f = FEUILLES_DECOR[nom];
+  const img = imagesDecor.get(nom);
+  if (!f || !img) return false;
+  const d = f.densite ?? 1;
+  const k = (f.echelle ?? 1) / d;
+  const { a, b } = ctx.getTransform();
+  ctx.imageSmoothingEnabled = Math.hypot(a, b) < d;
+  ctx.imageSmoothingQuality = 'high';
+  const sy = rangeeDeLaPlanche(f, ligne % f.images.length) * f.h;
+  const hs = Math.round(f.h * coupe);
+  const [x, y, l] = [-(f.pied ?? f.w / 2) * k, -f.h * k + haut, f.w * k];
+  // le bas d'abord, tassé ; le haut, intact, par-dessus (il recouvre la couture d'un demi-pixel)
+  ctx.drawImage(img, 0, sy + hs, f.w, f.h - hs, x, y + hs * k, l, (f.h - hs) * k + bas - haut);
+  ctx.drawImage(img, 0, sy, f.w, hs + 1, x, y, l, (hs + 1) * k);
+  ctx.imageSmoothingEnabled = false;
+  return true;
+}
+
 /** La force du voile du plan de fond (0 : aucun, 1 : tout à la couleur du lointain). Réglable en direct : voir ui/curseur-voile.ts. */
 export const reglageVoile = { force: 0.32 };
 export const FORCE_VOILE_MAX = 0.8;

@@ -3,6 +3,7 @@ import { ANIM, G, type Genre } from '../jeu/vue';
 import { FEUILLES } from '../rendu/feuilles';
 import { dessineDecorFeuille, dessineFeuille } from '../rendu/feuilles-images';
 import { FEUILLES_DECOR } from '../rendu/feuilles-objets';
+import { dessineMurPlie } from '../rendu/mur-anime';
 
 /**
  * L'écran titre vivant, derrière le logo et les boutons (une toile sous le menu, qui ne prend aucun clic) :
@@ -189,6 +190,8 @@ export function silhouette(
   image?: string,
   /** la ligne de cette image (ses temps : la tyrolienne en a deux, qui se balancent) */
   ligneImage = 0,
+  /** contre une paroi : le pli de l'escalade animée (rendu/mur-anime.ts) */
+  pli = 0,
 ): boolean {
   const aPart = image ? FEUILLES_DECOR[image] : undefined;
   const f = aPart ?? FEUILLES[genre];
@@ -209,7 +212,8 @@ export function silhouette(
   if (versLaGauche) tampon.scale(-1, 1);
   tampon.scale(k, k);
   const dessine = aPart
-    ? dessineDecorFeuille(tampon, image!, ligneImage) || dessineFeuille(tampon, genre, e, compteur, false)
+    ? (pli ? dessineMurPlie(tampon, image!, pli) : dessineDecorFeuille(tampon, image!, ligneImage)) ||
+      dessineFeuille(tampon, genre, e, compteur, false)
     : dessineFeuille(tampon, genre, e, compteur, false);
   if (!dessine) return false;
   if (ombre > 0) {

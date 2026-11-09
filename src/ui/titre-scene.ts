@@ -1,6 +1,7 @@
 import { BPM } from '../config';
 import { ANIM, G, type Genre } from '../jeu/vue';
 import { FEUILLES_DECOR } from '../rendu/feuilles-objets';
+import { pliRegulier } from '../rendu/mur-anime';
 import { projecteurs, rampe, silhouette } from './titre-anime';
 import { dessineBatterie, joueBatterie, nouvelleBatterie, placeBatterie } from './titre-batterie';
 import { joue, nouvelleChoregraphie } from './titre-choregraphie';
@@ -223,6 +224,8 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
         e,
         image_,
         a.pose ? a.poseLigne : balance,
+        // il grimpe : son image de paroi vit (rendu/mur-anime.ts)
+        a.etat === 'mur' ? pliRegulier(horloge + a.phase) : 0,
       );
     }
     dessineEclats(ca, batterie, s);
