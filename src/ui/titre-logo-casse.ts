@@ -91,6 +91,9 @@ export function tremble(l: LogoCasse, dt: number, ampleur: number): void {
       : '';
 }
 
+/** Plus aucune case : le logo n'existe plus (on ne peut plus monter dessus ni le frapper). */
+export const detruit = (l: LogoCasse): boolean => l.pieces.every((p) => p.restantes.size === 0);
+
 /** Le logo d'un seul bloc, comme neuf. */
 export function repare(l: LogoCasse): void {
   for (const p of l.pieces) {

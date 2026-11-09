@@ -29,15 +29,18 @@ const BATTEMENT = 60 / BPM;
 const ESTRADE = 0.3;
 const LOGO = ['#fff4d6', '#00c2d1', '#ff2e93', '#ffd23f', '#000000', '#c4172c', '#0b6e4f'];
 /** Les couleurs des éclats de la basse de Mat et de la guitare de Tom, et leurs images (une par étape de la casse). */
-const INSTRUMENTS: Record<string, { image: string; lignes: number[]; eclats: string[] }> = {
+const INSTRUMENTS: Record<string, { image: string; lignes: number[]; bas: number; eclats: string[] }> = {
+  // `bas` : ce que l'image garde de vide (éclats) sous les pieds, en pixels du jeu : on la descend d'autant pour qu'il pose le pied
   mat: {
     image: 'mat-basse',
     lignes: [-1, 0, 1, 2, 3, 3],
+    bas: 3 / 5.45,
     eclats: ['#c8641e', '#7a2a10', '#f0e8c8', '#2a1a10'],
   },
   tom: {
     image: 'tom-guitare',
     lignes: [-1, -1, 0, 1, 2, 2],
+    bas: 16 / 4.6,
     eclats: ['#e08a2a', '#a04a14', '#f2e2b8', '#2a2440'],
   },
 };
@@ -51,6 +54,10 @@ export const nouveauConcert = (ecran: HTMLElement): Concert => ({
   saut: new Map(),
   casse: new Map(),
 });
+
+/** De combien (pixels du jeu) on descend l'image à part d'un musicien pour que ses pieds touchent l'estrade. */
+export const enfonce = (a: Acteur): number =>
+  a.pose ? (Object.values(INSTRUMENTS).find((i) => i.image === a.pose)?.bas ?? 0) : 0;
 
 /** Où se range chacun, à gauche du menu, de gauche à droite : Mat, Tom, JBG, JBM. */
 function places(s: Scene): Record<string, number> {

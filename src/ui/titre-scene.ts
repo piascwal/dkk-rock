@@ -5,7 +5,8 @@ import { projecteurs, rampe, silhouette } from './titre-anime';
 import { dessineBatterie, joueBatterie, nouvelleBatterie, placeBatterie } from './titre-batterie';
 import { joue, nouvelleChoregraphie } from './titre-choregraphie';
 import { dessineEclats } from './titre-eclats';
-import { dessineConcert, joueConcert, nouveauConcert } from './titre-concert';
+import { dessineConcert, enfonce, joueConcert, nouveauConcert } from './titre-concert';
+import { detruit as logoDetruit } from './titre-logo-casse';
 import { blocsDesEnceintes, dessineEnceintes, lePublic, type Spectateur } from './titre-decor';
 import { pas, sousLeDoigt, type Acteur, type Bloc, type Scene } from './titre-physique';
 
@@ -72,6 +73,7 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
   const concert = nouveauConcert(ecran);
   let acteurs: Acteur[] = [];
   let [dernier, horloge, image] = [performance.now(), 0, 0];
+  let logoAbsent = false;
   const gens: Spectateur[] = Array.from({ length: 34 }, () => ({
     phase: Math.random() * 6,
     taille: 0.8 + Math.random() * 0.45,
@@ -85,7 +87,11 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
     [s.W, s.H, s.sol] = [W, H, H * 0.9];
     s.hh = Math.max(50, Math.min(H * 0.26, W / 5.5, 170));
     // les obstacles : le logo et les boutons (relus de la page de temps en temps), et les enceintes aux deux bords de la scène
-    if (image++ % 20 === 0) Object.assign(s, blocs(ecran));
+    // le logo cassé n'existe plus : ni obstacle, ni perchoir (les héros dessus tombent) ; réparé, on le relit tout de suite
+    const gone = logoDetruit(concert.logo);
+    if (image++ % 20 === 0 || (logoAbsent && !gone)) Object.assign(s, blocs(ecran));
+    logoAbsent = gone;
+    if (gone) s.logo = null;
     s.blocs = [...[s.logo, s.menu].filter((b) => b !== null), ...blocsDesEnceintes(W, s.sol, s.hh)];
     placeBatterie(batterie, s);
     const k = s.hh / 20;
@@ -208,7 +214,7 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
         tampon,
         a.genre,
         a.x,
-        a.y - a.hausse,
+        a.y - a.hausse + enfonce(a) * k,
         k,
         gauche,
         compteur,

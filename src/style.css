@@ -293,6 +293,13 @@ body:has(#ecran:not(:empty)) .fil-elim {
   font-size: clamp(2.6rem, 13vh, 6rem);
 }
 
+/* et un peu plus haut (le logo et son slogan, d'un bloc) : plus de place dessous pour les héros */
+.titre-en-scene .logo,
+.titre-en-scene .slogan {
+  position: relative;
+  top: -5vh;
+}
+
 .slogan {
   font-family: var(--titre);
   color: var(--jaune);
