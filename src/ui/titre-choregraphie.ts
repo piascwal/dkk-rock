@@ -112,7 +112,7 @@ export function joue(c: Choregraphie, s: Scene, acteurs: Acteur[], dt: number): 
   if (c.t >= c.folie && c.finFolie < c.folie) c.finFolie = c.t + 3.2;
   if (c.t >= c.finFolie && c.finFolie > c.folie) [c.folie, c.finFolie] = [c.t + hasard(16, 24), 0];
   for (const a of acteurs) {
-    if (a.etat !== 'sol') continue;
+    if (a.etat !== 'sol' || a.dirige) continue;
     if (fou) {
       // la folie : des sauts dans tous les sens, chacun à son moment (pas tous ensemble), et ils ricochent sur les bords
       if (a.tx === null || Math.random() < dt * 2) a.tx = Math.random() < 0.5 ? 0 : s.W;

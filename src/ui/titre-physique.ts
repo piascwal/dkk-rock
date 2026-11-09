@@ -46,6 +46,10 @@ export interface Acteur {
   ht: number;
   /** décalage de son animation (ils ne bougent pas tous ensemble) */
   phase: number;
+  /** dirigé par la mise en scène (titre-concert.ts) : la chorégraphie le laisse faire ; et l'image qu'il tient alors au sol */
+  dirige: boolean;
+  pose: string | null;
+  poseLigne: number;
 }
 
 export interface Scene {
@@ -54,6 +58,9 @@ export interface Scene {
   sol: number;
   hh: number;
   blocs: Bloc[];
+  /** le logo (avec son slogan) et la colonne des boutons, parmi les blocs */
+  logo: Bloc | null;
+  menu: Bloc | null;
 }
 
 /** En hauteurs de héros : pesanteur (par s²), marche, escalade, déplacement suspendu (par s). */
@@ -150,7 +157,8 @@ export function pas(s: Scene, a: Acteur, dt: number): void {
     else a.x = nx;
     return;
   }
-  // en l'air
+  // en l'air (lâché sous la scène : remis dessus, il s'y pose)
+  if (a.y > s.sol) a.y = s.sol;
   a.vy += PESANTEUR * hh * dt;
   const nx = a.x + a.vx * dt;
   const bord = nx - d < 0 || nx + d > s.W;

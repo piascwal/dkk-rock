@@ -124,6 +124,51 @@ function eclats(b: Batterie, s: Scene, couleurs: string[], n: number): void {
   }
 }
 
+/** Une gerbe d'éclats qui jaillit de (x, y) (les autres casseurs : titre-concert.ts). */
+export function gerbe(b: Batterie, s: Scene, x: number, y: number, couleurs: string[], n: number): void {
+  for (let i = 0; i < n; i++) {
+    const a = hasard(-Math.PI * 0.95, -Math.PI * 0.05);
+    const v = s.hh * hasard(1.5, 4);
+    const couleur = couleurs[i % couleurs.length]!;
+    lance(b, {
+      x,
+      y,
+      vx: Math.cos(a) * v,
+      vy: Math.sin(a) * v,
+      vie: 1.2,
+      couleur,
+      forme: 'eclat',
+      taille: hasard(1.5, 3),
+    });
+  }
+}
+
+/** Un nuage de fumée sur un rectangle de l'écran. */
+export function nuage(
+  b: Batterie,
+  s: Scene,
+  x0: number,
+  y0: number,
+  x1: number,
+  y1: number,
+  n: number,
+): void {
+  for (let i = 0; i < n; i++) {
+    const [vx, vy] = [hasard(-0.6, 0.6) * s.hh, hasard(-0.7, -0.1) * s.hh];
+    const [x, y] = [hasard(x0, x1), hasard(y0, y1)];
+    lance(b, {
+      x,
+      y,
+      vx,
+      vy,
+      vie: hasard(1, 1.6),
+      couleur: '#c8c0d0',
+      forme: 'fumee',
+      taille: s.hh * hasard(0.15, 0.3),
+    });
+  }
+}
+
 function fumee(b: Batterie, s: Scene, n: number): void {
   for (let i = 0; i < n; i++) {
     const [x, y] = ecran(b, s, hasard(30, 226), hasard(60, 230));
@@ -206,14 +251,7 @@ export function joueBatterie(b: Batterie, s: Scene, acteurs: Acteur[], dt: numbe
       [b.phase, b.attente] = ['attente', hasard(6, 10)];
     return;
   }
-  // le spectacle : les autres ne restent pas plantés devant (ils laissent la place au batteur)
-  const demi = (LARGEUR / 2) * b.k + s.hh * 0.2;
-  for (const a of acteurs)
-    if (a !== jbt && a.etat === 'sol' && a.tx === null && a.objectif === null && Math.abs(a.x - b.x) < demi)
-      a.tx = Math.max(
-        s.hh * 0.2,
-        Math.min(s.W - s.hh * 0.2, b.x + (a.x < b.x ? -1 : 1) * (demi + s.hh * 0.3)),
-      );
+  // le spectacle (les autres : titre-concert.ts)
   const etape = ETAPES.findIndex((e) => b.t < e.fin);
   if (etape !== b.etape && etape >= 0) {
     b.etape = etape;

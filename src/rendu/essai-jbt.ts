@@ -49,6 +49,16 @@ export function activeJbtEssai(): void {
   FEUILLES_DECOR['jbt-echelle'] = decor('echelle', 84, 160, 42, [1, 1]);
   FEUILLES_DECOR['jbt-tyrolienne'] = decor('tyrolienne', 85, 158, 53);
   // la batterie de l'écran titre en scène (ui/titre-batterie.ts) : seule, JBT qui en joue, puis qui la casse ; une image par ligne
+  // Mat qui casse sa basse, pendant ce temps (ui/titre-concert.ts) : joue, lève, écrase, cassée ; Mat y fait sa taille de jeu
+  FEUILLES_DECOR['mat-basse'] = {
+    fichier: 'mat-basse.png',
+    w: 101,
+    h: 121,
+    pied: 46,
+    images: [1, 1, 1, 1],
+    rythme: 1,
+    densite: 5.45,
+  };
   FEUILLES_DECOR['batterie'] = {
     fichier: 'batterie.png',
     w: 256,

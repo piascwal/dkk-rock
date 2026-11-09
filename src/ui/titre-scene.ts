@@ -10,6 +10,7 @@ import {
   placeBatterie,
 } from './titre-batterie';
 import { joue, nouvelleChoregraphie } from './titre-choregraphie';
+import { dessineConcert, joueConcert, nouveauConcert } from './titre-concert';
 import { blocsDesEnceintes, dessineEnceintes, lePublic, type Spectateur } from './titre-decor';
 import { pas, sousLeDoigt, type Acteur, type Bloc, type Scene } from './titre-physique';
 
@@ -41,25 +42,25 @@ const toile = (ecran: HTMLElement, classe: string): HTMLCanvasElement => {
 };
 
 /** Les obstacles : le logo (avec son slogan) et la colonne des boutons, en pixels de la toile. */
-function blocs(ecran: HTMLElement): Bloc[] {
+function blocs(ecran: HTMLElement): { logo: Bloc | null; menu: Bloc | null } {
   const boite = ecran.getBoundingClientRect();
   const r = (sel: string) => ecran.querySelector(sel)?.getBoundingClientRect();
-  const res: Bloc[] = [];
+  const res: { logo: Bloc | null; menu: Bloc | null } = { logo: null, menu: null };
   const [logo, slogan, boutons] = [r('.logo'), r('.slogan'), r('.boutons-menu')];
   if (logo) {
     const bas = slogan ? Math.max(logo.bottom, slogan.bottom) : logo.bottom;
     const [g, d] = slogan
       ? [Math.min(logo.left, slogan.left), Math.max(logo.right, slogan.right)]
       : [logo.left, logo.right];
-    res.push({ x0: g - boite.left, y0: logo.top - boite.top + 6, x1: d - boite.left, y1: bas - boite.top });
+    res.logo = { x0: g - boite.left, y0: logo.top - boite.top + 6, x1: d - boite.left, y1: bas - boite.top };
   }
   if (boutons)
-    res.push({
+    res.menu = {
       x0: boutons.left - boite.left,
       y0: boutons.top - boite.top,
       x1: boutons.right - boite.left,
       y1: boutons.bottom - boite.top,
-    });
+    };
   return res;
 }
 
@@ -70,9 +71,10 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
   const [cf, ca] = [fond.getContext('2d'), avant.getContext('2d')];
   const tampon = document.createElement('canvas').getContext('2d');
   if (!cf || !ca) return;
-  const s: Scene = { W: 0, H: 0, sol: 0, hh: 0, blocs: [] };
+  const s: Scene = { W: 0, H: 0, sol: 0, hh: 0, blocs: [], logo: null, menu: null };
   const c = nouvelleChoregraphie();
   const batterie = nouvelleBatterie();
+  const concert = nouveauConcert(ecran);
   let acteurs: Acteur[] = [];
   let [dernier, horloge, image] = [performance.now(), 0, 0];
   const gens: Spectateur[] = Array.from({ length: 34 }, () => ({
@@ -81,15 +83,15 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
     geste: Math.random() < 0.3 ? 'rien' : Math.random() < 0.5 ? 'poing' : 'cornes',
   }));
   let flashs: { x: number; y: number; t0: number }[] = [];
-  let pageBlocs: Bloc[] = [];
   const doigt = { a: null as Acteur | null, x: 0, y: 0, vx: 0, vy: 0, t: 0 };
 
   const mesure = (W: number, H: number) => {
     [s.W, s.H, s.sol] = [W, H, H * 0.9];
     s.hh = Math.max(50, Math.min(H * 0.26, W / 5.5, 170));
     // les obstacles : le logo et les boutons (relus de la page de temps en temps), et les enceintes aux deux bords de la scène
-    if (image++ % 20 === 0) pageBlocs = blocs(ecran);
-    s.blocs = [...pageBlocs, ...blocsDesEnceintes(W, s.sol, s.hh)];
+    // (pas pendant que le logo est cassé : il penche, sa boîte grandirait et pousserait ceux qui sont dessus)
+    if (image++ % 20 === 0 && !concert.degats) Object.assign(s, blocs(ecran));
+    s.blocs = [...[s.logo, s.menu].filter((b) => b !== null), ...blocsDesEnceintes(W, s.sol, s.hh)];
     placeBatterie(batterie, s);
     const k = s.hh / 20;
     const ht = (nom: string) => {
@@ -116,6 +118,9 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
         minuteur: 0.5 + i * 0.7,
         ht: ht(nom),
         phase: Math.random() * 4,
+        dirige: false,
+        pose: null,
+        poseLigne: 0,
       }));
     acteurs.forEach((a) => (a.ht = ht(a.nom)));
   };
@@ -167,28 +172,47 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
     rampe(cf, W, s.sol, temps);
     dessineEnceintes(cf, W, s.sol, s.hh, temps);
     dessineBatterie(ca, batterie, s);
+    dessineConcert(ca, concert, s);
     const k = s.hh / 20;
     for (const a of acteurs) {
       if (a.etat === 'batterie') continue;
       // tenu au doigt : il pend un peu sous le doigt (le doigt ne le cache pas)
-      if (a === doigt.a) [a.x, a.y] = [doigt.x, doigt.y + a.ht * 0.92 + s.hh * 0.3];
+      // (jamais sous la scène : attrapé au sol, il y reste tant que le doigt ne le soulève pas)
+      if (a === doigt.a)
+        [a.x, a.y] = [Math.max(0, Math.min(W, doigt.x)), Math.min(s.sol, doigt.y + a.ht * 0.92 + s.hh * 0.3)];
       const lumiere = faisceaux.reduce((v, fx) => Math.max(v, 1 - Math.abs(fx - a.x) / (W * 0.12)), 0);
       const ombre = 0.28 * (1 - Math.max(0, lumiere));
       const marche = a.etat === 'sol' && a.tx !== null;
       const [e, image_, gauche] =
-        a.etat === 'air'
-          ? [ANIM.SAUT, `${a.nom}-saut`, a.vx < 0 || (a.vx === 0 && a.dir < 0)]
-          : a.etat === 'mur'
-            ? [ANIM.SAUT, `${a.nom}-mur`, a.cote < 0]
-            : a.etat === 'plafond' || a.etat === 'tenu'
-              ? [ANIM.SAUT, `${a.nom}-tyrolienne`, a.dir < 0]
-              : [marche ? ANIM.COURT : ANIM.DEBOUT, undefined, a.dir < 0];
+        a.pose && a.etat === 'sol'
+          ? [ANIM.DEBOUT, a.pose, a.dir < 0]
+          : a.etat === 'air'
+            ? [ANIM.SAUT, `${a.nom}-saut`, a.vx < 0 || (a.vx === 0 && a.dir < 0)]
+            : a.etat === 'mur'
+              ? [ANIM.SAUT, `${a.nom}-mur`, a.cote < 0]
+              : a.etat === 'plafond' || a.etat === 'tenu'
+                ? [ANIM.SAUT, `${a.nom}-tyrolienne`, a.dir < 0]
+                : [marche ? ANIM.COURT : ANIM.DEBOUT, undefined, a.dir < 0];
       const compteur = marche
         ? Math.floor((horloge + a.phase) * 40)
         : (Math.floor((temps + a.phase) * 2) % 4) * 3;
       // suspendu ou tenu : la tyrolienne se balance (ses deux temps)
       const balance = Math.floor((horloge + a.phase) * 2.6) % 2;
-      silhouette(ca, tampon, a.genre, a.x, a.y, k, gauche, compteur, ombre, 1, e, image_, balance);
+      silhouette(
+        ca,
+        tampon,
+        a.genre,
+        a.x,
+        a.y,
+        k,
+        gauche,
+        compteur,
+        ombre,
+        1,
+        e,
+        image_,
+        a.pose ? a.poseLigne : balance,
+      );
     }
     dessineEffetsBatterie(ca, batterie, s);
     for (const e of c.etincelles) {
@@ -235,6 +259,7 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
         flashs.push({ x: Math.random() * W, y: H * (0.9 + Math.random() * 0.06), t0: horloge });
       flashs = flashs.filter((f) => horloge - f.t0 < 0.25);
       joueBatterie(batterie, s, acteurs, dt);
+      joueConcert(concert, batterie, s, acteurs, dt);
       joue(c, s, acteurs, dt);
     }
     for (const a of acteurs) pas(s, a, dt);
