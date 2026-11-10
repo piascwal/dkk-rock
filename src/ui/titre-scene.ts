@@ -51,7 +51,10 @@ function blocs(ecran: HTMLElement): { logo: Bloc | null; menu: Bloc | null } {
     const [g, d] = slogan
       ? [Math.min(logo.left, slogan.left), Math.max(logo.right, slogan.right)]
       : [logo.left, logo.right];
-    res.logo = { x0: g - boite.left, y0: logo.top - boite.top + 6, x1: d - boite.left, y1: bas - boite.top };
+    // le haut des lettres, pas celui de la boîte (la police laisse un cinquième de sa taille au-dessus) : on s'y tient les pieds dessus
+    const police = parseFloat(getComputedStyle(ecran.querySelector('.logo')!).fontSize) || 0;
+    const y0 = logo.top - boite.top + Math.max(6, police * 0.2);
+    res.logo = { x0: g - boite.left, y0, x1: d - boite.left, y1: bas - boite.top };
   }
   if (boutons)
     res.menu = {

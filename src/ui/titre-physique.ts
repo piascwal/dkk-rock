@@ -160,6 +160,11 @@ export function pas(s: Scene, a: Acteur, dt: number): void {
     // suspendu, il passe devant le logo et les boutons (il est dessiné par-dessus) ; il lâche au bout de son temps, au bord de
     // l'écran, ou une fois arrivé au-dessus de l'endroit où il voulait aller
     const arrive = a.objectif !== null && (nx - a.objectif) * a.dir >= 0;
+    // `tx` donné (titre-concert.ts : JBG au-dessus du logo) : il s'y arrête et reste suspendu là
+    if (a.tx !== null && a.objectif === null && (nx - a.tx) * a.dir >= 0) {
+      a.x = a.tx;
+      return;
+    }
     if (a.plafond <= 0 || nx - d < 0 || nx + d > s.W || arrive) lache(a);
     else a.x = nx;
     return;

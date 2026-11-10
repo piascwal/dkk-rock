@@ -84,6 +84,14 @@ const dessusLibre = (logo: Bloc, s: Scene) => logo.y0 > s.hh;
 function surLeLogo(co: Concert, b: Batterie, s: Scene, a: Acteur, logo: Bloc, frapper: boolean): void {
   if (a.etat === 'plafond') {
     a.plafond = Math.max(a.plafond, 1);
+    // avant la casse : suspendu au-dessus du milieu du logo, il attend
+    if (!frapper) {
+      a.objectif = null;
+      a.tx = (logo.x0 + logo.x1) / 2;
+      if (Math.abs(a.x - a.tx) > 2) a.dir = a.tx > a.x ? 1 : -1;
+      return;
+    }
+    a.tx = null;
     if (a.x > logo.x1 + s.hh * 0.3) a.dir = -1;
     else if (a.x < logo.x0 - s.hh * 0.3) a.dir = 1;
     if (frapper && a.x > logo.x0 && a.x < logo.x1 && b.t >= (co.saut.get(a) ?? 0)) {
@@ -94,8 +102,14 @@ function surLeLogo(co: Concert, b: Batterie, s: Scene, a: Acteur, logo: Bloc, fr
   }
   if (a.etat !== 'sol' || b.t < (co.saut.get(a) ?? 0)) return;
   if (surLogo(a, logo)) {
-    // il y est : il attend, tourné vers la batterie ; puis saute à pieds joints
-    [a.tx, a.objectif, a.dir, a.grimpe] = [null, null, b.x > a.x ? 1 : -1, false];
+    // il y est : il va au milieu du logo et attend, tourné vers la batterie ; puis saute à pieds joints
+    const milieu = (logo.x0 + logo.x1) / 2;
+    a.grimpe = false;
+    if (!frapper && Math.abs(a.x - milieu) > s.hh * 0.15) {
+      a.tx ??= milieu;
+      return;
+    }
+    [a.tx, a.objectif, a.dir] = [null, null, b.x > a.x ? 1 : -1];
     if (!frapper) return;
     saute(s, a, hasard(0.45, 0.75), hasard(-0.4, 0.4) * s.hh);
     co.saut.set(a, b.t + hasard(0.05, 0.3));
