@@ -155,7 +155,7 @@ export function joue(c: Choregraphie, s: Scene, acteurs: Acteur[], dt: number): 
       a.minuteur -= dt;
       if (Math.abs(a.x - a.objectif) < s.hh * 0.5 || a.minuteur <= 0)
         [a.objectif, a.minuteur] = [null, hasard(0.5, 2)];
-      else [a.tx, a.grimpe] = [a.objectif, true];
+      else [a.tx, a.grimpe] = [a.objectif, a.nom !== 'kiwi'];
       continue;
     }
     a.minuteur -= dt;
@@ -176,7 +176,11 @@ export function joue(c: Choregraphie, s: Scene, acteurs: Acteur[], dt: number): 
       a.minuteur = voisin.minuteur = hasard(1, 2);
       continue;
     }
-    if (a.minuteur <= 0) idee(c, s, a);
+    if (a.minuteur <= 0) {
+      idee(c, s, a);
+      // Fadatchi erre au sol : il ne grimpe pas (il saute, il marche, s'arrête au premier mur)
+      if (a.nom === 'kiwi') a.grimpe = false;
+    }
   }
   c.etincelles = c.etincelles.filter((e) => c.t - e.t0 < 0.7);
   for (const e of c.etincelles) [e.x, e.y, e.vy] = [e.x + e.vx * dt, e.y + e.vy * dt, e.vy + s.hh * 8 * dt];

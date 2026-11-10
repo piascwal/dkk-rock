@@ -2,7 +2,8 @@ import { BPM } from '../config';
 import type { Batterie } from './titre-batterie';
 import { gerbe, nuage } from './titre-eclats';
 import { casse, nouveauLogo, repare, tremble, type LogoCasse } from './titre-logo-casse';
-import { PESANTEUR, saute, type Acteur, type Bloc, type Scene } from './titre-physique';
+import { descend, nouveauRodeo, rodeo, type Rodeo } from './titre-rodeo';
+import { horsScene, PESANTEUR, saute, type Acteur, type Bloc, type Scene } from './titre-physique';
 
 /**
  * La mise en scène des autres pendant que JBT joue de la batterie (titre-batterie.ts) : ils quittent le devant de la batterie et
@@ -16,6 +17,7 @@ import { PESANTEUR, saute, type Acteur, type Bloc, type Scene } from './titre-ph
 export interface Concert {
   actif: boolean;
   logo: LogoCasse;
+  rodeo: Rodeo;
   /** la vitesse verticale et l'état de chacun à l'image d'avant : le haut d'un saut ou la retombée, c'est un coup au logo */
   vy: Map<Acteur, number>;
   etat: Map<Acteur, string>;
@@ -49,6 +51,7 @@ const hasard = (a: number, b: number) => a + Math.random() * (b - a);
 export const nouveauConcert = (ecran: HTMLElement): Concert => ({
   actif: false,
   logo: nouveauLogo(ecran),
+  rodeo: nouveauRodeo(),
   vy: new Map(),
   etat: new Map(),
   saut: new Map(),
@@ -64,7 +67,8 @@ function places(s: Scene): Record<string, number> {
   const xa = s.hh * 1.3;
   const xb = Math.max(xa + s.hh * 2.5, (s.menu ? s.menu.x0 : s.W * 0.45) - s.hh * 0.5);
   const en = (f: number) => xa + (xb - xa) * f;
-  return { mat: en(0.05), tom: en(0.38), jbg: en(0.68), jbm: en(1) };
+  // Fadatchi rejoint JBM : il lui sert de monture (titre-rodeo.ts)
+  return { mat: en(0.05), tom: en(0.38), jbg: en(0.68), jbm: en(0.88), kiwi: en(0.88) };
 }
 
 const surLogo = (a: Acteur, logo: Bloc) =>
@@ -138,6 +142,14 @@ function frappe(co: Concert, b: Batterie, s: Scene, x: number, y: number): void 
 }
 
 function libere(co: Concert, b: Batterie, s: Scene, acteurs: Acteur[]): void {
+  // JBM descend de Fadatchi
+  const jbm = acteurs.find((a) => a.nom === 'jbm');
+  if (jbm)
+    descend(
+      jbm,
+      acteurs.find((a) => a.nom === 'kiwi'),
+      s,
+    );
   for (const a of acteurs) {
     // l'estrade redescend dans un petit nuage
     if (a.hausse > 1)
@@ -183,8 +195,9 @@ export function joueConcert(co: Concert, b: Batterie, s: Scene, acteurs: Acteur[
   }
   const ou = places(s);
   const logo = s.logo;
+  const kiwi = acteurs.find((a) => a.nom === 'kiwi');
   for (const a of acteurs) {
-    if (!a.dirige) continue;
+    if (!a.dirige || horsScene(a)) continue;
     const [avant, avantEtat] = [co.vy.get(a) ?? 0, co.etat.get(a)];
     co.vy.set(a, a.vy);
     co.etat.set(a, a.etat);
@@ -203,6 +216,11 @@ export function joueConcert(co: Concert, b: Batterie, s: Scene, acteurs: Acteur[
         frappe(co, b, s, Math.max(logo.x0, Math.min(logo.x1, a.x)), logo.y1);
       else if (avantEtat === 'air' && surLogo(a, logo)) frappe(co, b, s, a.x, logo.y0);
       attaqueLogo(co, b, s, a, logo);
+      continue;
+    }
+    // JBM en selle, au sol comme en l'air : son rodéo
+    if (a.nom === 'jbm' && kiwi?.etat === 'monture' && rodeo(co.rodeo, b, s, a, kiwi)) {
+      if (a.etat === 'sol') a.dir = b.x > a.x ? 1 : -1;
       continue;
     }
     if (a.etat !== 'sol') {
@@ -234,7 +252,9 @@ export function joueConcert(co: Concert, b: Batterie, s: Scene, acteurs: Acteur[
     [a.tx, a.objectif, a.dir] = [null, null, b.x > a.x ? 1 : -1];
     // à sa place : chacun son numéro
     if (INSTRUMENTS[a.nom]) casseInstrument(co, b, s, a, dt);
-    else if (a.nom === 'jbm' && b.etape >= 1 && b.t >= (co.saut.get(a) ?? 0)) {
+    else if (a.nom === 'jbm' && rodeo(co.rodeo, b, s, a, kiwi)) {
+      // en selle sur Fadatchi (titre-rodeo.ts)
+    } else if (a.nom === 'jbm' && b.etape >= 1 && b.t >= (co.saut.get(a) ?? 0)) {
       saute(s, a, hasard(0.8, 1.5), 0);
       co.saut.set(a, b.t + BATTEMENT * (1 + Math.floor(Math.random() * 2)));
     }

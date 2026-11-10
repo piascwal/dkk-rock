@@ -54,7 +54,9 @@ d'un bond. Ses images : `public/sprites/batterie.png` (`outils/prepare-batterie.
 temps (`ui/titre-concert.ts`), les autres se rangent à gauche du menu ; Mat et Tom montent sur une estrade qui sort du sol.
 Quand JBT casse tout, Mat lève sa basse, l'écrase et la casse, Tom brandit sa guitare, l'écrase et la laisse en morceaux
 (`mat-basse.png`, `tom-guitare.png`, `outils/prepare-casse.py`), JBG casse le logo morceau par morceau (`ui/titre-logo-casse.ts` :
-un masque CSS retire les cases une à une, elles volent en éclats), JBM saute en l'air ; la fumée remet tout en état, le logo
+un masque CSS retire les cases une à une, elles volent en éclats), JBM fait du rodéo sur Fadatchi (le kiwi, qui erre sur la scène avec les héros, le rejoint : `ui/titre-rodeo.ts`,
+`jbm-kiwi.png`, `outils/prepare-jbm-kiwi.py`) : il attend les mains sur les cuisses, puis tient la selle et saute, un bras levé ou
+décollé du kiwi, en passant devant le logo ; la fumée remet tout en état, le logo
 revient d'un bloc. Le logo est un peu plus petit sur la scène.
 
 **L'entrée des boss** (`ui/entree-boss.ts`) : quand le Yéti Alpha, le Champion du FISE ou DJ Boucle se réveille, un éclair blanc,

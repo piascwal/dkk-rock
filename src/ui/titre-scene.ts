@@ -9,7 +9,7 @@ import { dessineEclats } from './titre-eclats';
 import { dessineConcert, enfonce, joueConcert, nouveauConcert } from './titre-concert';
 import { detruit as logoDetruit } from './titre-logo-casse';
 import { blocsDesEnceintes, dessineEnceintes, lePublic, type Spectateur } from './titre-decor';
-import { pas, sousLeDoigt, type Acteur, type Bloc, type Scene } from './titre-physique';
+import { horsScene, pas, sousLeDoigt, type Acteur, type Bloc, type Scene } from './titre-physique';
 
 /**
  * L'écran titre « en scène » (mode essai) : les cinq DKK vivent sur la scène, chacun à son idée (voir titre-choregraphie.ts) ;
@@ -27,6 +27,8 @@ const HEROS: readonly [Genre, string][] = [
   [G.TOM, 'tom'],
   [G.JBM, 'jbm'],
   [G.JBG, 'jbg'],
+  // Fadatchi le kiwi, qui erre avec eux (et sert de monture à JBM pendant le spectacle : titre-rodeo.ts)
+  [G.KIWI, 'kiwi'],
 ];
 const calme = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -98,7 +100,8 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
     const k = s.hh / 20;
     const ht = (nom: string) => {
       const f = FEUILLES_DECOR[`${nom}-tyrolienne`];
-      return f ? ((f.h * (f.echelle ?? 1)) / (f.densite ?? 1)) * k : s.hh * 1.05;
+      // (le kiwi, petit, n'a pas de tyrolienne : tenu au doigt, il pend juste sous lui)
+      return f ? ((f.h * (f.echelle ?? 1)) / (f.densite ?? 1)) * k : s.hh * (nom === 'kiwi' ? 0.5 : 1.05);
     };
     if (!acteurs.length)
       acteurs = HEROS.map(([genre, nom], i) => ({
@@ -124,6 +127,7 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
         pose: null,
         poseLigne: 0,
         hausse: 0,
+        fantome: false,
       }));
     acteurs.forEach((a) => (a.ht = ht(a.nom)));
   };
@@ -185,7 +189,7 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
     dessineConcert(ca, batterie, s, acteurs);
     const k = s.hh / 20;
     for (const a of acteurs) {
-      if (a.etat === 'batterie') continue;
+      if (horsScene(a)) continue;
       // tenu au doigt : il pend un peu sous le doigt (le doigt ne le cache pas)
       // (jamais sous la scène : attrapé au sol, il y reste tant que le doigt ne le soulève pas)
       if (a === doigt.a) {
@@ -196,7 +200,7 @@ export function animeScene(ecran: HTMLElement, qualite: () => Qualite): void {
       const ombre = 0.28 * (1 - Math.max(0, lumiere));
       const marche = a.etat === 'sol' && a.tx !== null;
       const [e, image_, gauche] =
-        a.pose && a.etat === 'sol'
+        a.pose && (a.etat === 'sol' || a.etat === 'air')
           ? [ANIM.DEBOUT, a.pose, a.dir < 0]
           : a.etat === 'air'
             ? [ANIM.SAUT, `${a.nom}-saut`, a.vx < 0 || (a.vx === 0 && a.dir < 0)]
