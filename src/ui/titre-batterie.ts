@@ -52,6 +52,8 @@ export interface Batterie {
   etape: number;
   temps: number;
   morceaux: Morceau[];
+  /** la largeur de l'écran quand elle a été placée */
+  largeur: number;
 }
 
 const hasard = (a: number, b: number) => a + Math.random() * (b - a);
@@ -66,10 +68,15 @@ export const nouvelleBatterie = (): Batterie => ({
   etape: -1,
   temps: -1,
   morceaux: [],
+  largeur: 0,
 });
 
 /** La pose dans le plus grand espace libre au sol (entre les blocs qui touchent sa hauteur), réduite s'il est étroit. */
 export function placeBatterie(b: Batterie, s: Scene): void {
+  // pendant le spectacle, elle ne bouge plus : quand le logo est entièrement cassé, il n'est plus un obstacle et le plus grand
+  // espace libre change (sous le logo, à gauche) ; la batterie y sautait d'un coup. Une nouvelle taille d'écran la replace.
+  if (b.phase === 'spectacle' && b.place && b.largeur === s.W) return;
+  b.largeur = s.W;
   const k = (s.hh * GRANDEUR) / DEBOUT;
   const haut = s.sol - s.hh * ESTRADE - HAUTEUR * k;
   const pris = s.blocs
