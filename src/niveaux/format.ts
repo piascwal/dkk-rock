@@ -21,6 +21,8 @@ import { chaineDeTyroliennes, relieTyroliennes, type Tyrolienne } from './tyroli
  *   & embarquement (le ferry : le pont se ferme, des vagues montent à l'abordage, voir jeu/traversee.ts)
  *   K cage (un membre du groupe à libérer)   * arme au hasard   + médiator d'or (un spécial de plus, 3 au plus)
  *   % baril explosif (s'allume au premier tir, explose deux secondes après)
+ *   _ grosse caisse trampoline   : bonbonne de fumée   } sirène d'alarme (voir entites/attractions.ts, ennemis/alarme.ts)
+ *   ] porteur de pancarte   ? sonneur d'alarme (des ennemis : les lettres sont toutes prises)
  *   ( et ) : extrémités d'une tyrolienne ; chaque ( est reliée au poteau le plus proche à sa droite
  *   $ : jointure de tyrolienne (un poteau où le câble change de pente et repart, voir niveaux/tyroliennes.ts)
  *   1 à 9 : déclencheurs de dialogue (quand un joueur franchit la colonne)
@@ -113,6 +115,8 @@ export interface NiveauLu {
   armes: Repere[];
   soins: Repere[];
   ennemis: (Repere & { lettre: string })[];
+  /** les attractions (`_` grosse caisse trampoline, `:` bonbonne de fumée, `}` sirène) */
+  attractions: (Repere & { c: string })[];
   boss: (Repere & { lettre: 'Y' | 'Z' | 'P' })[];
   tyroliennes: Tyrolienne[];
   declencheurs: (Repere & { cle: string })[];
@@ -142,6 +146,7 @@ export function litNiveau(def: DefNiveau): NiveauLu {
     armes: [],
     soins: [],
     ennemis: [],
+    attractions: [],
     boss: [],
     tyroliennes: [],
     declencheurs: [],
@@ -180,7 +185,8 @@ export function litNiveau(def: DefNiveau): NiveauLu {
       else if (c === '$') jointures.push(r);
       else if (c === 'Y' || c === 'Z' || c === 'P') lu.boss.push({ ...r, lettre: c });
       else if (/[1-9]/.test(c)) lu.declencheurs.push({ ...r, cle: c });
-      else if (/[a-z]/.test(c)) lu.ennemis.push({ ...r, lettre: c });
+      else if (/[a-z\]?]/.test(c)) lu.ennemis.push({ ...r, lettre: c });
+      else if (c === '_' || c === ':' || c === '}') lu.attractions.push({ ...r, c });
       else throw new ErreurNiveau(`${def.id} : caractère inconnu « ${c} » en ${tx},${ty}`);
     }
   }

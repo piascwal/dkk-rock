@@ -2,6 +2,7 @@ import { ANIM, G } from '../jeu/vue';
 import { humain, type Pinceau } from './pinceau';
 import { DESSINS_LOCAUX } from './dessins-locaux';
 import { DESSINS_OTTAWA } from './dessins-ottawa';
+import { DESSINS_ENNEMIS_NOUVEAUX } from './dessins-nouveautes';
 
 type Dessin = (p: Pinceau, e: number, f: number) => void;
 
@@ -11,6 +12,7 @@ const pasDe = (e: number, f: number) => (e === ANIM.COURT ? Math.floor(f / 5) % 
 export const DESSINS_ENNEMIS: Partial<Record<number, Dessin>> = {
   ...DESSINS_LOCAUX,
   ...DESSINS_OTTAWA,
+  ...DESSINS_ENNEMIS_NOUVEAUX,
   // le Viet Cong glaireux : torse nu couvert de boue, short vert, un bandeau de feuilles de figuier ; en attaque, une figue au poing
   [G.GLAIREUX]: (p, e, f) => {
     const lance = e === ANIM.ATTAQUE;

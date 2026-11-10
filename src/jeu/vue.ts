@@ -122,6 +122,13 @@ export const G = {
   P_RONDELLE: 91,
   /** le caribou d'Ottawa (après la rondelle : `estPersonnage` le compte à part) */
   CARIBOU: 92,
+  // les nouveautés qu'on découvre de niveau en niveau (voir jeu/nouveautes.ts) : le porteur de pancarte et le sonneur d'alarme
+  // (`estPersonnage` les compte), puis la grosse caisse trampoline, la bonbonne de fumée et la sirène (des objets)
+  PANCARTE: 93,
+  SONNEUR: 94,
+  TREMPLIN: 95,
+  BONBONNE: 96,
+  SIRENE: 97,
 } as const;
 
 export type Genre = (typeof G)[keyof typeof G];
@@ -135,7 +142,9 @@ export const estPersonnage = (g: number): boolean =>
   g < G.P_BAGUETTE ||
   (g >= G.PASSAGER && g <= G.BOULISTE) ||
   (g >= G.HOCKEYEUR && g <= G.GARDIEN) ||
-  g === G.CARIBOU;
+  g === G.CARIBOU ||
+  g === G.PANCARTE ||
+  g === G.SONNEUR;
 
 /** États d'animation des héros (champ `e`). */
 export const ANIM = {

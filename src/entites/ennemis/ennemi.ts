@@ -99,6 +99,14 @@ export class Ennemi implements Cible, EntiteSimulee {
 
   blesse(degats: number, ctx: Contexte, dx: number, explosion: boolean): void {
     if (this.fini || this.aTerre > 0) return;
+    // la pancarte arrête ce qui vient de face (le coup va à l'encontre de son regard) ; il sait d'où ça vient
+    if (this.def.bouclier && !explosion && dx && Math.sign(dx) === -this.dir) {
+      this.provoque = DUREE_PROVOCATION;
+      if (ctx.tick % 6 === 0) ctx.son('rebond', this.cx, this.cy);
+      ctx.evenement({ k: 'impact', x: this.cx + this.dir * 6, y: this.cy - 2, c: '#f5ecd6' });
+      if (this.etat === 'patrouille') this.passeEnAlerte(ctx);
+      return;
+    }
     if (dx) this.projete = dx > 0 ? 1 : -1;
     this.provoque = DUREE_PROVOCATION;
     this.pv -= degats;

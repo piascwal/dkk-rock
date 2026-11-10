@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { NIVEAUX, niveauLu } from '../src/niveaux';
 import { ErreurNiveau, litNiveau } from '../src/niveaux/format';
+import { ENNEMIS_NOUVEAUX } from '../src/entites/ennemis/alarme';
 import { ENNEMIS_PAR_LETTRE } from '../src/entites/ennemis/definitions';
 import { casesAccessibles } from './accessibilite';
 import { ESSAIS, REFONTES, versionDe } from '../src/niveaux/refontes';
@@ -44,7 +45,7 @@ describe('les niveaux', () => {
   it('refuse une carte incohérente', () => {
     const base = { ...NIVEAUX[0]!, dialogues: {} };
     expect(() => litNiveau({ ...base, carte: ['   ', '###'] })).toThrow(ErreurNiveau);
-    expect(() => litNiveau({ ...base, carte: [' @ F ', '#####', ' ?   '] })).toThrow(/inconnu/);
+    expect(() => litNiveau({ ...base, carte: [' @ F ', '#####', ' <   '] })).toThrow(/inconnu/);
     expect(() => litNiveau({ ...base, carte: ['@ ( F', '#####'] })).toThrow(/tyrolienne/);
     expect(() => litNiveau({ ...base, carte: ['@ 7 F', '#####'] })).toThrow(/dialogue/);
   });
@@ -58,7 +59,11 @@ describe('les niveaux refaits', () => {
   it.each(refaits.map((lu) => [lu.def.id, lu] as const))(
     '%s : on atteint la fin et chaque drapeau sans rien détruire',
     (_id, lu) => {
-      for (const e of lu.ennemis) expect(ENNEMIS_PAR_LETTRE[e.lettre], `ennemi ${e.lettre}`).toBeDefined();
+      for (const e of lu.ennemis)
+        expect(
+          ENNEMIS_PAR_LETTRE[e.lettre] ?? ENNEMIS_NOUVEAUX[e.lettre],
+          `ennemi ${e.lettre}`,
+        ).toBeDefined();
       const acces = casesAccessibles(lu);
       const cible = lu.boss.find((b) => b.lettre === 'Z') ?? lu.fin!;
       const atteint = [...acces].some((k) => {

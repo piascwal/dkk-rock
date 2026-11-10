@@ -85,6 +85,15 @@ se barre dans le fil ; les boutons des menus s'enfoncent et rebondissent.
 - **Pause :** « Recommencer le niveau » (et « Recommencer au drapeau » une fois un drapeau levé) refait la carte, détruite ou non,
   pour se sortir d'une impasse ; les vies et le score restent. Deux pressions (3 s pour confirmer) ; réservé à l'hôte.
 - **Ennemis touchés** : ils clignotent en blanc (sprite compris) pendant un instant, et ceux qui tiennent plus d'un coup montrent leur barre de vie au-dessus de la tête pendant deux secondes.
+- **Nouveautés à découvrir (à l'essai)** : une par niveau, présentée par un bandeau la première fois qu'on la voit
+  (`ui/decouverte.ts`), puis reprise dans les niveaux suivants (`niveaux/nouveautes.ts` : emplacements, ordre). Options → Mode
+  essai → « Niveaux refaits » joue chaque niveau avec la sienne. La **grosse caisse trampoline** (`_`, Saint-Cézaire) renvoie haut
+  qui tombe dessus, héros (plus haut en tenant le saut), ennemis et bonbonnes ; la **bonbonne de fumée** (`:`, pont des Tuves)
+  siffle au premier coup puis file au ras du sol du côté opposé (droit en l'air sous une explosion) et explose au premier obstacle
+  (`entites/attractions.ts`) ; le **porteur de pancarte** (`]`, Alpages) ne craint rien de face : à revers (il se retourne
+  lentement), d'en haut ou par une explosion ; le **sonneur d'alarme** (`?`, Gréau) court à la **sirène** (`}`) la plus proche,
+  qui appelle trois renforts s'il l'atteint ; on l'arrête avant, ou on casse la sirène (`entites/ennemis/alarme.ts`). Dessinés en
+  code (`rendu/dessins-nouveautes.ts`) en attendant leurs images. Protocole v50.
 - **Barils explosifs** (Saint-Cézaire et ville, marqueur `%`) : des tonneaux WOG en feu, à terre ; on peut les empiler (dans l'éditeur, rangé avec les tuiles à côté des tonneaux WOG ; une case au-dessus d'une autre), sprites entiers : le plus haut est dessiné en dernier, son pied recouvre un peu le dessus de celui qu'il porte. Le premier tir qui les touche (le leur comme celui d'une explosion voisine) les allume ; deux secondes plus tard, ils explosent (rayon 48 px, 5 dégâts aux héros comme aux ennemis : un cinquième de plus qu'un caisson de basses) et cassent ce qui se casse autour. Personne ne les vise, mais les tirs des ennemis les allument aussi. Ils sont pleins : héros et ennemis butent contre eux et peuvent monter dessus (`Carte.obstacles`, tenu à jour par la partie ; `monde/physique.ts`).
 - **Tonneaux WOG** (le WOG, une passion magique pour les membres des DKK ; l'histoire sera retravaillée) : ce sont des tuiles
   (`O` bois, `Q` or ; `outils/fixe-tuiles.py`), semées par le générateur (un raccord sur deux en bois, et un tonneau d'or bien en vue au milieu du parcours, posé seul, jamais sur un tonneau en bois, en plus de celui d'une cache).

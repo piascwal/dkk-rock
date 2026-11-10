@@ -1,6 +1,8 @@
 import { TUILE } from '../config';
 import { ARMES_RAMASSABLES } from '../entites/armes';
+import { Bonbonne, Tremplin } from '../entites/attractions';
 import { Baril } from '../entites/baril';
+import { ENNEMIS_NOUVEAUX, Sirene } from '../entites/ennemis/alarme';
 import { Chauffage } from '../entites/chauffage';
 import { Champion } from '../entites/ennemis/champion';
 import { DjBoucle } from '../entites/ennemis/dj';
@@ -39,6 +41,14 @@ export function peuple(p: Partie): void {
   });
   for (const c of lu.cages) p.ajoute(new Objet(p, 'cage', c.x, c.y));
   for (const b of lu.barils) p.ajoute(new Baril(p, b.tx, b.ty));
+  for (const a of lu.attractions)
+    p.ajoute(
+      a.c === '_'
+        ? new Tremplin(p, a.tx, a.ty)
+        : a.c === ':'
+          ? new Bonbonne(p, a.tx, a.ty)
+          : new Sirene(p, a.tx, a.ty, ennemiDuCoin('a', lu.def.theme) ?? ENNEMIS_PAR_LETTRE['a']!),
+    );
   for (const a of lu.armes)
     p.ajoute(new Objet(p, 'arme', a.x, a.y, p.rng.entier(1, ARMES_RAMASSABLES.length)));
   for (const s of lu.soins) p.ajoute(new Objet(p, 'soin', s.x, s.y));
@@ -51,7 +61,11 @@ export function peuple(p: Partie): void {
     const cle = choisis.get(`${e.tx},${e.ty}`);
     const perso = cle ? lisPersonnage(cle, lu.def.theme) : null;
     // dans les villes de l'International Tour, « a » et « c » sont des gens du coin
-    const def = perso?.def ?? ennemiDuCoin(e.lettre, lu.def.theme) ?? ENNEMIS_PAR_LETTRE[e.lettre];
+    const def =
+      perso?.def ??
+      ennemiDuCoin(e.lettre, lu.def.theme) ??
+      ENNEMIS_PAR_LETTRE[e.lettre] ??
+      ENNEMIS_NOUVEAUX[e.lettre];
     if (def && e.x > depart) {
       if (perso?.apparence != null) aligneIdentifiant(() => p.prochainId(), perso.apparence);
       const en = new Ennemi(p, def, e.x, e.y);

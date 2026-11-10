@@ -1,6 +1,7 @@
 import { ANIM, G, type EtatVue, type Genre } from '../jeu/vue';
 import { FEUILLES } from '../rendu/feuilles';
 import { dessineFeuille } from '../rendu/feuilles-images';
+import { Decouverte } from './decouverte';
 
 /**
  * L'entrée d'un boss, quand il se réveille (sa barre de vie apparaît dans la vue) : un éclair blanc, l'écran qui tremble, un
@@ -33,6 +34,8 @@ export class EntreeBoss {
   private niveau = -1;
   /** les boss déjà présentés dans ce niveau */
   private readonly vus = new Set<Genre>();
+  /** l'autre scène coupée : la première rencontre d'une nouveauté (voir decouverte.ts) */
+  private readonly decouverte = new Decouverte();
 
   constructor() {
     this.toile.className = 'entree-boss';
@@ -43,10 +46,12 @@ export class EntreeBoss {
 
   /** Vrai pendant l'animation : la partie attend (si on joue seul). */
   get enCours(): boolean {
-    return this.actif;
+    return this.actif || this.decouverte.enCours;
   }
 
-  maj(v: EtatVue): void {
+  /** `occupe` : une autre scène coupée est à l'écran (la recrue) ; la découverte d'une nouveauté attend son tour */
+  maj(v: EtatVue, occupe = false): void {
+    if (!occupe && !this.actif) this.decouverte.maj(v);
     if (v.niveau !== this.niveau) {
       this.niveau = v.niveau;
       this.vus.clear();

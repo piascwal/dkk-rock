@@ -1,3 +1,4 @@
+import { DESSINS_OBJETS_NOUVEAUX } from './dessins-nouveautes';
 import { G } from '../jeu/vue';
 import type { Pinceau } from './pinceau';
 import { DESSINS_TIRS } from './dessins-tirs';
@@ -64,6 +65,7 @@ const COEUR_DORE = [
 ];
 
 export const DESSINS_OBJETS: Partial<Record<number, Dessin>> = {
+  ...DESSINS_OBJETS_NOUVEAUX,
   [G.CAGE]: (p, e) => {
     p(-8, -18, 16, 2, '#555');
     p(-8, -1, 16, 1, '#555');
