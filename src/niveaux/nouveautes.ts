@@ -11,7 +11,7 @@ import { CARTE_TUVES_REFONTE } from './refontes/13-tuves';
  *
  *   Saint-Cézaire : la grosse caisse trampoline (`_`) ; un monte-charge (`>`) vers une cave ; on aperçoit une bonbonne
  *   le pont des Tuves : la bonbonne de fumée (`:`) ; un monte-charge ; des projecteurs suspendus (`"`) vers la fin
- *   les Alpages : des projecteurs suspendus en chaîne, avec les précédentes
+ *   les Alpages : des projecteurs suspendus en chaîne (dans la salle de bois du début), avec les précédentes
  *   les Cimes : le sonneur d'alarme (`?`) et sa sirène (`}`), avec tout le reste
  *
  * Les emplacements ont été choisis sur les cartes publiées (un rebord à atteindre pour une grosse caisse, un long plat pour les
@@ -101,12 +101,12 @@ export const POSES: Readonly<Record<string, readonly Pose[]>> = {
     ['_', 293, 9],
     ['_', 462, 33],
     ['>', 30, 32, 42],
-    ['"', 68, 20],
-    ['"', 71, 20],
-    ['"', 279, 20],
-    ['"', 282, 20],
-    ['"', 289, 14],
-    ['"', 292, 14],
+    // dans la salle de bois du début, sur le chemin : cinq projecteurs au-dessus des gardes et d'un caisson de basses
+    ['"', 60, 31],
+    ['"', 64, 31],
+    ['"', 68, 31],
+    ['"', 76, 31],
+    ['"', 80, 31],
   ],
   cimes: [
     ['?', 167, 58],

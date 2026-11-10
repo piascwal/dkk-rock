@@ -2,6 +2,7 @@
 import { G, type Genre } from '../jeu/vue';
 import type { Feuille } from './feuilles';
 import { FEUILLES_PANNEAUX } from './feuilles-panneaux';
+import { DECOR_ATTRACTIONS } from './feuilles-attractions';
 import { DECOR_CONCERT } from './feuilles-concert';
 import { DECOR_JBM } from './feuilles-jbm';
 import { DECOR_JBT } from './feuilles-jbt';
@@ -276,6 +277,7 @@ export const FEUILLES_DECOR: Record<string, Feuille> = {
   ...FEUILLES_PANNEAUX,
   ...DECOR_JBM,
   ...DECOR_JBT,
+  ...DECOR_ATTRACTIONS,
   ...DECOR_CONCERT,
   ...DECOR_TYROLIENNES,
 };

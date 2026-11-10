@@ -92,6 +92,8 @@ export function dessineDecorFeuille(
   nom: string,
   ligne: number,
   voile?: string,
+  /** sa silhouette blanche (un clignotement), faite une fois par ligne : voir planches-cuites.ts */
+  blanc = false,
 ): boolean {
   const f = FEUILLES_DECOR[nom];
   const img = imagesDecor.get(nom);
@@ -99,7 +101,16 @@ export function dessineDecorFeuille(
   const l = ligne % f.images.length;
   const brumee = voile ? voilee(nom, l, voile, img, f) : null;
   if (brumee) dessineCase(ctx, brumee, f, 0, 0);
-  else dessineCase(ctx, img, f, 0, l);
+  else dessineCase(ctx, img, f, 0, l, blanc);
+  return true;
+}
+
+/** Prépare d'avance la silhouette blanche d'une planche du décor (le tonneau-fusée qui clignote) ; faux si elle n'est pas chargée. */
+export function prechauffeBlancDecor(nom: string): boolean {
+  const f = FEUILLES_DECOR[nom];
+  const img = imagesDecor.get(nom);
+  if (!f || !img) return false;
+  ligneBlanche(img, rangeeDeLaPlanche(f, 0), f.h);
   return true;
 }
 

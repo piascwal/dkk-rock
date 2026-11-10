@@ -2,6 +2,7 @@ import { TUILE } from '../config';
 import type { Cible, Contexte, EntiteSimulee } from '../jeu/contexte';
 import { G, type EntiteVue } from '../jeu/vue';
 import { zoneLibre, nouveauCorps, type Corps } from '../monde/physique';
+import { passagersSur } from './passagers';
 
 /**
  * Le monte-charge (`>` dans la carte, à la case de son sommet) : une plate-forme de deux tuiles qui descend dans un puits creusé
@@ -45,16 +46,6 @@ export class MonteCharge implements EntiteSimulee {
     this.corps = nouveauCorps(tx * TUILE + (TUILE * 2 - LARGEUR) / 2, this.haut, LARGEUR, EPAISSEUR);
   }
 
-  /** Ce qui se tient dessus (les pieds sur la plate-forme, qui n'a pas sauté) parmi `cibles`. */
-  private dessus(cibles: readonly Cible[], sortie: Corps[]): void {
-    const t = this.corps;
-    for (const cible of cibles) {
-      const c = corpsDe(cible);
-      if (!c || c.vy < 0 || c.x + c.w <= t.x || c.x >= t.x + t.w || Math.abs(c.y + c.h - t.y) > 1.5) continue;
-      sortie.push(c);
-    }
-  }
-
   /** Un corps (qui n'est pas dessus) gênerait-il la plate-forme à sa nouvelle hauteur ? */
   private gene(cibles: readonly Cible[], y: number, passagers: readonly Corps[]): boolean {
     const t = this.corps;
@@ -69,8 +60,7 @@ export class MonteCharge implements EntiteSimulee {
   maj(ctx: Contexte): void {
     const t = this.corps;
     const passagers: Corps[] = [];
-    this.dessus(ctx.cibles('tous'), passagers);
-    this.dessus(ctx.props(), passagers);
+    passagersSur(ctx, t, passagers);
     const heros = ctx.heros();
     const unHeros = passagers.some((c) => heros.some((h) => corpsDe(h) === c));
     if (this.mouvement === 0) {

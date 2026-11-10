@@ -1,7 +1,8 @@
 import { TUILE } from '../config';
 import type { Cible, Contexte, EntiteSimulee } from '../jeu/contexte';
 import { G, type EntiteVue } from '../jeu/vue';
-import { appliqueGravite, deplace, nouveauCorps, type Corps } from '../monde/physique';
+import { appliqueGravite, deplace, nouveauCorps, zoneLibre, type Corps } from '../monde/physique';
+import { passagersSur } from './passagers';
 
 /**
  * Les attractions de la scène, qu'on découvre de niveau en niveau (voir jeu/nouveautes.ts) :
@@ -25,10 +26,14 @@ export class Tremplin implements EntiteSimulee {
   readonly corps: Corps;
   fini = false;
   private enfonce = 0;
+  /** en métal (sinon en bois) */
+  private readonly metal: boolean;
 
   constructor(ctx: Contexte, tx: number, ty: number) {
     this.id = ctx.prochainId();
-    this.corps = nouveauCorps(tx * TUILE - 2, ty * TUILE + TUILE - 8, 20, 8);
+    this.corps = nouveauCorps(tx * TUILE - 1, ty * TUILE + TUILE - 16, 18, 16);
+    // en bois ou en métal (deux images fournies), au gré de la colonne
+    this.metal = tx % 2 === 1;
   }
 
   get x(): number {
@@ -71,8 +76,9 @@ export class Tremplin implements EntiteSimulee {
       y: c.y + c.h,
       gauche: false,
       clignote: false,
-      e: this.enfonce > 0 ? 1 : 0,
-      f: 0,
+      // e : 0 en bois, 1 en métal ; f : les ticks de sa compression (10 au choc, puis 0) : le dessin l'écrase puis la relâche
+      e: this.metal ? 1 : 0,
+      f: this.enfonce,
     };
   }
 }
@@ -96,10 +102,12 @@ export class Bonbonne implements EntiteSimulee, Cible {
   private meche = 0;
   /** le sens où elle bascule, puis où elle file : -1 ou 1 */
   private sens: 1 | -1 = 1;
+  /** ceux qui voyagent dessus pendant son vol (le même tableau resservi à chaque pas) */
+  private readonly passagers: Corps[] = [];
 
   constructor(ctx: Contexte, tx: number, ty: number) {
     this.id = ctx.prochainId();
-    this.corps = nouveauCorps(tx * TUILE + 4, ty * TUILE + TUILE - 15, 8, 15);
+    this.corps = nouveauCorps(tx * TUILE + 1, ty * TUILE + TUILE - 17, 14, 17);
   }
 
   get x(): number {
@@ -126,7 +134,7 @@ export class Bonbonne implements EntiteSimulee, Cible {
     this.meche = MECHE;
     const c = this.corps;
     // couchée : large et basse, les pieds au même sol ; un petit bond dans le sens du coup
-    [c.x, c.y, c.w, c.h] = [c.x - 3.5, c.y + c.h - 8, 15, 8];
+    [c.x, c.y, c.w, c.h] = [c.x - 1.5, c.y + 3, 17, 14];
     [c.vx, c.vy] = [this.sens * 0.9, -1.4];
     ctx.son('rebond', c.x, c.y);
   }
@@ -151,14 +159,30 @@ export class Bonbonne implements EntiteSimulee, Cible {
       }
       return;
     }
-    // en vol : elle file droit, au ras du sol, puis s'essouffle et retombe ; le premier obstacle la fait exploser
+    // en vol : elle file droit, au ras du sol, puis s'essouffle et retombe ; le premier obstacle la fait exploser. Ceux qui sont
+    // dessus (un héros qui l'a enfourchée) voyagent avec elle.
     this.meche--;
+    const passagers = this.passagers;
+    passagers.length = 0;
+    passagersSur(ctx, c, passagers);
     if (-this.meche > PORTEE || c.vy !== 0) appliqueGravite(c, 0.5);
     c.vx = this.sens * VITESSE;
+    const [x0, y0] = [c.x, c.y];
     deplace(c, ctx.carte);
+    for (const p of passagers)
+      if (zoneLibre(ctx.carte, p.x + c.x - x0, p.y + c.y - y0, p.w, p.h))
+        [p.x, p.y] = [p.x + c.x - x0, p.y + c.y - y0];
     const touche = ctx
       .cibles('tous')
-      .some((o) => o.vivant() && o.x < c.x + c.w && o.x + o.w > c.x && o.y < c.y + c.h && o.y + o.h > c.y);
+      .some(
+        (o) =>
+          o.vivant() &&
+          !passagers.includes((o as Partial<{ corps: Corps }>).corps!) &&
+          o.x < c.x + c.w &&
+          o.x + o.w > c.x &&
+          o.y < c.y + c.h - 1 &&
+          o.y + o.h > c.y + 1,
+      );
     const dehors = c.x < -16 || c.x > ctx.carte.largeur * TUILE + 16;
     // (les premiers instants, elle ne s'arrête sur rien : elle décolle, à côté de celui qui l'a allumée)
     if (c.mur || dehors || -this.meche > VOL_MAX || (-this.meche > 5 && (c.auSol || touche)))
@@ -181,7 +205,8 @@ export class Bonbonne implements EntiteSimulee, Cible {
       clignote: this.meche > 0 && Math.floor(ecoule / (ecoule < MECHE / 2 ? 8 : 4)) % 2 === 1,
       // 0 : debout ; 1 : couchée ; 2 : en vol
       e: this.meche === 0 ? 0 : this.meche > 0 ? 1 : 2,
-      f: 0,
+      // f : la parité du temps de vol, pour que la flamme vacille
+      f: this.meche < 0 ? -this.meche & 1 : 0,
     };
   }
 }

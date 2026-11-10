@@ -365,13 +365,14 @@ def main():
         "import { G, type Genre } from '../jeu/vue';\n"
         "import type { Feuille } from './feuilles';\n"
         "import { FEUILLES_PANNEAUX } from './feuilles-panneaux';\n"
+        "import { DECOR_ATTRACTIONS } from './feuilles-attractions';\n"
         "import { DECOR_CONCERT } from './feuilles-concert';\n"
         "import { DECOR_JBM } from './feuilles-jbm';\n"
         "import { DECOR_JBT } from './feuilles-jbt';\n"
         "import { DECOR_TYROLIENNES } from './feuilles-tyroliennes';\n\n"
         "export const FEUILLES_OBJETS: Partial<Record<Genre, Feuille>> = {\n" + '\n'.join(lignes) + '\n};\n\n'
         "/** Les planches du décor, sans genre : une ligne par apparence. */\n"
-        "export const FEUILLES_DECOR: Record<string, Feuille> = {\n" + '\n'.join(decors) + '\n  ...FEUILLES_PANNEAUX,\n  ...DECOR_JBM,\n  ...DECOR_JBT,\n  ...DECOR_CONCERT,\n  ...DECOR_TYROLIENNES,\n};\n'
+        "export const FEUILLES_DECOR: Record<string, Feuille> = {\n" + '\n'.join(decors) + '\n  ...FEUILLES_PANNEAUX,\n  ...DECOR_JBM,\n  ...DECOR_JBT,\n  ...DECOR_ATTRACTIONS,\n  ...DECOR_CONCERT,\n  ...DECOR_TYROLIENNES,\n};\n'
     )
 
 

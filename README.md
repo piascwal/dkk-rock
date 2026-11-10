@@ -87,9 +87,10 @@ se barre dans le fil ; les boutons des menus s'enfoncent et rebondissent.
 - **Ennemis touchés** : ils clignotent en blanc (sprite compris) pendant un instant, et ceux qui tiennent plus d'un coup montrent leur barre de vie au-dessus de la tête pendant deux secondes.
 - **Nouveautés à découvrir (à l'essai)**, sans rien pour les annoncer : on les trouve en jouant, et elles reviennent d'un niveau à
   l'autre (`niveaux/nouveautes.ts` : emplacements). Options → Mode essai → « Niveaux refaits » joue chaque niveau avec les siennes.
-  La **grosse caisse trampoline** (`_`) renvoie haut qui tombe dessus (héros, plus haut en tenant le saut ; ennemis ; bonbonnes).
-  La **bonbonne de fumée** (`:`) : le premier coup la couche aussitôt, elle clignote en blanc (de plus en plus vite), puis file au
-  ras du sol dans le sens du coup et explose au premier obstacle (`entites/attractions.ts`). Le **monte-charge** (`>`, le puits
+  La **grosse caisse trampoline** (`_`, en bois ou en métal : `outils/prepare-attractions.py`) renvoie haut qui tombe dessus (héros, plus haut en tenant le saut ; ennemis ; bonbonnes) et s'écrase puis se relâche à chaque rebond.
+  Le **tonneau-fusée** (`:`, un tonneau de métal) : le premier coup le couche aussitôt, il clignote en blanc (de plus en plus
+  vite), puis file au ras du sol dans le sens du coup et explose au premier obstacle ; il est plein, on peut monter dessus, et qui
+  est dessus au départ voyage avec lui (`entites/attractions.ts`, `entites/passagers.ts`). Le **monte-charge** (`>`, le puits
   est creusé dans la carte) descend dans une cave le héros qui s'y tient une demi-seconde, avec ceux qui sont dessus ; on ne
   l'impose jamais (échelles et terrain y mènent aussi) ; seul en bas, il remonte (`entites/monte-charge.ts`). Les **projecteurs
   suspendus** (`"`) : un tir ou un souffle sur le câble ou la lampe la fait tomber ; elle écrase ce qu'elle touche et, en
@@ -97,7 +98,7 @@ se barre dans le fil ; les boutons des menus s'enfoncent et rebondissent.
   chaîne (`entites/suspendus.ts`). Le **sonneur d'alarme** (`?`) court à la **sirène** (`}`) la plus proche, qui appelle trois
   renforts s'il l'atteint ; on l'arrête avant, ou on casse la sirène (`entites/ennemis/alarme.ts`). Dessinés en code
   (`rendu/dessins-nouveautes.ts`) en attendant leurs images : repris du cache d'images, silhouette blanche comprise, et préparés
-  d'avance au chargement du niveau (`prechauffage.ts`). Protocole v51.
+  d'avance au chargement du niveau (`prechauffage.ts`). Protocole v52.
 - **Barils explosifs** (Saint-Cézaire et ville, marqueur `%`) : des tonneaux WOG en feu, à terre ; on peut les empiler (dans l'éditeur, rangé avec les tuiles à côté des tonneaux WOG ; une case au-dessus d'une autre), sprites entiers : le plus haut est dessiné en dernier, son pied recouvre un peu le dessus de celui qu'il porte. Le premier tir qui les touche (le leur comme celui d'une explosion voisine) les allume ; deux secondes plus tard, ils explosent (rayon 48 px, 5 dégâts aux héros comme aux ennemis : un cinquième de plus qu'un caisson de basses) et cassent ce qui se casse autour. Personne ne les vise, mais les tirs des ennemis les allument aussi. Ils sont pleins : héros et ennemis butent contre eux et peuvent monter dessus (`Carte.obstacles`, tenu à jour par la partie ; `monde/physique.ts`).
 - **Tonneaux WOG** (le WOG, une passion magique pour les membres des DKK ; l'histoire sera retravaillée) : ce sont des tuiles
   (`O` bois, `Q` or ; `outils/fixe-tuiles.py`), semées par le générateur (un raccord sur deux en bois, et un tonneau d'or bien en vue au milieu du parcours, posé seul, jamais sur un tonneau en bois, en plus de celui d'une cache).

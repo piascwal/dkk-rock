@@ -82,6 +82,30 @@ describe('la bonbonne de fumée', () => {
   });
 });
 
+describe('le tonneau-fusée', () => {
+  it('emporte avec lui le héros qui est dessus quand il part', () => {
+    const p = partie('@   :                              a   F');
+    const [j, b] = [p.joueurs[0]!, un(p, Bonbonne)];
+    avance(p, 30);
+    b.blesse(1, p, 1);
+    avance(p, 20);
+    // le héros monte dessus (il est couché, immobile) et attend le départ
+    Object.assign(j.corps, { x: b.corps.x + 3, y: b.corps.y - j.corps.h, vx: 0, vy: 0 });
+    let depart = 0;
+    for (let i = 0; i < 200 && !depart; i++) {
+      avance(p, 1);
+      if (b.vue()?.e === 2) depart = i;
+    }
+    expect(depart).toBeGreaterThan(0);
+    const x0 = j.corps.x;
+    avance(p, 14);
+    // il a avancé avec le tonneau, toujours posé dessus
+    expect(j.corps.x).toBeGreaterThan(x0 + 3 * TUILE);
+    expect(Math.abs(j.corps.y + j.corps.h - b.corps.y)).toBeLessThan(2);
+    expect(Math.abs(j.corps.x + j.corps.w / 2 - (b.corps.x + b.corps.w / 2))).toBeLessThan(12);
+  });
+});
+
 describe('le monte-charge', () => {
   /** Un puits de cinq tuiles creusé dans le sol, le monte-charge à son sommet, le héros juste à côté. */
   const partieAvecPuits = () => {

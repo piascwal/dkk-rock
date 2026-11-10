@@ -7,7 +7,7 @@ import { zoneAGarder } from './blocs-tuiles';
 import { niveauLu } from '../niveaux';
 import { estPersonnage } from '../jeu/vue';
 import { herosDuGenre } from '../entites/heros';
-import { prechauffeBlanc } from './feuilles-images';
+import { prechauffeBlanc, prechauffeBlancDecor } from './feuilles-images';
 import { prechauffeRocker } from './rockers-convertis';
 import { prechauffeNouveaute } from './dessins-nouveautes';
 
@@ -58,6 +58,7 @@ export class Prechauffage {
   private rockers = 0;
   /** les images des nouveautés déjà préparées (voir dessins-nouveautes.ts) */
   private nouveautes = 0;
+  private tonneauBlanc = false;
   private readonly toileNouveautes = document.createElement('canvas').getContext('2d')!;
 
   /**
@@ -67,6 +68,11 @@ export class Prechauffage {
   private effets(vue: EtatVue): void {
     if (prechauffeNouveaute(this.nouveautes, this.toileNouveautes)) {
       this.nouveautes++;
+      return;
+    }
+    // la silhouette blanche du tonneau-fusée (son clignotement), faite d'avance
+    if (!this.tonneauBlanc && prechauffeBlancDecor('tonneau-metal')) {
+      this.tonneauBlanc = true;
       return;
     }
     if (this.rockers < 12) {
