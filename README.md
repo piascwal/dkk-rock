@@ -35,14 +35,12 @@ mer, puis le festival, sa foule, ses lasers, ses stroboscopes et sa grande scèn
 
 ## Comment on joue
 
-**L'écran titre est vivant** (`ui/titre-anime.ts`) : les cinq DKK en silhouette de part et d'autre des boutons rebondissent au tempo du jeu,
-trois projecteurs aux couleurs du logo balaient la scène (un héros pris dans un faisceau sort de l'ombre), la rampe de LED bat la
-mesure, et de temps en temps un passant traverse : Fadatchi, un yéti, un goéland ou le van. Sur un téléphone debout, les héros
-se rangent plus petits le long du bas. En affichage économe, ou si le système demande moins d'animations : une image fixe.
-En mode essai, l'écran titre passe **en scène** (`ui/titre-scene.ts`) : les cinq héros vivent chacun à son idée
+**L'écran titre est une scène de concert** (`ui/titre-scene.ts`) : trois projecteurs aux couleurs du logo balaient la scène (un héros pris
+dans un faisceau sort de l'ombre), la rampe de LED bat la mesure (`ui/titre-anime.ts`). En affichage économe, ou si le système demande
+moins d'animations : une image fixe. Les cinq héros y vivent chacun à son idée
 (`ui/titre-choregraphie.ts` : flâner, sautiller, se taper dans la main avec un voisin, sauter par-dessus qui barre la route, et
 de temps en temps quelques secondes de folie où tous sautent partout). Le logo et la colonne des boutons sont des obstacles
-(`ui/titre-physique.ts`) : ils les escaladent (image de mur), montent sur le logo, grimpent aux bords de l'écran et filent
+(`ui/titre-physique.ts`) : ils les escaladent (image de mur, animée : `rendu/mur-anime.ts`), montent sur le logo, grimpent aux bords de l'écran et filent
 suspendus au haut de l'écran (image de tyrolienne) ; en l'air, leur image de saut. Au doigt (ou à la souris), on attrape un
 héros (il s'accroche sous le doigt, sa tyrolienne se balance), on le lance, il rebondit sur tout ; les boutons restent à eux.
 Pour changer de côté, ils passent par le haut de l'écran (suspendus, devant le logo et les boutons), escaladent le menu ou
@@ -52,7 +50,7 @@ des flashs d'appareils photo (`ui/titre-decor.ts`). Une batterie sur son estrade
 (`ui/titre-batterie.ts`, un décor : on n'y monte pas) : de temps en temps JBT y va et disparaît derrière, joue tranquille au tempo
 (notes qui s'envolent, cymbales qui scintillent), s'emballe, puis pète un câble : la grosse caisse se fend, crève, il la soulève,
 arrache le charleston et le lance ; éclats et baguettes volent, un nuage de fumée, la batterie est comme neuve et JBT en ressort
-d'un bond. Ses images : `public/sprites/batterie.png` (`outils/prepare-batterie.py`, chargée seulement en mode essai). Pendant ce
+d'un bond. Ses images : `public/sprites/batterie.png` (`outils/prepare-batterie.py`). Pendant ce
 temps (`ui/titre-concert.ts`), les autres se rangent à gauche du menu ; Mat et Tom montent sur une estrade qui sort du sol.
 Quand JBT casse tout, Mat lève sa basse, l'écrase et la casse, Tom brandit sa guitare, l'écrase et la laisse en morceaux
 (`mat-basse.png`, `tom-guitare.png`, `outils/prepare-casse.py`), JBG casse le logo morceau par morceau (`ui/titre-logo-casse.ts` :

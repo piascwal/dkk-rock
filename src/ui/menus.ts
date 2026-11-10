@@ -22,7 +22,6 @@ import { estInstallee, installe, peutInstaller, surIPhone } from './installation
 import { pleinEcran } from './plein-ecran';
 import { ecranCarte } from './carte-choix';
 import { aUnClavier, contenuTouches } from './touches-ui';
-import { animeTitre } from './titre-anime';
 import { animeScene } from './titre-scene';
 import { transitionVan } from './transition-van';
 import { etatNiveau } from '../rendu/prechauffage';
@@ -120,8 +119,8 @@ export class Menus {
       el('p', texteVersion(), 'version version-coin'),
     );
     document.body.classList.add('titre-ouvert');
-    // en essai : l'écran titre en scène (les héros jouent entre eux) ; sinon, les silhouettes qui rebondissent
-    (modeEssai() ? animeScene : animeTitre)(this.ecran, () => this.a.sauvegarde.qualite);
+    // l'écran titre en scène : les héros jouent entre eux (ui/titre-scene.ts)
+    animeScene(this.ecran, () => this.a.sauvegarde.qualite);
   }
 
   /** La carte du monde : on choisit un niveau débloqué (par défaut la partie en cours, sinon le dernier ouvert). */

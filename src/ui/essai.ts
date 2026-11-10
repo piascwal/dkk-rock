@@ -1,6 +1,6 @@
 /**
  * Le mode essai : les niveaux refaits, les héros et les coups encore en essai se jouent sur cet appareil avant d'être publiés aux
- * joueurs. Il s'allume dans Options (« Mode essai », l'appareil s'en souvient ; le jeu redémarre), ou avec `?essai` dans
+ * joueurs (en ce moment, rien n'attend : tout est publié). Il s'allume dans Options (« Mode essai », l'appareil s'en souvient ; le jeu redémarre), ou avec `?essai` dans
  * l'adresse (`?essai=0` l'éteint). Un bandeau le rappelle, avec deux boutons : afficher ou masquer les mesures, et les copier.
  * Éteint, il ne coûte rien : rien n'est mesuré.
  */

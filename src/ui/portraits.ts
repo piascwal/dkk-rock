@@ -1,4 +1,3 @@
-import { essaiJbt } from '../rendu/essai-jbt';
 import { ANIM, G } from '../jeu/vue';
 import { VERSION } from '../version';
 import type { Qui } from '../niveaux/format';
@@ -84,9 +83,7 @@ const IMAGES: Partial<Record<Qui, string>> = {
 
 export function portrait(qui: Qui): string {
   const fichier = IMAGES[qui];
-  // le nouveau JBT, à l'essai : son portrait
-  const nom = qui === 'JBT' && essaiJbt.actif ? 'jbt-essai' : fichier;
-  if (nom) return `${import.meta.env.BASE_URL}portraits/${nom}.png?v=${VERSION}`;
+  if (fichier) return `${import.meta.env.BASE_URL}portraits/${fichier}.png?v=${VERSION}`;
   let url = cache.get(qui);
   if (url) return url;
   const [w, h, dessin] = DESSINS[qui as Exclude<Qui, 'YETI'>];

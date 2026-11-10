@@ -4,9 +4,10 @@ import type { Feuille } from './feuilles';
  * Les planches de JBM, d'après ses bandes d'animation fournies (outils/prepare-jbm.py, sources dans assets-sources/heros/jbm-source/) :
  * repos 4, course 4 (foulée et passage alternés), saut, échelle 2 temps, mur, tyrolienne 2 temps, à terre. Déclarées à la main :
  * outils/anime-instrument.py et outils/fixe-objets.py ne le fabriquent plus. Plus fines que celles des autres héros (162 pixels pour
- * JBM debout au lieu de 120) : densité 8,1, la même taille en jeu.
+ * JBM debout au lieu de 120) : densité 7,5, un peu plus grand que les autres (8,1 le mettrait à leur taille), comme JBT. Contre la
+ * paroi, le pied est à 4,2 pixels du jeu du bord.
  */
-const DENSITE = 8.1;
+const DENSITE = 7.5;
 
 export const FEUILLE_JBM: Feuille = {
   fichier: 'jbm-instrument.png',
@@ -33,7 +34,7 @@ const decor = (nom: string, w: number, h: number, pied: number, images = [1]): F
 /** En l'air, contre une paroi, de dos sur une échelle, sur une tyrolienne : une image à part (voir dessin-entites.ts). */
 export const DECOR_JBM: Record<string, Feuille> = {
   'jbm-saut': decor('jbm-saut', 95, 141, 47),
-  'jbm-mur': decor('jbm-mur', 90, 157, 56),
+  'jbm-mur': decor('jbm-mur', 90, 157, 58),
   'jbm-echelle': decor('jbm-echelle', 93, 162, 46, [1, 1]),
   'jbm-tyrolienne': decor('jbm-tyrolienne', 133, 145, 66, [1, 1]),
 };

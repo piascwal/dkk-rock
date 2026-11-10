@@ -1,4 +1,3 @@
-import { essaiJbt } from './essai-jbt';
 import { G, ANIM, type Genre } from '../jeu/vue';
 import { VERSION } from '../version';
 import { dessineFeuille } from './feuilles-images';
@@ -21,9 +20,7 @@ export function chargeAvion(base: string): void {
   for (const nom of PORTRAITS) {
     const img = new Image();
     img.onload = () => portraits.set(nom, img);
-    // le nouveau JBT, à l'essai, aux hublots aussi
-    const fichier = nom === 'jbt' && essaiJbt.actif ? 'jbt-essai' : nom;
-    img.src = `${base}portraits/${fichier}.png?v=${VERSION}`;
+    img.src = `${base}portraits/${nom}.png?v=${VERSION}`;
   }
 }
 

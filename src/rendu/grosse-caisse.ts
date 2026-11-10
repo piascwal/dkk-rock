@@ -1,9 +1,9 @@
 import { VERSION } from '../version';
 
 /**
- * La grosse caisse « DKK » que lance le nouveau JBT (essai) : elle roule en tournant sur elle-même (lentement : un tour à chaque
+ * La grosse caisse « DKK » que lance le nouveau JBT : elle roule en tournant sur elle-même (lentement : un tour à chaque
  * quatre périmètres parcourus, environ une seconde) et passe au blanc quand elle va exploser. Une image (grosse-caisse.png, 96 × 88, 3 Ko), d'après la
- * grosse caisse fournie (assets-sources/heros/jbt-essai/).
+ * grosse caisse fournie (assets-sources/heros/jbt-source/).
  */
 
 /** Sa taille en jeu (pixels du jeu) : un peu plus grosse que la boîte de collision du tir (12 pixels). */

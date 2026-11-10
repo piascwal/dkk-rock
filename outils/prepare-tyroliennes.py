@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Les tyroliennes de JBG, Tom, JBT et Mat : leurs bandes de 4 poses fournies (fond magenta) → public/sprites/<héros>-tyrolienne.png.
+"""Les tyroliennes de JBG, Tom et Mat (JBT : outils/prepare-jbt.py) : leurs bandes de 4 poses fournies (fond magenta) → public/sprites/<héros>-tyrolienne.png.
 
 Usage : python3 outils/prepare-tyroliennes.py        (Pillow, numpy et scipy requis ; même traitement que outils/prepare-jbm.py)
 
@@ -18,7 +18,7 @@ pj = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(pj)
 
 # héros : (les poses gardées, de 0 à 3 ; pixels de planche par pixel du jeu)
-HEROS = {'jbg': ((1, 2), 6.8), 'tom': ((2, 3), 6), 'jbt': ((2, 1), 7.2), 'mat': ((0, 1), 7.5)}
+HEROS = {'jbg': ((1, 2), 6.8), 'tom': ((2, 3), 6), 'mat': ((0, 1), 7.5)}
 
 
 def main():

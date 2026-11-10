@@ -20,7 +20,6 @@ import { DEMI_TAILLE, DESSINS_TIRS } from './dessins-tirs';
 import { dessineOeuf } from './oeuf-kiwi';
 import { dessineGrenadeOM } from './grenade-om';
 import { dessineGrosseCaisse } from './grosse-caisse';
-import { essaiJbt } from './essai-jbt';
 import { imageEnLair } from './en-lair';
 import { dessineMurPlie, pliEnJeu } from './mur-anime';
 import { pinceau, type Pinceau } from './pinceau';
@@ -68,10 +67,8 @@ function imageMur(ctx: CanvasRenderingContext2D, nom: string, v: EntiteVue): boo
     ctx.rotate(p.angle);
     ctx.translate(-p.x, -p.y);
   }
-  // à l'essai : l'image vit (mur-anime.ts)
-  const dessine = essaiJbt.actif
-    ? dessineMurPlie(ctx, nom, pliEnJeu(v.id, v.y))
-    : dessineDecorFeuille(ctx, nom, 0);
+  // l'image vit : jambes qui se ramassent, bras qui se plient (mur-anime.ts)
+  const dessine = dessineMurPlie(ctx, nom, pliEnJeu(v.id, v.y));
   ctx.restore();
   return dessine;
 }
@@ -244,8 +241,8 @@ export function dessineEntite(
   else if (v.g === G.KIWI) dessineKiwi(p, v.e, v.f);
   else if (v.g === G.P_OEUF && dessineOeuf(ctx, v.x)) {
     // l'œuf de Fadatchi : son image fournie (voir oeuf-kiwi.ts)
-  } else if (v.g === G.P_GROSSE_CAISSE && essaiJbt.actif && dessineCaisse(ctx, v)) {
-    // essai : la grosse caisse « DKK » du nouveau JBT, qui roule (voir grosse-caisse.ts)
+  } else if (v.g === G.P_GROSSE_CAISSE && dessineCaisse(ctx, v)) {
+    // la grosse caisse « DKK » de JBT, qui roule (voir grosse-caisse.ts)
   } else if (v.g === G.P_LARSEN && dessineGrenade(ctx, v)) {
     // la grenade de l'OM de Tom, qui tourne et clignote (voir grenade-om.ts)
   } else if (estTir) DESSINS_TIRS[v.g]?.(pb, v.f, v.e);

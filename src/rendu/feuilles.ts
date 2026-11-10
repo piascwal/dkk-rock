@@ -2,6 +2,7 @@ import { G, type Genre } from '../jeu/vue';
 import { FEUILLES_ENNEMIS } from './feuilles-ennemis';
 import { FEUILLES_HEROS } from './feuilles-heros';
 import { FEUILLE_JBM } from './feuilles-jbm';
+import { FEUILLE_JBT } from './feuilles-jbt';
 import { FEUILLES_OBJETS } from './feuilles-objets';
 
 /**
@@ -77,8 +78,9 @@ export interface Feuille {
 export const FEUILLES: Partial<Record<Genre, Feuille>> = {
   ...FEUILLES_ENNEMIS,
   ...FEUILLES_HEROS,
-  // JBM, d'après ses bandes d'animation (voir feuilles-jbm.ts)
+  // JBM et JBT, d'après leurs images fournies (voir feuilles-jbm.ts et feuilles-jbt.ts)
   [G.JBM]: FEUILLE_JBM,
+  [G.JBT]: FEUILLE_JBT,
   ...FEUILLES_OBJETS,
   // l'élan de Lund porte la planche du caribou d'Ottawa, en attendant la sienne
   [G.ELAN]: FEUILLES_ENNEMIS[G.CARIBOU],

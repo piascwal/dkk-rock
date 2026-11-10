@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Planche d'un héros avec son instrument, à partir du sprite de référence qui le tient (assets-sources/heros/).
 
-Usage : python3 outils/anime-instrument.py [tom|mat|jbt|jbg ...] (JBM : outils/prepare-jbm.py)     (Pillow et numpy requis)
+Usage : python3 outils/anime-instrument.py [tom|mat|jbg ...] (JBM : outils/prepare-jbm.py, JBT : outils/prepare-jbt.py)     (Pillow et numpy requis)
 Sortie : public/sprites/<nom>-instrument.png + aperçu ; la méta (taille, lignes, pied) est affichée.
 
 Le sprite est remis sur sa grille (prepare_instrument.py). L'instrument et les bras qui le tiennent forment une
@@ -161,8 +161,8 @@ def fabrique(nom):
     print(nom, json.dumps(meta))
 
 
-# JBM n'est plus fabriqué ici : ses planches viennent de ses bandes d'animation (outils/prepare-jbm.py, src/rendu/feuilles-jbm.ts)
-GENRES = {'jbt': 'JBT', 'jbg': 'JBG', 'mat': 'MAT', 'tom': 'TOM'}
+# JBM et JBT ne sont plus fabriqués ici (outils/prepare-jbt.py, src/rendu/feuilles-jbt.ts) ; JBM : ses planches viennent de ses bandes d'animation (outils/prepare-jbm.py, src/rendu/feuilles-jbm.ts)
+GENRES = {'jbg': 'JBG', 'mat': 'MAT', 'tom': 'TOM'}
 # pixels de planche par pixel du jeu, quand le héros n'est pas à 6 (un Mat plus grand : son image est plus petite)
 DENSITE_HEROS = {'mat': 5.6}
 
