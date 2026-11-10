@@ -239,7 +239,9 @@ describe('les niveaux à l’essai', () => {
     const def = NIVEAUX.find((n) => n.id === id)!;
     const lu = litNiveau({ ...def, ...ESSAIS_NOUVEAUTES[id] });
     const solide = (x: number, y: number) => proprietes(lu.tuiles[y * lu.largeur + x]!).solide;
-    for (const [c, x, y, sol] of POSES[id]!) {
+    // les caissons (T) et barils (%) des réactions en chaîne ne sont pas des attractions : `pose` les a vérifiés
+    const poses = POSES[id]!.filter(([c]) => c !== 'T' && c !== '%');
+    for (const [c, x, y, sol] of poses) {
       if (c === '>') {
         // des deux côtés de la case de départ, le sol de la surface ; au fond, le sol de la cave sous les deux colonnes
         expect(solide(x - 1, y) && solide(x + 2, y), `${c} en ${x},${y} : la surface`).toBe(true);
@@ -250,6 +252,6 @@ describe('les niveaux à l’essai', () => {
         expect(solide(x, r), `${c} en ${x},${y} : un plafond`).toBe(true);
       } else expect(solide(x, y + 1), `${c} en ${x},${y}`).toBe(true);
     }
-    expect(lu.attractions.length + lu.ennemis.filter((e) => e.lettre === '?').length).toBe(POSES[id]!.length);
+    expect(lu.attractions.length + lu.ennemis.filter((e) => e.lettre === '?').length).toBe(poses.length);
   });
 });

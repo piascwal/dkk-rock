@@ -17,6 +17,11 @@ import { CARTE_TUVES_REFONTE } from './refontes/13-tuves';
  * Les emplacements ont été choisis sur les cartes publiées (un rebord à atteindre pour une grosse caisse, un long plat pour les
  * autres, un plafond au-dessus d'ennemis ou de barils pour un projecteur, un puits au-dessus d'une cave pour un monte-charge) ;
  * `pose` vérifie que chacun tient (test).
+ *
+ * Règle de level design, à reprendre dans chaque niveau où l'on propage ces nouveautés : des objets explosifs (caissons `T`, barils
+ * `%`, empilés) sont posés là où quelque chose finit par les atteindre, pour provoquer des réactions en chaîne : au bout de la
+ * course d'un tonneau-fusée (une vingtaine de cases, de chaque côté), et sous chaque projecteur. Chacun garde le chemin praticable
+ * (le test d'accessibilité des niveaux le vérifie).
  */
 
 /** [repère, colonne, rangée] ; le monte-charge a une rangée de plus : celle du sol de la cave où descend son puits. */
@@ -89,6 +94,31 @@ export const POSES: Readonly<Record<string, readonly Pose[]>> = {
     ['"', 430, 34],
     ['"', 433, 34],
     ['"', 436, 34],
+    // réactions en chaîne : des barils sous les lampes, un caisson et un baril au bout de la course de chaque tonneau-fusée
+    ['T', 28, 39],
+    ['%', 29, 39],
+    ['T', 116, 47],
+    ['%', 117, 47],
+    ['T', 222, 45],
+    ['%', 223, 45],
+    ['T', 273, 55],
+    ['%', 272, 55],
+    ['T', 318, 58],
+    ['%', 317, 58],
+    ['T', 354, 51],
+    ['%', 355, 51],
+    ['T', 418, 49],
+    ['%', 417, 49],
+    ['T', 463, 63],
+    ['%', 462, 63],
+    ['T', 499, 59],
+    ['%', 500, 59],
+    ['T', 554, 49],
+    ['T', 639, 59],
+    ['%', 640, 59],
+    ['%', 430, 35],
+    ['%', 433, 35],
+    ['%', 436, 35],
   ],
   alpages: [
     [':', 86, 33],
@@ -107,6 +137,21 @@ export const POSES: Readonly<Record<string, readonly Pose[]>> = {
     ['"', 68, 31],
     ['"', 76, 31],
     ['"', 80, 31],
+    // réactions en chaîne : des barils sous les lampes, un caisson et un baril au bout de la course de chaque tonneau-fusée
+    ['T', 68, 33],
+    ['T', 303, 33],
+    ['%', 302, 33],
+    ['T', 339, 33],
+    ['T', 469, 33],
+    ['%', 468, 33],
+    ['%', 60, 33],
+    ['%', 60, 32],
+    ['%', 64, 33],
+    ['%', 64, 32],
+    ['%', 68, 32],
+    ['%', 76, 32],
+    ['%', 80, 33],
+    ['%', 80, 32],
   ],
   cimes: [
     ['?', 167, 58],
@@ -122,6 +167,15 @@ export const POSES: Readonly<Record<string, readonly Pose[]>> = {
     ['"', 297, 39],
     ['"', 446, 40],
     ['"', 449, 40],
+    // réactions en chaîne : des barils sous les lampes, un caisson et un baril au bout de la course de chaque tonneau-fusée
+    ['T', 351, 41],
+    ['%', 350, 41],
+    ['%', 294, 40],
+    ['%', 297, 40],
+    ['%', 446, 44],
+    ['%', 446, 43],
+    ['%', 449, 45],
+    ['%', 449, 44],
   ],
 };
 
