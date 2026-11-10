@@ -13,12 +13,12 @@ const [ATTEND, SELLE, BRAS, DECOLLE] = [0, 1, 2, 3];
 const hasard = (a: number, b: number) => a + Math.random() * (b - a);
 
 export interface Rodeo {
-  /** l'image du saut en cours (un bras levé, ou décollé), et quand repartir */
+  /** l'image du saut en cours (un bras levé, puis décollé au saut suivant, et ainsi de suite), et le temps du dernier saut */
   enLair: number;
-  prochain: number;
+  temps: number;
 }
 
-export const nouveauRodeo = (): Rodeo => ({ enLair: BRAS, prochain: 0 });
+export const nouveauRodeo = (): Rodeo => ({ enLair: DECOLLE, temps: -1 });
 
 /** Il descend de Fadatchi : le kiwi revient sur la scène, à côté de lui. */
 export function descend(jbm: Acteur, kiwi: Acteur | undefined, s: Scene): void {
@@ -56,17 +56,19 @@ export function rodeo(r: Rodeo, b: Batterie, s: Scene, jbm: Acteur, kiwi: Acteur
     descend(jbm, kiwi, s);
     return false;
   }
-  [jbm.fantome, jbm.pose, jbm.hausse] = [true, 'jbm-kiwi', 0];
+  [jbm.fantome, jbm.pose] = [true, 'jbm-kiwi'];
   if (jbm.etat === 'air') {
     jbm.poseLigne = r.enLair;
     return true;
   }
+  // au sol : il attend assis, les pieds par terre et les mains sur les cuisses ; dès que JBT s'emballe (quand Mat et Tom montent
+  // sur leur estrade), il retombe les deux mains sur la selle et rebondit, un saut tous les deux temps de la musique
   jbm.poseLigne = b.etape >= 1 ? SELLE : ATTEND;
-  if (b.etape >= 1 && b.t >= r.prochain) {
-    // rodéo : un saut sur place (le logo ne l'arrête pas), un bras levé ou décollé du kiwi
-    saute(s, jbm, hasard(0.8, 1.6), 0);
-    r.enLair = Math.random() < 0.5 ? BRAS : DECOLLE;
-    r.prochain = b.t + hasard(0.75, 1.2);
+  if (b.etape >= 1 && b.temps % 2 === 0 && b.temps !== r.temps) {
+    r.temps = b.temps;
+    // le logo ne l'arrête pas ; en l'air, tour à tour un bras levé et décollé du kiwi
+    saute(s, jbm, hasard(0.9, 1.3), 0);
+    r.enLair = r.enLair === BRAS ? DECOLLE : BRAS;
   }
   return true;
 }

@@ -3,7 +3,7 @@ import type { Batterie } from './titre-batterie';
 import { gerbe, nuage } from './titre-eclats';
 import { casse, nouveauLogo, repare, tremble, type LogoCasse } from './titre-logo-casse';
 import { descend, nouveauRodeo, rodeo, type Rodeo } from './titre-rodeo';
-import { horsScene, PESANTEUR, saute, type Acteur, type Bloc, type Scene } from './titre-physique';
+import { horsScene, saute, type Acteur, type Bloc, type Scene } from './titre-physique';
 
 /**
  * La mise en scène des autres pendant que JBT joue de la batterie (titre-batterie.ts) : ils quittent le devant de la batterie et
@@ -62,59 +62,43 @@ export const nouveauConcert = (ecran: HTMLElement): Concert => ({
 export const enfonce = (a: Acteur): number =>
   a.pose ? (Object.values(INSTRUMENTS).find((i) => i.image === a.pose)?.bas ?? 0) : 0;
 
-/** Où se range chacun, à gauche du menu, de gauche à droite : Mat, Tom, JBG, JBM. */
+/** Où se range chacun, à gauche du menu, de gauche à droite : Mat, Tom, JBM sur Fadatchi ; JBG, lui, va sur le logo. */
 function places(s: Scene): Record<string, number> {
-  const xa = s.hh * 1.3;
-  const xb = Math.max(xa + s.hh * 2.5, (s.menu ? s.menu.x0 : s.W * 0.45) - s.hh * 0.5);
+  const xa = s.hh * 1.1;
+  const xb = Math.max(xa + s.hh * 2.5, (s.menu ? s.menu.x0 : s.W * 0.45) - s.hh * 0.6);
   const en = (f: number) => xa + (xb - xa) * f;
   // Fadatchi rejoint JBM : il lui sert de monture (titre-rodeo.ts)
-  return { mat: en(0.05), tom: en(0.38), jbg: en(0.68), jbm: en(0.88), kiwi: en(0.88) };
+  return { mat: en(0), tom: en(0.5), jbm: en(1), kiwi: en(1) };
 }
 
 const surLogo = (a: Acteur, logo: Bloc) =>
   a.etat === 'sol' && Math.abs(a.y - logo.y0) < 2 && a.x > logo.x0 && a.x < logo.x1;
-/** Assez de sol libre sous le logo pour sauter le frapper par-dessous (pas de menu juste dessous, comme sur iPad). */
-const dessousLibre = (s: Scene, logo: Bloc) =>
-  s.sol - logo.y1 > s.hh * 1.6 &&
-  !s.blocs.some(
-    (o) => o !== logo && o.x1 > logo.x0 && o.x0 < logo.x1 && o.y0 > logo.y1 - 1 && o.y0 < s.sol - s.hh * 0.5,
-  );
 /** Assez de place entre le logo et le haut de l'écran pour s'y tenir debout (sinon, on s'y suspend). */
 const dessusLibre = (logo: Bloc, s: Scene) => logo.y0 > s.hh;
 
 /**
- * JBG au travail sur le logo, selon la place : par-dessous (sa tête y cogne) ; dessus (il y grimpe, puis saute à pieds joints) ;
- * ou, quand le logo est trop haut sous le plafond pour s'y tenir (iPad), suspendu au haut de l'écran : il se balance au-dessus du
- * logo, d'un bord à l'autre, et lui donne des coups de pied.
+ * JBG et le logo : il prend sa place dessus dès le début du spectacle (il y grimpe ; s'il n'a pas la place d'y tenir debout,
+ * comme sur iPad, il se suspend au haut de l'écran, au-dessus de lui) ; quand JBT casse tout (`frapper`), il saute dessus à pieds
+ * joints, ou, suspendu, se balance d'un bord à l'autre du logo en lui donnant des coups de pied.
  */
-function attaqueLogo(co: Concert, b: Batterie, s: Scene, a: Acteur, logo: Bloc): void {
+function surLeLogo(co: Concert, b: Batterie, s: Scene, a: Acteur, logo: Bloc, frapper: boolean): void {
   if (a.etat === 'plafond') {
     a.plafond = Math.max(a.plafond, 1);
     if (a.x > logo.x1 + s.hh * 0.3) a.dir = -1;
     else if (a.x < logo.x0 - s.hh * 0.3) a.dir = 1;
-    if (a.x > logo.x0 && a.x < logo.x1 && b.t >= (co.saut.get(a) ?? 0)) {
+    if (frapper && a.x > logo.x0 && a.x < logo.x1 && b.t >= (co.saut.get(a) ?? 0)) {
       frappe(co, b, s, a.x, Math.max(logo.y0, Math.min(logo.y1, a.y)));
       co.saut.set(a, b.t + hasard(0.45, 0.8));
     }
     return;
   }
   if (a.etat !== 'sol' || b.t < (co.saut.get(a) ?? 0)) return;
-  const milieu = (logo.x0 + logo.x1) / 2;
-  a.grimpe = false;
   if (surLogo(a, logo)) {
-    [a.tx, a.objectif] = [null, null];
+    // il y est : il attend, tourné vers la batterie ; puis saute à pieds joints
+    [a.tx, a.objectif, a.dir, a.grimpe] = [null, null, b.x > a.x ? 1 : -1, false];
+    if (!frapper) return;
     saute(s, a, hasard(0.45, 0.75), hasard(-0.4, 0.4) * s.hh);
     co.saut.set(a, b.t + hasard(0.05, 0.3));
-  } else if (dessousLibre(s, logo)) {
-    if (a.y < s.sol - 2 || Math.abs(a.x - milieu) > (logo.x1 - logo.x0) / 2 + s.hh) {
-      // trop loin (ou perché ailleurs) : il revient sous le logo
-      a.tx ??= Math.max(logo.x0, Math.min(logo.x1, a.x));
-      return;
-    }
-    const cible = Math.max(logo.x0 + s.hh * 0.3, Math.min(logo.x1 - s.hh * 0.3, a.x));
-    const monte = Math.max(s.hh * 0.5, a.y - logo.y1 - s.hh * 0.8);
-    saute(s, a, monte / s.hh, (cible - a.x) / Math.sqrt((2 * monte) / (PESANTEUR * s.hh)));
-    co.saut.set(a, b.t + hasard(0.5, 1.1));
   } else if (!dessusLibre(logo, s)) {
     // pas la place debout dessus : il grimpe au bord de l'écran (sur l'enceinte, puis le long du bord) et s'y suspend
     a.tx ??= a.x < s.W / 2 ? 0 : s.W;
@@ -125,7 +109,8 @@ function attaqueLogo(co: Concert, b: Batterie, s: Scene, a: Acteur, logo: Bloc):
     const droite = (s.menu ? s.menu.x0 : s.W) - logo.x1 > s.hh * 0.9;
     const elan = droite ? logo.x1 + s.hh * 0.45 : logo.x0 - s.hh * 0.45;
     if (Math.abs(a.x - elan) > s.hh * 0.25 || a.y < s.sol - 2) {
-      a.tx ??= elan;
+      // (par-dessus ce qui le gêne : la colonne des boutons, quand il vient de la batterie)
+      if (a.tx === null) [a.tx, a.objectif, a.grimpe, a.plafond] = [elan, elan, true, s.W / (1.3 * s.hh)];
       return;
     }
     a.grimpe = true;
@@ -198,29 +183,21 @@ export function joueConcert(co: Concert, b: Batterie, s: Scene, acteurs: Acteur[
   const kiwi = acteurs.find((a) => a.nom === 'kiwi');
   for (const a of acteurs) {
     if (!a.dirige || horsScene(a)) continue;
-    const [avant, avantEtat] = [co.vy.get(a) ?? 0, co.etat.get(a)];
+    const avantEtat = co.etat.get(a);
     co.vy.set(a, a.vy);
     co.etat.set(a, a.etat);
-    if (logo && b.etape >= 2 && a.nom === 'jbg') {
-      // un coup : le haut d'un saut sous le logo (la tête cogne), ou la retombée à pieds joints dessus
-      const tete = a.y - s.hh;
-      const dessous = a.x > logo.x0 - s.hh * 0.3 && a.x < logo.x1 + s.hh * 0.3;
-      if (
-        a.etat === 'air' &&
-        avant < 0 &&
-        a.vy >= 0 &&
-        dessous &&
-        tete < logo.y1 + s.hh * 0.6 &&
-        tete > logo.y0 - s.hh
-      )
-        frappe(co, b, s, Math.max(logo.x0, Math.min(logo.x1, a.x)), logo.y1);
-      else if (avantEtat === 'air' && surLogo(a, logo)) frappe(co, b, s, a.x, logo.y0);
-      attaqueLogo(co, b, s, a, logo);
+    if (logo && a.nom === 'jbg') {
+      // un coup : la retombée à pieds joints sur le logo (suspendu : surLeLogo)
+      const frapper = b.etape >= 2;
+      if (frapper && avantEtat === 'air' && surLogo(a, logo)) frappe(co, b, s, a.x, logo.y0);
+      surLeLogo(co, b, s, a, logo, frapper);
       continue;
     }
     // JBM en selle, au sol comme en l'air : son rodéo
     if (a.nom === 'jbm' && kiwi?.etat === 'monture' && rodeo(co.rodeo, b, s, a, kiwi)) {
       if (a.etat === 'sol') a.dir = b.x > a.x ? 1 : -1;
+      // son estrade sort du sol avec celles de Mat et Tom
+      a.hausse = Math.min(s.hh * ESTRADE, a.hausse + (b.etape >= 1 ? s.hh * dt : 0));
       continue;
     }
     if (a.etat !== 'sol') {
@@ -254,6 +231,19 @@ export function joueConcert(co: Concert, b: Batterie, s: Scene, acteurs: Acteur[
     if (INSTRUMENTS[a.nom]) casseInstrument(co, b, s, a, dt);
     else if (a.nom === 'jbm' && rodeo(co.rodeo, b, s, a, kiwi)) {
       // en selle sur Fadatchi (titre-rodeo.ts)
+    } else if (a.nom === 'jbm' && kiwi && b.etape >= 1 && kiwi.etat !== 'tenu') {
+      // le spectacle commence et Fadatchi n'est pas encore là (bloqué en route) : il accourt, dans un petit nuage
+      nuage(b, s, a.x - s.hh * 0.4, s.sol - s.hh * 0.6, a.x + s.hh * 0.4, s.sol, 6);
+      [kiwi.etat, kiwi.x, kiwi.y, kiwi.vx, kiwi.vy, kiwi.tx, kiwi.objectif] = [
+        'sol',
+        a.x,
+        a.y,
+        0,
+        0,
+        null,
+        null,
+      ];
+      rodeo(co.rodeo, b, s, a, kiwi);
     } else if (a.nom === 'jbm' && b.etape >= 1 && b.t >= (co.saut.get(a) ?? 0)) {
       saute(s, a, hasard(0.8, 1.5), 0);
       co.saut.set(a, b.t + BATTEMENT * (1 + Math.floor(Math.random() * 2)));
@@ -272,7 +262,7 @@ export function dessineConcert(
   const u = Math.max(2, Math.round(s.hh / 40));
   for (const a of acteurs) {
     if (a.hausse < 1) continue;
-    const [l, h] = [Math.round(s.hh * 0.9), Math.ceil(a.hausse)];
+    const [l, h] = [Math.round(s.hh * (a.nom === 'jbm' ? 1.2 : 0.9)), Math.ceil(a.hausse)];
     const [x0, y0] = [Math.round(a.x - l / 2), Math.round(s.sol - h)];
     ctx.fillStyle = '#17121c';
     ctx.fillRect(x0, y0, l, h + 1);
