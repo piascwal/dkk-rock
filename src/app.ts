@@ -337,7 +337,7 @@ export class App implements Actions {
     this.derniereVue = v;
     this.finMini.maj(v);
     this.suiviRecrue.maj(v, siege);
-    this.entreeBoss.maj(v, this.recrue.enCours);
+    this.entreeBoss.maj(v);
     this.rendu.dessine(v, carte, siege);
     if (retiensRecords(this.sauvegarde, v)) this.enregistre();
     const noms = nomsDesJoueurs(this.client, this.hote, this.sauvegarde.pseudo);

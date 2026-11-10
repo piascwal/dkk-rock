@@ -74,69 +74,6 @@ body {
   pointer-events: none;
 }
 
-/* la première rencontre d'une nouveauté (ui/decouverte.ts) : un bandeau en travers de l'écran, par-dessus le jeu */
-.decouverte {
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%) rotate(-2deg);
-  z-index: 25;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  padding: 0.6rem 1rem;
-  background: #120914;
-  border-top: 6px solid #ffd23f;
-  border-bottom: 6px solid #c4172c;
-  box-shadow: 0 0 0 100vmax rgba(10, 4, 14, 0.5);
-  pointer-events: none;
-  animation: decouverte-entre 0.3s ease-out;
-}
-
-.decouverte[hidden] {
-  display: none;
-}
-
-.decouverte canvas {
-  width: min(28vh, 160px);
-  height: min(28vh, 160px);
-  image-rendering: pixelated;
-}
-
-.decouverte p {
-  margin: 0;
-  font-family: var(--titre);
-}
-
-.decouverte-nouveau {
-  color: #ff2e93;
-  font-size: clamp(0.8rem, 4vh, 1.2rem);
-  letter-spacing: 0.2em;
-}
-
-.decouverte-nom {
-  color: #fff4d6;
-  font-size: clamp(1.4rem, 9vh, 3rem);
-  font-weight: 700;
-  text-shadow:
-    2px 2px 0 #00c2d1,
-    4px 4px 0 #ff2e93;
-}
-
-.decouverte-astuce {
-  color: #ffd23f;
-  font-size: clamp(0.7rem, 3.6vh, 1.1rem);
-  max-width: 28rem;
-}
-
-@keyframes decouverte-entre {
-  from {
-    transform: translateY(-50%) translateX(-100%) rotate(-2deg);
-  }
-}
-
 /* le bouton pour passer l'intro : discret, en haut à droite (le bas porte les noms des personnages) */
 .passer-intro {
   position: fixed;

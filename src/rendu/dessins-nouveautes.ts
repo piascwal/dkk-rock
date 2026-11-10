@@ -1,35 +1,16 @@
 import { ANIM, G } from '../jeu/vue';
+import { dessineEnCache } from './dessins-en-cache';
 import { humain, type Pinceau } from './pinceau';
 
 /**
  * Les nouveautés qu'on découvre de niveau en niveau (voir jeu/nouveautes.ts), dessinées en code en attendant leurs images : le
- * porteur de pancarte, le sonneur d'alarme, la grosse caisse trampoline, la bonbonne de fumée et la sirène.
+ * sonneur d'alarme, la grosse caisse trampoline, la bonbonne de fumée et la sirène.
  */
 type Dessin = (p: Pinceau, e: number, f: number) => void;
 
 const pasDe = (e: number, f: number) => (e === ANIM.COURT ? Math.floor(f / 5) % 4 : -1);
 
 export const DESSINS_ENNEMIS_NOUVEAUX: Partial<Record<number, Dessin>> = {
-  // le porteur de pancarte : costaud, polo rose, casquette ; devant lui, une grande pancarte « NON AU ROCK » qui le couvre
-  [G.PANCARTE]: (p, e, f) => {
-    const yt = humain(
-      p,
-      { peau: '#e0b088', haut: '#e8607a', bas: '#2a2a3a', chaussures: '#f0f0f0', carrure: 7 },
-      { pas: pasDe(e, f) },
-    );
-    p(-4, yt - 1, 8, 2, '#2a2a3a'); // la casquette
-    p(2, yt, 3, 1, '#2a2a3a');
-    // le manche, puis le panneau, tenu devant lui (à droite : il regarde à droite)
-    p(6, yt + 4, 1, 14, '#8a5a2b');
-    p(3, yt - 4, 8, 13, '#1a1018');
-    p(4, yt - 3, 6, 11, '#f5ecd6');
-    p(5, yt - 1, 4, 1, '#c1121f');
-    p(5, yt + 1, 4, 1, '#c1121f');
-    p(5, yt + 3, 3, 1, '#c1121f');
-    // la note de musique barrée
-    p(5, yt + 5, 2, 2, '#1a1018');
-    p(8, yt + 5, 1, 2, '#c1121f');
-  },
   // le sonneur d'alarme : gilet jaune fluo, casquette rouge, un sifflet ; en alerte, il lève les bras
   [G.SONNEUR]: (p, e, f) => {
     const yt = humain(
@@ -44,14 +25,14 @@ export const DESSINS_ENNEMIS_NOUVEAUX: Partial<Record<number, Dessin>> = {
   },
 };
 
-export const DESSINS_OBJETS_NOUVEAUX: Partial<Record<number, Dessin>> = {
+/** Les objets, dessinés pieds en (0, 0) : `e` et `f` comme dans leur vue (voir entites/attractions.ts, monte-charge.ts, suspendus.ts). */
+const OBJETS: Partial<Record<number, Dessin>> = {
   // la grosse caisse couchée, la peau vers le haut : `e` = 1 quand on vient de rebondir (la peau est enfoncée)
   [G.TREMPLIN]: (p, e) => {
     p(-10, -7, 20, 7, '#3b2a1e');
     p(-10, -7, 20, 1, '#c9a23a'); // le cercle
     p(-10, -1, 20, 1, '#c9a23a');
     for (const x of [-8, -3, 2, 7]) p(x, -6, 1, 5, '#8a96a3'); // les tirants
-    // la peau
     if (e) {
       p(-9, -8, 3, 1, '#f5ecd6');
       p(6, -8, 3, 1, '#f5ecd6');
@@ -61,8 +42,8 @@ export const DESSINS_OBJETS_NOUVEAUX: Partial<Record<number, Dessin>> = {
       p(-4, -9, 8, 1, '#ffd23f'); // le logo
     }
   },
-  // la bonbonne de fumée : `e` 0 posée, 1 elle siffle (elle tremble), 2 en vol de côté (couchée, nez devant), 3 droit en l'air
-  [G.BONBONNE]: (p, e, f) => {
+  // la bonbonne de fumée : `e` 0 debout, 1 couchée (elle clignote : le blanc vient du dessin), 2 en vol (la flamme derrière)
+  [G.BONBONNE]: (p, e) => {
     const corps = (q: Pinceau) => {
       q(-3, -12, 6, 12, '#c8322a');
       q(-3, -12, 2, 12, '#e8605a');
@@ -70,19 +51,12 @@ export const DESSINS_OBJETS_NOUVEAUX: Partial<Record<number, Dessin>> = {
       q(-2, -14, 4, 2, '#8a96a3');
       q(-1, -15, 2, 1, '#5d6b73');
     };
+    if (e === 0) return corps(p);
+    // couchée : (x, y) → (-y, x - 6) : la valve en avant (à droite), posée sur le sol
+    corps((x, y, w, h, c) => p(-y - h - 6, x - 6 + 6 - 3, h, w, c));
     if (e === 2) {
-      // couchée : (x, y) → (-y, x), la valve en avant ; la flamme derrière
-      corps((x, y, w, h, c) => p(-y - h - 6, x - 6, h, w, c));
-      p(-10 - (f % 2), -8, 4, 4, '#ffd23f');
-      p(-13 - (f % 3), -7, 3, 2, '#ff9b2f');
-      return;
-    }
-    const dx = e === 1 ? (f % 2 ? 1 : -1) : 0;
-    corps((x, y, w, h, c) => p(x + dx, y, w, h, c));
-    if (e === 1) p(-1 + dx, -18, 2, 3, '#e8e8f0'); // le sifflement
-    if (e === 3) {
-      p(-2, 0, 4, 4, '#ffd23f');
-      p(-1, 4, 2, 3, '#ff9b2f');
+      p(-13, -7, 4, 4, '#ffd23f');
+      p(-16, -6, 3, 2, '#ff9b2f');
     }
   },
   // la sirène sur son poteau : `e` 0 en veille, 1 elle hurle (le gyrophare tourne), 2 éteinte après avoir sonné
@@ -100,4 +74,84 @@ export const DESSINS_OBJETS_NOUVEAUX: Partial<Record<number, Dessin>> = {
       p(cote * 7 - 1, -22, 1, 5, '#ff8080');
     }
   },
+  // la plate-forme du monte-charge (ses câbles sont tracés à part : leur longueur change)
+  [G.MONTE_CHARGE]: (p) => {
+    p(-15, -6, 30, 6, '#46525a');
+    p(-15, -6, 30, 2, '#ffd23f');
+    for (let x = -15; x < 15; x += 6) p(x, -6, 3, 2, '#1a1a1e'); // les rayures de sécurité
+    p(-15, -1, 30, 1, '#2a2a30');
+    p(-15, -8, 2, 2, '#8a96a3'); // les anneaux des câbles
+    p(13, -8, 2, 2, '#8a96a3');
+  },
+  // le projecteur de scène : `e` 0 il pend, 1 il tombe, 2 l'épave (ses câbles, tracés à part)
+  [G.PROJECTEUR]: (p, e) => {
+    if (e === 2) {
+      p(-6, -5, 12, 5, '#2a2a3a');
+      p(-3, -2, 2, 1, '#ffe9a0'); // les éclats de verre
+      p(2, -1, 2, 1, '#ffe9a0');
+      p(5, -9, 1, 5, '#1a1a1e'); // le bout de câble
+      return;
+    }
+    p(-1, -12, 2, 2, '#5d6b73'); // l'étrier
+    p(-5, -10, 10, 6, '#2a2a3a');
+    p(-7, -9, 2, 4, '#46525a'); // les volets
+    p(5, -9, 2, 4, '#46525a');
+    p(-4, -4, 8, 3, '#ffe9a0'); // la lentille, éclairée
+    p(-3, -3, 6, 1, '#ffffff');
+  },
 };
+
+/** Les états à préparer d'avance (voir prechauffage.ts) : [genre, e, f]. */
+export const ETATS_NOUVEAUTES: readonly (readonly [number, number, number])[] = [
+  [G.TREMPLIN, 0, 0],
+  [G.TREMPLIN, 1, 0],
+  [G.BONBONNE, 0, 0],
+  [G.BONBONNE, 1, 0],
+  [G.BONBONNE, 2, 0],
+  [G.SIRENE, 0, 0],
+  [G.SIRENE, 1, 0],
+  [G.SIRENE, 1, 4],
+  [G.SIRENE, 1, 8],
+  [G.SIRENE, 1, 12],
+  [G.SIRENE, 2, 0],
+  [G.MONTE_CHARGE, 0, 0],
+  [G.PROJECTEUR, 0, 0],
+  [G.PROJECTEUR, 1, 0],
+  [G.PROJECTEUR, 2, 0],
+];
+
+/**
+ * Le dessin d'un objet nouveau, repris du cache d'images (jamais rectangle par rectangle à chaque image) ; `blanc` : sa
+ * silhouette blanche, le clignotement. Faux si ce genre n'est pas l'un d'eux. Les câbles, dont la longueur varie, sont tracés ici.
+ */
+export function dessineNouveaute(
+  ctx: CanvasRenderingContext2D,
+  v: { g: number; e: number; f: number },
+  blanc: boolean,
+): boolean {
+  const dessin = OBJETS[v.g];
+  if (!dessin) return false;
+  // un état = une image : la sirène tourne (4 images), le reste ne dépend que de `e`
+  const f = v.g === G.SIRENE ? Math.floor(v.f / 4) * 4 : 0;
+  dessineEnCache(ctx, (q) => dessin(blanc ? (x, y, w, h) => q(x, y, w, h, '#ffffff') : q, v.e, f));
+  ctx.fillStyle = blanc ? '#ffffff' : '#1a1a1e';
+  if (v.g === G.MONTE_CHARGE) {
+    const l = v.f * 2;
+    ctx.fillRect(-14, -8 - l, 1, l);
+    ctx.fillRect(13, -8 - l, 1, l);
+  } else if (v.g === G.PROJECTEUR && v.e === 0) {
+    ctx.fillRect(-0.5, -12 - v.f * 2, 1, v.f * 2);
+  }
+  return true;
+}
+
+/** Prépare l'image `n` de la liste (normale, puis blanche) : faux quand tout est prêt. */
+export function prechauffeNouveaute(n: number, ctx: CanvasRenderingContext2D): boolean {
+  const k = Math.floor(n / 2);
+  const etat = ETATS_NOUVEAUTES[k];
+  if (!etat) return false;
+  ctx.save();
+  dessineNouveaute(ctx, { g: etat[0], e: etat[1], f: etat[2] }, n % 2 === 1);
+  ctx.restore();
+  return true;
+}

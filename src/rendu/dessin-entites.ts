@@ -16,6 +16,7 @@ import { FEUILLES } from './feuilles';
 import { FEUILLES_DECOR } from './feuilles-objets';
 import { dessineHeros, dessineInstrument, dessineKiwi } from './dessins-heros';
 import { DESSINS_OBJETS, iconeArme } from './dessins-objets';
+import { dessineNouveaute } from './dessins-nouveautes';
 import { DEMI_TAILLE, DESSINS_TIRS } from './dessins-tirs';
 import { dessineOeuf } from './oeuf-kiwi';
 import { dessineGrenadeOM } from './grenade-om';
@@ -250,6 +251,8 @@ export function dessineEntite(
     // dessinés en code : mis en image une fois, puis repris du cache (voir dessins-en-cache.ts)
     const dessin = (DESSINS_ENNEMIS[v.g] ?? DESSINS_BOSS[v.g])!;
     dessineEnCache(ctx, (q) => dessin(blanc ? (x0, y0, w, h) => q(x0, y0, w, h, '#ffffff') : q, v.e, v.f));
+  } else if (dessineNouveaute(ctx, v, blanc)) {
+    // les nouveautés (grosse caisse, bonbonne, sirène, monte-charge, projecteur) : depuis le cache, en blanc quand elles clignotent
   } else if (v.g === G.ARME && dessineBonus(ctx, v.f)) {
     // une arme à icône fournie : l'icône flotte à la place de la mallette
   } else if (DESSINS_OBJETS[v.g]) {

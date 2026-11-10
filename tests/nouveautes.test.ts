@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { TUILE, VIES_DEPART } from '../src/config';
 import { Bonbonne, Tremplin } from '../src/entites/attractions';
 import { Sirene } from '../src/entites/ennemis/alarme';
+import { ENNEMIS_PAR_LETTRE } from '../src/entites/ennemis/definitions';
+import { MonteCharge } from '../src/entites/monte-charge';
+import { Projecteur } from '../src/entites/suspendus';
 import { Ennemi } from '../src/entites/ennemis/ennemi';
 import { Partie } from '../src/jeu/partie';
 import { G } from '../src/jeu/vue';
@@ -51,48 +54,131 @@ describe('la grosse caisse trampoline', () => {
 });
 
 describe('la bonbonne de fumée', () => {
-  it('file du côté opposé au coup et explose sur le premier ennemi', () => {
+  it('tombe tout de suite au premier coup, clignote, puis file et explose sur le premier ennemi', () => {
     const p = partie('@   :            a               F');
     const b = un(p, Bonbonne);
     avance(p, 30);
-    const x0 = b.corps.x;
-    b.blesse(1, p, 1, false);
-    avance(p, 30);
-    expect(b.corps.x).toBeGreaterThan(x0 + TUILE);
-    expect(b.fini).toBe(false);
-    avance(p, 90);
+    const [x0, h0] = [b.corps.x, b.corps.h];
+    b.blesse(1, p, 1);
+    // couchée aussitôt (large et basse), sur place
+    expect(b.corps.h).toBeLessThan(h0);
+    avance(p, 20);
+    expect(b.corps.x).toBeLessThan(x0 + 2 * TUILE);
+    expect(b.vue()?.e).toBe(1);
+    // elle clignote (blanc) pendant qu'elle est couchée
+    const blancs = new Set<boolean>();
+    for (let i = 0; i < 30; i++) {
+      avance(p, 1);
+      if (b.vue()?.e === 1) blancs.add(b.vue()!.clignote);
+    }
+    expect(blancs.size).toBe(2);
+    // puis elle part
+    avance(p, 40);
+    expect(b.corps.x).toBeGreaterThan(x0 + 3 * TUILE);
+    avance(p, 120);
     expect(b.fini).toBe(true);
-    // l'ennemi a pris l'explosion
     const e = un(p, Ennemi);
     expect(!e || !e.vivant()).toBe(true);
   });
+});
 
-  it('part droit en l’air sous une explosion', () => {
-    const p = partie('@         :                      F');
-    const b = un(p, Bonbonne);
-    avance(p, 30);
-    const y0 = b.corps.y;
-    b.blesse(5, p, 1, true);
-    avance(p, 40);
-    expect(b.corps.y).toBeLessThan(y0 - 2 * TUILE);
+describe('le monte-charge', () => {
+  /** Un puits de cinq tuiles creusé dans le sol, le monte-charge à son sommet, le héros juste à côté. */
+  const partieAvecPuits = () => {
+    const vide = ' '.repeat(34);
+    const carte = [
+      ...Array(8).fill(vide),
+      '@' + ' '.repeat(32) + 'F',
+      '###>.' + '#'.repeat(29),
+      ...Array(4).fill('###..' + '#'.repeat(29)),
+      'X'.repeat(34),
+    ];
+    const p = new Partie({
+      niveau: ajouteNiveauEssai({ ...NIVEAUX[0]!, id: 'essai-monte', carte, decor: [] }),
+      drapeau: -1,
+      vies: VIES_DEPART,
+      score: 0,
+    });
+    p.ajouteJoueur(0, 0);
+    while (p.phase === 'histoire') p.suivant();
+    return p;
+  };
+  it('emmène le héros qui s’y tient jusqu’au fond du puits, puis le remonte', () => {
+    const p = partieAvecPuits();
+    const [j, m] = [p.joueurs[0]!, un(p, MonteCharge)];
+    const haut = m.corps.y;
+    avance(p, 20);
+    Object.assign(j.corps, { x: m.corps.x + 8, y: haut - j.corps.h, vx: 0, vy: 0 });
+    // une demi-seconde d'attente, puis il descend avec lui
+    avance(p, 70);
+    expect(m.corps.y).toBeGreaterThan(haut + TUILE);
+    expect(Math.abs(j.corps.y + j.corps.h - m.corps.y)).toBeLessThan(2);
+    // au fond du puits (cinq tuiles), toujours dessus
+    avance(p, 80);
+    expect(m.corps.y).toBe(haut + 5 * TUILE);
+    expect(Math.abs(j.corps.y + j.corps.h - m.corps.y)).toBeLessThan(2);
+    // s'il reste, il le remonte (après un temps pour en descendre)
+    avance(p, 180);
+    expect(m.corps.y).toBe(haut);
+    expect(Math.abs(j.corps.y + j.corps.h - m.corps.y)).toBeLessThan(2);
+  });
+  it('ne bouge pas tant que personne n’est dessus', () => {
+    const p = partieAvecPuits();
+    const m = un(p, MonteCharge);
+    const y0 = m.corps.y;
+    avance(p, 200);
+    expect(m.corps.y).toBe(y0);
   });
 });
 
-describe('le porteur de pancarte', () => {
-  it('ne craint rien de face, mais tombe sous les coups dans le dos ou une explosion', () => {
-    const p = partie('@           ]                    F');
+describe('les projecteurs suspendus', () => {
+  /** Une salle avec un plafond, et des projecteurs pendus sous lui. */
+  const salle = (lampes: string) => {
+    const larg = lampes.length;
+    const carte = [
+      'X'.repeat(larg),
+      lampes,
+      ' '.repeat(larg),
+      ' '.repeat(larg),
+      ' '.repeat(larg),
+      '@' + ' '.repeat(larg - 2) + 'F',
+      'X'.repeat(larg),
+      'X'.repeat(larg),
+    ];
+    const p = new Partie({
+      niveau: ajouteNiveauEssai({ ...NIVEAUX[0]!, id: 'essai-lampes', carte, decor: [] }),
+      drapeau: -1,
+      vies: VIES_DEPART,
+      score: 0,
+    });
+    p.ajouteJoueur(0, 0);
+    while (p.phase === 'histoire') p.suivant();
+    return p;
+  };
+  it('un tir sur le câble la fait tomber, et le choc coupe les câbles voisins : la chaîne', () => {
+    const p = salle('X  "  "  "  X   ');
+    const lampes = p.entites.filter((e): e is Projecteur => e instanceof Projecteur);
+    expect(lampes).toHaveLength(3);
+    avance(p, 5);
+    expect(lampes.every((l) => l.vivant())).toBe(true);
+    lampes[0]!.blesse(1, p);
+    expect(lampes[0]!.vivant()).toBe(false);
+    avance(p, 40);
+    // la première a atterri ; les autres, secouées, cèdent l'une après l'autre
+    expect(lampes[0]!.vue()?.e).toBe(2);
+    avance(p, 160);
+    expect(lampes.map((l) => l.vue()?.e)).toEqual([2, 2, 2]);
+  });
+  it('écrase un ennemi dessous', () => {
+    const p = salle('X  "                 ');
+    const [lampe] = p.entites.filter((e): e is Projecteur => e instanceof Projecteur);
+    const e = new Ennemi(p, ENNEMIS_PAR_LETTRE['a']!, lampe!.corps.x - 4, 5 * TUILE);
+    p.ajoute(e);
     avance(p, 2);
-    const e = un(p, Ennemi);
-    expect(e.def.genre).toBe(G.PANCARTE);
-    e.dir = -1;
     const pv = e.pv;
-    e.blesse(2, p, 1, false); // un tir qui va vers la droite, lui regarde à gauche : de face
-    expect(e.pv).toBe(pv);
-    e.blesse(1, p, -1, false); // dans le dos
-    expect(e.pv).toBe(pv - 1);
-    e.dir = -1;
-    e.blesse(1, p, 1, true); // une explosion, même de face
-    expect(e.pv).toBe(pv - 2);
+    lampe!.blesse(1, p);
+    avance(p, 60);
+    expect(e.pv < pv || !e.vivant()).toBe(true);
   });
 });
 
@@ -125,13 +211,21 @@ describe('le sonneur d’alarme', () => {
 });
 
 describe('les niveaux à l’essai', () => {
-  it.each(Object.keys(ESSAIS_NOUVEAUTES))('%s : chaque nouveauté tient debout sur du sol', (id) => {
+  it.each(Object.keys(ESSAIS_NOUVEAUTES))('%s : chaque nouveauté tient (sol, plafond, puits)', (id) => {
     const def = NIVEAUX.find((n) => n.id === id)!;
     const lu = litNiveau({ ...def, ...ESSAIS_NOUVEAUTES[id] });
-    for (const [c, x, y] of POSES[id]!)
-      expect(proprietes(lu.tuiles[(y + 1) * lu.largeur + x]!).solide, `${c} en ${x},${y}`).toBe(true);
-    expect(
-      lu.attractions.length + lu.ennemis.filter((e) => e.lettre === ']' || e.lettre === '?').length,
-    ).toBe(POSES[id]!.length);
+    const solide = (x: number, y: number) => proprietes(lu.tuiles[y * lu.largeur + x]!).solide;
+    for (const [c, x, y, sol] of POSES[id]!) {
+      if (c === '>') {
+        // des deux côtés de la case de départ, le sol de la surface ; au fond, le sol de la cave sous les deux colonnes
+        expect(solide(x - 1, y) && solide(x + 2, y), `${c} en ${x},${y} : la surface`).toBe(true);
+        expect(solide(x, sol!) && solide(x + 1, sol!), `${c} en ${x},${y} : le fond`).toBe(true);
+      } else if (c === '"') {
+        let r = y - 1;
+        while (r > 0 && !solide(x, r)) r--;
+        expect(solide(x, r), `${c} en ${x},${y} : un plafond`).toBe(true);
+      } else expect(solide(x, y + 1), `${c} en ${x},${y}`).toBe(true);
+    }
+    expect(lu.attractions.length + lu.ennemis.filter((e) => e.lettre === '?').length).toBe(POSES[id]!.length);
   });
 });

@@ -9,6 +9,7 @@ import { estPersonnage } from '../jeu/vue';
 import { herosDuGenre } from '../entites/heros';
 import { prechauffeBlanc } from './feuilles-images';
 import { prechauffeRocker } from './rockers-convertis';
+import { prechauffeNouveaute } from './dessins-nouveautes';
 
 /**
  * Le préchauffage d'un niveau : ses tuiles (chaque variante, ses bords, sa paroi de fond) sont peintes d'avance, colonne par
@@ -55,12 +56,19 @@ export class Prechauffage {
   /** Les ennemis déjà prêts en blanc, et les rockers déjà cuits avec leur halo (voir planches-cuites.ts). */
   private readonly blancs = new Set<number>();
   private rockers = 0;
+  /** les images des nouveautés déjà préparées (voir dessins-nouveautes.ts) */
+  private nouveautes = 0;
+  private readonly toileNouveautes = document.createElement('canvas').getContext('2d')!;
 
   /**
    * Un effet préparé par image, au plus : la silhouette blanche des ennemis présents (le flash d'un coup), puis les rockers et
    * leur halo (la conversion) ; sans cela, leur première fabrication tombait en pleine explosion.
    */
   private effets(vue: EtatVue): void {
+    if (prechauffeNouveaute(this.nouveautes, this.toileNouveautes)) {
+      this.nouveautes++;
+      return;
+    }
     if (this.rockers < 12) {
       if (prechauffeRocker(this.rockers)) this.rockers++;
       return;

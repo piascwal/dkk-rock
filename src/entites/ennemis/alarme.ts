@@ -10,9 +10,6 @@ import { Ennemi } from './ennemi';
  * L'alarme, qu'on découvre de niveau en niveau (voir jeu/nouveautes.ts) : une sirène (`}`) et son sonneur (`?`). Dès qu'il vous
  * repère, le sonneur court à la sirène la plus proche au lieu de se battre ; s'il l'atteint, elle hurle et des renforts tombent du
  * ciel. On l'en empêche en le mettant au tapis avant, ou en cassant la sirène (trois coups). Sans sirène, il se bat comme un fêtard.
- *
- * Et le porteur de pancarte (`]`) : sa pancarte arrête tout ce qui vient de face. Il faut le prendre à revers (il met du temps à se
- * retourner), lui tirer dessus d'en haut, ou le faire sauter : une explosion ne s'arrête pas à une pancarte.
  */
 
 const PV_SIRENE = 3;
@@ -140,39 +137,8 @@ export const sonneur: Comportement = (e, ctx, cible) => {
   if (ctx.tick % 50 === 0) ctx.texte(e.cx, e.corps.y - 12, 'L’alarme !', '#ff4fd8');
 };
 
-/** Le temps qu'il met à se retourner (ticks) : de quoi lui passer dans le dos. */
-const DEMI_TOUR = 42;
-
-/** Le porteur de pancarte : il avance sur le héros, pancarte en avant, et se retourne lentement. */
-export const pancarte: Comportement = (e, ctx, cible) => {
-  const vers = cible.x + cible.w / 2 > e.cx ? 1 : -1;
-  if (vers !== e.dir) {
-    e.corps.vx = 0;
-    if (++e.memoire >= DEMI_TOUR) [e.dir, e.memoire] = [vers, 0];
-    return;
-  }
-  e.memoire = 0;
-  e.corps.vx = e.corps.auSol && !e.solDevant(ctx) ? 0 : e.dir * e.def.vitesse;
-};
-
-/** Les deux nouveaux venus, par repère de carte (les lettres sont toutes prises). */
+/** Le sonneur, par repère de carte (les lettres sont toutes prises). */
 export const ENNEMIS_NOUVEAUX: Record<string, DefEnnemi> = {
-  ']': {
-    nom: 'Porteur de pancarte',
-    genre: G.PANCARTE,
-    pv: 4,
-    w: 9,
-    h: 20,
-    vitesse: 0.55,
-    vision: 170,
-    visionVerticale: 50,
-    cadence: 0,
-    points: 300,
-    comportement: pancarte,
-    contact: 1,
-    bouclier: true,
-    cris: ['NON AU ROCK !', 'Autotune pour tous !', 'Vous ne passerez pas.'],
-  },
   '?': {
     nom: 'Sonneur d’alarme',
     genre: G.SONNEUR,

@@ -1,6 +1,8 @@
 import { TUILE } from '../config';
 import { ARMES_RAMASSABLES } from '../entites/armes';
 import { Bonbonne, Tremplin } from '../entites/attractions';
+import { MonteCharge } from '../entites/monte-charge';
+import { Projecteur } from '../entites/suspendus';
 import { Baril } from '../entites/baril';
 import { ENNEMIS_NOUVEAUX, Sirene } from '../entites/ennemis/alarme';
 import { Chauffage } from '../entites/chauffage';
@@ -47,7 +49,11 @@ export function peuple(p: Partie): void {
         ? new Tremplin(p, a.tx, a.ty)
         : a.c === ':'
           ? new Bonbonne(p, a.tx, a.ty)
-          : new Sirene(p, a.tx, a.ty, ennemiDuCoin('a', lu.def.theme) ?? ENNEMIS_PAR_LETTRE['a']!),
+          : a.c === '>'
+            ? new MonteCharge(p, a.tx, a.ty)
+            : a.c === '"'
+              ? new Projecteur(p, a.tx, a.ty)
+              : new Sirene(p, a.tx, a.ty, ennemiDuCoin('a', lu.def.theme) ?? ENNEMIS_PAR_LETTRE['a']!),
     );
   for (const a of lu.armes)
     p.ajoute(new Objet(p, 'arme', a.x, a.y, p.rng.entier(1, ARMES_RAMASSABLES.length)));

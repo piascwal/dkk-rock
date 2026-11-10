@@ -4,7 +4,7 @@ import { Aleatoire } from '../moteur/maths';
 import { Carte } from '../monde/carte';
 import { Joueur } from '../entites/joueur';
 import { Projectile } from '../entites/projectile';
-import { corpsDesBarils } from '../entites/baril';
+import { corpsPleins } from '../entites/pleins';
 import { Boss } from '../entites/ennemis/boss';
 import type { Objet } from '../entites/objets';
 import { niveauLu } from '../niveaux';
@@ -359,7 +359,7 @@ export class Partie implements Contexte {
   private recalculeCibles(): void {
     this.cache = calculeCibles(this.joueurs, this.entites);
     this.arene?.oublieCibles();
-    this.carte.obstacles = corpsDesBarils(this.entites);
+    this.carte.obstacles = corpsPleins(this.entites);
   }
 
   /** La vie du boss éveillé, pour la barre du HUD. */

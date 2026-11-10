@@ -40,8 +40,6 @@ export interface DefEnnemi {
   /** au repos, il rôde à sa façon (un rider roule dans son module) au lieu de la patrouille ordinaire */
   errance?: (e: Ennemi, ctx: Contexte) => void;
   explose?: { rayon: number; degats: number };
-  /** il porte une pancarte : ce qui vient de face ne lui fait rien (sauf une explosion) */
-  bouclier?: boolean;
   /** ce qu'il crie quand il vous repère */
   cris: string[];
 }
