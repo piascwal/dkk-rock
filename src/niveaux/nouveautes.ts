@@ -8,7 +8,7 @@ import { CARTE_GROIX_REFONTE } from './refontes/09-groix';
 import { CARTE_TUVES_REFONTE } from './refontes/13-tuves';
 
 /**
- * Les nouveautés à l'essai (Options → Mode essai → « Niveaux refaits »), posées sur les cartes publiées, sans rien pour les
+ * Les nouveautés de gameplay, posées sur les cartes des niveaux, sans rien pour les
  * annoncer : on les découvre en jouant. Elles reviennent d'un niveau à l'autre, de plus en plus mêlées, et certaines sont aperçues
  * un niveau plus tôt.
  *
@@ -86,9 +86,6 @@ export const POSES: Readonly<Record<string, readonly Pose[]>> = {
     ['<', 301, 82],
   ],
   stc: [
-    // trampolines muraux sur le chemin : on les heurte sans pousser vers le mur, ils lancent en cloche de l'autre côté
-    ['`', 97, 29],
-    ['`', 177, 23],
     ['_', 6, 29],
     ['_', 98, 29],
     ['_', 140, 29],
@@ -100,10 +97,6 @@ export const POSES: Readonly<Record<string, readonly Pose[]>> = {
     [':', 506, 23],
   ],
   tuves: [
-    // trampolines muraux sur le chemin : on les heurte sans pousser vers le mur, ils lancent en cloche de l'autre côté
-    ['`', 48, 43],
-    ['`', 323, 57],
-    ['`', 374, 57],
     [':', 10, 39],
     [':', 98, 45],
     [':', 204, 40],
@@ -149,10 +142,6 @@ export const POSES: Readonly<Record<string, readonly Pose[]>> = {
     ['%', 436, 35],
   ],
   alpages: [
-    // trampolines muraux sur le chemin : on les heurte sans pousser vers le mur, ils lancent en cloche de l'autre côté
-    ['`', 249, 21],
-    ['`', 230, 27],
-    ['`', 251, 33],
     [':', 86, 33],
     [':', 321, 33],
     [':', 427, 33],
@@ -185,10 +174,6 @@ export const POSES: Readonly<Record<string, readonly Pose[]>> = {
     ['%', 80, 32],
   ],
   cimes: [
-    // trampolines muraux sur le chemin : on les heurte sans pousser vers le mur, ils lancent en cloche de l'autre côté
-    ['`', 305, 46],
-    ['`', 394, 40],
-    ['`', 498, 31],
     ['?', 167, 58],
     ['}', 179, 58],
     ['?', 326, 40],
@@ -213,8 +198,8 @@ export const POSES: Readonly<Record<string, readonly Pose[]>> = {
   ],
 };
 
-/** Les niveaux à l'essai : la carte publiée, plus ses nouveautés (voir refontes.ts, `ESSAIS`). */
-export const ESSAIS_NOUVEAUTES: Readonly<Record<string, Partial<DefNiveau>>> = {
+/** Les niveaux avec leurs nouveautés, publiées : tous les joueurs les ont (voir refontes.ts). */
+export const NOUVEAUTES_PUBLIEES: Readonly<Record<string, Partial<DefNiveau>>> = {
   stc: { carte: pose(CARTE_STC, POSES['stc']!) },
   tuves: { carte: pose(CARTE_TUVES_REFONTE, POSES['tuves']!) },
   alpages: { carte: pose(CARTE_ALPAGES, POSES['alpages']!) },

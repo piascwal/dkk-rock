@@ -9,7 +9,8 @@ import { ESSAIS, REFONTES, versionDe } from '../src/niveaux/refontes';
 describe('les niveaux', () => {
   it.each(NIVEAUX.map((n, i) => [n.id, i] as const))('%s se lit sans erreur', (_id, i) => {
     const lu = niveauLu(i);
-    for (const e of lu.ennemis) expect(ENNEMIS_PAR_LETTRE[e.lettre], `ennemi ${e.lettre}`).toBeDefined();
+    for (const e of lu.ennemis)
+      expect(ENNEMIS_PAR_LETTRE[e.lettre] ?? ENNEMIS_NOUVEAUX[e.lettre], `ennemi ${e.lettre}`).toBeDefined();
     // une arène du battle royale n'a ni histoire ni fin (voir arene.test.ts)
     if (lu.def.arene) return;
     expect(lu.def.intro.length).toBeGreaterThan(0);

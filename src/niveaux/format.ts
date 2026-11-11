@@ -23,7 +23,6 @@ import { chaineDeTyroliennes, relieTyroliennes, type Tyrolienne } from './tyroli
  *   % baril explosif (s'allume au premier tir, explose deux secondes après)
  *   _ grosse caisse trampoline   : bonbonne de fumée   } sirène d'alarme (voir entites/attractions.ts, ennemis/alarme.ts)
  *   > et < téléporteurs (le haut et le bas : chaque > est relié au < le plus proche, et inversement ; entites/teleporteur.ts)
- *   ` trampoline mural (une case vide contre un mur ; il lance en cloche, à l'opposé : entites/tremplin-mural.ts)
  *   " projecteur suspendu (à la case de la lampe ; son câble monte au plafond : entites/suspendus.ts)
  *   ? sonneur d'alarme (un ennemi : les lettres sont toutes prises)
  *   ( et ) : extrémités d'une tyrolienne ; chaque ( est reliée au poteau le plus proche à sa droite
@@ -189,7 +188,7 @@ export function litNiveau(def: DefNiveau): NiveauLu {
       else if (c === 'Y' || c === 'Z' || c === 'P') lu.boss.push({ ...r, lettre: c });
       else if (/[1-9]/.test(c)) lu.declencheurs.push({ ...r, cle: c });
       else if (/[a-z?]/.test(c)) lu.ennemis.push({ ...r, lettre: c });
-      else if (c === '_' || c === ':' || c === '}' || c === '>' || c === '<' || c === '`' || c === '"')
+      else if (c === '_' || c === ':' || c === '}' || c === '>' || c === '<' || c === '"')
         lu.attractions.push({ ...r, c });
       else throw new ErreurNiveau(`${def.id} : caractère inconnu « ${c} » en ${tx},${ty}`);
     }

@@ -11,7 +11,7 @@ import { Partie } from '../src/jeu/partie';
 import { G } from '../src/jeu/vue';
 import { NIVEAUX, ajouteNiveauEssai } from '../src/niveaux';
 import { litNiveau } from '../src/niveaux/format';
-import { ESSAIS_NOUVEAUTES, POSES } from '../src/niveaux/nouveautes';
+import { NOUVEAUTES_PUBLIEES, POSES } from '../src/niveaux/nouveautes';
 import { T, proprietes } from '../src/monde/tuiles';
 
 /** Une partie sur une petite carte : un long plat, le héros à gauche, et ce qu'on y pose. */
@@ -260,10 +260,10 @@ describe('le sonneur d’alarme', () => {
   });
 });
 
-describe('les niveaux à l’essai', () => {
-  it.each(Object.keys(ESSAIS_NOUVEAUTES))('%s : chaque nouveauté tient (sol, plafond, puits)', (id) => {
+describe('les niveaux et leurs nouveautés', () => {
+  it.each(Object.keys(NOUVEAUTES_PUBLIEES))('%s : chaque nouveauté tient (sol, plafond, puits)', (id) => {
     const def = NIVEAUX.find((n) => n.id === id)!;
-    const lu = litNiveau({ ...def, ...ESSAIS_NOUVEAUTES[id] });
+    const lu = litNiveau({ ...def, ...NOUVEAUTES_PUBLIEES[id] });
     const solide = (x: number, y: number) => proprietes(lu.tuiles[y * lu.largeur + x]!).solide;
     // les caissons (T) et barils (%) des réactions en chaîne ne sont pas des attractions : `pose` les a vérifiés
     const poses = POSES[id]!.filter(([c]) => c !== 'T' && c !== '%');
@@ -275,10 +275,6 @@ describe('les niveaux à l’essai', () => {
           for (const dy of [1, 2])
             expect(solide(x + dx, y - dy), `${c} en ${x},${y} : de la place`).toBe(false);
         }
-      } else if (c === '`') {
-        // un mur d'un côté, un sol dessous, de la place devant
-        expect(solide(x - 1, y) || solide(x + 1, y), `${c} en ${x},${y} : un mur`).toBe(true);
-        expect(solide(x, y + 1), `${c} en ${x},${y} : un sol`).toBe(true);
       } else if (c === '"') {
         let r = y - 1;
         while (r > 0 && !solide(x, r)) r--;

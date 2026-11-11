@@ -130,7 +130,6 @@ export const G = {
   SIRENE: 96,
   TELEPORTEUR: 97,
   PROJECTEUR: 98,
-  TREMPLIN_MURAL: 99,
 } as const;
 
 export type Genre = (typeof G)[keyof typeof G];

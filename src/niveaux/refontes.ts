@@ -11,7 +11,7 @@ import { CARTE_NEW_YORK_REFONTE } from './refontes/20-new-york';
 import { CARTE_MARSEILLE_REFONTE } from './refontes/21-marseille';
 import { CARTE_OTTAWA_REFONTE, DECOR_OTTAWA_REFONTE } from './refontes/23-ottawa';
 import type { DefNiveau } from './format';
-import { ESSAIS_NOUVEAUTES } from './nouveautes';
+import { NOUVEAUTES_PUBLIEES } from './nouveautes';
 
 /**
  * Le chantier du level design : des niveaux refaits (à la manière de Broforce : du relief, des vides, plusieurs routes ; voir
@@ -21,7 +21,7 @@ import { ESSAIS_NOUVEAUTES } from './nouveautes';
  * les sauvegardes (niveaux faits, partie en cours) ne bougent pas. Les joueurs n'ont une refonte qu'une fois publiée ; avant,
  * le mode essai (`?essai` dans l'adresse, voir ui/essai.ts) la fait jouer à part, à côté de l'original (menus-refontes.ts).
  */
-export const REFONTES: Readonly<Record<string, Partial<DefNiveau>>> = {
+const REFONTES_SEULES: Readonly<Record<string, Partial<DefNiveau>>> = {
   marseille: { carte: CARTE_MARSEILLE_REFONTE },
   // l'International Tour
   beauvais: { carte: CARTE_BEAUVAIS_REFONTE },
@@ -39,11 +39,22 @@ export const REFONTES: Readonly<Record<string, Partial<DefNiveau>>> = {
   cimes: { carte: CARTE_CIMES_REFONTE },
 };
 
+/** Les refontes, avec les nouveautés de gameplay publiées posées sur leur carte (voir nouveautes.ts). */
+export const REFONTES: Readonly<Record<string, Partial<DefNiveau>>> = {
+  ...REFONTES_SEULES,
+  ...Object.fromEntries(
+    Object.entries(NOUVEAUTES_PUBLIEES).map(([id, n]) => [id, { ...REFONTES_SEULES[id], ...n }]),
+  ),
+};
+
 /**
  * Les refontes essayées et validées : tous les joueurs les ont. En publier une change les cartes que l'hôte et les invités
  * doivent partager : augmenter VERSION_PROTOCOLE (reseau/protocole.ts) dans le même temps.
  */
 export const REFONTES_PUBLIEES: ReadonlySet<string> = new Set<string>([
+  // les nouveautés de gameplay (nouveautes.ts) : sur Saint-Cézaire et les Alpages, sans autre refonte
+  'stc',
+  'alpages',
   'marseille',
   'beauvais',
   'limerick',
@@ -62,7 +73,7 @@ export const REFONTES_PUBLIEES: ReadonlySet<string> = new Set<string>([
  * Les nouvelles versions de niveaux déjà publiés, le temps de les essayer : le mode essai les joue à la place de la version
  * publiée (« après »), les joueurs gardent la publiée. Validée, une nouvelle version prend la place de la refonte ci-dessus.
  */
-export const ESSAIS: Readonly<Record<string, Partial<DefNiveau>>> = { ...ESSAIS_NOUVEAUTES };
+export const ESSAIS: Readonly<Record<string, Partial<DefNiveau>>> = {};
 
 /** La version d'un niveau à jouer : en essai, sa nouvelle version ou sa refonte ; sinon sa refonte publiée, ou l'original. */
 export function versionDe(def: DefNiveau, essai: boolean): DefNiveau {

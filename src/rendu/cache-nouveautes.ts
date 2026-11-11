@@ -1,5 +1,5 @@
 /**
- * Les images des nouveautés qu'il faut tourner ou rogner (le tourbillon du téléporteur, le trampoline mural) : dessinées une fois
+ * Les images des nouveautés qu'il faut tourner ou rogner (le tourbillon du téléporteur) : dessinées une fois
  * dans une petite toile, à 6 pixels par pixel du jeu, puis reprises telles quelles à chaque image (tourner ou rogner une grande
  * image à chaque image coûte plusieurs fois le dessin d'un sprite ; voir CLAUDE.md, la fluidité sur téléphone).
  */
