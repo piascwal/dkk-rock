@@ -1,6 +1,6 @@
 import { coupee, note, top } from './chrono';
 import { cadence } from './cadence';
-import { particulesDesEvenements } from './evenements-particules';
+import { particulesDesEvenements, regleSobriete } from './evenements-particules';
 import { DENSITE_MAX, DENSITE_MIN, HAUTEUR_CARTE, HAUTEUR_VUE, TUILE } from '../config';
 import type { Qualite } from '../jeu/sauvegarde';
 import { ANIM, G, estPersonnage, estUnTir, type EntiteVue, type EtatVue, type Evenement } from '../jeu/vue';
@@ -106,13 +106,12 @@ export class Rendu {
     this.qualite = q;
     this.echauffement = 240;
     this.densite = DENSITE_MAX;
+    regleSobriete(this.qualite, this.fps);
     this.redimensionne();
   }
 
   /** Les braises des flammes ne valent pas une image perdue : coupées en mode éco et sous 45 images par seconde. */
-  private braisesPermises(): boolean {
-    return this.qualite !== 'eco' && this.fps >= 45;
-  }
+  private braisesPermises = (): boolean => this.qualite !== 'eco' && this.fps >= 45;
 
   /** Ce qu'on affiche : « 6× · 60 i/s ». */
   diagnostic(): string {
@@ -165,6 +164,7 @@ export class Rendu {
     const moyenne = this.duree / this.images;
     this.fps = 1000 / moyenne;
     this.duree = this.images = 0;
+    regleSobriete(this.qualite, this.fps);
     if (this.qualite === 'auto' && moyenne > 30 && this.densite > DENSITE_MIN) {
       this.densite = DENSITE_MIN;
       this.redimensionne();

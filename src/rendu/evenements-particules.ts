@@ -50,6 +50,18 @@ export function particulesDesEvenements(
   for (const a of enAttente) a.age++;
 }
 
+/** Vrai quand l'appareil ne tient pas 45 images par seconde (ou en mode éco) : le rendu le règle (voir rendu.ts). */
+export const sobre = { actif: false };
+
+/** Les débris ne se retiennent que sur un appareil qui peine : en éco toujours, en max jamais, en auto sous 45 images par seconde. */
+export const regleSobriete = (qualite: string, fps: number): void => {
+  sobre.actif = qualite === 'eco' || (qualite === 'auto' && fps < 45);
+};
+
+/** Les débris d'une tuile cassée : 7, moins quand l'appareil est sobre et que les particules s'accumulent. */
+const nbDebris = (p: Particules): number =>
+  !sobre.actif ? 7 : p.liste.length > 300 ? 2 : p.liste.length > 180 ? 4 : 7;
+
 function traite(
   p: Particules,
   decorParTuile: ReadonlyMap<number, ReturnType<typeof semeDecor>>,
@@ -59,16 +71,11 @@ function traite(
     case 'tuile':
       if (e.t !== 0) break;
       if (chrono.actif) chrono.tuiles++;
-      // une chaîne d'explosions casse des dizaines de tuiles : plus il y a de particules vivantes, moins chacune en donne (le
-      // téléphone ne suit plus au-delà de quelques centaines)
-      p.debris(
-        (e.x + 0.5) * TUILE,
-        (e.y + 0.5) * TUILE,
-        proprietes(e.avant).debris,
-        p.liste.length > 300 ? 2 : p.liste.length > 180 ? 4 : 7,
-      );
+      // une chaîne d'explosions casse des dizaines de tuiles : sur un appareil qui peine (voir `sobre`), plus il y a de particules
+      // vivantes, moins chacune en donne ; un appareil qui suit garde tous ses débris
+      p.debris((e.x + 0.5) * TUILE, (e.y + 0.5) * TUILE, proprietes(e.avant).debris, nbDebris(p));
       // ce qui était posé sur cette tuile (décor) se brise aussi : des morceaux s'envolent
-      if (p.liste.length < 300)
+      if (!sobre.actif || p.liste.length < 300)
         for (const o of decorParTuile.get(e.y * 100000 + e.x) ?? []) debrisDeDecor(p, o);
       break;
     case 'explo':
