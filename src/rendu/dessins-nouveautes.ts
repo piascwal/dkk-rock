@@ -1,4 +1,5 @@
 import { ANIM, G } from '../jeu/vue';
+import { enCache } from './cache-nouveautes';
 import { dessineEnCache } from './dessins-en-cache';
 import { dessineDecorFeuille } from './feuilles-images';
 import { humain, type Pinceau } from './pinceau';
@@ -151,14 +152,17 @@ function dessineTonneau(ctx: CanvasRenderingContext2D, v: { e: number; f: number
 function dessineTeleporteur(ctx: CanvasRenderingContext2D, v: { e: number; f: number }): boolean {
   const ouvert = v.e === 2 || (v.e === 1 && Math.floor(v.f / 6) % 2 === 1);
   if (!ouvert) return dessineDecorFeuille(ctx, 'teleporteur', 0);
-  // le centre du rond, par rapport aux pieds (voir feuilles-attractions.ts)
-  ctx.save();
-  ctx.translate(0.55, -13.6);
-  ctx.rotate((v.f / 144) * Math.PI * 2);
-  ctx.translate(-0.55, 13.6);
-  const ok = dessineDecorFeuille(ctx, 'teleporteur', 2);
-  ctx.restore();
-  return ok && dessineDecorFeuille(ctx, 'teleporteur', 1);
+  // le tourbillon, tourné par pas de 15° (24 images, faites une fois) autour du centre du rond (0,55 ; -13,6 par rapport aux pieds)
+  const k = Math.floor(v.f / 6) % 24;
+  const tour = enCache(`teleporteur-${k}`, 28, 28, (o) => {
+    o.translate(14, 14);
+    o.rotate((k * Math.PI) / 12);
+    o.translate(-0.55, 13.6);
+    return dessineDecorFeuille(o, 'teleporteur', 2);
+  });
+  if (!tour) return false;
+  ctx.drawImage(tour, 0.55 - 14, -13.6 - 14, 28, 28);
+  return dessineDecorFeuille(ctx, 'teleporteur', 1);
 }
 
 /**
@@ -166,18 +170,23 @@ function dessineTeleporteur(ctx: CanvasRenderingContext2D, v: { e: number; f: nu
  * paroi (le mur est à gauche des pieds ; le dessin est retourné par l'appelant s'il est à droite). Elle s'écrase au lancer.
  */
 function dessineTremplinMural(ctx: CanvasRenderingContext2D, v: { e: number; f: number }): boolean {
-  const t = v.f > 0 ? Math.min(1, v.f / 4, (10 - v.f) / 6 + 0.2) : 0;
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(0, -40, 40, 40); // la paroi : ce qui y entrerait est rogné
-  ctx.clip();
-  ctx.translate(10, -10);
-  ctx.rotate((50 * Math.PI) / 180);
-  ctx.scale(0.9 * (1 + 0.1 * t), 0.9 * (1 - 0.3 * t));
-  ctx.translate(0, 8.35);
-  const ok = dessineDecorFeuille(ctx, v.e ? 'trampoline-metal' : 'trampoline-bois', 0);
-  ctx.restore();
-  return ok;
+  // l'écrasement par tiers (0, 1/2, 1), pour n'avoir que trois images par trampoline
+  const q = v.f > 0 ? Math.round(2 * Math.min(1, v.f / 4, (10 - v.f) / 6 + 0.2)) : 0;
+  const nom = v.e ? 'trampoline-metal' : 'trampoline-bois';
+  const img = enCache(`mural-${nom}-${q}`, 30, 40, (o) => {
+    o.translate(0, 35);
+    o.beginPath();
+    o.rect(0, -35, 30, 40); // la paroi : ce qui y entrerait est rogné
+    o.clip();
+    o.translate(10, -10);
+    o.rotate((50 * Math.PI) / 180);
+    o.scale(0.9 * (1 + 0.05 * q), 0.9 * (1 - 0.15 * q));
+    o.translate(0, 8.35);
+    return dessineDecorFeuille(o, nom, 0);
+  });
+  if (!img) return false;
+  ctx.drawImage(img, 0, -35, 30, 40);
+  return true;
 }
 
 /** Les états à préparer d'avance (voir prechauffage.ts) : [genre, e, f]. */
@@ -194,7 +203,8 @@ export const ETATS_NOUVEAUTES: readonly (readonly [number, number, number])[] = 
   [G.SIRENE, 1, 12],
   [G.SIRENE, 2, 0],
   [G.TELEPORTEUR, 0, 0],
-  [G.TELEPORTEUR, 2, 0],
+  ...Array.from({ length: 24 }, (_, k): readonly [number, number, number] => [G.TELEPORTEUR, 2, k * 6]),
+  ...[0, 1].flatMap((e) => [0, 4, 8].map((f): readonly [number, number, number] => [G.TREMPLIN_MURAL, e, f])),
   [G.PROJECTEUR, 0, 0],
   [G.PROJECTEUR, 1, 0],
   [G.PROJECTEUR, 2, 0],
