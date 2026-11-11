@@ -35,6 +35,11 @@ export function particulesDesEvenements(
   // un autre jeu de particules (niveau rechargé) : ce qui attendait n'a plus de sens
   if (p !== derniere) enAttente.length = 0;
   derniere = p;
+  // une image de plus de 40 ms sous un gros nuage : la carte graphique sature, on retient les effets quelques secondes
+  const maintenant = performance.now();
+  const ecart = maintenant - sobre.dernier;
+  sobre.dernier = maintenant;
+  if (ecart > 40 && ecart < 500 && p.liste.length > 150) sobre.jusqua = maintenant + 4000;
   for (const e of evts) {
     if (poids(e) === 0) traite(p, decorParTuile, e);
     else enAttente.push({ e, age: 0 });
@@ -51,16 +56,27 @@ export function particulesDesEvenements(
 }
 
 /** Vrai quand l'appareil ne tient pas 45 images par seconde (ou en mode éco) : le rendu le règle (voir rendu.ts). */
-export const sobre = { actif: false };
+export const sobre = {
+  actif: false,
+  /** faux en qualité max : jamais de retenue */
+  permis: true,
+  /** jusqu'à quand (ms) une image trop longue sous un gros nuage de particules garde la retenue */
+  jusqua: 0,
+  dernier: 0,
+};
+
+/** Vrai si les effets se retiennent maintenant : appareil qui peine, ou image trop longue il y a peu (le téléphone sature d'un coup). */
+const retenu = (): boolean => sobre.permis && (sobre.actif || performance.now() < sobre.jusqua);
 
 /** Les débris ne se retiennent que sur un appareil qui peine : en éco toujours, en max jamais, en auto sous 45 images par seconde. */
 export const regleSobriete = (qualite: string, fps: number): void => {
+  sobre.permis = qualite !== 'max';
   sobre.actif = qualite === 'eco' || (qualite === 'auto' && fps < 45);
 };
 
 /** Les débris d'une tuile cassée : 7, moins quand l'appareil est sobre et que les particules s'accumulent. */
 const nbDebris = (p: Particules): number =>
-  !sobre.actif ? 7 : p.liste.length > 300 ? 2 : p.liste.length > 180 ? 4 : 7;
+  !retenu() ? 7 : p.liste.length > 300 ? 2 : p.liste.length > 180 ? 4 : 7;
 
 function traite(
   p: Particules,
@@ -75,11 +91,12 @@ function traite(
       // vivantes, moins chacune en donne ; un appareil qui suit garde tous ses débris
       p.debris((e.x + 0.5) * TUILE, (e.y + 0.5) * TUILE, proprietes(e.avant).debris, nbDebris(p));
       // ce qui était posé sur cette tuile (décor) se brise aussi : des morceaux s'envolent
-      if (!sobre.actif || p.liste.length < 300)
+      if (!retenu() || p.liste.length < 300)
         for (const o of decorParTuile.get(e.y * 100000 + e.x) ?? []) debrisDeDecor(p, o);
       break;
     case 'explo':
-      p.explosion(e.x, e.y, e.r);
+      // retenu et déjà beaucoup de particules : la destruction a lieu, mais pas un nuage de plus
+      if (!retenu() || p.liste.length < 350) p.explosion(e.x, e.y, e.r);
       // la grenade de l'OM : en plus, une pluie de logos
       if (e.r === RAYON_GRENADE_OM) logosDeGrenade(p, e.x, e.y);
       break;
