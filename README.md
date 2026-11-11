@@ -90,17 +90,20 @@ se barre dans le fil ; les boutons des menus s'enfoncent et rebondissent.
   La **grosse caisse trampoline** (`_`, en bois ou en métal : `outils/prepare-attractions.py`) renvoie haut qui tombe dessus (héros, plus haut en tenant le saut ; ennemis ; bonbonnes) et s'écrase puis se relâche à chaque rebond.
   Le **tonneau-fusée** (`:`, un tonneau de métal) : le premier coup le couche aussitôt, il clignote en blanc (de plus en plus
   vite), puis file au ras du sol dans le sens du coup et explose au premier obstacle ; il est plein, on peut monter dessus, et qui
-  est dessus au départ voyage avec lui (`entites/attractions.ts`, `entites/passagers.ts`). Le **téléporteur** (`>` en haut, `<` dans la cave ; chaque haut est relié au
+  est dessus au départ voyage avec lui (`entites/attractions.ts`, `entites/passagers.ts`). Le **téléporteur** (`>` au sol, `<` tout au fond d'une cave ; chaque haut est relié au
   bas le plus proche : `entites/teleporteur.ts`, images dans `outils/prepare-teleporteur.py`) est une porte éteinte qui s'allume (le
   tourbillon tourne derrière son cadre) devant un héros qui s'arrête ; en restant un peu, ou avec la flèche du bas une fois allumée, il
-  passe à l'autre porte, dans la grande salle de la cave la plus proche. On ne l'impose jamais (échelles et terrain y mènent aussi) ;
-  à l'arrivée, il faut s'éloigner pour la reprendre. Les **projecteurs
+  passe à l'autre porte, dans une cave profonde (Tuves, Forêt, Port, Groix : de 18 à 52 rangées plus bas) qu'il faut remonter en la
+  découvrant, car on a trop tendance à monter. On ne l'impose jamais ; à l'arrivée, il faut s'éloigner pour la reprendre. Chaque porte
+  pose sur cinq cases de socle incassable. Le **trampoline mural** (`` ` ``, `entites/tremplin-mural.ts`) est la grosse caisse posée de
+  biais contre un mur : qui le heurte sans pousser vers le mur (en tombant, ou en sautant à côté) part en cloche à l'opposé, de quoi
+  franchir un vide ; qui grimpe en poussant vers le mur passe à côté. Les **projecteurs
   suspendus** (`"`) : un tir ou un souffle sur le câble ou la lampe la fait tomber ; elle écrase ce qu'elle touche et, en
   s'écrasant, souffle (barils, bonbonnes, caissons) et secoue les câbles voisins, qui cèdent l'un après l'autre : une réaction en
   chaîne (`entites/suspendus.ts`). Le **sonneur d'alarme** (`?`) court à la **sirène** (`}`) la plus proche, qui appelle trois
   renforts s'il l'atteint ; on l'arrête avant, ou on casse la sirène (`entites/ennemis/alarme.ts`). Dessinés en code
   (`rendu/dessins-nouveautes.ts`) en attendant leurs images : repris du cache d'images, silhouette blanche comprise, et préparés
-  d'avance au chargement du niveau (`prechauffage.ts`). Protocole v53.
+  d'avance au chargement du niveau (`prechauffage.ts`). Protocole v54.
 - **Barils explosifs** (Saint-Cézaire et ville, marqueur `%`) : des tonneaux WOG en feu, à terre ; on peut les empiler (dans l'éditeur, rangé avec les tuiles à côté des tonneaux WOG ; une case au-dessus d'une autre), sprites entiers : le plus haut est dessiné en dernier, son pied recouvre un peu le dessus de celui qu'il porte. Le premier tir qui les touche (le leur comme celui d'une explosion voisine) les allume ; deux secondes plus tard, ils explosent (rayon 48 px, 5 dégâts aux héros comme aux ennemis : un cinquième de plus qu'un caisson de basses) et cassent ce qui se casse autour. Personne ne les vise, mais les tirs des ennemis les allument aussi. Ils sont pleins : héros et ennemis butent contre eux et peuvent monter dessus (`Carte.obstacles`, tenu à jour par la partie ; `monde/physique.ts`).
 - **Tonneaux WOG** (le WOG, une passion magique pour les membres des DKK ; l'histoire sera retravaillée) : ce sont des tuiles
   (`O` bois, `Q` or ; `outils/fixe-tuiles.py`), semées par le générateur (un raccord sur deux en bois, et un tonneau d'or bien en vue au milieu du parcours, posé seul, jamais sur un tonneau en bois, en plus de celui d'une cache).

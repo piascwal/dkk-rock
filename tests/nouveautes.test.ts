@@ -275,6 +275,10 @@ describe('les niveaux à l’essai', () => {
           for (const dy of [1, 2])
             expect(solide(x + dx, y - dy), `${c} en ${x},${y} : de la place`).toBe(false);
         }
+      } else if (c === '`') {
+        // un mur d'un côté, un sol dessous, de la place devant
+        expect(solide(x - 1, y) || solide(x + 1, y), `${c} en ${x},${y} : un mur`).toBe(true);
+        expect(solide(x, y + 1), `${c} en ${x},${y} : un sol`).toBe(true);
       } else if (c === '"') {
         let r = y - 1;
         while (r > 0 && !solide(x, r)) r--;

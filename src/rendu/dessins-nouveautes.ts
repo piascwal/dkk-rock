@@ -44,6 +44,12 @@ const OBJETS: Partial<Record<number, Dessin>> = {
       p(-4, -9, 8, 1, '#ffd23f'); // le logo
     }
   },
+  // (repli, si les images ne sont pas chargées) le trampoline mural : une caisse de biais contre la paroi (à gauche des pieds)
+  [G.TREMPLIN_MURAL]: (p) => {
+    p(0, -16, 4, 12, '#3b2a1e');
+    p(4, -20, 4, 12, '#c9a23a');
+    p(8, -22, 3, 8, '#f5ecd6');
+  },
   // la bonbonne de fumée : `e` 0 debout, 1 couchée (elle clignote : le blanc vient du dessin), 2 en vol (la flamme derrière)
   [G.BONBONNE]: (p, e) => {
     const corps = (q: Pinceau) => {
@@ -155,6 +161,25 @@ function dessineTeleporteur(ctx: CanvasRenderingContext2D, v: { e: number; f: nu
   return ok && dessineDecorFeuille(ctx, 'teleporteur', 1);
 }
 
+/**
+ * Le trampoline mural : la grosse caisse tournée de 50° (la peau vers le haut et le large), son pied contre le mur, rognée par la
+ * paroi (le mur est à gauche des pieds ; le dessin est retourné par l'appelant s'il est à droite). Elle s'écrase au lancer.
+ */
+function dessineTremplinMural(ctx: CanvasRenderingContext2D, v: { e: number; f: number }): boolean {
+  const t = v.f > 0 ? Math.min(1, v.f / 4, (10 - v.f) / 6 + 0.2) : 0;
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, -40, 40, 40); // la paroi : ce qui y entrerait est rogné
+  ctx.clip();
+  ctx.translate(10, -10);
+  ctx.rotate((50 * Math.PI) / 180);
+  ctx.scale(0.9 * (1 + 0.1 * t), 0.9 * (1 - 0.3 * t));
+  ctx.translate(0, 8.35);
+  const ok = dessineDecorFeuille(ctx, v.e ? 'trampoline-metal' : 'trampoline-bois', 0);
+  ctx.restore();
+  return ok;
+}
+
 /** Les états à préparer d'avance (voir prechauffage.ts) : [genre, e, f]. */
 export const ETATS_NOUVEAUTES: readonly (readonly [number, number, number])[] = [
   [G.TREMPLIN, 0, 0],
@@ -186,6 +211,7 @@ export function dessineNouveaute(
 ): boolean {
   // avec leurs images (planches fournies) quand elles sont chargées : le trampoline s'écrase, le tonneau se couche
   if (v.g === G.TREMPLIN && dessineTremplin(ctx, v)) return true;
+  if (v.g === G.TREMPLIN_MURAL && dessineTremplinMural(ctx, v)) return true;
   if (v.g === G.BONBONNE && dessineTonneau(ctx, v, blanc)) return true;
   if (v.g === G.TELEPORTEUR && dessineTeleporteur(ctx, v)) return true;
   const dessin = OBJETS[v.g];
