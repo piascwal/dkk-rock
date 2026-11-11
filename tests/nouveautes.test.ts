@@ -12,7 +12,7 @@ import { G } from '../src/jeu/vue';
 import { NIVEAUX, ajouteNiveauEssai } from '../src/niveaux';
 import { litNiveau } from '../src/niveaux/format';
 import { ESSAIS_NOUVEAUTES, POSES } from '../src/niveaux/nouveautes';
-import { proprietes } from '../src/monde/tuiles';
+import { T, proprietes } from '../src/monde/tuiles';
 
 /** Une partie sur une petite carte : un long plat, le héros à gauche, et ce qu'on y pose. */
 const partie = (sol: string) => {
@@ -269,9 +269,12 @@ describe('les niveaux à l’essai', () => {
     const poses = POSES[id]!.filter(([c]) => c !== 'T' && c !== '%');
     for (const [c, x, y] of poses) {
       if (c === '>' || c === '<') {
-        // la porte pose sur un sol plein, sur ses trois colonnes, avec de la place au-dessus
-        for (const dx of [-1, 0, 1]) expect(solide(x + dx, y + 1), `${c} en ${x},${y} : le sol`).toBe(true);
-        expect(solide(x, y - 1) || solide(x, y - 2), `${c} en ${x},${y} : de la place`).toBe(false);
+        // la porte pose sur du socle incassable, sur ses cinq colonnes, avec de la place au-dessus
+        for (const dx of [-2, -1, 0, 1, 2]) {
+          expect(lu.tuiles[(y + 1) * lu.largeur + x + dx], `${c} en ${x},${y} : le sol`).toBe(T.SOCLE);
+          for (const dy of [1, 2])
+            expect(solide(x + dx, y - dy), `${c} en ${x},${y} : de la place`).toBe(false);
+        }
       } else if (c === '"') {
         let r = y - 1;
         while (r > 0 && !solide(x, r)) r--;

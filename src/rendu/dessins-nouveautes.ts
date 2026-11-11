@@ -78,11 +78,11 @@ const OBJETS: Partial<Record<number, Dessin>> = {
   },
   // (repli, si l'image n'est pas chargée) le téléporteur : un cadre de métal, un rond sombre qui s'allume
   [G.TELEPORTEUR]: (p, e) => {
-    p(-20, -25, 40, 25, '#46525a');
-    p(-20, -25, 40, 3, '#8a5a2a');
-    p(-9, -21, 18, 18, '#2a2a3a');
-    if (e) p(-7, -19, 14, 14, e === 2 ? '#5aa0ff' : '#33507a');
-    p(14, -8, 4, 3, '#4adf6a');
+    p(-28, -35, 56, 35, '#46525a');
+    p(-28, -35, 56, 4, '#8a5a2a');
+    p(-13, -30, 26, 26, '#2a2a3a');
+    if (e) p(-10, -27, 20, 20, e === 2 ? '#5aa0ff' : '#33507a');
+    p(20, -11, 6, 4, '#4adf6a');
   },
   // le projecteur de scène : `e` 0 il pend, 1 il tombe, 2 l'épave (ses câbles, tracés à part)
   [G.PROJECTEUR]: (p, e) => {
@@ -147,9 +147,9 @@ function dessineTeleporteur(ctx: CanvasRenderingContext2D, v: { e: number; f: nu
   if (!ouvert) return dessineDecorFeuille(ctx, 'teleporteur', 0);
   // le centre du rond, par rapport aux pieds (voir feuilles-attractions.ts)
   ctx.save();
-  ctx.translate(0.4, -9.6);
+  ctx.translate(0.55, -13.6);
   ctx.rotate((v.f / 144) * Math.PI * 2);
-  ctx.translate(-0.4, 9.6);
+  ctx.translate(-0.55, 13.6);
   const ok = dessineDecorFeuille(ctx, 'teleporteur', 2);
   ctx.restore();
   return ok && dessineDecorFeuille(ctx, 'teleporteur', 1);

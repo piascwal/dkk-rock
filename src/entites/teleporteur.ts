@@ -13,7 +13,7 @@ import type { Corps } from '../monde/physique';
  */
 
 /** Demi-largeur de la zone devant la porte, tolérance en hauteur (pixels) et durées (ticks). */
-const DEVANT = 12;
+const DEVANT = 16;
 const HAUTEUR = 4;
 /** Le temps pour qu'elle s'allume, avant lequel la flèche du bas ne sert encore à rien ; puis celui, tranquille, d'y passer. */
 const ALLUME = 14;

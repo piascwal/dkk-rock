@@ -30,6 +30,27 @@ type Pose = readonly [string, number, number];
 /** Les cases où un repère peut se poser : le vide, un mur de fond, ou (pour le sonneur) un autre ennemi dont il prend la place. */
 const libre = (c: string, repere: string) => c === ' ' || c === '.' || (repere === '?' && /[a-z]/.test(c));
 
+/** Les tuiles pleines qu'une porte de téléporteur fait disparaître autour d'elle (ni échelles ni plateformes). */
+const PLEINES = /[#RBMXNGWCTSVDEOQLUAI|{^~;[/\\]/;
+
+/**
+ * La place d'un téléporteur (cinq cases de large, trois de haut, sa case au milieu en bas) : ce qui est plein dans ce volume est
+ * dégagé, et le sol dessous, de toute sa largeur, devient du socle incassable (`X`) : la porte ne pend jamais dans le vide.
+ */
+function assoit(lignes: string[][], x: number, y: number): void {
+  for (let dx = -2; dx <= 2; dx++) {
+    for (let dy = 0; dy < 3; dy++) {
+      const ligne = lignes[y - dy];
+      if (ligne && !(dx === 0 && dy === 0) && PLEINES.test(ligne[x + dx] ?? ' ')) ligne[x + dx] = ' ';
+    }
+    const sol = lignes[y + 1];
+    if (sol) {
+      while (sol.length <= x + dx) sol.push(' ');
+      sol[x + dx] = 'X';
+    }
+  }
+}
+
 /** La carte, avec ses nouveautés posées. Lève une erreur si une case n'est pas libre. */
 export function pose(carte: readonly string[], poses: readonly Pose[]): string[] {
   const lignes = carte.map((l) => [...l]);
@@ -40,6 +61,7 @@ export function pose(carte: readonly string[], poses: readonly Pose[]): string[]
     if (!libre(ligne[x]!, c))
       throw new Error(`nouveauté ${c} : la case ${x},${y} est prise (« ${ligne[x]} »)`);
     ligne[x] = c;
+    if (c === '>' || c === '<') assoit(lignes, x, y);
   }
   return lignes.map((l) => l.join(''));
 }
@@ -72,7 +94,7 @@ export const POSES: Readonly<Record<string, readonly Pose[]>> = {
     ['_', 102, 45],
     ['_', 423, 45],
     ['>', 42, 41],
-    ['<', 45, 52],
+    ['<', 46, 52],
     // vers la fin : trois projecteurs en chaîne au-dessus de ceux qui gardent le passage
     ['"', 430, 34],
     ['"', 433, 34],
