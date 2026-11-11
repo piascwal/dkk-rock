@@ -11,7 +11,7 @@ import { CARTE_NEW_YORK_REFONTE } from './refontes/20-new-york';
 import { CARTE_MARSEILLE_REFONTE } from './refontes/21-marseille';
 import { CARTE_OTTAWA_REFONTE, DECOR_OTTAWA_REFONTE } from './refontes/23-ottawa';
 import type { DefNiveau } from './format';
-import { NOUVEAUTES_PUBLIEES } from './nouveautes';
+import { ESSAIS_NOUVEAUTES, NOUVEAUTES_PUBLIEES } from './nouveautes';
 
 /**
  * Le chantier du level design : des niveaux refaits (à la manière de Broforce : du relief, des vides, plusieurs routes ; voir
@@ -73,7 +73,10 @@ export const REFONTES_PUBLIEES: ReadonlySet<string> = new Set<string>([
  * Les nouvelles versions de niveaux déjà publiés, le temps de les essayer : le mode essai les joue à la place de la version
  * publiée (« après »), les joueurs gardent la publiée. Validée, une nouvelle version prend la place de la refonte ci-dessus.
  */
-export const ESSAIS: Readonly<Record<string, Partial<DefNiveau>>> = {};
+export const ESSAIS: Readonly<Record<string, Partial<DefNiveau>>> = Object.fromEntries(
+  // la refonte publiée (son décor compris), avec la carte à l'essai
+  Object.entries(ESSAIS_NOUVEAUTES).map(([id, n]) => [id, { ...REFONTES[id], ...n }]),
+);
 
 /** La version d'un niveau à jouer : en essai, sa nouvelle version ou sa refonte ; sinon sa refonte publiée, ou l'original. */
 export function versionDe(def: DefNiveau, essai: boolean): DefNiveau {

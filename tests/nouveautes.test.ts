@@ -11,7 +11,7 @@ import { Partie } from '../src/jeu/partie';
 import { G } from '../src/jeu/vue';
 import { NIVEAUX, ajouteNiveauEssai } from '../src/niveaux';
 import { litNiveau } from '../src/niveaux/format';
-import { NOUVEAUTES_PUBLIEES, POSES } from '../src/niveaux/nouveautes';
+import { ESSAIS_NOUVEAUTES, NOUVEAUTES_PUBLIEES, POSES, POSES_ESSAI } from '../src/niveaux/nouveautes';
 import { T, proprietes } from '../src/monde/tuiles';
 
 /** Une partie sur une petite carte : un long plat, le héros à gauche, et ce qu'on y pose. */
@@ -261,12 +261,14 @@ describe('le sonneur d’alarme', () => {
 });
 
 describe('les niveaux et leurs nouveautés', () => {
-  it.each(Object.keys(NOUVEAUTES_PUBLIEES))('%s : chaque nouveauté tient (sol, plafond, puits)', (id) => {
+  const TOUS = { ...NOUVEAUTES_PUBLIEES, ...ESSAIS_NOUVEAUTES };
+  const TOUTES_POSES = { ...POSES, ...POSES_ESSAI };
+  it.each(Object.keys(TOUS))('%s : chaque nouveauté tient (sol, plafond, puits)', (id) => {
     const def = NIVEAUX.find((n) => n.id === id)!;
-    const lu = litNiveau({ ...def, ...NOUVEAUTES_PUBLIEES[id] });
+    const lu = litNiveau({ ...def, ...TOUS[id] });
     const solide = (x: number, y: number) => proprietes(lu.tuiles[y * lu.largeur + x]!).solide;
     // les caissons (T) et barils (%) des réactions en chaîne ne sont pas des attractions : `pose` les a vérifiés
-    const poses = POSES[id]!.filter(([c]) => c !== 'T' && c !== '%');
+    const poses = TOUTES_POSES[id]!.filter(([c]) => c !== 'T' && c !== '%');
     for (const [c, x, y] of poses) {
       if (c === '>' || c === '<') {
         // la porte pose sur du socle incassable, sur ses cinq colonnes, avec de la place au-dessus

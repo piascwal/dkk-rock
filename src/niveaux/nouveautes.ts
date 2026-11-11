@@ -6,6 +6,10 @@ import { CARTE_FORET_REFONTE } from './refontes/07-foret';
 import { CARTE_PORT_REFONTE } from './refontes/08-port';
 import { CARTE_GROIX_REFONTE } from './refontes/09-groix';
 import { CARTE_TUVES_REFONTE } from './refontes/13-tuves';
+import { CARTE_BEAUVAIS_REFONTE } from './refontes/17-beauvais';
+import { CARTE_LIMERICK_REFONTE } from './refontes/18-limerick';
+import { CARTE_LUND_REFONTE } from './refontes/19-lund';
+import { CARTE_MARSEILLE_REFONTE } from './refontes/21-marseille';
 
 /**
  * Les nouveautés de gameplay, posées sur les cartes des niveaux, sans rien pour les
@@ -207,4 +211,87 @@ export const NOUVEAUTES_PUBLIEES: Readonly<Record<string, Partial<DefNiveau>>> =
   foret: { carte: pose(CARTE_FORET_REFONTE, POSES['foret']!) },
   port: { carte: pose(CARTE_PORT_REFONTE, POSES['port']!) },
   groix: { carte: pose(CARTE_GROIX_REFONTE, POSES['groix']!) },
+};
+
+/**
+ * Les nouveautés à l'essai (Options → Mode essai → « Niveaux refaits »), propagées à l'International Tour : un élément par niveau
+ * en plus du téléporteur, avec ses explosifs posés pour les réactions en chaîne (voir la règle plus haut).
+ */
+export const POSES_ESSAI: Readonly<Record<string, readonly Pose[]>> = {
+  // le téléporteur vers la cave la plus profonde (47 rangées), et deux rangées de trois projecteurs, deux barils empilés sous chacun
+  marseille: [
+    ['>', 700, 31],
+    ['<', 696, 78],
+    ['"', 242, 43],
+    ['%', 242, 47],
+    ['%', 242, 46],
+    ['"', 245, 43],
+    ['%', 245, 47],
+    ['%', 245, 46],
+    ['"', 248, 43],
+    ['%', 248, 47],
+    ['%', 248, 46],
+    ['"', 584, 52],
+    ['%', 584, 57],
+    ['%', 584, 56],
+    ['"', 587, 52],
+    ['%', 587, 57],
+    ['%', 587, 56],
+    ['"', 590, 52],
+    ['%', 590, 57],
+    ['%', 590, 56],
+  ],
+  // le téléporteur (32 rangées plus bas), et deux tonneaux-fusées, un caisson et un baril au bout de leur course
+  beauvais: [
+    ['>', 202, 44],
+    ['<', 202, 76],
+    [':', 364, 46],
+    ['T', 382, 46],
+    ['%', 383, 46],
+    [':', 673, 54],
+    ['T', 655, 54],
+    ['%', 654, 54],
+  ],
+  // le téléporteur (32 rangées plus bas), et deux rangées de trois projecteurs, deux barils empilés sous chacun
+  lund: [
+    ['>', 361, 45],
+    ['<', 361, 77],
+    ['"', 176, 53],
+    ['%', 176, 57],
+    ['%', 176, 56],
+    ['"', 179, 53],
+    ['%', 179, 57],
+    ['%', 179, 56],
+    ['"', 182, 53],
+    ['%', 182, 57],
+    ['%', 182, 56],
+    ['"', 711, 40],
+    ['%', 711, 45],
+    ['%', 711, 44],
+    ['"', 714, 40],
+    ['%', 714, 45],
+    ['%', 714, 44],
+    ['"', 717, 40],
+    ['%', 717, 45],
+    ['%', 717, 44],
+  ],
+  // le téléporteur (26 rangées plus bas), et deux tonneaux-fusées, un caisson et un baril au bout de leur course
+  limerick: [
+    ['>', 101, 47],
+    ['<', 102, 73],
+    [':', 306, 59],
+    ['T', 324, 59],
+    ['%', 325, 59],
+    [':', 495, 50],
+    ['T', 477, 50],
+    ['%', 476, 50],
+  ],
+};
+
+/** Les niveaux à l'essai (refontes.ts, `ESSAIS`) : leur carte refaite, avec ces nouveautés. */
+export const ESSAIS_NOUVEAUTES: Readonly<Record<string, Partial<DefNiveau>>> = {
+  marseille: { carte: pose(CARTE_MARSEILLE_REFONTE, POSES_ESSAI['marseille']!) },
+  beauvais: { carte: pose(CARTE_BEAUVAIS_REFONTE, POSES_ESSAI['beauvais']!) },
+  lund: { carte: pose(CARTE_LUND_REFONTE, POSES_ESSAI['lund']!) },
+  limerick: { carte: pose(CARTE_LIMERICK_REFONTE, POSES_ESSAI['limerick']!) },
 };
