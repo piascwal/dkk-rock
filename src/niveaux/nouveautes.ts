@@ -2,6 +2,9 @@ import { CARTE_STC } from './cartes/01-stc';
 import { CARTE_ALPAGES } from './cartes/02-alpages';
 import type { DefNiveau } from './format';
 import { CARTE_CIMES_REFONTE } from './refontes/03-cimes';
+import { CARTE_FORET_REFONTE } from './refontes/07-foret';
+import { CARTE_PORT_REFONTE } from './refontes/08-port';
+import { CARTE_GROIX_REFONTE } from './refontes/09-groix';
 import { CARTE_TUVES_REFONTE } from './refontes/13-tuves';
 
 /**
@@ -9,13 +12,15 @@ import { CARTE_TUVES_REFONTE } from './refontes/13-tuves';
  * annoncer : on les découvre en jouant. Elles reviennent d'un niveau à l'autre, de plus en plus mêlées, et certaines sont aperçues
  * un niveau plus tôt.
  *
- *   Saint-Cézaire : la grosse caisse trampoline (`_`) ; un téléporteur (`>`, et `<` dans la cave) vers une cave ; on aperçoit une bonbonne
- *   le pont des Tuves : la bonbonne de fumée (`:`) ; un téléporteur ; des projecteurs suspendus (`"`) vers la fin
+ *   Saint-Cézaire : la grosse caisse trampoline (`_`) ; on aperçoit une bonbonne
+ *   le pont des Tuves : la bonbonne de fumée (`:`) ; un téléporteur (`>` au sol, `<` tout au fond d'une grande cave) ; des projecteurs suspendus (`"`) vers la fin
  *   les Alpages : des projecteurs suspendus en chaîne (dans la salle de bois du début), avec les précédentes
  *   les Cimes : le sonneur d'alarme (`?`) et sa sirène (`}`), avec tout le reste
+ *   la Forêt, le Port, Groix : le téléporteur seul, vers leurs caves les plus profondes (une quarantaine de rangées plus bas)
  *
  * Les emplacements ont été choisis sur les cartes publiées (un rebord à atteindre pour une grosse caisse, un long plat pour les
- * autres, un plafond au-dessus d'ennemis ou de barils pour un projecteur, un sol dégagé de chaque côté pour une porte de téléporteur, en haut et dans la grande salle de la cave la plus proche) ;
+ * autres, un plafond au-dessus d'ennemis ou de barils pour un projecteur, un sol dégagé de chaque côté pour une porte de téléporteur : en haut au niveau du sol, en bas dans la cave la plus profonde dont
+ * on peut remonter) ;
  * `pose` vérifie que chacun tient (test).
  *
  * Règle de level design, à reprendre dans chaque niveau où l'on propage ces nouveautés : des objets explosifs (caissons `T`, barils
@@ -67,6 +72,19 @@ export function pose(carte: readonly string[], poses: readonly Pose[]): string[]
 }
 
 export const POSES: Readonly<Record<string, readonly Pose[]>> = {
+  // le Breizh Tour : la porte au sol, l'autre tout au fond des plus profondes caves (de 39 à 52 rangées plus bas), à remonter
+  foret: [
+    ['>', 400, 39],
+    ['<', 419, 78],
+  ],
+  port: [
+    ['>', 204, 34],
+    ['<', 203, 73],
+  ],
+  groix: [
+    ['>', 232, 30],
+    ['<', 246, 82],
+  ],
   stc: [
     ['_', 6, 29],
     ['_', 98, 29],
@@ -75,9 +93,6 @@ export const POSES: Readonly<Record<string, readonly Pose[]>> = {
     ['_', 449, 29],
     ['_', 513, 23],
     ['_', 638, 23],
-    // un téléporteur vers la première cave (la cage est à côté)
-    ['>', 54, 29],
-    ['<', 55, 37],
     // aperçue : une bonbonne, vers la fin
     [':', 506, 23],
   ],
@@ -93,8 +108,9 @@ export const POSES: Readonly<Record<string, readonly Pose[]>> = {
     [':', 621, 57],
     ['_', 102, 45],
     ['_', 423, 45],
-    ['>', 42, 41],
-    ['<', 46, 52],
+    // un téléporteur : la porte au sol du pont, l'autre au fond de la grande galerie d'eau qu'il faut remonter
+    ['>', 448, 45],
+    ['<', 457, 63],
     // vers la fin : trois projecteurs en chaîne au-dessus de ceux qui gardent le passage
     ['"', 430, 34],
     ['"', 433, 34],
@@ -135,8 +151,6 @@ export const POSES: Readonly<Record<string, readonly Pose[]>> = {
     ['_', 228, 33],
     ['_', 293, 9],
     ['_', 462, 33],
-    ['>', 35, 33],
-    ['<', 30, 41],
     // dans la salle de bois du début, sur le chemin : cinq projecteurs au-dessus des gardes et d'un caisson de basses
     ['"', 60, 31],
     ['"', 64, 31],
@@ -168,8 +182,6 @@ export const POSES: Readonly<Record<string, readonly Pose[]>> = {
     ['_', 40, 85],
     ['_', 83, 64],
     ['_', 212, 58],
-    ['>', 363, 28],
-    ['<', 363, 40],
     ['"', 294, 39],
     ['"', 297, 39],
     ['"', 446, 40],
@@ -192,4 +204,7 @@ export const ESSAIS_NOUVEAUTES: Readonly<Record<string, Partial<DefNiveau>>> = {
   tuves: { carte: pose(CARTE_TUVES_REFONTE, POSES['tuves']!) },
   alpages: { carte: pose(CARTE_ALPAGES, POSES['alpages']!) },
   cimes: { carte: pose(CARTE_CIMES_REFONTE, POSES['cimes']!) },
+  foret: { carte: pose(CARTE_FORET_REFONTE, POSES['foret']!) },
+  port: { carte: pose(CARTE_PORT_REFONTE, POSES['port']!) },
+  groix: { carte: pose(CARTE_GROIX_REFONTE, POSES['groix']!) },
 };
