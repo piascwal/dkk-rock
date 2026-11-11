@@ -86,9 +86,9 @@ export const POSES: Readonly<Record<string, readonly Pose[]>> = {
     ['<', 301, 82],
   ],
   stc: [
-    // des trampolines muraux : on les heurte sans pousser vers le mur, ils lancent en cloche de l'autre côté du vide
+    // trampolines muraux sur le chemin : on les heurte sans pousser vers le mur, ils lancent en cloche de l'autre côté
     ['`', 97, 29],
-    ['`', 462, 29],
+    ['`', 177, 23],
     ['_', 6, 29],
     ['_', 98, 29],
     ['_', 140, 29],
@@ -100,8 +100,10 @@ export const POSES: Readonly<Record<string, readonly Pose[]>> = {
     [':', 506, 23],
   ],
   tuves: [
-    // un trampoline mural contre la paroi du fort
-    ['`', 441, 40],
+    // trampolines muraux sur le chemin : on les heurte sans pousser vers le mur, ils lancent en cloche de l'autre côté
+    ['`', 48, 43],
+    ['`', 323, 57],
+    ['`', 374, 57],
     [':', 10, 39],
     [':', 98, 45],
     [':', 204, 40],
@@ -147,9 +149,10 @@ export const POSES: Readonly<Record<string, readonly Pose[]>> = {
     ['%', 436, 35],
   ],
   alpages: [
-    // des trampolines muraux dans les puits
+    // trampolines muraux sur le chemin : on les heurte sans pousser vers le mur, ils lancent en cloche de l'autre côté
     ['`', 249, 21],
-    ['`', 283, 40],
+    ['`', 230, 27],
+    ['`', 251, 33],
     [':', 86, 33],
     [':', 321, 33],
     [':', 427, 33],
@@ -182,11 +185,10 @@ export const POSES: Readonly<Record<string, readonly Pose[]>> = {
     ['%', 80, 32],
   ],
   cimes: [
-    // des trampolines muraux : deux, face à face, pour monter le puits en zigzag ; d'autres pour passer le vide
-    ['`', 379, 57],
-    ['`', 387, 62],
-    ['`', 407, 53],
-    ['`', 317, 52],
+    // trampolines muraux sur le chemin : on les heurte sans pousser vers le mur, ils lancent en cloche de l'autre côté
+    ['`', 305, 46],
+    ['`', 394, 40],
+    ['`', 498, 31],
     ['?', 167, 58],
     ['}', 179, 58],
     ['?', 326, 40],
