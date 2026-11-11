@@ -128,7 +128,7 @@ export const G = {
   TREMPLIN: 94,
   BONBONNE: 95,
   SIRENE: 96,
-  MONTE_CHARGE: 97,
+  TELEPORTEUR: 97,
   PROJECTEUR: 98,
 } as const;
 

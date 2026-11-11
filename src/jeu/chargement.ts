@@ -1,7 +1,7 @@
 import { TUILE } from '../config';
 import { ARMES_RAMASSABLES } from '../entites/armes';
 import { Bonbonne, Tremplin } from '../entites/attractions';
-import { MonteCharge } from '../entites/monte-charge';
+import { Teleporteur } from '../entites/teleporteur';
 import { Projecteur } from '../entites/suspendus';
 import { Baril } from '../entites/baril';
 import { ENNEMIS_NOUVEAUX, Sirene } from '../entites/ennemis/alarme';
@@ -18,6 +18,17 @@ import { BlocTombant, Objet } from '../entites/objets';
 import { T, proprietes } from '../monde/tuiles';
 import { peupleSibylles } from './sibylles';
 import type { Partie } from './partie';
+
+/** Chaque porte du haut est reliée à la porte du bas la plus proche (et celle-ci à elle) ; les portes seules restent éteintes. */
+function relieLesPortes(portes: readonly { haut: boolean; porte: Teleporteur }[]): void {
+  const dist = (a: Teleporteur, b: Teleporteur) => Math.hypot(a.x - b.x, a.y - b.y);
+  for (const haut of portes.filter((q) => q.haut)) {
+    const bas = portes
+      .filter((q) => !q.haut && !q.porte.autre)
+      .sort((a, b) => dist(haut.porte, a.porte) - dist(haut.porte, b.porte))[0];
+    if (bas) Teleporteur.relie(haut.porte, bas.porte);
+  }
+}
 
 /** Le module où se trouve la colonne x (ses bornes en pixels), ou null : hors d'un module, le rider s'en tient à sa ronde. */
 function zoneDe(
@@ -43,18 +54,24 @@ export function peuple(p: Partie): void {
   });
   for (const c of lu.cages) p.ajoute(new Objet(p, 'cage', c.x, c.y));
   for (const b of lu.barils) p.ajoute(new Baril(p, b.tx, b.ty));
-  for (const a of lu.attractions)
+  const portes: { haut: boolean; porte: Teleporteur }[] = [];
+  for (const a of lu.attractions) {
+    if (a.c === '>' || a.c === '<') {
+      portes.push({ haut: a.c === '>', porte: new Teleporteur(p, a.tx, a.ty) });
+      p.ajoute(portes[portes.length - 1]!.porte);
+      continue;
+    }
     p.ajoute(
       a.c === '_'
         ? new Tremplin(p, a.tx, a.ty)
         : a.c === ':'
           ? new Bonbonne(p, a.tx, a.ty)
-          : a.c === '>'
-            ? new MonteCharge(p, a.tx, a.ty)
-            : a.c === '"'
-              ? new Projecteur(p, a.tx, a.ty)
-              : new Sirene(p, a.tx, a.ty, ennemiDuCoin('a', lu.def.theme) ?? ENNEMIS_PAR_LETTRE['a']!),
+          : a.c === '"'
+            ? new Projecteur(p, a.tx, a.ty)
+            : new Sirene(p, a.tx, a.ty, ennemiDuCoin('a', lu.def.theme) ?? ENNEMIS_PAR_LETTRE['a']!),
     );
+  }
+  relieLesPortes(portes);
   for (const a of lu.armes)
     p.ajoute(new Objet(p, 'arme', a.x, a.y, p.rng.entier(1, ARMES_RAMASSABLES.length)));
   for (const s of lu.soins) p.ajoute(new Objet(p, 'soin', s.x, s.y));

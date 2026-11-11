@@ -26,7 +26,7 @@ export const DESSINS_ENNEMIS_NOUVEAUX: Partial<Record<number, Dessin>> = {
   },
 };
 
-/** Les objets, dessinés pieds en (0, 0) : `e` et `f` comme dans leur vue (voir entites/attractions.ts, monte-charge.ts, suspendus.ts). */
+/** Les objets, dessinés pieds en (0, 0) : `e` et `f` comme dans leur vue (voir entites/attractions.ts, teleporteur.ts, suspendus.ts). */
 const OBJETS: Partial<Record<number, Dessin>> = {
   // (repli, si les images ne sont pas chargées) la grosse caisse couchée, la peau vers le haut : `f` > 0 quand on vient de
   // rebondir (la peau est enfoncée)
@@ -76,14 +76,13 @@ const OBJETS: Partial<Record<number, Dessin>> = {
       p(cote * 7 - 1, -22, 1, 5, '#ff8080');
     }
   },
-  // la plate-forme du monte-charge (ses câbles sont tracés à part : leur longueur change)
-  [G.MONTE_CHARGE]: (p) => {
-    p(-15, -6, 30, 6, '#46525a');
-    p(-15, -6, 30, 2, '#ffd23f');
-    for (let x = -15; x < 15; x += 6) p(x, -6, 3, 2, '#1a1a1e'); // les rayures de sécurité
-    p(-15, -1, 30, 1, '#2a2a30');
-    p(-15, -8, 2, 2, '#8a96a3'); // les anneaux des câbles
-    p(13, -8, 2, 2, '#8a96a3');
+  // (repli, si l'image n'est pas chargée) le téléporteur : un cadre de métal, un rond sombre qui s'allume
+  [G.TELEPORTEUR]: (p, e) => {
+    p(-20, -25, 40, 25, '#46525a');
+    p(-20, -25, 40, 3, '#8a5a2a');
+    p(-9, -21, 18, 18, '#2a2a3a');
+    if (e) p(-7, -19, 14, 14, e === 2 ? '#5aa0ff' : '#33507a');
+    p(14, -8, 4, 3, '#4adf6a');
   },
   // le projecteur de scène : `e` 0 il pend, 1 il tombe, 2 l'épave (ses câbles, tracés à part)
   [G.PROJECTEUR]: (p, e) => {
@@ -139,6 +138,23 @@ function dessineTonneau(ctx: CanvasRenderingContext2D, v: { e: number; f: number
   return ok;
 }
 
+/**
+ * Le téléporteur : éteint (« sealed unit »), il vacille en s'allumant (`e` 1), puis le tourbillon tourne derrière son cadre (`e` 2,
+ * `f` : le tour, voir entites/teleporteur.ts). Le tourbillon est une image tournée sur le centre du rond : rien n'est recalculé.
+ */
+function dessineTeleporteur(ctx: CanvasRenderingContext2D, v: { e: number; f: number }): boolean {
+  const ouvert = v.e === 2 || (v.e === 1 && Math.floor(v.f / 6) % 2 === 1);
+  if (!ouvert) return dessineDecorFeuille(ctx, 'teleporteur', 0);
+  // le centre du rond, par rapport aux pieds (voir feuilles-attractions.ts)
+  ctx.save();
+  ctx.translate(0.4, -9.6);
+  ctx.rotate((v.f / 144) * Math.PI * 2);
+  ctx.translate(-0.4, 9.6);
+  const ok = dessineDecorFeuille(ctx, 'teleporteur', 2);
+  ctx.restore();
+  return ok && dessineDecorFeuille(ctx, 'teleporteur', 1);
+}
+
 /** Les états à préparer d'avance (voir prechauffage.ts) : [genre, e, f]. */
 export const ETATS_NOUVEAUTES: readonly (readonly [number, number, number])[] = [
   [G.TREMPLIN, 0, 0],
@@ -152,7 +168,8 @@ export const ETATS_NOUVEAUTES: readonly (readonly [number, number, number])[] = 
   [G.SIRENE, 1, 8],
   [G.SIRENE, 1, 12],
   [G.SIRENE, 2, 0],
-  [G.MONTE_CHARGE, 0, 0],
+  [G.TELEPORTEUR, 0, 0],
+  [G.TELEPORTEUR, 2, 0],
   [G.PROJECTEUR, 0, 0],
   [G.PROJECTEUR, 1, 0],
   [G.PROJECTEUR, 2, 0],
@@ -170,17 +187,14 @@ export function dessineNouveaute(
   // avec leurs images (planches fournies) quand elles sont chargées : le trampoline s'écrase, le tonneau se couche
   if (v.g === G.TREMPLIN && dessineTremplin(ctx, v)) return true;
   if (v.g === G.BONBONNE && dessineTonneau(ctx, v, blanc)) return true;
+  if (v.g === G.TELEPORTEUR && dessineTeleporteur(ctx, v)) return true;
   const dessin = OBJETS[v.g];
   if (!dessin) return false;
   // un état = une image : la sirène tourne (4 images), le reste ne dépend que de `e`
   const f = v.g === G.SIRENE ? Math.floor(v.f / 4) * 4 : v.g === G.TREMPLIN ? Math.min(1, v.f) : 0;
   dessineEnCache(ctx, (q) => dessin(blanc ? (x, y, w, h) => q(x, y, w, h, '#ffffff') : q, v.e, f));
   ctx.fillStyle = blanc ? '#ffffff' : '#1a1a1e';
-  if (v.g === G.MONTE_CHARGE) {
-    const l = v.f * 2;
-    ctx.fillRect(-14, -8 - l, 1, l);
-    ctx.fillRect(13, -8 - l, 1, l);
-  } else if (v.g === G.PROJECTEUR && v.e === 0) {
+  if (v.g === G.PROJECTEUR && v.e === 0) {
     ctx.fillRect(-0.5, -12 - v.f * 2, 1, v.f * 2);
   }
   return true;

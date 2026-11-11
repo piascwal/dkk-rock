@@ -5,7 +5,7 @@ const corpsDe = (c: Cible): Corps | undefined => (c as Partial<{ corps: Corps }>
 
 /**
  * Ce qui se tient sur le dessus de `t` (les pieds posés dessus, sans monter) : héros, ennemis et accessoires. Ils voyagent avec lui
- * (le monte-charge, le tonneau-fusée : voir monte-charge.ts et attractions.ts). Remplit `sortie`.
+ * (le tonneau-fusée : voir attractions.ts). Remplit `sortie`.
  */
 export function passagersSur(ctx: Contexte, t: Corps, sortie: Corps[]): void {
   for (const liste of [ctx.cibles('tous'), ctx.props()])

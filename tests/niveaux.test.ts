@@ -45,7 +45,7 @@ describe('les niveaux', () => {
   it('refuse une carte incohérente', () => {
     const base = { ...NIVEAUX[0]!, dialogues: {} };
     expect(() => litNiveau({ ...base, carte: ['   ', '###'] })).toThrow(ErreurNiveau);
-    expect(() => litNiveau({ ...base, carte: [' @ F ', '#####', ' <   '] })).toThrow(/inconnu/);
+    expect(() => litNiveau({ ...base, carte: [' @ F ', '#####', ' §   '] })).toThrow(/inconnu/);
     expect(() => litNiveau({ ...base, carte: ['@ ( F', '#####'] })).toThrow(/tyrolienne/);
     expect(() => litNiveau({ ...base, carte: ['@ 7 F', '#####'] })).toThrow(/dialogue/);
   });

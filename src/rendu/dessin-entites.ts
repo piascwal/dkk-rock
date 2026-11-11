@@ -252,7 +252,7 @@ export function dessineEntite(
     const dessin = (DESSINS_ENNEMIS[v.g] ?? DESSINS_BOSS[v.g])!;
     dessineEnCache(ctx, (q) => dessin(blanc ? (x0, y0, w, h) => q(x0, y0, w, h, '#ffffff') : q, v.e, v.f));
   } else if (dessineNouveaute(ctx, v, blanc)) {
-    // les nouveautés (grosse caisse, bonbonne, sirène, monte-charge, projecteur) : depuis le cache, en blanc quand elles clignotent
+    // les nouveautés (grosse caisse, bonbonne, sirène, téléporteur, projecteur) : depuis le cache, en blanc quand elles clignotent
   } else if (v.g === G.ARME && dessineBonus(ctx, v.f)) {
     // une arme à icône fournie : l'icône flotte à la place de la mallette
   } else if (DESSINS_OBJETS[v.g]) {

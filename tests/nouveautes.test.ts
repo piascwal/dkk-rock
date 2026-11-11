@@ -3,7 +3,8 @@ import { TUILE, VIES_DEPART } from '../src/config';
 import { Bonbonne, Tremplin } from '../src/entites/attractions';
 import { Sirene } from '../src/entites/ennemis/alarme';
 import { ENNEMIS_PAR_LETTRE } from '../src/entites/ennemis/definitions';
-import { MonteCharge } from '../src/entites/monte-charge';
+import { Teleporteur } from '../src/entites/teleporteur';
+import { C } from '../src/jeu/commandes';
 import { Projecteur } from '../src/entites/suspendus';
 import { Ennemi } from '../src/entites/ennemis/ennemi';
 import { Partie } from '../src/jeu/partie';
@@ -106,19 +107,21 @@ describe('le tonneau-fusée', () => {
   });
 });
 
-describe('le monte-charge', () => {
-  /** Un puits de cinq tuiles creusé dans le sol, le monte-charge à son sommet, le héros juste à côté. */
-  const partieAvecPuits = () => {
-    const vide = ' '.repeat(34);
+describe('le téléporteur', () => {
+  /** Un sol, une cave dessous ; une porte en haut (`>`), l'autre dans la cave (`<`) ; le héros au départ à gauche. */
+  const partieAvecPortes = () => {
+    const vide = ' '.repeat(40);
     const carte = [
       ...Array(8).fill(vide),
-      '@' + ' '.repeat(32) + 'F',
-      '###>.' + '#'.repeat(29),
-      ...Array(4).fill('###..' + '#'.repeat(29)),
-      'X'.repeat(34),
+      '@' + ' '.repeat(7) + '>' + ' '.repeat(30) + 'F',
+      '#'.repeat(40),
+      '#' + ' '.repeat(38) + '#',
+      '#' + ' '.repeat(28) + '<' + ' '.repeat(9) + '#',
+      'X'.repeat(40),
+      'X'.repeat(40),
     ];
     const p = new Partie({
-      niveau: ajouteNiveauEssai({ ...NIVEAUX[0]!, id: 'essai-monte', carte, decor: [] }),
+      niveau: ajouteNiveauEssai({ ...NIVEAUX[0]!, id: 'essai-portes', carte, decor: [] }),
       drapeau: -1,
       vies: VIES_DEPART,
       score: 0,
@@ -127,31 +130,54 @@ describe('le monte-charge', () => {
     while (p.phase === 'histoire') p.suivant();
     return p;
   };
-  it('emmène le héros qui s’y tient jusqu’au fond du puits, puis le remonte', () => {
-    const p = partieAvecPuits();
-    const [j, m] = [p.joueurs[0]!, un(p, MonteCharge)];
-    const haut = m.corps.y;
+  const portes = (p: Partie) => p.entites.filter((e): e is Teleporteur => e instanceof Teleporteur);
+  const devant = (p: Partie, t: Teleporteur) => {
+    const j = p.joueurs[0]!;
+    Object.assign(j.corps, { x: t.x - j.corps.w / 2, y: t.y - j.corps.h, vx: 0, vy: 0 });
+  };
+
+  it('s’allume devant un héros qui s’arrête, puis l’emmène à l’autre porte', () => {
+    const p = partieAvecPortes();
+    const [haut, bas] = portes(p) as [Teleporteur, Teleporteur];
+    expect(haut.autre).toBe(bas);
+    const j = p.joueurs[0]!;
     avance(p, 20);
-    Object.assign(j.corps, { x: m.corps.x + 8, y: haut - j.corps.h, vx: 0, vy: 0 });
-    // une demi-seconde d'attente, puis il descend avec lui
-    avance(p, 70);
-    expect(m.corps.y).toBeGreaterThan(haut + TUILE);
-    expect(Math.abs(j.corps.y + j.corps.h - m.corps.y)).toBeLessThan(2);
-    // au fond du puits (cinq tuiles), toujours dessus
-    avance(p, 80);
-    expect(m.corps.y).toBe(haut + 5 * TUILE);
-    expect(Math.abs(j.corps.y + j.corps.h - m.corps.y)).toBeLessThan(2);
-    // s'il reste, il le remonte (après un temps pour en descendre)
-    avance(p, 180);
-    expect(m.corps.y).toBe(haut);
-    expect(Math.abs(j.corps.y + j.corps.h - m.corps.y)).toBeLessThan(2);
-  });
-  it('ne bouge pas tant que personne n’est dessus', () => {
-    const p = partieAvecPuits();
-    const m = un(p, MonteCharge);
-    const y0 = m.corps.y;
+    expect(haut.vue().e).toBe(0);
+    devant(p, haut);
+    avance(p, 5);
+    expect(haut.vue().e).toBe(1);
+    avance(p, 20);
+    expect(haut.vue().e).toBe(2);
+    avance(p, 90);
+    expect(Math.abs(j.corps.x + j.corps.w / 2 - bas.x)).toBeLessThan(6);
+    expect(Math.abs(j.corps.y + j.corps.h - bas.y)).toBeLessThan(3);
+    // à l'arrivée, la porte ne le reprend pas tant qu'il n'est pas parti
     avance(p, 200);
-    expect(m.corps.y).toBe(y0);
+    expect(Math.abs(j.corps.x + j.corps.w / 2 - bas.x)).toBeLessThan(6);
+  });
+  it('part tout de suite avec la flèche du bas, une fois allumé', () => {
+    const p = partieAvecPortes();
+    const [haut, bas] = portes(p) as [Teleporteur, Teleporteur];
+    const j = p.joueurs[0]!;
+    avance(p, 20);
+    devant(p, haut);
+    avance(p, 5, C.BAS);
+    expect(Math.abs(j.corps.x + j.corps.w / 2 - haut.x)).toBeLessThan(6); // pas encore allumée
+    avance(p, 15, C.BAS);
+    expect(Math.abs(j.corps.x + j.corps.w / 2 - bas.x)).toBeLessThan(6);
+  });
+  it('reste éteinte quand on ne fait que passer', () => {
+    const p = partieAvecPortes();
+    const [haut] = portes(p) as [Teleporteur, Teleporteur];
+    avance(p, 20);
+    for (let i = 0; i < 5; i++) {
+      devant(p, haut);
+      avance(p, 8);
+      const j = p.joueurs[0]!;
+      j.corps.x += 60;
+      avance(p, 2);
+    }
+    expect(Math.abs(p.joueurs[0]!.corps.x - haut.x)).toBeGreaterThan(20);
   });
 });
 
@@ -241,11 +267,11 @@ describe('les niveaux à l’essai', () => {
     const solide = (x: number, y: number) => proprietes(lu.tuiles[y * lu.largeur + x]!).solide;
     // les caissons (T) et barils (%) des réactions en chaîne ne sont pas des attractions : `pose` les a vérifiés
     const poses = POSES[id]!.filter(([c]) => c !== 'T' && c !== '%');
-    for (const [c, x, y, sol] of poses) {
-      if (c === '>') {
-        // des deux côtés de la case de départ, le sol de la surface ; au fond, le sol de la cave sous les deux colonnes
-        expect(solide(x - 1, y) && solide(x + 2, y), `${c} en ${x},${y} : la surface`).toBe(true);
-        expect(solide(x, sol!) && solide(x + 1, sol!), `${c} en ${x},${y} : le fond`).toBe(true);
+    for (const [c, x, y] of poses) {
+      if (c === '>' || c === '<') {
+        // la porte pose sur un sol plein, sur ses trois colonnes, avec de la place au-dessus
+        for (const dx of [-1, 0, 1]) expect(solide(x + dx, y + 1), `${c} en ${x},${y} : le sol`).toBe(true);
+        expect(solide(x, y - 1) || solide(x, y - 2), `${c} en ${x},${y} : de la place`).toBe(false);
       } else if (c === '"') {
         let r = y - 1;
         while (r > 0 && !solide(x, r)) r--;

@@ -19,5 +19,7 @@ export const DECOR_ATTRACTIONS: Record<string, Feuille> = {
   'tonneau-metal': image('tonneau-metal.png', 129, 157, 8.5),
   // 18 pixels de large, 16,7 de haut (rogné sous la dernière ligne pleine : le fût rond est enterré)
   'trampoline-metal': image('trampoline-metal.png', 156, 145, 8.7),
+  // le téléporteur : éteint, le cadre (le rond transparent), le tourbillon (il tourne derrière le cadre) ; 39,8 pixels de large, 25 de haut
+  teleporteur: { ...image('teleporteur.png', 338, 213, 8.5), images: [1, 1, 1] },
   'trampoline-bois': image('trampoline-bois.png', 156, 145, 8.7),
 };
