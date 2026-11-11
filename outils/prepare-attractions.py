@@ -27,6 +27,12 @@ def main():
         im = pc.detoure(pc.natif(np.array(Image.open(SRC / f'{nom}.jpg').convert('RGB')).astype(float), GRAIN))
         p = Image.fromarray(im)
         p = p.crop(p.getbbox())
+        if nom.startswith('trampoline'):
+            # le fût est rond par le bas : on rogne sous la dernière ligne pleine (sans pixel transparent), qui pose sur le sol
+            alpha = np.array(p)[..., 3] > 0
+            largeurs = alpha.sum(1)
+            pleines = np.nonzero(largeurs == largeurs[len(largeurs) // 2 :].max())[0]  # la largeur du fût (moitié basse)
+            p = p.crop((0, 0, p.width, int(pleines.max()) + 1))
         q = p.quantize(80, method=Image.FASTOCTREE, dither=Image.NONE)
         sortie = pc.SPRITES / f'{nom}.png'
         q.save(sortie, optimize=True)
