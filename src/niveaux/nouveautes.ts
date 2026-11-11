@@ -16,7 +16,7 @@ import { CARTE_TUVES_REFONTE } from './refontes/13-tuves';
  *   le pont des Tuves : la bonbonne de fumée (`:`) ; un téléporteur (`>` au sol, `<` tout au fond d'une grande cave) ; des projecteurs suspendus (`"`) vers la fin
  *   les Alpages : des projecteurs suspendus en chaîne (dans la salle de bois du début), avec les précédentes
  *   les Cimes : le sonneur d'alarme (`?`) et sa sirène (`}`), avec tout le reste
- *   la Forêt, le Port, Groix : le téléporteur seul, vers leurs caves les plus profondes (une quarantaine de rangées plus bas)
+ *   la Forêt, le Port, Groix : le téléporteur seul, vers leurs caves les plus profondes (35 à 43 rangées sous le chemin)
  *
  * Les emplacements ont été choisis sur les cartes publiées (un rebord à atteindre pour une grosse caisse, un long plat pour les
  * autres, un plafond au-dessus d'ennemis ou de barils pour un projecteur, un sol dégagé de chaque côté pour une porte de téléporteur : en haut au niveau du sol, en bas dans la cave la plus profonde dont
@@ -72,18 +72,18 @@ export function pose(carte: readonly string[], poses: readonly Pose[]): string[]
 }
 
 export const POSES: Readonly<Record<string, readonly Pose[]>> = {
-  // le Breizh Tour : la porte au sol, l'autre tout au fond des plus profondes caves (de 39 à 52 rangées plus bas), à remonter
+  // le Breizh Tour : la porte sur le chemin du niveau, l'autre tout au fond d'une des plus profondes caves (35 à 43 rangées plus bas), à remonter
   foret: [
-    ['>', 400, 39],
-    ['<', 419, 78],
+    ['>', 393, 39],
+    ['<', 411, 70],
   ],
   port: [
-    ['>', 204, 34],
-    ['<', 203, 73],
+    ['>', 609, 57],
+    ['<', 603, 74],
   ],
   groix: [
-    ['>', 232, 30],
-    ['<', 246, 82],
+    ['>', 292, 53],
+    ['<', 301, 82],
   ],
   stc: [
     // des trampolines muraux : on les heurte sans pousser vers le mur, ils lancent en cloche de l'autre côté du vide
@@ -113,9 +113,9 @@ export const POSES: Readonly<Record<string, readonly Pose[]>> = {
     [':', 621, 57],
     ['_', 102, 45],
     ['_', 423, 45],
-    // un téléporteur : la porte au sol du pont, l'autre au fond de la grande galerie d'eau qu'il faut remonter
-    ['>', 448, 45],
-    ['<', 457, 63],
+    // un téléporteur : la porte sur le chemin (au début du pont), l'autre au fond d'une cave qu'il faut remonter
+    ['>', 58, 45],
+    ['<', 49, 62],
     // vers la fin : trois projecteurs en chaîne au-dessus de ceux qui gardent le passage
     ['"', 430, 34],
     ['"', 433, 34],

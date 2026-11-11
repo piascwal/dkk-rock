@@ -59,9 +59,17 @@ function traite(
     case 'tuile':
       if (e.t !== 0) break;
       if (chrono.actif) chrono.tuiles++;
-      p.debris((e.x + 0.5) * TUILE, (e.y + 0.5) * TUILE, proprietes(e.avant).debris, 7);
+      // une chaîne d'explosions casse des dizaines de tuiles : plus il y a de particules vivantes, moins chacune en donne (le
+      // téléphone ne suit plus au-delà de quelques centaines)
+      p.debris(
+        (e.x + 0.5) * TUILE,
+        (e.y + 0.5) * TUILE,
+        proprietes(e.avant).debris,
+        p.liste.length > 300 ? 2 : p.liste.length > 180 ? 4 : 7,
+      );
       // ce qui était posé sur cette tuile (décor) se brise aussi : des morceaux s'envolent
-      for (const o of decorParTuile.get(e.y * 100000 + e.x) ?? []) debrisDeDecor(p, o);
+      if (p.liste.length < 300)
+        for (const o of decorParTuile.get(e.y * 100000 + e.x) ?? []) debrisDeDecor(p, o);
       break;
     case 'explo':
       p.explosion(e.x, e.y, e.r);
